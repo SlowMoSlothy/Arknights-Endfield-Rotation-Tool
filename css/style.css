@@ -4,8 +4,26 @@ body {
     font-family: Arial;
 }
 
-.operator {
-    border: 1px solid #444;
+.container {
+    display: flex;
+    gap: 40px;
+}
+
+.box {
+    width: 300px;
+    min-height: 400px;
+    border: 2px dashed #555;
     padding: 10px;
-    margin: 10px;
+}
+
+.skill {
+    background: #2a2a2a;
+    margin: 5px;
+    padding: 10px;
+    cursor: grab;
+    border-radius: 6px;
+}
+
+.skill:hover {
+    background: #3a3a3a;
 }
