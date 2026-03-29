@@ -1,81 +1,26 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
-<meta charset="UTF-8">
-<title>Endfield Rotation Tool</title>
-<style>
-  body { background:#121212; color:white; font-family:Arial; }
-  .operator { border:1px solid #444; padding:10px; margin:10px; }
-</style>
+  <meta charset="UTF-8">
+  <title>Endfield Rotation Tool</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
-<h2>Arknights Endfield Rotation Simulator</h2>
+  <h2>Endfield Rotation Simulator</h2>
 
-<div id="operators"></div>
-<ul id="log"></ul>
+  <div id="operators"></div>
 
-<script>
-let time = 0;
-let totalDamage = 0;
+  <h3>Log</h3>
+  <ul id="log"></ul>
 
-const skills = [
-  { id: 1, name: "Skill A", cooldown: 5, energyCost: 20, damage: 150, lastUsed: -999 },
-  { id: 2, name: "Skill B", cooldown: 8, energyCost: 40, damage: 300, lastUsed: -999 }
-];
-
-const operators = [
-  { id: 1, name: "Operator A", energy: 100, maxEnergy: 100, skills: [1,2] }
-];
-
-function canUseSkill(skill, operator) {
-  return (time - skill.lastUsed >= skill.cooldown) &&
-         (operator.energy >= skill.energyCost);
-}
-
-function useSkill(operator, skill) {
-  skill.lastUsed = time;
-  operator.energy -= skill.energyCost;
-  totalDamage += skill.damage;
-
-  log(`${time.toFixed(1)}s: ${operator.name} benutzt ${skill.name}`);
-}
-
-function autoRotation() {
-  operators.forEach(op => {
-    const availableSkills = op.skills
-      .map(id => skills.find(s => s.id === id))
-      .filter(s => canUseSkill(s, op));
-
-    if (availableSkills.length > 0) {
-      // Priorität: höchster Schaden
-      const best = availableSkills.sort((a,b) => b.damage - a.damage)[0];
-      useSkill(op, best);
-    }
-  });
-}
-
-function regenEnergy() {
-  operators.forEach(op => {
-    op.energy = Math.min(op.maxEnergy, op.energy + 5 * 0.1);
-  });
-}
-
-function log(text) {
-  const li = document.createElement("li");
-  li.textContent = text;
-  document.getElementById("log").appendChild(li);
-}
-
-setInterval(() => {
-  time += 0.1;
-
-  regenEnergy();
-  autoRotation();
-
-}, 100);
-
-</script>
+  <!-- Wichtig: Pfade angepasst -->
+  <script src="js/data/data.js"></script>
+  <script src="js/core/simulation.js"></script>
+  <script src="js/ui/main.js"></script>
 
 </body>
+
 </html>
