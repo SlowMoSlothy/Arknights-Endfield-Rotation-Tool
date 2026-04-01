@@ -167,6 +167,22 @@ function initDragDrop() {
     });
 }
 
+function exportImage() {
+    const element = document.getElementById("rotation");
+
+    html2canvas(element, {
+        backgroundColor: "#121212",
+        scale: 2 // höhere Qualität
+    }).then(canvas => {
+
+        const link = document.createElement("a");
+        link.download = "rotation.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+
+    });
+}
+
 // ------------------
 // Init
 // ------------------

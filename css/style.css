@@ -88,3 +88,9 @@ body {
 .arrow.down.left {
     justify-content: flex-start;
 }
+
+#rotation {
+    background: #121212;
+    padding: 15px;
+    border-radius: 10px;
+}
