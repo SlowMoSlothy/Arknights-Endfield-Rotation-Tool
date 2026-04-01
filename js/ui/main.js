@@ -172,7 +172,8 @@ function exportImage() {
 
     html2canvas(element, {
         backgroundColor: "#121212",
-        scale: 2 // höhere Qualität
+        scale: 2,
+        useCORS: true
     }).then(canvas => {
 
         const link = document.createElement("a");
@@ -189,3 +190,4 @@ function exportImage() {
 renderSkills();
 initDragDrop();
 loadRotation();
+window.exportImage = exportImage;
