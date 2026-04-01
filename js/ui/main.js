@@ -170,6 +170,9 @@ function initDragDrop() {
 function exportImage() {
     const element = document.getElementById("rotation");
 
+    // 👉 Export-Modus aktivieren
+    element.classList.add("export-mode");
+
     html2canvas(element, {
         backgroundColor: "#121212",
         scale: 2,
@@ -181,9 +184,11 @@ function exportImage() {
         link.href = canvas.toDataURL("image/png");
         link.click();
 
+        // 👉 Export-Modus wieder entfernen
+        element.classList.remove("export-mode");
+
     });
 }
-
 // ------------------
 // Init
 // ------------------
