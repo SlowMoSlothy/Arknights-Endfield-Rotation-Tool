@@ -10,20 +10,81 @@ body {
 }
 
 .box {
-    width: 300px;
+    width: 320px;
     min-height: 400px;
     border: 2px dashed #555;
     padding: 10px;
 }
 
+/* Skill */
 .skill {
+    width: 60px;
+    height: 60px;
     background: #2a2a2a;
-    margin: 5px;
-    padding: 10px;
+    border-radius: 8px;
+    overflow: hidden;
     cursor: grab;
-    border-radius: 6px;
+    position: relative;
 }
 
-.skill:hover {
-    background: #3a3a3a;
+.skill img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Remove Button */
+.remove-btn {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 18px;
+    height: 18px;
+    background: red;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.remove-btn:hover {
+    background: darkred;
+}
+
+/* Grid Layout */
+.rotation-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.rotation-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.arrow {
+    font-size: 20px;
+    color: #888;
+}
+
+/* Down Arrow Position */
+.arrow.down {
+    width: 100%;
+    display: flex;
+    margin: 5px 0;
+}
+
+.arrow.down.right {
+    justify-content: flex-end;
+}
+
+.arrow.down.left {
+    justify-content: flex-start;
 }

@@ -10,9 +10,13 @@ function renderSkills() {
     skills.forEach(skill => {
         const div = document.createElement("div");
         div.className = "skill";
-        div.textContent = skill.name;
         div.dataset.id = skill.id;
 
+        const img = document.createElement("img");
+        img.src = skill.icon;
+        img.title = skill.name;
+
+        div.appendChild(img);
         list.appendChild(div);
     });
 }
@@ -24,11 +28,12 @@ function saveRotation() {
     const items = document.querySelectorAll("#rotation .skill");
 
     rotation = Array.from(items).map(el => ({
-        id: parseInt(el.dataset.id),
-        name: el.textContent.replace(/^\d+\.\s/, "")
+        uid: el.dataset.uid || crypto.randomUUID(),
+        id: parseInt(el.dataset.id)
     }));
 
     localStorage.setItem("rotation", JSON.stringify(rotation));
+    renderRotationGrid();
 }
 
 // ------------------
@@ -38,24 +43,99 @@ function loadRotation() {
     const saved = localStorage.getItem("rotation");
     if (!saved) return;
 
-    const container = document.getElementById("rotation");
-
-    JSON.parse(saved).forEach(skill => {
-        const div = document.createElement("div");
-        div.className = "skill";
-        div.textContent = skill.name;
-        div.dataset.id = skill.id;
-
-        container.appendChild(div);
-    });
+    rotation = JSON.parse(saved);
+    renderRotationGrid();
 }
 
 // ------------------
-// Sortable aktivieren
+// Grid Rendering
+// ------------------
+function renderRotationGrid() {
+    const container = document.getElementById("rotation");
+    container.innerHTML = "";
+
+    const grid = document.createElement("div");
+    grid.className = "rotation-grid";
+
+    const chunkSize = 5;
+
+    for (let i = 0; i < rotation.length; i += chunkSize) {
+
+        let rowItems = rotation.slice(i, i + chunkSize);
+        const row = document.createElement("div");
+        row.className = "rotation-row";
+
+        const isReverse = (i / chunkSize) % 2 === 1;
+
+        if (isReverse) {
+            rowItems = [...rowItems].reverse();
+        }
+
+        rowItems.forEach((entry, index) => {
+
+            const skillData = skills.find(s => s.id === entry.id);
+
+            const skillDiv = document.createElement("div");
+            skillDiv.className = "skill";
+            skillDiv.dataset.id = entry.id;
+            skillDiv.dataset.uid = entry.uid;
+
+            const img = document.createElement("img");
+            img.src = skillData.icon;
+            img.title = skillData.name;
+
+            // ❌ Remove Button
+            const removeBtn = document.createElement("div");
+            removeBtn.className = "remove-btn";
+            removeBtn.textContent = "×";
+
+            removeBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+
+                const uid = skillDiv.dataset.uid;
+                rotation = rotation.filter(s => s.uid !== uid);
+
+                localStorage.setItem("rotation", JSON.stringify(rotation));
+                renderRotationGrid();
+            });
+
+            skillDiv.appendChild(img);
+            skillDiv.appendChild(removeBtn);
+
+            row.appendChild(skillDiv);
+
+            // → oder ←
+            if (index < rowItems.length - 1) {
+                const arrow = document.createElement("div");
+                arrow.className = "arrow";
+                arrow.textContent = isReverse ? "←" : "→";
+                row.appendChild(arrow);
+            }
+        });
+
+        grid.appendChild(row);
+
+        // ↓ Pfeil
+        if (i + chunkSize < rotation.length) {
+            const downWrapper = document.createElement("div");
+            downWrapper.className = "arrow down " + (isReverse ? "left" : "right");
+
+            const arrow = document.createElement("div");
+            arrow.textContent = "↓";
+
+            downWrapper.appendChild(arrow);
+            grid.appendChild(downWrapper);
+        }
+    }
+
+    container.appendChild(grid);
+}
+
+// ------------------
+// Drag & Drop
 // ------------------
 function initDragDrop() {
 
-    // Skills (Quelle)
     new Sortable(document.getElementById("skillList"), {
         group: {
             name: "skills",
@@ -65,7 +145,6 @@ function initDragDrop() {
         sort: false
     });
 
-    // Rotation (Ziel + reorder)
     new Sortable(document.getElementById("rotation"), {
         group: {
             name: "skills",
@@ -74,42 +153,19 @@ function initDragDrop() {
         },
         animation: 150,
 
-        onAdd: function () {
-            updateNumbers();
+        onAdd: function (evt) {
+            const el = evt.item;
+
+            el.dataset.uid = crypto.randomUUID();
+
             saveRotation();
         },
 
         onUpdate: function () {
-            updateNumbers();
             saveRotation();
         }
     });
 }
-
-// ------------------
-// Nummerierung
-// ------------------
-function updateNumbers() {
-    const items = document.querySelectorAll("#rotation .skill");
-
-    items.forEach((el, index) => {
-        const name = el.textContent.replace(/^\d+\.\s/, "");
-        el.textContent = `${index + 1}. ${name}`;
-    });
-}
-
-// ------------------
-// Entfernen per Klick
-// ------------------
-document.addEventListener("click", function (e) {
-    if (e.target.classList.contains("skill") &&
-        e.target.parentElement.id === "rotation") {
-
-        e.target.remove();
-        updateNumbers();
-        saveRotation();
-    }
-});
 
 // ------------------
 // Init
@@ -117,4 +173,3 @@ document.addEventListener("click", function (e) {
 renderSkills();
 initDragDrop();
 loadRotation();
-updateNumbers();
