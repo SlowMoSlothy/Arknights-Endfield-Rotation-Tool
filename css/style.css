@@ -94,3 +94,7 @@ body {
     padding: 15px;
     border-radius: 10px;
 }
+
+.export-mode .remove-btn {
+    display: none !important;
+}
