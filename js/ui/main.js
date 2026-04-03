@@ -53,7 +53,6 @@ function renderTeamSlots() {
 
 function highlightActiveSlot() {
     const slots = document.querySelectorAll(".team-slot");
-
     slots.forEach((slot, index) => {
         slot.style.borderColor = index === activeSlotIndex ? "#00ffcc" : "#555";
     });
@@ -105,7 +104,6 @@ function confirmTeam() {
     document.getElementById("selectionScreen").style.display = "none";
     document.getElementById("builderScreen").style.display = "block";
 
-    console.log("confirmTeam -> init drag");
     renderSkills();
     initSkillDragDrop();
     renderRotation();
@@ -115,7 +113,6 @@ function backToSelection() {
     document.getElementById("selectionScreen").style.display = "block";
     document.getElementById("builderScreen").style.display = "none";
 }
-
 
 function renderOperatorList() {
     const grid = document.getElementById("operatorList");
@@ -193,9 +190,9 @@ function renderSkills() {
             div.dataset.id = String(skill.id);
 
             const img = document.createElement("img");
-            img.src = skill.iconSmall;
+            img.src = skill.iconSmall || skill.icon;
             img.alt = skill.name;
-            img.draggable = false;           
+            img.draggable = false;
 
             div.appendChild(img);
             skillRow.appendChild(div);
@@ -207,14 +204,20 @@ function renderSkills() {
 
 function buildRotationSequence() {
     const sequence = [];
+    const chunkSize = 5;
 
-    for (let i = 0; i < rotation.length; i += 5) {
-        const rowItems = rotation.slice(i, i + 5);
-        const isReverse = (i / 5) % 2 === 1;
+    for (let i = 0; i < rotation.length; i += chunkSize) {
+        const rowItems = rotation.slice(i, i + chunkSize);
+        const isReverse = (i / chunkSize) % 2 === 1;
         const displayItems = isReverse ? [...rowItems].reverse() : rowItems;
 
         displayItems.forEach((entry, index) => {
-            sequence.push({ type: "skill", entry });
+            sequence.push({
+                type: "skill",
+                entry,
+                rowIndex: Math.floor(i / chunkSize),
+                reverse: isReverse
+            });
 
             if (index < displayItems.length - 1) {
                 sequence.push({
@@ -224,7 +227,7 @@ function buildRotationSequence() {
             }
         });
 
-        if (i + 5 < rotation.length) {
+        if (i + chunkSize < rotation.length) {
             sequence.push({ type: "arrow", direction: "down" });
         }
     }
@@ -246,7 +249,7 @@ function renderRotation() {
             if (!skillData) return;
 
             const skillDiv = document.createElement("div");
-            skillDiv.className = "skill";
+            skillDiv.className = "skill rotation-skill";
             skillDiv.dataset.id = String(item.entry.id);
             skillDiv.dataset.uid = item.entry.uid;
 
@@ -256,6 +259,7 @@ function renderRotation() {
             const img = document.createElement("img");
             img.src = skillData.icon;
             img.alt = skillData.name;
+            img.draggable = false;
 
             inner.appendChild(img);
             skillDiv.appendChild(inner);
@@ -268,7 +272,6 @@ function renderRotation() {
                 rotation = rotation.filter(s => s.uid !== item.entry.uid);
                 saveRotation();
             };
-
             skillDiv.appendChild(removeBtn);
 
             const tooltip = document.createElement("div");
@@ -284,11 +287,10 @@ function renderRotation() {
             container.appendChild(skillDiv);
         } else {
             const arrow = document.createElement("div");
-            arrow.className = "rotation-arrow";
-
-            if (item.direction === "right") arrow.textContent = "→";
-            if (item.direction === "left") arrow.textContent = "←";
-            if (item.direction === "down") arrow.textContent = "↓";
+            arrow.className = `rotation-arrow ${item.direction}`;
+            arrow.textContent =
+                item.direction === "right" ? "→" :
+                    item.direction === "left" ? "←" : "↓";
 
             container.appendChild(arrow);
         }
@@ -316,15 +318,12 @@ function loadRotation() {
 }
 
 function initSkillDragDrop() {
-    // alte Instanzen zerstören
     skillSourceSortables.forEach(sortable => sortable.destroy());
     skillSourceSortables = [];
 
     const skillRows = document.querySelectorAll("#skillList .skill-row");
 
-    console.log("initSkillDragDrop -> rows:", skillRows.length);
-
-    skillRows.forEach((row, index) => {
+    skillRows.forEach((row) => {
         const sortable = new Sortable(row, {
             group: {
                 name: "skills",
@@ -336,7 +335,23 @@ function initSkillDragDrop() {
             forceFallback: true,
             fallbackOnBody: true,
 
-  
+            setData: function (dataTransfer, dragEl) {
+                dataTransfer.setData("text/plain", dragEl.dataset.id || "");
+            },
+
+            onClone: (evt) => {
+                const skillId = parseInt(evt.item.dataset.id, 10);
+                const skillData = getSkillById(skillId);
+                if (!skillData) return;
+
+                const cloneImg = evt.clone.querySelector("img");
+                if (cloneImg) {
+                    cloneImg.src = skillData.icon;
+                }
+
+                evt.clone.classList.remove("skill-small");
+                evt.clone.classList.add("rotation-skill", "drag-ghost");
+            }
         });
 
         skillSourceSortables.push(sortable);
@@ -346,8 +361,6 @@ function initSkillDragDrop() {
 function initRotationDragDrop() {
     const rotationZone = document.getElementById("rotationDropZone");
     if (!rotationZone) return;
-
-    console.log("initRotationDragDrop ->", rotationZone);
 
     if (rotationSortable) {
         rotationSortable.destroy();
@@ -360,24 +373,39 @@ function initRotationDragDrop() {
             put: true
         },
         animation: 150,
-        draggable: ".skill",
+        draggable: ".rotation-skill",
+        filter: ".rotation-arrow",
         forceFallback: true,
         fallbackOnBody: true,
+        swapThreshold: 0.65,
 
-       
-
-        onAdd: (evt) => {            
-
+        onAdd: (evt) => {
             const skillId = parseInt(evt.item.dataset.id, 10);
             evt.item.remove();
 
             if (!skillId) return;
 
-            rotation.push({
+            const dropIndex = getRotationIndexFromDomIndex(evt.newIndex);
+
+            rotation.splice(dropIndex, 0, {
                 uid: crypto.randomUUID(),
                 id: skillId
             });
 
+            saveRotation();
+        },
+
+        onUpdate: () => {
+            const skillEls = Array.from(rotationZone.querySelectorAll(".rotation-skill"));
+
+            const newRotation = skillEls
+                .map(el => {
+                    const uid = el.dataset.uid;
+                    return rotation.find(r => r.uid === uid);
+                })
+                .filter(Boolean);
+
+            rotation = newRotation;
             saveRotation();
         }
     });
@@ -386,7 +414,7 @@ function initRotationDragDrop() {
 function getRotationIndexFromDomIndex(domIndex) {
     const zone = document.getElementById("rotationDropZone");
     const children = Array.from(zone.children).slice(0, domIndex);
-    return children.filter(el => el.classList.contains("skill")).length;
+    return children.filter(el => el.classList.contains("rotation-skill")).length;
 }
 
 function exportImage() {
@@ -419,6 +447,3 @@ loadTeam();
 loadRotation();
 renderTeamSlots();
 renderOperatorList();
-
-console.log("SkillList:", document.getElementById("skillList"));
-console.log("DropZone:", document.getElementById("rotationDropZone"));
