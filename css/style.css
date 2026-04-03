@@ -265,9 +265,22 @@ body {
 }
 
 .drag-ghost {
-    opacity: 0.9;
+    width: 60px !important;
+    height: 60px !important;
+    border-radius: 50%;
+    opacity: 0.95;
+    z-index: 1000;
 }
 
+.drag-ghost img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+}
+
+.sortable-fallback {
+    pointer-events: none;
+}
 .sortable-ghost {
     opacity: 0.35;
 }

@@ -188,6 +188,7 @@ function renderSkills() {
             const div = document.createElement("div");
             div.className = "skill skill-small";
             div.dataset.id = String(skill.id);
+            div.dataset.largeIcon = skill.icon;
 
             const img = document.createElement("img");
             img.src = skill.iconSmall || skill.icon;
@@ -323,6 +324,16 @@ function initSkillDragDrop() {
 
     const skillRows = document.querySelectorAll("#skillList .skill-row");
 
+    onStart: (evt) => {
+        setTimeout(() => {
+            const ghost = document.querySelector(".drag-ghost img");
+            const largeIcon = evt.item.dataset.largeIcon;
+
+            if (ghost && largeIcon) {
+                ghost.src = largeIcon;
+            }
+        }, 0);
+    }
     skillRows.forEach((row) => {
         const sortable = new Sortable(row, {
             group: {
@@ -334,26 +345,9 @@ function initSkillDragDrop() {
             draggable: ".skill-small",
             forceFallback: true,
             fallbackOnBody: true,
-
-            setData: function (dataTransfer, dragEl) {
-                dataTransfer.setData("text/plain", dragEl.dataset.id || "");
-            },
-
-            onClone: (evt) => {
-                const skillId = parseInt(evt.item.dataset.id, 10);
-                const skillData = getSkillById(skillId);
-                if (!skillData) return;
-
-                const cloneImg = evt.clone.querySelector("img");
-                if (cloneImg) {
-                    cloneImg.src = skillData.icon;
-                }
-
-                evt.clone.classList.remove("skill-small");
-                evt.clone.classList.add("rotation-skill", "drag-ghost");
-            }
+            fallbackClass: "drag-ghost",
+            removeCloneOnHide: true
         });
-
         skillSourceSortables.push(sortable);
     });
 }
