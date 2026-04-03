@@ -1,42 +1,45 @@
 let rotation = [];
 let selectedTeam = [null, null, null, null];
 let activeSlotIndex = null;
+let skillSourceSortable = null;
+let rotationSortable = null;
 
 function renderTeamSlots() {
     const container = document.getElementById("teamSlots");
+    if (!container) return;
+
     container.innerHTML = "";
 
     selectedTeam.forEach((opId, index) => {
-
         const slot = document.createElement("div");
         slot.className = "team-slot";
 
-        
         if (!opId) {
             slot.classList.add("empty");
         } else {
             const op = operators.find(o => o.id === opId);
+            if (op) {
+                const img = document.createElement("img");
+                img.src = op.icon;
+                img.alt = op.name;
+                slot.appendChild(img);
 
-            const img = document.createElement("img");
-            img.src = op.icon;
-            slot.appendChild(img);
+                const remove = document.createElement("div");
+                remove.className = "slot-remove";
+                remove.textContent = "×";
 
-            // ❌ entfernen
-            const remove = document.createElement("div");
-            remove.className = "slot-remove";
-            remove.textContent = "×";
+                remove.onclick = (e) => {
+                    e.stopPropagation();
+                    selectedTeam[index] = null;
+                    saveTeam();
+                    renderTeamSlots();
+                    renderOperatorList();
+                };
 
-            remove.onclick = (e) => {
-                e.stopPropagation();
-                selectedTeam[index] = null;
-                renderTeamSlots();
-                renderOperatorList();
-            };
-
-            slot.appendChild(remove);
+                slot.appendChild(remove);
+            }
         }
 
-        // Slot auswählen
         slot.onclick = () => {
             activeSlotIndex = index;
             highlightActiveSlot();
@@ -44,12 +47,24 @@ function renderTeamSlots() {
 
         container.appendChild(slot);
     });
+
+    highlightActiveSlot();
 }
-// Skill suchen
+
+function highlightActiveSlot() {
+    const slots = document.querySelectorAll(".team-slot");
+
+    slots.forEach((slot, index) => {
+        slot.style.borderColor = index === activeSlotIndex ? "#00ffcc" : "#555";
+    });
+}
+
 function getSkillById(id) {
     for (const op of operators) {
         const skill = op.skills.find(s => s.id === id);
-        if (skill) return { ...skill, operator: op.name };
+        if (skill) {
+            return { ...skill, operator: op.name };
+        }
     }
     return null;
 }
@@ -60,20 +75,23 @@ function saveTeam() {
 
 function loadTeam() {
     const saved = localStorage.getItem("team");
+    if (!saved) return;
 
-    if (saved) {
+    try {
         const parsed = JSON.parse(saved);
-
-        // sicherstellen, dass es 4 Slots gibt
         selectedTeam = [null, null, null, null];
 
-        parsed.forEach((id, index) => {
-            if (index < 4) {
-                selectedTeam[index] = id;
-            }
-        });
+        if (Array.isArray(parsed)) {
+            parsed.slice(0, 4).forEach((id, index) => {
+                selectedTeam[index] = id ?? null;
+            });
+        }
+    } catch (error) {
+        console.error("Team konnte nicht geladen werden:", error);
+        selectedTeam = [null, null, null, null];
     }
 }
+
 function confirmTeam() {
     const team = selectedTeam.filter(x => x !== null);
 
@@ -88,7 +106,10 @@ function confirmTeam() {
     document.getElementById("builderScreen").style.display = "block";
 
     renderSkills();
+    initSkillDragDrop();
+    renderRotation();
 }
+
 function backToSelection() {
     document.getElementById("selectionScreen").style.display = "block";
     document.getElementById("builderScreen").style.display = "none";
@@ -96,10 +117,11 @@ function backToSelection() {
 
 function renderOperatorList() {
     const grid = document.getElementById("operatorList");
+    if (!grid) return;
+
     grid.innerHTML = "";
 
     operators.forEach(op => {
-
         const isSelected = selectedTeam.includes(op.id);
 
         const card = document.createElement("div");
@@ -107,11 +129,12 @@ function renderOperatorList() {
 
         if (isSelected) {
             card.classList.add("disabled");
-            card.title="Bereits im Team"
+            card.title = "Bereits im Team";
         }
 
         const img = document.createElement("img");
         img.src = op.icon;
+        img.alt = op.name;
 
         const name = document.createElement("div");
         name.className = "operator-name";
@@ -120,13 +143,12 @@ function renderOperatorList() {
         card.appendChild(img);
         card.appendChild(name);
 
-        // ❌ Blockieren wenn schon im Team
         if (!isSelected) {
             card.onclick = () => {
                 if (activeSlotIndex === null) return;
 
                 selectedTeam[activeSlotIndex] = op.id;
-
+                saveTeam();
                 renderTeamSlots();
                 renderOperatorList();
             };
@@ -136,23 +158,21 @@ function renderOperatorList() {
     });
 }
 
-// Skills anzeigen
 function renderSkills() {
     const list = document.getElementById("skillList");
+    if (!list) return;
+
     list.innerHTML = "";
 
-    const activeOperators = operators.filter(op =>
-        selectedTeam.includes(op.id)
-    );
+    const activeOperators = operators.filter(op => selectedTeam.includes(op.id));
 
     activeOperators.forEach(op => {
-
-        // 🧑 Operator Kopf
         const opRow = document.createElement("div");
         opRow.className = "operator-row";
 
         const opImg = document.createElement("img");
         opImg.src = op.icon;
+        opImg.alt = op.name;
         opImg.className = "operator-icon";
 
         const opName = document.createElement("div");
@@ -160,22 +180,19 @@ function renderSkills() {
 
         opRow.appendChild(opImg);
         opRow.appendChild(opName);
-
         list.appendChild(opRow);
 
-        // 🔹 Skills darunter
         const skillRow = document.createElement("div");
         skillRow.className = "skill-row";
 
         op.skills.forEach(skill => {
-
             const div = document.createElement("div");
             div.className = "skill skill-small";
-
-            div.setAttribute("data-id", skill.id);
+            div.dataset.id = String(skill.id);
 
             const img = document.createElement("img");
-            img.src = skill.iconSmall; // 🔥 kleines Icon
+            img.src = skill.iconSmall || skill.icon;
+            img.alt = skill.name;
 
             div.appendChild(img);
             skillRow.appendChild(div);
@@ -185,57 +202,125 @@ function renderSkills() {
     });
 }
 
-// Grid rendern
-function renderRotationGrid() {
-    const container = document.getElementById("rotationDropZone");
-    container.innerHTML = "";
+function buildRotationSequence() {
+    const sequence = [];
 
-    rotation.forEach(entry => {
-        const skillData = getSkillById(entry.id);
-        if (!skillData) return;
+    for (let i = 0; i < rotation.length; i += 5) {
+        const rowItems = rotation.slice(i, i + 5);
+        const isReverse = (i / 5) % 2 === 1;
+        const displayItems = isReverse ? [...rowItems].reverse() : rowItems;
 
-        const skillDiv = document.createElement("div");
-        skillDiv.className = "skill";
-        skillDiv.dataset.id = entry.id;
-        skillDiv.dataset.uid = entry.uid;
+        displayItems.forEach((entry, index) => {
+            sequence.push({ type: "skill", entry });
 
-        const inner = document.createElement("div");
-        inner.className = "skill-inner";
+            if (index < displayItems.length - 1) {
+                sequence.push({
+                    type: "arrow",
+                    direction: isReverse ? "left" : "right"
+                });
+            }
+        });
 
-        const img = document.createElement("img");
-        img.src = skillData.icon; // großes Bild in der Rotation
-        img.alt = skillData.name;
+        if (i + 5 < rotation.length) {
+            sequence.push({ type: "arrow", direction: "down" });
+        }
+    }
 
-        inner.appendChild(img);
-        skillDiv.appendChild(inner);
-
-        const removeBtn = document.createElement("div");
-        removeBtn.className = "remove-btn";
-        removeBtn.textContent = "×";
-        removeBtn.onclick = (e) => {
-            e.stopPropagation();
-            rotation = rotation.filter(s => s.uid !== entry.uid);
-            saveRotation();
-        };
-        skillDiv.appendChild(removeBtn);
-
-        const tooltip = document.createElement("div");
-        tooltip.className = "tooltip";
-        tooltip.innerHTML = `
-            <b>${skillData.name}</b><br>
-            <i>${skillData.operator}</i><br>
-            CD: ${skillData.cooldown}s<br>
-            Energy: ${skillData.energy}
-        `;
-        skillDiv.appendChild(tooltip);
-
-        container.appendChild(skillDiv);
-    });
+    return sequence;
 }
 
-// Drag & Drop
-function initDragDrop() {
-    new Sortable(document.getElementById("skillList"), {
+function renderRotation() {
+    const container = document.getElementById("rotationDropZone");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    const sequence = buildRotationSequence();
+
+    sequence.forEach(item => {
+        if (item.type === "skill") {
+            const skillData = getSkillById(item.entry.id);
+            if (!skillData) return;
+
+            const skillDiv = document.createElement("div");
+            skillDiv.className = "skill";
+            skillDiv.dataset.id = String(item.entry.id);
+            skillDiv.dataset.uid = item.entry.uid;
+
+            const inner = document.createElement("div");
+            inner.className = "skill-inner";
+
+            const img = document.createElement("img");
+            img.src = skillData.icon;
+            img.alt = skillData.name;
+
+            inner.appendChild(img);
+            skillDiv.appendChild(inner);
+
+            const removeBtn = document.createElement("div");
+            removeBtn.className = "remove-btn";
+            removeBtn.textContent = "×";
+            removeBtn.onclick = (e) => {
+                e.stopPropagation();
+                rotation = rotation.filter(s => s.uid !== item.entry.uid);
+                saveRotation();
+            };
+
+            skillDiv.appendChild(removeBtn);
+
+            const tooltip = document.createElement("div");
+            tooltip.className = "tooltip";
+            tooltip.innerHTML = `
+                <b>${skillData.name}</b><br>
+                <i>${skillData.operator}</i><br>
+                CD: ${skillData.cooldown}s<br>
+                Energy: ${skillData.energy}
+            `;
+            skillDiv.appendChild(tooltip);
+
+            container.appendChild(skillDiv);
+        } else {
+            const arrow = document.createElement("div");
+            arrow.className = "rotation-arrow";
+
+            if (item.direction === "right") arrow.textContent = "→";
+            if (item.direction === "left") arrow.textContent = "←";
+            if (item.direction === "down") arrow.textContent = "↓";
+
+            container.appendChild(arrow);
+        }
+    });
+
+    initRotationDragDrop();
+}
+
+function saveRotation() {
+    localStorage.setItem("rotation", JSON.stringify(rotation));
+    renderRotation();
+}
+
+function loadRotation() {
+    const saved = localStorage.getItem("rotation");
+    if (!saved) return;
+
+    try {
+        const parsed = JSON.parse(saved);
+        rotation = Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+        console.error("Rotation konnte nicht geladen werden:", error);
+        rotation = [];
+    }
+}
+
+function initSkillDragDrop() {
+    const skillList = document.getElementById("skillList");
+    if (!skillList) return;
+
+    if (skillSourceSortable) {
+        skillSourceSortable.destroy();
+    }
+
+    skillSourceSortable = new Sortable(skillList, {
         group: {
             name: "skills",
             pull: "clone",
@@ -246,15 +331,20 @@ function initDragDrop() {
         forceFallback: true,
         fallbackOnBody: true
     });
+}
 
-    new Sortable(document.getElementById("rotationDropZone"), {
-        group: {
-            name: "skills",
-            pull: false,
-            put: true
-        },
-        sort: true,
+function initRotationDragDrop() {
+    const rotationZone = document.getElementById("rotationDropZone");
+    if (!rotationZone) return;
+
+    if (rotationSortable) {
+        rotationSortable.destroy();
+    }
+
+    rotationSortable = new Sortable(rotationZone, {
         animation: 150,
+        draggable: ".skill",
+        filter: ".rotation-arrow",
         forceFallback: true,
         fallbackOnBody: true,
 
@@ -265,7 +355,9 @@ function initDragDrop() {
 
             if (!skillId) return;
 
-            rotation.push({
+            const dropIndex = getRotationIndexFromDomIndex(evt.newIndex);
+
+            rotation.splice(dropIndex, 0, {
                 uid: crypto.randomUUID(),
                 id: skillId
             });
@@ -274,61 +366,54 @@ function initDragDrop() {
         },
 
         onUpdate: () => {
-            const items = document.querySelectorAll("#rotationDropZone .skill");
-            rotation = Array.from(items).map(el => ({
-                uid: el.dataset.uid,
-                id: parseInt(el.dataset.id, 10)
-            }));
+            const skillEls = Array.from(rotationZone.querySelectorAll(".skill"));
+
+            const newRotation = skillEls
+                .map(el => {
+                    const uid = el.dataset.uid;
+                    return rotation.find(r => r.uid === uid);
+                })
+                .filter(Boolean);
+
+            rotation = newRotation;
             saveRotation();
         }
     });
 }
 
-// Speichern
-function saveRotation() {
-    localStorage.setItem("rotation", JSON.stringify(rotation));
-    renderRotationGrid();
-}
-function highlightActiveSlot() {
-    const slots = document.querySelectorAll(".team-slot");
-    slots.forEach((slot, i) => {
-        slot.style.borderColor = i === activeSlotIndex ? "#00ffcc" : "#555";
-    });
-}
-// Laden
-function loadRotation() {
-    const saved = localStorage.getItem("rotation");
-    if (!saved) return;
-
-    rotation = JSON.parse(saved);
-    renderRotationGrid();
+function getRotationIndexFromDomIndex(domIndex) {
+    const zone = document.getElementById("rotationDropZone");
+    const children = Array.from(zone.children).slice(0, domIndex);
+    return children.filter(el => el.classList.contains("skill")).length;
 }
 
-// Export
 function exportImage() {
     const element = document.getElementById("rotation");
+    if (!element) return;
 
     element.classList.add("export-mode");
 
     html2canvas(element, {
         backgroundColor: "#121212",
-        scale: 2
+        scale: 2,
+        useCORS: true
     }).then(canvas => {
         const link = document.createElement("a");
         link.download = "rotation.png";
-        link.href = canvas.toDataURL();
+        link.href = canvas.toDataURL("image/png");
         link.click();
-
+        element.classList.remove("export-mode");
+    }).catch(error => {
+        console.error("Export fehlgeschlagen:", error);
         element.classList.remove("export-mode");
     });
 }
 
 window.exportImage = exportImage;
+window.confirmTeam = confirmTeam;
+window.backToSelection = backToSelection;
 
-// Init
-initDragDrop();
 loadTeam();
+loadRotation();
 renderTeamSlots();
 renderOperatorList();
-
-loadRotation();

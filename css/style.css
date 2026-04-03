@@ -103,8 +103,10 @@ body {
 #rotationDropZone {
     min-height: 150px;
     width: 100%;
-    display: block;
-    /* 🔥 DAS IST DER FIX */
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
 }
 .skill-row {
     display: flex;
@@ -254,7 +256,13 @@ body {
     display: flex;
     gap: 8px;
 }
-
+.rotation-arrow {
+    width: 20px;
+    text-align: center;
+    font-size: 20px;
+    color: #888;
+    flex: 0 0 auto;
+}
 /* Pfeile */
 .arrow {
     font-size: 20px;
