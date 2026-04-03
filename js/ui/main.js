@@ -191,18 +191,43 @@ function renderRotationGrid() {
     container.innerHTML = "";
 
     rotation.forEach(entry => {
-
         const skillData = getSkillById(entry.id);
+        if (!skillData) return;
 
         const skillDiv = document.createElement("div");
         skillDiv.className = "skill";
         skillDiv.dataset.id = entry.id;
         skillDiv.dataset.uid = entry.uid;
 
-        const img = document.createElement("img");
-        img.src = skillData.icon;
+        const inner = document.createElement("div");
+        inner.className = "skill-inner";
 
-        skillDiv.appendChild(img);
+        const img = document.createElement("img");
+        img.src = skillData.icon; // großes Bild in der Rotation
+        img.alt = skillData.name;
+
+        inner.appendChild(img);
+        skillDiv.appendChild(inner);
+
+        const removeBtn = document.createElement("div");
+        removeBtn.className = "remove-btn";
+        removeBtn.textContent = "×";
+        removeBtn.onclick = (e) => {
+            e.stopPropagation();
+            rotation = rotation.filter(s => s.uid !== entry.uid);
+            saveRotation();
+        };
+        skillDiv.appendChild(removeBtn);
+
+        const tooltip = document.createElement("div");
+        tooltip.className = "tooltip";
+        tooltip.innerHTML = `
+            <b>${skillData.name}</b><br>
+            <i>${skillData.operator}</i><br>
+            CD: ${skillData.cooldown}s<br>
+            Energy: ${skillData.energy}
+        `;
+        skillDiv.appendChild(tooltip);
 
         container.appendChild(skillDiv);
     });
@@ -217,9 +242,9 @@ function initDragDrop() {
             put: false
         },
         sort: false,
-
         draggable: ".skill-small",
         forceFallback: true,
+        fallbackOnBody: true
     });
 
     new Sortable(document.getElementById("rotationDropZone"), {
@@ -228,20 +253,18 @@ function initDragDrop() {
             pull: false,
             put: true
         },
+        sort: true,
         animation: 150,
-        onMove: () => {
-            console.log("MOVE OK");
-        },
+        forceFallback: true,
+        fallbackOnBody: true,
+
         onAdd: (evt) => {
+            const skillId = parseInt(evt.item.dataset.id, 10);
 
-            console.log("DROP:", evt.item);
-            console.log("ID:", evt.item.dataset.id);
-            const skillId = parseInt(evt.item.dataset.id);
-
-            // 🔥 Wichtig: Element entfernen (weil clone!)
             evt.item.remove();
 
-            // 👉 in Rotation einfügen
+            if (!skillId) return;
+
             rotation.push({
                 uid: crypto.randomUUID(),
                 id: skillId
@@ -249,23 +272,29 @@ function initDragDrop() {
 
             saveRotation();
         },
-        onUpdate: saveRotation
+
+        onUpdate: () => {
+            const items = document.querySelectorAll("#rotationDropZone .skill");
+            rotation = Array.from(items).map(el => ({
+                uid: el.dataset.uid,
+                id: parseInt(el.dataset.id, 10)
+            }));
+            saveRotation();
+        }
     });
 }
 
 // Speichern
 function saveRotation() {
-    const items = document.querySelectorAll("#rotationDropZone .skill");
-
-    rotation = Array.from(items).map(el => ({
-        uid: el.dataset.uid,
-        id: parseInt(el.dataset.id)
-    }));
-
     localStorage.setItem("rotation", JSON.stringify(rotation));
     renderRotationGrid();
 }
-
+function highlightActiveSlot() {
+    const slots = document.querySelectorAll(".team-slot");
+    slots.forEach((slot, i) => {
+        slot.style.borderColor = i === activeSlotIndex ? "#00ffcc" : "#555";
+    });
+}
 // Laden
 function loadRotation() {
     const saved = localStorage.getItem("rotation");
@@ -297,8 +326,9 @@ function exportImage() {
 window.exportImage = exportImage;
 
 // Init
+initDragDrop();
 loadTeam();
 renderTeamSlots();
 renderOperatorList();
-initDragDrop();
+
 loadRotation();
