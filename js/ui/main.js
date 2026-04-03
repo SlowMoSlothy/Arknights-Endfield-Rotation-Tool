@@ -1,7 +1,7 @@
 let rotation = [];
 let selectedTeam = [null, null, null, null];
 let activeSlotIndex = null;
-let skillSourceSortable = null;
+let skillSourceSortable = [];
 let rotationSortable = null;
 
 function renderTeamSlots() {
@@ -105,6 +105,7 @@ function confirmTeam() {
     document.getElementById("selectionScreen").style.display = "none";
     document.getElementById("builderScreen").style.display = "block";
 
+    console.log("confirmTeam -> init drag");
     renderSkills();
     initSkillDragDrop();
     renderRotation();
@@ -114,6 +115,7 @@ function backToSelection() {
     document.getElementById("selectionScreen").style.display = "block";
     document.getElementById("builderScreen").style.display = "none";
 }
+
 
 function renderOperatorList() {
     const grid = document.getElementById("operatorList");
@@ -191,8 +193,9 @@ function renderSkills() {
             div.dataset.id = String(skill.id);
 
             const img = document.createElement("img");
-            img.src = skill.iconSmall || skill.icon;
+            img.src = skill.iconSmall;
             img.alt = skill.name;
+            img.draggable = false;           
 
             div.appendChild(img);
             skillRow.appendChild(div);
@@ -313,34 +316,49 @@ function loadRotation() {
 }
 
 function initSkillDragDrop() {
-    const skillList = document.getElementById("skillList");
-    if (!skillList) return;
+    // alte Instanzen zerstören
+    skillSourceSortables.forEach(sortable => sortable.destroy());
+    skillSourceSortables = [];
 
-    if (skillSourceSortable) {
-        skillSourceSortable.destroy();
-    }
+    const skillRows = document.querySelectorAll("#skillList .skill-row");
 
-    skillSourceSortable = new Sortable(skillList, {
-        group: {
-            name: "skills",
-            pull: "clone",
-            put: false
-        },
-        sort: false,
-        draggable: ".skill-small",
-        forceFallback: true,
-        fallbackOnBody: true,
+    console.log("initSkillDragDrop -> rows:", skillRows.length);
 
-        onStart: (evt) => {
-            const id = evt.item.dataset.id;
-            console.log("🟢 DRAG START:", id);
-        }
+    skillRows.forEach((row, index) => {
+        const sortable = new Sortable(row, {
+            group: {
+                name: "skills",
+                pull: "clone",
+                put: false
+            },
+            sort: false,
+            draggable: ".skill-small",
+            forceFallback: true,
+            fallbackOnBody: true,
+
+            onChoose: (evt) => {
+                console.log(`row ${index} onChoose:`, evt.item.dataset.id);
+            },
+            onStart: (evt) => {
+                console.log(`row ${index} onStart:`, evt.item.dataset.id);
+            },
+            onClone: (evt) => {
+                console.log(`row ${index} onClone:`, evt.item.dataset.id);
+            },
+            onEnd: (evt) => {
+                console.log(`row ${index} onEnd:`, evt.item.dataset.id);
+            }
+        });
+
+        skillSourceSortables.push(sortable);
     });
 }
 
 function initRotationDragDrop() {
     const rotationZone = document.getElementById("rotationDropZone");
     if (!rotationZone) return;
+
+    console.log("initRotationDragDrop ->", rotationZone);
 
     if (rotationSortable) {
         rotationSortable.destroy();
@@ -354,38 +372,28 @@ function initRotationDragDrop() {
         },
         animation: 150,
         draggable: ".skill",
-        filter: ".rotation-arrow",
         forceFallback: true,
         fallbackOnBody: true,
 
-        onAdd: (evt) => {
-            const skillId = parseInt(evt.item.dataset.id, 10);
+        onMove: (evt) => {
+            console.log("onMove:", evt.dragged?.dataset?.id);
+            return true;
+        },
 
+        onAdd: (evt) => {
+            console.log("onAdd fired");
+            console.log("dropped id:", evt.item.dataset.id);
+
+            const skillId = parseInt(evt.item.dataset.id, 10);
             evt.item.remove();
 
             if (!skillId) return;
 
-            const dropIndex = getRotationIndexFromDomIndex(evt.newIndex);
-
-            rotation.splice(dropIndex, 0, {
+            rotation.push({
                 uid: crypto.randomUUID(),
                 id: skillId
             });
 
-            saveRotation();
-        },
-
-        onUpdate: () => {
-            const skillEls = Array.from(rotationZone.querySelectorAll(".skill"));
-
-            const newRotation = skillEls
-                .map(el => {
-                    const uid = el.dataset.uid;
-                    return rotation.find(r => r.uid === uid);
-                })
-                .filter(Boolean);
-
-            rotation = newRotation;
             saveRotation();
         }
     });

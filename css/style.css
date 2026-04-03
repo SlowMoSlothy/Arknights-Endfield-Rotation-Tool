@@ -114,7 +114,14 @@ body {
     margin-left: 48px;
     margin-bottom: 10px;
 }
-
+.skill-small img,
+.skill-inner img,
+.operator-card img,
+.team-slot img {
+    pointer-events: none;
+    -webkit-user-drag: none;
+    user-select: none;
+}
 /* kleine Skill Icons */
 .skill-small {
     width: 35px;
