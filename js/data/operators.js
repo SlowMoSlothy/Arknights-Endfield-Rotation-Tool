@@ -9,17 +9,28 @@ const operators = [
                 name: "Final Strike",
                 icon: "assets/operators/skills/laevatain/fs.png",
                 iconSmall: "assets/operators/skills/laevatain/fs_small.png",
-                type: "ultimate",
+                type: "FS",
                 cooldown: 20,
                 energy: 60,
                 description: "Massiver AoE Schaden."
             },
             {
                 id: 102,
-                name: "Final Strike",
+                name: "Battle Skill",
                 icon: "assets/operators/skills/laevatain/bs.png",
                 iconSmall: "assets/operators/skills/laevatain/bs_small.png",
-                type: "ultimate",
+                type: "BS",
+                cooldown: 20,
+                energy: 60,
+                description: "Massiver AoE Schaden."
+            }
+            ,
+            {
+                id: 103,
+                name: "Combo Skill",
+                icon: "assets/operators/skills/laevatain/cs.png",
+                iconSmall: "assets/operators/skills/laevatain/cs_small.png",
+                type: "CS",
                 cooldown: 20,
                 energy: 60,
                 description: "Massiver AoE Schaden."
