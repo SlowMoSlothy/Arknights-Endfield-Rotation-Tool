@@ -1,44 +1,50 @@
 let rotation = [];
-let selectedTeam = [];
+let selectedTeam = [null, null, null, null];
+let activeSlotIndex = null;
 
-function renderTeamSelection() {
-    const container = document.getElementById("teamSelection");
+function renderTeamSlots() {
+    const container = document.getElementById("teamSlots");
     container.innerHTML = "";
 
-    operators.forEach(op => {
+    selectedTeam.forEach((opId, index) => {
 
-        const label = document.createElement("label");
+        const slot = document.createElement("div");
+        slot.className = "team-slot";
 
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.value = op.id;
+        
+        if (!opId) {
+            slot.classList.add("empty");
+        } else {
+            const op = operators.find(o => o.id === opId);
 
-        checkbox.checked = selectedTeam.includes(op.id);
+            const img = document.createElement("img");
+            img.src = op.icon;
+            slot.appendChild(img);
 
-        checkbox.onchange = () => {
+            // ❌ entfernen
+            const remove = document.createElement("div");
+            remove.className = "slot-remove";
+            remove.textContent = "×";
 
-            if (checkbox.checked) {
-                if (selectedTeam.length >= 3) {
-                    checkbox.checked = false;
-                    alert("Maximal 3 Operatoren!");
-                    return;
-                }
-                selectedTeam.push(op.id);
-            } else {
-                selectedTeam = selectedTeam.filter(id => id !== op.id);
-            }
+            remove.onclick = (e) => {
+                e.stopPropagation();
+                selectedTeam[index] = null;
+                renderTeamSlots();
+                renderOperatorList();
+            };
 
-            saveTeam();
-            renderSkills();
+            slot.appendChild(remove);
+        }
+
+        // Slot auswählen
+        slot.onclick = () => {
+            activeSlotIndex = index;
+            highlightActiveSlot();
         };
 
-        label.appendChild(checkbox);
-        label.appendChild(document.createTextNode(" " + op.name));
-
-        container.appendChild(label);
+        container.appendChild(slot);
     });
 }
-
 // Skill suchen
 function getSkillById(id) {
     for (const op of operators) {
@@ -54,9 +60,80 @@ function saveTeam() {
 
 function loadTeam() {
     const saved = localStorage.getItem("team");
+
     if (saved) {
-        selectedTeam = JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+
+        // sicherstellen, dass es 4 Slots gibt
+        selectedTeam = [null, null, null, null];
+
+        parsed.forEach((id, index) => {
+            if (index < 4) {
+                selectedTeam[index] = id;
+            }
+        });
     }
+}
+function confirmTeam() {
+    const team = selectedTeam.filter(x => x !== null);
+
+    if (team.length === 0) {
+        alert("Bitte mindestens einen Operator wählen!");
+        return;
+    }
+
+    saveTeam();
+
+    document.getElementById("selectionScreen").style.display = "none";
+    document.getElementById("builderScreen").style.display = "block";
+
+    renderSkills();
+}
+function backToSelection() {
+    document.getElementById("selectionScreen").style.display = "block";
+    document.getElementById("builderScreen").style.display = "none";
+}
+
+function renderOperatorList() {
+    const grid = document.getElementById("operatorList");
+    grid.innerHTML = "";
+
+    operators.forEach(op => {
+
+        const isSelected = selectedTeam.includes(op.id);
+
+        const card = document.createElement("div");
+        card.className = "operator-card";
+
+        if (isSelected) {
+            card.classList.add("disabled");
+            card.title="Bereits im Team"
+        }
+
+        const img = document.createElement("img");
+        img.src = op.icon;
+
+        const name = document.createElement("div");
+        name.className = "operator-name";
+        name.textContent = op.name;
+
+        card.appendChild(img);
+        card.appendChild(name);
+
+        // ❌ Blockieren wenn schon im Team
+        if (!isSelected) {
+            card.onclick = () => {
+                if (activeSlotIndex === null) return;
+
+                selectedTeam[activeSlotIndex] = op.id;
+
+                renderTeamSlots();
+                renderOperatorList();
+            };
+        }
+
+        grid.appendChild(card);
+    });
 }
 
 // Skills anzeigen
@@ -70,153 +147,106 @@ function renderSkills() {
 
     activeOperators.forEach(op => {
 
-        const title = document.createElement("h4");
-        title.textContent = op.name;
-        list.appendChild(title);
+        // 🧑 Operator Kopf
+        const opRow = document.createElement("div");
+        opRow.className = "operator-row";
+
+        const opImg = document.createElement("img");
+        opImg.src = op.icon;
+        opImg.className = "operator-icon";
+
+        const opName = document.createElement("div");
+        opName.textContent = op.name;
+
+        opRow.appendChild(opImg);
+        opRow.appendChild(opName);
+
+        list.appendChild(opRow);
+
+        // 🔹 Skills darunter
+        const skillRow = document.createElement("div");
+        skillRow.className = "skill-row";
 
         op.skills.forEach(skill => {
 
             const div = document.createElement("div");
-            div.className = "skill";
-            div.dataset.id = skill.id;
+            div.className = "skill skill-small";
 
-            const inner = document.createElement("div");
-            inner.className = "skill-inner";
+            div.setAttribute("data-id", skill.id);
 
             const img = document.createElement("img");
-            img.src = skill.icon;
+            img.src = skill.iconSmall; // 🔥 kleines Icon
 
-            inner.appendChild(img);
-            div.appendChild(inner);
-
-            list.appendChild(div);
+            div.appendChild(img);
+            skillRow.appendChild(div);
         });
+
+        list.appendChild(skillRow);
     });
 }
 
 // Grid rendern
 function renderRotationGrid() {
-    const container = document.getElementById("rotation");
+    const container = document.getElementById("rotationDropZone");
     container.innerHTML = "";
 
-    const grid = document.createElement("div");
-    grid.className = "rotation-grid";
+    rotation.forEach(entry => {
 
-    const chunkSize = 5;
+        const skillData = getSkillById(entry.id);
 
-    for (let i = 0; i < rotation.length; i += chunkSize) {
+        const skillDiv = document.createElement("div");
+        skillDiv.className = "skill";
+        skillDiv.dataset.id = entry.id;
+        skillDiv.dataset.uid = entry.uid;
 
-        let rowItems = rotation.slice(i, i + chunkSize);
-        const row = document.createElement("div");
-        row.className = "rotation-row";
+        const img = document.createElement("img");
+        img.src = skillData.icon;
 
-        const isReverse = (i / chunkSize) % 2 === 1;
+        skillDiv.appendChild(img);
 
-        if (isReverse) {
-            rowItems = [...rowItems].reverse();
-            row.style.justifyContent = "flex-end";
-        } else {
-            row.style.justifyContent = "flex-start";
-        }
-
-        rowItems.forEach((entry, index) => {
-
-            const skillData = getSkillById(entry.id);
-
-            const skillDiv = document.createElement("div");
-            skillDiv.className = "skill";
-            skillDiv.dataset.id = entry.id;
-            skillDiv.dataset.uid = entry.uid;
-
-            const inner = document.createElement("div");
-            inner.className = "skill-inner";
-
-            const img = document.createElement("img");
-            img.src = skillData.icon;
-
-            inner.appendChild(img);
-            skillDiv.appendChild(inner);
-
-            // ❌
-            const removeBtn = document.createElement("div");
-            removeBtn.className = "remove-btn";
-            removeBtn.textContent = "×";
-
-            removeBtn.onclick = (e) => {
-                e.stopPropagation();
-                rotation = rotation.filter(s => s.uid !== entry.uid);
-                localStorage.setItem("rotation", JSON.stringify(rotation));
-                renderRotationGrid();
-            };
-
-            skillDiv.appendChild(removeBtn);
-
-            // Tooltip
-            const tooltip = document.createElement("div");
-            tooltip.className = "tooltip";
-            tooltip.innerHTML = `
-                <b>${skillData.name}</b><br>
-                <i>${skillData.operator}</i><br>
-                CD: ${skillData.cooldown}s<br>
-                Energy: ${skillData.energy}
-            `;
-
-            skillDiv.appendChild(tooltip);
-
-            row.appendChild(skillDiv);
-
-            if (index < rowItems.length - 1) {
-                const arrow = document.createElement("div");
-                arrow.className = "arrow";
-                arrow.textContent = isReverse ? "←" : "→";
-                row.appendChild(arrow);
-            }
-        });
-
-        grid.appendChild(row);
-
-        // ↓ Pfeil exakt positionieren
-        if (i + chunkSize < rotation.length) {
-
-            const downWrapper = document.createElement("div");
-            downWrapper.className = "arrow down";
-
-            const arrow = document.createElement("span");
-            arrow.textContent = "↓";
-
-            grid.appendChild(downWrapper);
-            downWrapper.appendChild(arrow);
-
-            setTimeout(() => {
-
-                const skills = row.querySelectorAll(".skill");
-                const target = isReverse ? skills[0] : skills[skills.length - 1];
-
-                const rowRect = row.getBoundingClientRect();
-                const skillRect = target.getBoundingClientRect();
-
-                const offset = skillRect.left - rowRect.left + skillRect.width / 2;
-                arrow.style.left = offset + "px";
-
-            }, 0);
-        }
-    }
-
-    container.appendChild(grid);
+        container.appendChild(skillDiv);
+    });
 }
 
 // Drag & Drop
 function initDragDrop() {
     new Sortable(document.getElementById("skillList"), {
-        group: { name: "skills", pull: "clone", put: false },
-        sort: false
+        group: {
+            name: "skills",
+            pull: "clone",
+            put: false
+        },
+        sort: false,
+
+        draggable: ".skill-small",
+        forceFallback: true,
     });
 
-    new Sortable(document.getElementById("rotation"), {
-        group: "skills",
+    new Sortable(document.getElementById("rotationDropZone"), {
+        group: {
+            name: "skills",
+            pull: false,
+            put: true
+        },
         animation: 150,
+        onMove: () => {
+            console.log("MOVE OK");
+        },
         onAdd: (evt) => {
-            evt.item.dataset.uid = crypto.randomUUID();
+
+            console.log("DROP:", evt.item);
+            console.log("ID:", evt.item.dataset.id);
+            const skillId = parseInt(evt.item.dataset.id);
+
+            // 🔥 Wichtig: Element entfernen (weil clone!)
+            evt.item.remove();
+
+            // 👉 in Rotation einfügen
+            rotation.push({
+                uid: crypto.randomUUID(),
+                id: skillId
+            });
+
             saveRotation();
         },
         onUpdate: saveRotation
@@ -225,7 +255,7 @@ function initDragDrop() {
 
 // Speichern
 function saveRotation() {
-    const items = document.querySelectorAll("#rotation .skill");
+    const items = document.querySelectorAll("#rotationDropZone .skill");
 
     rotation = Array.from(items).map(el => ({
         uid: el.dataset.uid,
@@ -268,7 +298,7 @@ window.exportImage = exportImage;
 
 // Init
 loadTeam();
-renderTeamSelection();
-renderSkills();
+renderTeamSlots();
+renderOperatorList();
 initDragDrop();
 loadRotation();

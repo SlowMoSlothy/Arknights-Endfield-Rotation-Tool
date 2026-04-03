@@ -9,32 +9,52 @@
 
 <body>
 
-  <h2>Rotation Builder</h2>
+  <!-- =========================
+     OPERATOR SELECTION SCREEN
+========================= -->
+  <div id="selectionScreen">
 
-  <button onclick="exportImage()">📸 Export als Bild</button>
+    <h2>Wähle dein Team (max. 4)</h2>
 
-  <div class="container">
-    <div>
-      <h3>Team auswählen</h3>
-      <div id="teamSelection"></div>
-    </div>
-    <div>
-      <h3>Operatoren</h3>
-      <div id="skillList" class="box"></div>
-    </div>
+    <div id="teamSlots" class="team-slots"></div>
+    
+    <h3>Operator auswählen</h3>
+    <div id="operatorList" class="operator-grid"></div>
 
-    <div>
-      <h3>Rotation</h3>
-      <div id="rotation" class="box"></div>
-    </div>
+    <button onclick="confirmTeam()">Team bestätigen</button>
+
   </div>
 
+  <!-- =========================
+     ROTATION BUILDER
+========================= -->
+  <div id="builderScreen" style="display:none;">
+
+    <h2>Rotation Builder</h2>
+
+    <button onclick="backToSelection()">← Zurück</button>
+    <button onclick="exportImage()">📸 Export</button>
+
+    <div class="container">
+      <div>
+        <h3>Skills</h3>
+        <div id="skillList" class="box"></div>
+      </div>
+
+      <div>
+        <h3>Rotation</h3>
+        <div id="rotation" class="box">
+          <div id="rotationDropZone"></div> <!-- 🔥 NEU -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <script src="js/data/operators.js"></script>
   <script src="js/ui/main.js"></script>
-
-</body>
-
 </html>

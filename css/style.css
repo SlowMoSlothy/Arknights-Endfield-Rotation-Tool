@@ -27,6 +27,72 @@ body {
     margin-bottom: 4px;
 }
 
+.operator-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 100px);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.operator-card {
+    width: 100px;
+    height: 120px;
+    background: #2a2a2a;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: 0.2s;
+    padding: 5px;
+}
+
+.operator-card img {
+    width: 70px;
+    height: 70px;
+    border-radius: 8px;
+    object-fit: cover;
+    margin-bottom: 5px;
+}
+
+.operator-name {
+    font-size: 12px;
+    text-align: center;
+}
+
+.operator-card:hover img {
+    transform: scale(1.1);
+}
+
+.operator-card.selected img {
+    box-shadow: 0 0 10px rgba(0, 255, 200, 0.7);
+}
+
+.operator-card.disabled {
+    opacity: 0.4;
+    filter: grayscale(100%);
+    cursor: not-allowed;
+}
+
+.operator-card.disabled:hover {
+    transform: none;
+    border-color: transparent;
+}
+
+.operator-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.operator-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    margin-right: 8px;
+}
 /* Skill Wrapper */
 .skill {
     width: 60px;
@@ -34,7 +100,33 @@ body {
     position: relative;
     flex-shrink: 0;
 }
+#rotationDropZone {
+    min-height: 150px;
+    width: 100%;
+    display: block;
+    /* 🔥 DAS IST DER FIX */
+}
+.skill-row {
+    display: flex;
+    gap: 6px;
+    margin-left: 48px;
+    margin-bottom: 10px;
+}
 
+/* kleine Skill Icons */
+.skill-small {
+    width: 35px;
+    height: 35px;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: grab;
+}
+
+.skill-small img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 /* Inner Circle */
 .skill-inner {
     width: 100%;
@@ -93,6 +185,58 @@ body {
     opacity: 0;
     transition: 0.2s;
     white-space: nowrap;
+}
+
+/* Slots */
+.team-slots {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.team-slot {
+    width: 100px;
+    height: 100px;
+    border: 2px dashed #555;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1e1e1e;
+    cursor: pointer;
+    position: relative;
+    flex: 0 0 100px;
+        /* verhindert Verschieben */
+}
+
+.team-slot img {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+/* Plus Icon */
+.team-slot.empty::after {
+    content: "+";
+    font-size: 28px;
+    color: #777;
+}
+
+/* Entfernen X */
+.slot-remove {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: red;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
 
 .skill:hover .tooltip {
