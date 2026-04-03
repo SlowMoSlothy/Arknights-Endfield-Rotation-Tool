@@ -32,6 +32,7 @@ function renderTeamSlots() {
                     e.stopPropagation();
                     selectedTeam[index] = null;
                     saveTeam();
+                    clearRotation();
                     renderTeamSlots();
                     renderOperatorList();
                 };
@@ -146,8 +147,14 @@ function renderOperatorList() {
             card.onclick = () => {
                 if (activeSlotIndex === null) return;
 
+                const oldOpId = selectedTeam[activeSlotIndex];
                 selectedTeam[activeSlotIndex] = op.id;
                 saveTeam();
+
+                if (oldOpId !== op.id) {
+                    clearRotation();
+                }
+
                 renderTeamSlots();
                 renderOperatorList();
             };
@@ -156,7 +163,11 @@ function renderOperatorList() {
         grid.appendChild(card);
     });
 }
-
+function clearRotation() {
+    rotation = [];
+    localStorage.removeItem("rotation");
+    renderRotation();
+}
 function renderSkills() {
     const list = document.getElementById("skillList");
     if (!list) return;
@@ -319,21 +330,12 @@ function loadRotation() {
 }
 
 function initSkillDragDrop() {
+    // alte Instanzen zerstören
     skillSourceSortables.forEach(sortable => sortable.destroy());
     skillSourceSortables = [];
 
     const skillRows = document.querySelectorAll("#skillList .skill-row");
 
-    onStart: (evt) => {
-        setTimeout(() => {
-            const ghost = document.querySelector(".drag-ghost img");
-            const largeIcon = evt.item.dataset.largeIcon;
-
-            if (ghost && largeIcon) {
-                ghost.src = largeIcon;
-            }
-        }, 0);
-    }
     skillRows.forEach((row) => {
         const sortable = new Sortable(row, {
             group: {
@@ -346,8 +348,21 @@ function initSkillDragDrop() {
             forceFallback: true,
             fallbackOnBody: true,
             fallbackClass: "drag-ghost",
-            removeCloneOnHide: true
+            removeCloneOnHide: true,
+
+            // 🔥 HIER wird das große Bild gesetzt
+            onStart: (evt) => {
+                setTimeout(() => {
+                    const ghost = document.querySelector(".drag-ghost img");
+                    const largeIcon = evt.item.dataset.largeIcon;
+
+                    if (ghost && largeIcon) {
+                        ghost.src = largeIcon;
+                    }
+                }, 0);
+            }
         });
+
         skillSourceSortables.push(sortable);
     });
 }
@@ -436,6 +451,7 @@ function exportImage() {
 window.exportImage = exportImage;
 window.confirmTeam = confirmTeam;
 window.backToSelection = backToSelection;
+window.clearRotation = clearRotation;
 
 loadTeam();
 loadRotation();
