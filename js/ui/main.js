@@ -342,6 +342,11 @@ function initRotationDragDrop() {
     }
 
     rotationSortable = new Sortable(rotationZone, {
+        group: {
+            name: "skills",
+            pull: false,
+            put: true
+        },
         animation: 150,
         draggable: ".skill",
         filter: ".rotation-arrow",
