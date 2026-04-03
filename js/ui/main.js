@@ -329,7 +329,12 @@ function initSkillDragDrop() {
         sort: false,
         draggable: ".skill-small",
         forceFallback: true,
-        fallbackOnBody: true
+        fallbackOnBody: true,
+
+        onStart: (evt) => {
+            const id = evt.item.dataset.id;
+            console.log("🟢 DRAG START:", id);
+        }
     });
 }
 
@@ -422,3 +427,6 @@ loadTeam();
 loadRotation();
 renderTeamSlots();
 renderOperatorList();
+
+console.log("SkillList:", document.getElementById("skillList"));
+console.log("DropZone:", document.getElementById("rotationDropZone"));
