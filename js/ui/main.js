@@ -1,7 +1,7 @@
 let rotation = [];
 let selectedTeam = [null, null, null, null];
 let activeSlotIndex = null;
-let skillSourceSortable = [];
+let skillSourceSortables = [];
 let rotationSortable = null;
 
 function renderTeamSlots() {
