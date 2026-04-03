@@ -336,18 +336,7 @@ function initSkillDragDrop() {
             forceFallback: true,
             fallbackOnBody: true,
 
-            onChoose: (evt) => {
-                console.log(`row ${index} onChoose:`, evt.item.dataset.id);
-            },
-            onStart: (evt) => {
-                console.log(`row ${index} onStart:`, evt.item.dataset.id);
-            },
-            onClone: (evt) => {
-                console.log(`row ${index} onClone:`, evt.item.dataset.id);
-            },
-            onEnd: (evt) => {
-                console.log(`row ${index} onEnd:`, evt.item.dataset.id);
-            }
+  
         });
 
         skillSourceSortables.push(sortable);
@@ -375,14 +364,9 @@ function initRotationDragDrop() {
         forceFallback: true,
         fallbackOnBody: true,
 
-        onMove: (evt) => {
-            console.log("onMove:", evt.dragged?.dataset?.id);
-            return true;
-        },
+       
 
-        onAdd: (evt) => {
-            console.log("onAdd fired");
-            console.log("dropped id:", evt.item.dataset.id);
+        onAdd: (evt) => {            
 
             const skillId = parseInt(evt.item.dataset.id, 10);
             evt.item.remove();
