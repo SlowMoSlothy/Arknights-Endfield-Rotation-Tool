@@ -255,6 +255,7 @@ button:hover {
     left: 0;
     width: 60px;
     height: 60px;
+    border-radius: 6px;
 }
 
 .rotation-arrow {
@@ -345,4 +346,9 @@ button:hover {
 /* Export */
 .export-mode .remove-btn {
     display: none !important;
+}
+
+.export-mode .rotation-slot:empty {
+    border-color: transparent !important;
+    background: transparent !important;
 }
