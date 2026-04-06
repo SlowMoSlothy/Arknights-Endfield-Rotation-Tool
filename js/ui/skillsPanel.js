@@ -43,3 +43,10 @@ function renderSkills() {
         list.appendChild(skillRow);
     });
 }
+function getSkillById(id) {
+    for (const op of operators) {
+        const skill = op.skills.find(s => s.id === id);
+        if (skill) return { ...skill, operator: op.name };
+    }
+    return null;
+}

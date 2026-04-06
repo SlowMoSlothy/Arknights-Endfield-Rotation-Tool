@@ -1,3 +1,26 @@
+function backToSelection() {
+    document.getElementById("selectionScreen").style.display = "block";
+    document.getElementById("builderScreen").style.display = "none";
+}
+
+function confirmTeam() {
+    const team = selectedTeam.filter(x => x !== null);
+
+    if (team.length === 0) {
+        alert("Bitte mindestens einen Operator wählen!");
+        return;
+    }
+
+    saveTeam();
+
+    document.getElementById("selectionScreen").style.display = "none";
+    document.getElementById("builderScreen").style.display = "block";
+
+    renderSelectedOperators();
+    renderSkills();
+    renderRotation();
+    initSkillDragDrop();
+}
 function renderTeamSlots() {
     const container = document.getElementById("teamSlots");
     if (!container) return;

@@ -76,6 +76,7 @@ function initRotationDragDrop() {
                     id: draggedId
                 };
 
+                ensureExtraSlots();
                 saveRotation();
             }
         });

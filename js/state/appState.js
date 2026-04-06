@@ -1,3 +1,5 @@
-export let rotation = [];
-export let selectedTeam = [null, null, null, null];
-export let activeSlotIndex = null;
+let rotation = new Array(10).fill(null);
+let selectedTeam = [null, null, null, null];
+let activeSlotIndex = null;
+let skillSourceSortables = [];
+let slotSortables = [];
