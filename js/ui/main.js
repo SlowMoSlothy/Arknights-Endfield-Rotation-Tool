@@ -1,8 +1,8 @@
-let rotation = [];
+let rotation = new Array(10).fill(null);
 let selectedTeam = [null, null, null, null];
 let activeSlotIndex = null;
 let skillSourceSortables = [];
-let rotationSortable = null;
+let slotSortables = [];
 
 function renderTeamSlots() {
     const container = document.getElementById("teamSlots");
@@ -59,12 +59,38 @@ function highlightActiveSlot() {
     });
 }
 
+function renderSelectedOperators() {
+    const container = document.getElementById("selectedOperators");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    selectedTeam
+        .filter(id => id !== null)
+        .forEach(id => {
+            const op = operators.find(o => o.id === id);
+            if (!op) return;
+
+            const item = document.createElement("div");
+            item.className = "team-preview-operator";
+
+            const img = document.createElement("img");
+            img.src = op.icon;
+            img.alt = op.name;
+
+            const name = document.createElement("div");
+            name.textContent = op.name;
+
+            item.appendChild(img);
+            item.appendChild(name);
+            container.appendChild(item);
+        });
+}
+
 function getSkillById(id) {
     for (const op of operators) {
         const skill = op.skills.find(s => s.id === id);
-        if (skill) {
-            return { ...skill, operator: op.name };
-        }
+        if (skill) return { ...skill, operator: op.name };
     }
     return null;
 }
@@ -105,9 +131,10 @@ function confirmTeam() {
     document.getElementById("selectionScreen").style.display = "none";
     document.getElementById("builderScreen").style.display = "block";
 
+    renderSelectedOperators();
     renderSkills();
-    initSkillDragDrop();
     renderRotation();
+    initSkillDragDrop();
 }
 
 function backToSelection() {
@@ -163,11 +190,7 @@ function renderOperatorList() {
         grid.appendChild(card);
     });
 }
-function clearRotation() {
-    rotation = [];
-    localStorage.removeItem("rotation");
-    renderRotation();
-}
+
 function renderSkills() {
     const list = document.getElementById("skillList");
     if (!list) return;
@@ -214,96 +237,103 @@ function renderSkills() {
     });
 }
 
-function buildRotationSequence() {
-    const sequence = [];
-    const chunkSize = 5;
+function getSnakeSlotMap() {
+    return [
+        { gridColumn: 1, gridRow: 1, arrow: { text: "→", gridColumn: 2, gridRow: 1 } },
+        { gridColumn: 3, gridRow: 1, arrow: { text: "→", gridColumn: 4, gridRow: 1 } },
+        { gridColumn: 5, gridRow: 1, arrow: { text: "→", gridColumn: 6, gridRow: 1 } },
+        { gridColumn: 7, gridRow: 1, arrow: { text: "→", gridColumn: 8, gridRow: 1 } },
+        { gridColumn: 9, gridRow: 1, arrow: { text: "↓", gridColumn: 9, gridRow: 2 } },
 
-    for (let i = 0; i < rotation.length; i += chunkSize) {
-        const rowItems = rotation.slice(i, i + chunkSize);
-        const isReverse = (i / chunkSize) % 2 === 1;
-        const displayItems = isReverse ? [...rowItems].reverse() : rowItems;
-
-        displayItems.forEach((entry, index) => {
-            sequence.push({
-                type: "skill",
-                entry,
-                rowIndex: Math.floor(i / chunkSize),
-                reverse: isReverse
-            });
-
-            if (index < displayItems.length - 1) {
-                sequence.push({
-                    type: "arrow",
-                    direction: isReverse ? "left" : "right"
-                });
-            }
-        });
-
-        if (i + chunkSize < rotation.length) {
-            sequence.push({ type: "arrow", direction: "down" });
-        }
-    }
-
-    return sequence;
+        { gridColumn: 9, gridRow: 3, arrow: { text: "←", gridColumn: 8, gridRow: 3 } },
+        { gridColumn: 7, gridRow: 3, arrow: { text: "←", gridColumn: 6, gridRow: 3 } },
+        { gridColumn: 5, gridRow: 3, arrow: { text: "←", gridColumn: 4, gridRow: 3 } },
+        { gridColumn: 3, gridRow: 3, arrow: { text: "←", gridColumn: 2, gridRow: 3 } },
+        { gridColumn: 1, gridRow: 3, arrow: null }
+    ];
 }
 
 function renderRotation() {
     const container = document.getElementById("rotationDropZone");
+    if (!container) return;
+
     container.innerHTML = "";
 
-    const maxSlots = 10;
+    const slotMap = getSnakeSlotMap();
 
-    for (let i = 0; i < maxSlots; i++) {
+    slotMap.forEach((slotInfo, index) => {
         const slot = document.createElement("div");
         slot.className = "rotation-slot";
-        slot.dataset.index = i;
+        slot.dataset.index = index;
+        slot.style.gridColumn = String(slotInfo.gridColumn);
+        slot.style.gridRow = String(slotInfo.gridRow);
 
-        // 🔥 Snake Logik
-        if (i >= 5) {
-            slot.classList.add("snake-back");
-        }
-
-        if (i === 4) {
-            slot.classList.add("turn");
-        }
-
-        const entry = rotation[i];
+        const entry = rotation[index];
 
         if (entry) {
             const skillData = getSkillById(entry.id);
 
-            const skillDiv = document.createElement("div");
-            skillDiv.className = "skill rotation-skill";
-            skillDiv.dataset.id = entry.id;
-            skillDiv.dataset.uid = entry.uid;
+            if (skillData) {
+                const skillDiv = document.createElement("div");
+                skillDiv.className = "skill rotation-skill";
+                skillDiv.dataset.id = String(entry.id);
+                skillDiv.dataset.uid = entry.uid;
 
-            const inner = document.createElement("div");
-            inner.className = "skill-inner";
+                const inner = document.createElement("div");
+                inner.className = "skill-inner";
 
-            const img = document.createElement("img");
-            img.src = skillData.icon;
+                const img = document.createElement("img");
+                img.src = skillData.icon;
+                img.alt = skillData.name;
+                img.draggable = false;
 
-            inner.appendChild(img);
-            skillDiv.appendChild(inner);
+                inner.appendChild(img);
+                skillDiv.appendChild(inner);
 
-            const removeBtn = document.createElement("div");
-            removeBtn.className = "remove-btn";
-            removeBtn.textContent = "×";
+                const removeBtn = document.createElement("div");
+                removeBtn.className = "remove-btn";
+                removeBtn.textContent = "×";
+                removeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    rotation[index] = null;
+                    saveRotation();
+                };
 
-            removeBtn.onclick = (e) => {
-                e.stopPropagation();
-                rotation.splice(i, 1);
-                saveRotation();
-            };
+                skillDiv.appendChild(removeBtn);
 
-            skillDiv.appendChild(removeBtn);
-            slot.appendChild(skillDiv);
+                const tooltip = document.createElement("div");
+                tooltip.className = "tooltip";
+                tooltip.innerHTML = `
+                    <b>${skillData.name}</b><br>
+                    <i>${skillData.operator}</i><br>
+                    CD: ${skillData.cooldown}s<br>
+                    Energy: ${skillData.energy}
+                `;
+                skillDiv.appendChild(tooltip);
+
+                slot.appendChild(skillDiv);
+            }
         }
 
         container.appendChild(slot);
-    }
+
+        if (slotInfo.arrow) {
+            const arrow = document.createElement("div");
+            arrow.className = "rotation-arrow";
+            arrow.textContent = slotInfo.arrow.text;
+            arrow.style.gridColumn = String(slotInfo.arrow.gridColumn);
+            arrow.style.gridRow = String(slotInfo.arrow.gridRow);
+            container.appendChild(arrow);
+        }
+    });
 
     initRotationDragDrop();
+}
+
+function clearRotation() {
+    rotation = new Array(10).fill(null);
+    localStorage.removeItem("rotation");
+    renderRotation();
 }
 
 function saveRotation() {
@@ -317,15 +347,19 @@ function loadRotation() {
 
     try {
         const parsed = JSON.parse(saved);
-        rotation = Array.isArray(parsed) ? parsed : [];
+        if (Array.isArray(parsed)) {
+            rotation = new Array(10).fill(null);
+            parsed.slice(0, 10).forEach((entry, index) => {
+                rotation[index] = entry ?? null;
+            });
+        }
     } catch (error) {
         console.error("Rotation konnte nicht geladen werden:", error);
-        rotation = [];
+        rotation = new Array(10).fill(null);
     }
 }
 
 function initSkillDragDrop() {
-    // alte Instanzen zerstören
     skillSourceSortables.forEach(sortable => sortable.destroy());
     skillSourceSortables = [];
 
@@ -345,7 +379,6 @@ function initSkillDragDrop() {
             fallbackClass: "drag-ghost",
             removeCloneOnHide: true,
 
-            // 🔥 HIER wird das große Bild gesetzt
             onStart: (evt) => {
                 setTimeout(() => {
                     const ghost = document.querySelector(".drag-ghost img");
@@ -363,115 +396,54 @@ function initSkillDragDrop() {
 }
 
 function initRotationDragDrop() {
-    const rotationZone = document.getElementById("rotationDropZone");
-    if (!rotationZone) return;
+    slotSortables.forEach(sortable => sortable.destroy());
+    slotSortables = [];
 
-    if (rotationSortable) {
-        rotationSortable.destroy();
-    }
+    const slots = document.querySelectorAll(".rotation-slot");
 
-    rotationSortable = new Sortable(rotationZone, {
-        group: {
-            name: "skills",
-            pull: false,
-            put: true
-        },
-        animation: 150,
-        draggable: ".rotation-skill",
-        filter: ".rotation-arrow",
-        forceFallback: true,
-        fallbackOnBody: true,
-        swapThreshold: 0.65,
+    slots.forEach((slot, index) => {
+        const sortable = new Sortable(slot, {
+            group: {
+                name: "skills",
+                pull: true,
+                put: true
+            },
+            sort: false,
+            draggable: ".rotation-skill",
+            forceFallback: true,
+            fallbackOnBody: true,
 
-        onAdd: (evt) => {
-            const skillId = parseInt(evt.item.dataset.id, 10);
-            evt.item.remove();
+            onAdd: (evt) => {
+                const draggedUid = evt.item.dataset.uid;
+                const draggedId = parseInt(evt.item.dataset.id, 10);
 
-            if (!skillId) return;
+                evt.item.remove();
 
-            const dropIndex = getRotationIndexFromDomIndex(evt.newIndex);
+                if (draggedUid) {
+                    const oldIndex = rotation.findIndex(item => item && item.uid === draggedUid);
 
-            rotation.splice(dropIndex, 0, {
-                uid: crypto.randomUUID(),
-                id: skillId
-            });
-
-            saveRotation();
-        },
-
-        onUpdate: () => {
-            const skillEls = Array.from(rotationZone.querySelectorAll(".rotation-skill"));
-
-            // sichtbare Reihenfolge aus dem Grid
-            const visualOrder = skillEls.map(el => ({
-                uid: el.dataset.uid,
-                rowIndex: parseInt(el.dataset.rowIndex, 10),
-                displayIndex: parseInt(el.dataset.displayIndex, 10)
-            }));
-
-            visualOrder.sort((a, b) => {
-                if (a.rowIndex !== b.rowIndex) {
-                    return a.rowIndex - b.rowIndex;
-                }
-                return a.displayIndex - b.displayIndex;
-            });
-
-            const rebuilt = [];
-
-            // wieder zurück in logische Snake-Reihenfolge
-            const rows = new Map();
-            visualOrder.forEach(item => {
-                if (!rows.has(item.rowIndex)) {
-                    rows.set(item.rowIndex, []);
-                }
-                rows.get(item.rowIndex).push(item);
-            });
-
-            Array.from(rows.keys()).sort((a, b) => a - b).forEach(rowIndex => {
-                const rowItems = rows.get(rowIndex);
-                const isReverse = rowIndex % 2 === 1;
-
-                const orderedRow = isReverse ? [...rowItems].reverse() : rowItems;
-
-                orderedRow.forEach(item => {
-                    const existing = rotation.find(r => r.uid === item.uid);
-                    if (existing) {
-                        rebuilt.push(existing);
+                    if (oldIndex !== -1) {
+                        const temp = rotation[index];
+                        rotation[index] = rotation[oldIndex];
+                        rotation[oldIndex] = temp;
+                        saveRotation();
+                        return;
                     }
-                });
-            });
+                }
 
-            rotation = rebuilt;
-            saveRotation();
-        }
+                if (!draggedId) return;
+
+                rotation[index] = {
+                    uid: crypto.randomUUID(),
+                    id: draggedId
+                };
+
+                saveRotation();
+            }
+        });
+
+        slotSortables.push(sortable);
     });
-}
-
-function getRotationIndexFromDomIndex(domIndex) {
-    const zone = document.getElementById("rotationDropZone");
-    const children = Array.from(zone.children).slice(0, domIndex);
-
-    const visualSkills = children.filter(el => el.classList.contains("rotation-skill"));
-
-    if (visualSkills.length === 0) {
-        return 0;
-    }
-
-    const lastSkill = visualSkills[visualSkills.length - 1];
-    const rowIndex = parseInt(lastSkill.dataset.rowIndex, 10);
-    const displayIndex = parseInt(lastSkill.dataset.displayIndex, 10);
-
-    const isReverse = rowIndex % 2 === 1;
-
-    let logicalIndexInRow;
-    if (isReverse) {
-        const rowLength = rotation.slice(rowIndex * 5, rowIndex * 5 + 5).length;
-        logicalIndexInRow = rowLength - 1 - displayIndex;
-    } else {
-        logicalIndexInRow = displayIndex;
-    }
-
-    return rowIndex * 5 + logicalIndexInRow + 1;
 }
 
 function exportImage() {
