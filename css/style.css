@@ -101,14 +101,10 @@ body {
     flex-shrink: 0;
 }
 #rotationDropZone {
-    min-height: 150px;
-    width: 100%;
     display: grid;
-    grid-template-columns: 60px 20px 60px 20px 60px 20px 60px 20px 60px;
-    grid-auto-rows: minmax(60px, auto);
-    column-gap: 10px;
-    row-gap: 10px;
-    align-items: center;
+    grid-template-columns: repeat(10, 60px);
+    gap: 10px;
+    position: relative;
 }
 .skill-row {
     display: flex;
@@ -310,23 +306,35 @@ body {
     width: 60px;
     height: 60px;
 }
-/* Pfeile */
-.arrow {
-    font-size: 20px;
-    color: #888;
-}
-
-/* Down Arrow */
-.arrow.down {
-    position: relative;
-    height: 20px;
-}
-
-.arrow.down span {
+/* Standard → Pfeile */
+.rotation-slot::after {
+    content: "→";
     position: absolute;
+    right: -14px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* letzter Slot kein Pfeil */
+.rotation-slot:last-child::after {
+    display: none;
+}
+
+/* Rückweg (Snake Effekt) */
+.rotation-slot.snake-back::after {
+    content: "←";
+    left: -14px;
+    right: auto;
+}
+
+/* Mitte zeigt Richtungswechsel */
+.rotation-slot.turn::before {
+    content: "↵";
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
     transform: translateX(-50%);
 }
-
 /* Export Mode */
 .export-mode .remove-btn {
     display: none !important;

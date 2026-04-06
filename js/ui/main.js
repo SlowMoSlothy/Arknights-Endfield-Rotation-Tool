@@ -249,47 +249,39 @@ function buildRotationSequence() {
 
 function renderRotation() {
     const container = document.getElementById("rotationDropZone");
-    if (!container) return;
-
     container.innerHTML = "";
 
-    const chunkSize = 5;
+    const maxSlots = 10;
 
-    for (let i = 0; i < rotation.length; i += chunkSize) {
-        const rowItems = rotation.slice(i, i + chunkSize);
-        const rowIndex = Math.floor(i / chunkSize);
-        const isReverse = rowIndex % 2 === 1;
+    for (let i = 0; i < maxSlots; i++) {
+        const slot = document.createElement("div");
+        slot.className = "rotation-slot";
+        slot.dataset.index = i;
 
-        const displayItems = isReverse ? [...rowItems].reverse() : rowItems;
+        // 🔥 Snake Logik
+        if (i >= 5) {
+            slot.classList.add("snake-back");
+        }
 
-        const skillRow = rowIndex * 2 + 1;
-        const downRow = rowIndex * 2 + 2;
+        if (i === 4) {
+            slot.classList.add("turn");
+        }
 
-        displayItems.forEach((entry, index) => {
+        const entry = rotation[i];
+
+        if (entry) {
             const skillData = getSkillById(entry.id);
-            if (!skillData) return;
 
             const skillDiv = document.createElement("div");
             skillDiv.className = "skill rotation-skill";
-            skillDiv.dataset.id = String(entry.id);
+            skillDiv.dataset.id = entry.id;
             skillDiv.dataset.uid = entry.uid;
-            skillDiv.dataset.rowIndex = String(rowIndex);
-            skillDiv.dataset.displayIndex = String(index);
-
-            const skillColumn = isReverse
-                ? 9 - (index * 2)
-                : 1 + (index * 2);
-
-            skillDiv.style.gridColumn = String(skillColumn);
-            skillDiv.style.gridRow = String(skillRow);
 
             const inner = document.createElement("div");
             inner.className = "skill-inner";
 
             const img = document.createElement("img");
             img.src = skillData.icon;
-            img.alt = skillData.name;
-            img.draggable = false;
 
             inner.appendChild(img);
             skillDiv.appendChild(inner);
@@ -297,51 +289,18 @@ function renderRotation() {
             const removeBtn = document.createElement("div");
             removeBtn.className = "remove-btn";
             removeBtn.textContent = "×";
+
             removeBtn.onclick = (e) => {
                 e.stopPropagation();
-                rotation = rotation.filter(s => s.uid !== entry.uid);
+                rotation.splice(i, 1);
                 saveRotation();
             };
+
             skillDiv.appendChild(removeBtn);
-
-            const tooltip = document.createElement("div");
-            tooltip.className = "tooltip";
-            tooltip.innerHTML = `
-                <b>${skillData.name}</b><br>
-                <i>${skillData.operator}</i><br>
-                CD: ${skillData.cooldown}s<br>
-                Energy: ${skillData.energy}
-            `;
-            skillDiv.appendChild(tooltip);
-
-            container.appendChild(skillDiv);
-
-            if (index < displayItems.length - 1) {
-                const arrow = document.createElement("div");
-                arrow.className = "rotation-arrow";
-                arrow.textContent = isReverse ? "←" : "→";
-
-                const arrowColumn = isReverse
-                    ? 8 - (index * 2)
-                    : 2 + (index * 2);
-
-                arrow.style.gridColumn = String(arrowColumn);
-                arrow.style.gridRow = String(skillRow);
-
-                container.appendChild(arrow);
-            }
-        });
-
-        if (i + chunkSize < rotation.length) {
-            const downArrow = document.createElement("div");
-            downArrow.className = "rotation-arrow down";
-            downArrow.textContent = "↓";
-
-            downArrow.style.gridColumn = isReverse ? "1" : "9";
-            downArrow.style.gridRow = String(downRow);
-
-            container.appendChild(downArrow);
+            slot.appendChild(skillDiv);
         }
+
+        container.appendChild(slot);
     }
 
     initRotationDragDrop();
