@@ -22,7 +22,7 @@ button:hover {
 
 .box {
     width: fit-content;
-    min-width: 420px;
+    min-width: 210px;
     min-height: 100px;
     border: 2px dashed #555;
     padding: 10px;
@@ -348,7 +348,32 @@ button:hover {
     display: none !important;
 }
 
+/* äußeren Rahmen der Export-Box ausblenden */
+.export-mode {
+    border-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+/* Slot-Rahmen beim Export unsichtbar machen */
+.export-mode .rotation-slot {
+    border-color: transparent !important;
+    background: transparent !important;
+}
+
+/* Skill-Rahmen beim Export entfernen */
+.export-mode .rotation-skill .skill-inner {
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+
+/* freie Slots komplett unsichtbar machen */
 .export-mode .rotation-slot:empty {
     border-color: transparent !important;
     background: transparent !important;
+}
+
+/* leere Pfeile beim Export verstecken */
+.export-mode .rotation-arrow.is-unused {
+    visibility: hidden !important;
 }

@@ -66,6 +66,27 @@ function renderRotation() {
             const arrow = document.createElement("div");
             arrow.className = "rotation-arrow";
             arrow.textContent = slotInfo.arrow.text;
+
+            let isArrowUsed = false;
+
+            // obere Reihe: 0 -> 1 -> 2 -> 3 -> 4
+            if (index >= 0 && index <= 3) {
+                isArrowUsed = rotation[index] !== null && rotation[index + 1] !== null;
+            }
+
+            // Pfeil nach unten: 4 -> 5
+            if (index === 4) {
+                isArrowUsed = rotation[4] !== null && rotation[5] !== null;
+            }
+
+            // untere Reihe: 5 <- 6 <- 7 <- 8 <- 9
+            if (index >= 5 && index <= 8) {
+                isArrowUsed = rotation[index] !== null && rotation[index + 1] !== null;
+            }
+
+            if (!isArrowUsed) {
+                arrow.classList.add("is-unused");
+            }
             arrow.style.gridColumn = String(slotInfo.arrow.gridColumn);
             arrow.style.gridRow = String(slotInfo.arrow.gridRow);
             container.appendChild(arrow);
