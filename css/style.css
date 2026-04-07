@@ -384,3 +384,16 @@ button:hover {
 .export-mode .rotation-arrow.is-unused {
     visibility: hidden !important;
 }
+
+.skill-debuff {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 18px;
+    height: 18px;
+    object-fit: cover;
+    border-radius: 4px;
+    z-index: 6;
+    background: #111;
+    border: 1px solid #666;
+}

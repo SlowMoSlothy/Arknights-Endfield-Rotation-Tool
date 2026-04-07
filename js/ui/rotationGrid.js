@@ -35,6 +35,16 @@ function renderRotation() {
                 inner.appendChild(img);
                 skillDiv.appendChild(inner);
 
+                if (skillData.debuff && skillData.debuff.icon) {
+                    const debuff = document.createElement("img");
+                    debuff.className = "skill-debuff";
+                    debuff.src = skillData.debuff.icon;
+                    debuff.alt = skillData.debuff.name || "Debuff";
+                    debuff.title = skillData.debuff.name || "Debuff";
+
+                    skillDiv.appendChild(debuff);
+                }
+                
                 const removeBtn = document.createElement("div");
                 removeBtn.className = "remove-btn";
                 removeBtn.textContent = "×";
