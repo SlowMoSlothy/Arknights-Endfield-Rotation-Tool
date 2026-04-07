@@ -235,7 +235,7 @@ button:hover {
 #rotationDropZone {
     display: grid;
     grid-template-columns: 60px 20px 60px 20px 60px 20px 60px 20px 60px;
-    grid-auto-rows: 60px;
+    grid-auto-rows: minmax(24px, auto);
     column-gap: 10px;
     row-gap: 10px;
     width: max-content;

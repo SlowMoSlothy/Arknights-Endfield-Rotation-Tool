@@ -114,9 +114,8 @@ function getSnakeSlotMap() {
             const gridRow = row * 2 + 1;
 
             let arrow = null;
-
-            const isLastInRow = col === 4;
             const hasNextSlot = slotIndex + 1 < rotation.length;
+            const isLastInRow = col === 4;
 
             if (hasNextSlot) {
                 if (!isLastInRow) {

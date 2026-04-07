@@ -31,17 +31,23 @@ function loadRotation() {
 
     try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
+
+        if (Array.isArray(parsed) && parsed.length > 0) {
+            rotation = [...parsed];
+
+            // Falls weniger als 10 Slots gespeichert wurden, auf 10 auffüllen
+            while (rotation.length < 10) {
+                rotation.push(null);
+            }
+        } else {
             rotation = new Array(10).fill(null);
-            parsed.slice(0, 10).forEach((entry, index) => {
-                rotation[index] = entry ?? null;
-            });
         }
     } catch (error) {
         console.error("Rotation konnte nicht geladen werden:", error);
         rotation = new Array(10).fill(null);
     }
 }
+
 function clearRotation() {
     rotation = new Array(10).fill(null);
     localStorage.removeItem("rotation");
