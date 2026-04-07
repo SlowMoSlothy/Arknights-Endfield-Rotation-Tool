@@ -83,7 +83,6 @@ function initRotationDragDrop() {
 
                         compactRotation();
                         ensureExtraSlots();
-                        trimTrailingEmptyRows();
                         saveRotation();
                         return;
                     }
@@ -97,7 +96,6 @@ function initRotationDragDrop() {
                 };
 
                 ensureExtraSlots();
-                trimTrailingEmptyRows();
                 saveRotation();
             }
         });
