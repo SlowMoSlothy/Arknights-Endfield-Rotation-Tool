@@ -41,6 +41,8 @@ function renderRotation() {
                 removeBtn.onclick = (e) => {
                     e.stopPropagation();
                     rotation[index] = null;
+                    compactRotation();
+                    trimTrailingEmptyRows();
                     saveRotation();
                 };
 
@@ -95,6 +97,7 @@ function renderRotation() {
 
     initRotationDragDrop();
 }
+
 function getSnakeSlotMap() {
     const map = [];
     const rows = Math.ceil(rotation.length / 5);

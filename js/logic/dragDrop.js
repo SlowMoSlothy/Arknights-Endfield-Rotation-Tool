@@ -51,6 +51,16 @@ function initRotationDragDrop() {
             forceFallback: true,
             fallbackOnBody: true,
 
+            onMove: () => {
+                document.querySelectorAll(".rotation-slot").forEach(s => s.classList.remove("drag-hover"));
+                slot.classList.add("drag-hover");
+                return true;
+            },
+
+            onEnd: () => {
+                document.querySelectorAll(".rotation-slot").forEach(s => s.classList.remove("drag-hover"));
+            },
+
             onAdd: (evt) => {
                 const draggedUid = evt.item.dataset.uid;
                 const draggedId = parseInt(evt.item.dataset.id, 10);
@@ -61,14 +71,24 @@ function initRotationDragDrop() {
                     const oldIndex = rotation.findIndex(item => item && item.uid === draggedUid);
 
                     if (oldIndex !== -1) {
-                        const temp = rotation[index];
-                        rotation[index] = rotation[oldIndex];
-                        rotation[oldIndex] = temp;
+                        const movedItem = rotation[oldIndex];
+                        rotation.splice(oldIndex, 1);
+
+                        let insertIndex = index;
+                        if (oldIndex < index) {
+                            insertIndex--;
+                        }
+
+                        rotation.splice(insertIndex, 0, movedItem);
+
+                        compactRotation();
+                        ensureExtraSlots();
+                        trimTrailingEmptyRows();
                         saveRotation();
                         return;
                     }
                 }
-
+                
                 if (!draggedId) return;
 
                 rotation[index] = {
@@ -77,6 +97,7 @@ function initRotationDragDrop() {
                 };
 
                 ensureExtraSlots();
+                trimTrailingEmptyRows();
                 saveRotation();
             }
         });
