@@ -60,3 +60,28 @@ function getComboSkillByTrigger(trigger) {
     }
     return null;
 }
+function getOperatorBySkillId(skillId) {
+    for (const op of operators) {
+        if (op.skills.some(skill => skill.id === skillId)) {
+            return op;
+        }
+    }
+    return null;
+}
+
+function getComboSkillFromSelectedTeam(trigger, sourceOperatorId) {
+    const activeOperators = operators.filter(op => selectedTeam.includes(op.id));
+
+    for (const op of activeOperators) {
+        if (op.id === sourceOperatorId) {
+            continue; // nur anderer Operator
+        }
+
+        const comboSkill = op.skills.find(skill => skill.comboTrigger === trigger);
+        if (comboSkill) {
+            return comboSkill;
+        }
+    }
+
+    return null;
+}

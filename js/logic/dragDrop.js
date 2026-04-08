@@ -96,18 +96,25 @@ function initRotationDragDrop() {
                 };
 
                 const insertedSkillData = getSkillById(draggedId);
+                const sourceOperator = getOperatorBySkillId(draggedId);
 
-                if (insertedSkillData && insertedSkillData.appliesEffect) {
-                    const comboSkill = getComboSkillByTrigger(insertedSkillData.appliesEffect);
+                if (insertedSkillData && insertedSkillData.appliesEffect && sourceOperator) {
+                    const comboSkill = getComboSkillFromSelectedTeam(
+                        insertedSkillData.appliesEffect,
+                        sourceOperator.id
+                    );
 
                     if (comboSkill) {
                         const comboIndex = index + 1;
 
-                        rotation.splice(comboIndex, 0, {
-                            uid: crypto.randomUUID(),
-                            id: comboSkill.id,
-                            autoInserted: true
-                        });
+                        // nicht doppelt einfügen
+                        if (!rotation[comboIndex] || rotation[comboIndex].id !== comboSkill.id) {
+                            rotation.splice(comboIndex, 0, {
+                                uid: crypto.randomUUID(),
+                                id: comboSkill.id,
+                                autoInserted: true
+                            });
+                        }
                     }
                 }
 
