@@ -21,6 +21,9 @@ function renderRotation() {
             if (skillData) {
                 const skillDiv = document.createElement("div");
                 skillDiv.className = "skill rotation-skill";
+                if (entry.autoInserted) {
+                    skillDiv.classList.add("auto-inserted");
+                }
                 skillDiv.dataset.id = String(entry.id);
                 skillDiv.dataset.uid = entry.uid;
 

@@ -50,3 +50,13 @@ function getSkillById(id) {
     }
     return null;
 }
+function getComboSkillByTrigger(trigger) {
+    for (const op of operators) {
+        for (const skill of op.skills) {
+            if (skill.comboTrigger === trigger) {
+                return skill;
+            }
+        }
+    }
+    return null;
+}

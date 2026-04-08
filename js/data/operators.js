@@ -16,7 +16,8 @@ const operators = [
                 debuff: {
                     icon: "assets/debuffs/heat.webp",
                     name: "Burn"
-                }
+                },
+                appliesEffect:"Lift"
             },
             {
                 id: 102,
@@ -74,7 +75,8 @@ const operators = [
                 type: "cs",
                 cooldown: 20,
                 energy: 60,
-                description: "Massiver AoE Schaden."
+                description: "Massiver AoE Schaden.",
+                comboTrigger: "Lift"
             },
             {
                 id: 204,

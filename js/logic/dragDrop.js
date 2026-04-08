@@ -95,6 +95,22 @@ function initRotationDragDrop() {
                     id: draggedId
                 };
 
+                const insertedSkillData = getSkillById(draggedId);
+
+                if (insertedSkillData && insertedSkillData.appliesEffect) {
+                    const comboSkill = getComboSkillByTrigger(insertedSkillData.appliesEffect);
+
+                    if (comboSkill) {
+                        const comboIndex = index + 1;
+
+                        rotation.splice(comboIndex, 0, {
+                            uid: crypto.randomUUID(),
+                            id: comboSkill.id,
+                            autoInserted: true
+                        });
+                    }
+                }
+
                 ensureExtraSlots();
                 saveRotation();
             }

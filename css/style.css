@@ -385,7 +385,10 @@ button:hover {
 .export-mode .rotation-arrow.is-unused {
     visibility: hidden !important;
 }
-
+.rotation-skill.auto-inserted .skill-inner {
+    box-shadow: 0 0 10px rgba(255, 200, 0, 0.7);
+    border-color: #ffcc00;
+}
 .arrow-debuff {
     position: absolute;
     top: 5px;
