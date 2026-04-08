@@ -267,6 +267,7 @@ button:hover {
     user-select: none;
     pointer-events: none;
     min-height: 24px;
+    position: relative;
 }
 
 /* Remove Button */
@@ -385,15 +386,16 @@ button:hover {
     visibility: hidden !important;
 }
 
-.skill-debuff {
+.arrow-debuff {
     position: absolute;
-    top: -10px;
-    right: -10px;
-    width: 12px;
-    height: 12px;
+    top: -14px;
+    left: 50%;
+    transform: translate(-50%);
+    width: 14px;
+    height: 14px;
     object-fit: cover;
     border-radius: 3px;
-    z-index: 10;
+    z-index: 20;
     background: #111;
     border: 1px solid #777;
     box-shadow: 0 0 6px rgba(255,100   , 100, 0.6);

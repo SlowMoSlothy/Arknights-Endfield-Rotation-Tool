@@ -79,6 +79,21 @@ function renderRotation() {
             arrow.className = "rotation-arrow";
             arrow.textContent = slotInfo.arrow.text;
 
+            const currentEntry =rotation[index];
+
+            if(currentEntry){
+
+                const skillData = getSkillById(currentEntry.id);
+
+                if(skillData && skillData.debuff && skillData.debuff.icon){
+                    const debuff = document.createElement("img");
+                    debuff.className ="arrow-debuff";
+                    debuff.src = skillData.debuff.icon;
+                    debuff.title = skillData.debuff.name || "Debuff";
+                    arrow.appendChild(debuff)
+                }
+            }
+
             let isArrowUsed = false;
 
             // obere Reihe: 0 -> 1 -> 2 -> 3 -> 4
