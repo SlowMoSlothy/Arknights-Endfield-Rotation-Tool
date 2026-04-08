@@ -68,44 +68,42 @@ function renderRotation() {
             const arrow = document.createElement("div");
             arrow.className = "rotation-arrow";
             arrow.textContent = slotInfo.arrow.text;
+            arrow.style.gridColumn = String(slotInfo.arrow.gridColumn);
+            arrow.style.gridRow = String(slotInfo.arrow.gridRow);
 
-            const currentEntry =rotation[index];
+            const currentEntry = rotation[index];
+            let isUsed = false;
 
-            if(currentEntry){
+            if (index >= 0 && index <= 3) {
+                isUsed = rotation[index] !== null && rotation[index + 1] !== null;
+            }
 
+            if (index === 4) {
+                isUsed = rotation[4] !== null && rotation[5] !== null;
+            }
+
+            if (index >= 5 && index <= 8) {
+                isUsed = rotation[index] !== null && rotation[index + 1] !== null;
+            }
+
+            if (!isUsed) {
+                arrow.classList.add("is-unused");
+            }
+
+            if (currentEntry && isUsed) {
                 const skillData = getSkillById(currentEntry.id);
 
-                if(skillData && skillData.debuff && skillData.debuff.icon){
+                if (skillData && skillData.debuff && skillData.debuff.icon) {
                     const debuff = document.createElement("img");
-                    debuff.className ="arrow-debuff";
+                    debuff.className = "arrow-debuff";
                     debuff.src = skillData.debuff.icon;
+                    debuff.alt = skillData.debuff.name || "Debuff";
                     debuff.title = skillData.debuff.name || "Debuff";
-                    arrow.appendChild(debuff)
+
+                    arrow.appendChild(debuff);
                 }
             }
 
-            let isArrowUsed = false;
-
-            // obere Reihe: 0 -> 1 -> 2 -> 3 -> 4
-            if (index >= 0 && index <= 3) {
-                isArrowUsed = rotation[index] !== null && rotation[index + 1] !== null;
-            }
-
-            // Pfeil nach unten: 4 -> 5
-            if (index === 4) {
-                isArrowUsed = rotation[4] !== null && rotation[5] !== null;
-            }
-
-            // untere Reihe: 5 <- 6 <- 7 <- 8 <- 9
-            if (index >= 5 && index <= 8) {
-                isArrowUsed = rotation[index] !== null && rotation[index + 1] !== null;
-            }
-
-            if (!isArrowUsed) {
-                arrow.classList.add("is-unused");
-            }
-            arrow.style.gridColumn = String(slotInfo.arrow.gridColumn);
-            arrow.style.gridRow = String(slotInfo.arrow.gridRow);
             container.appendChild(arrow);
         }
     });
