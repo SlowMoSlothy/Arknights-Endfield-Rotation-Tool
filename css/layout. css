@@ -1,0 +1,35 @@
+.builder-shell {
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.builder-top {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.builder-divider {
+    height: 1px;
+    background: #444;
+    margin: 20px 0;
+}
+
+.builder-content {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 24px;
+}
+
+.builder-sidebar {
+    background: #181818;
+    border: 1px solid #444;
+    border-radius: 10px;
+    padding: 16px;
+}
+
+.builder-main {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
