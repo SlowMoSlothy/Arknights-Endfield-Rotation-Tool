@@ -1,8 +1,16 @@
 .rotation-panel {
-    background: #161616;
     border: 2px dashed #555;
     border-radius: 10px;
     padding: 14px;
+    width: fit-content;
+}
+
+#rotationDropZone {
+    display: grid;
+    grid-template-columns:
+        repeat(10, 60px 20px);
+    grid-auto-rows: minmax(24px, auto);
+    gap: 10px;
 }
 
 .rotation-slot {
@@ -10,10 +18,32 @@
     height: 60px;
     border: 2px dashed #444;
     border-radius: 8px;
+    position: relative;
+}
+
+.rotation-skill {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.skill-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.skill-inner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .rotation-arrow {
-    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     color: #888;
     position: relative;
 }
