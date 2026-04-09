@@ -607,7 +607,8 @@ button:hover {
     display: flex;
     gap: 20px;
     align-items: flex-start;
-    flex-wrap: wrap;
+flex-wrap: nowrap;
+overflow-x: auto;
 }
 
 .operator-skill-card {
