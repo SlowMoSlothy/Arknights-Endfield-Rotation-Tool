@@ -3,3 +3,10 @@ body {
     color: white;
     font-family: Arial;
 }
+
+.box {
+    border: 2px dashed #555;
+    padding: 10px;
+    border-radius: 8px;
+    background: #161616;
+}
