@@ -1,49 +1,115 @@
+/* =========================
+   SKILLS WRAPPER
+========================= */
+.skills-panel {
+    background: #161616;
+    border: 2px dashed #555;
+    border-radius: 10px;
+    padding: 14px;
+}
+
+/* =========================
+   OPERATOR GRID (NEBENEINANDER)
+========================= */
 .operators-skills-grid {
     display: flex;
     gap: 20px;
+    align-items: flex-start;
     flex-wrap: wrap;
 }
 
+/* =========================
+   OPERATOR CARD (SKILLS)
+========================= */
 .operator-skill-card {
     display: flex;
     flex-direction: column;
     gap: 10px;
+
     min-width: 180px;
+
     background: #1b1b1b;
     border: 1px solid #444;
     border-radius: 10px;
+
     padding: 10px;
 }
 
+/* =========================
+   OPERATOR HEADER
+========================= */
+.operator-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .operator-icon {
-    width: 28px !important;
-    height: 28px !important;
+    width: 32px;
+    height: 32px;
     border-radius: 6px;
     object-fit: cover;
 }
 
-.operator-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 8px;
-}
-
+/* =========================
+   SKILL ROW
+========================= */
 .skill-row {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
 }
 
+/* =========================
+   SMALL SKILLS (DRAG SOURCE)
+========================= */
 .skill-small {
-    width: 35px;
-    height: 35px;
+    width: 36px;
+    height: 36px;
+
     border-radius: 6px;
     overflow: hidden;
+
     cursor: grab;
+    transition: 0.2s;
+}
+
+.skill-small:hover {
+    transform: scale(1.1);
 }
 
 .skill-small img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+/* =========================
+   GENERIC SKILL (ROTATION)
+========================= */
+.skill {
+    width: 60px;
+    height: 60px;
+    position: relative;
+}
+
+.skill-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #2a2a2a;
+    border: 2px solid #555;
+}
+
+.skill-inner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Hover Effekt */
+.skill:hover .skill-inner {
+    transform: scale(1.05);
+    box-shadow: 0 0 8px rgba(0, 150, 255, 0.6);
 }
