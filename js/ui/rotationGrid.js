@@ -72,19 +72,20 @@ function renderRotation() {
             arrow.className = "rotation-arrow";
             arrow.textContent = slotInfo.arrow.text;
 
+            const currentEntry = rotation[index];
             let isUsed = false;
 
-            // obere Reihe: 0 -> 1 -> 2 -> 3 -> 4
+            // obere Reihe
             if (index >= 0 && index <= 3) {
                 isUsed = rotation[index] !== null && rotation[index + 1] !== null;
             }
 
-            // Pfeil nach unten: 4 -> 5
+            // Pfeil nach unten
             if (index === 4) {
                 isUsed = rotation[4] !== null && rotation[5] !== null;
             }
 
-            // untere Reihe: 5 <- 6 <- 7 <- 8 <- 9
+            // untere Reihe
             if (index >= 5 && index <= 8) {
                 isUsed = rotation[index] !== null && rotation[index + 1] !== null;
             }
@@ -93,25 +94,32 @@ function renderRotation() {
                 arrow.classList.add("is-unused");
             }
 
-            const currentEntry = rotation[index];
-            if (currentEntry) {
+            if (currentEntry && isUsed) {
                 const skillData = getSkillById(currentEntry.id);
 
-                if (skillData && skillData.debuff && skillData.debuff.icon) {
-                    const debuff = document.createElement("img");
-                    debuff.className = "arrow-debuff";
-                    debuff.src = skillData.debuff.icon;
-                    debuff.alt = skillData.debuff.name || "Debuff";
-                    debuff.title = skillData.debuff.name || "Debuff";
+                if (skillData && skillData.debuff) {
+                    const debuffWrap = document.createElement("div");
+                    debuffWrap.className = "arrow-effect";
 
-                    arrow.appendChild(debuff);
+                    if (skillData.debuff.icon) {
+                        const debuffIcon = document.createElement("img");
+                        debuffIcon.className = "arrow-effect-icon";
+                        debuffIcon.src = skillData.debuff.icon;
+                        debuffIcon.alt = skillData.debuff.name || "Effect";
+                        debuffIcon.title = skillData.debuff.name || "Effect";
+                        debuffWrap.appendChild(debuffIcon);
+                    }
+
+                    if (skillData.debuff.name) {
+                        const debuffLabel = document.createElement("div");
+                        debuffLabel.className = "arrow-effect-label";
+                        debuffLabel.textContent = skillData.debuff.name;
+                        debuffWrap.appendChild(debuffLabel);
+                    }
+
+                    arrow.appendChild(debuffWrap);
                 }
             }
-
-            arrow.style.gridColumn = String(slotInfo.arrow.gridColumn);
-            arrow.style.gridRow = String(slotInfo.arrow.gridRow);
-
-            container.appendChild(arrow);
         }
     });
 
