@@ -54,7 +54,6 @@ function renderSkills() {
 
     list.appendChild(wrapper);
 }
-
 function getSkillById(id) {
     for (const op of operators) {
         const skill = op.skills.find(s => s.id === id);
@@ -80,7 +79,6 @@ function getOperatorBySkillId(skillId) {
     }
     return null;
 }
-
 function getComboSkillFromSelectedTeam(trigger, sourceOperatorId) {
     const activeOperators = operators.filter(op => selectedTeam.includes(op.id));
 
@@ -96,4 +94,20 @@ function getComboSkillFromSelectedTeam(trigger, sourceOperatorId) {
     }
 
     return null;
+}
+function getComboSkillsFromEffects(effects, sourceOperatorId) {
+    const activeOperators = operators.filter(op => selectedTeam.includes(op.id));
+    const result = [];
+
+    for (const op of activeOperators) {
+        if (op.id === sourceOperatorId) continue;
+
+        for (const skill of op.skills) {
+            if (effects.includes(skill.comboTrigger)) {
+                result.push(skill);
+            }
+        }
+    }
+
+    return result;
 }

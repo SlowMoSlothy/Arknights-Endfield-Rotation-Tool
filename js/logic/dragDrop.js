@@ -98,24 +98,36 @@ function initRotationDragDrop() {
                 const insertedSkillData = getSkillById(draggedId);
                 const sourceOperator = getOperatorBySkillId(draggedId);
 
-                if (insertedSkillData && insertedSkillData.appliesEffect && sourceOperator) {
-                    const comboSkill = getComboSkillFromSelectedTeam(
-                        insertedSkillData.appliesEffect,
-                        sourceOperator.id
-                    );
+                if (
+                    insertedSkillData &&
+                    insertedSkillData.debuffs &&
+                    insertedSkillData.debuffs.length > 0 &&
+                    sourceOperator
+                ) {
+                    const effects = insertedSkillData.debuffs
+                        .map(d => d.appliesEffect)
+                        .filter(Boolean);
 
-                    if (comboSkill) {
-                        const comboIndex = index + 1;
+                    const comboSkills = getComboSkillsFromEffects(effects, sourceOperator.id);
 
-                        // nicht doppelt einfügen
-                        if (!rotation[comboIndex] || rotation[comboIndex].id !== comboSkill.id) {
+                    let insertOffset = 1;
+
+                    comboSkills.forEach(comboSkill => {
+                        const comboIndex = index + insertOffset;
+
+                        const alreadyThere =
+                            rotation[comboIndex] &&
+                            rotation[comboIndex].id === comboSkill.id;
+
+                        if (!alreadyThere) {
                             rotation.splice(comboIndex, 0, {
                                 uid: crypto.randomUUID(),
                                 id: comboSkill.id,
                                 autoInserted: true
                             });
+                            insertOffset++;
                         }
-                    }
+                    });
                 }
 
                 ensureExtraSlots();
