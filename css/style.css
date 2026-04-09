@@ -602,3 +602,44 @@ button:hover {
     width: 100%;
     text-align: left;
 }
+
+.operators-skills-grid {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.operator-skill-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 180px;
+    background: #1b1b1b;
+    border: 1px solid #444;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.operator-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0;
+}
+
+.operator-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    object-fit: cover;
+    margin-right: 0;
+}
+
+.skill-row {
+    display: flex;
+    gap: 8px;
+    margin-left: 0;
+    margin-bottom: 0;
+    flex-wrap: wrap;
+}
