@@ -13,7 +13,7 @@ const operators = [
                 cooldown: 20,
                 energy: 60,
                 description: "Massiver AoE Schaden.",
-                debuff: [
+                debuffs: [
                 {
                     icon: "assets/debuffs/heat.webp",
                     name: "Burn",
