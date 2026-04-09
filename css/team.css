@@ -18,8 +18,9 @@
     object-fit: cover;
 }
 
-.team-preview-operator {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.team-preview-operator img {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 6px;
+    object-fit: cover;
 }
