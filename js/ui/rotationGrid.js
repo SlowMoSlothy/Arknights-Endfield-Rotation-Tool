@@ -94,7 +94,7 @@ function renderRotation() {
                 arrow.classList.add("is-unused");
             }
 
-            if (currentEntry && isUsed) {
+            if (currentEntry) {
                 const skillData = getSkillById(currentEntry.id);
 
                 if (skillData && skillData.debuff) {
@@ -120,6 +120,7 @@ function renderRotation() {
                     arrow.appendChild(debuffWrap);
                 }
             }
+            container.appendChild(arrow);
         }
     });
 
