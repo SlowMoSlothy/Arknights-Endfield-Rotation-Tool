@@ -1,0 +1,17 @@
+.team-slots {
+    display: flex;
+    gap: 15px;
+}
+
+.team-slot {
+    width: 100px;
+    height: 100px;
+    border: 2px dashed #555;
+    border-radius: 10px;
+}
+
+.team-preview-operator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
