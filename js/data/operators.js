@@ -14,13 +14,17 @@ const operators = [
                 energy: 60,
                 description: "Massiver AoE Schaden.",
                 debuffs: [
-                {
-                    icon: "assets/debuffs/heat.webp",
-                    name: "Burn",
-                    appliesEffect: "Lift"
-                }
-            ]                
-            },
+    {
+        icon: "assets/debuffs/heat.webp",
+        name: "Burn",
+        appliesEffect: "Burn"
+    },
+    {
+        icon: "assets/debuffs/lift.webp",
+        name: "Lift",
+        appliesEffect: "Lift"
+    }
+],
             {
                 id: 102,
                 name: "Battle Skill",
