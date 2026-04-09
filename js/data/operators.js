@@ -6,7 +6,7 @@ const operators = [
         skills: [
             {
                 id: 101,
-                name: "Final Strike",
+                name: "Flaming Cinders",
                 icon: "assets/operators/skills/laevatain/fs.png",
                 iconSmall: "assets/operators/skills/laevatain/fs_small.png",
                 type: "FS",
@@ -14,17 +14,16 @@ const operators = [
                 energy: 60,
                 description: "Massiver AoE Schaden.",
                 debuffs: [
-    {
-        icon: "assets/debuffs/heat.webp",
-        name: "Burn",
-        appliesEffect: "Burn"
-    },
-    {
-        icon: "assets/debuffs/lift.webp",
-        name: "Lift",
-        appliesEffect: "Lift"
-    }
-],
+                {
+                    icon: "assets/debuffs/heat.webp",
+                    name: "Heat DMG",
+                    appliesEffect: "Heat DMG"
+                },
+                {
+                    icon: "assets/debuffs/lift.webp",
+                    name: "Lift",
+                    appliesEffect: "Lift"
+                }]},
             {
                 id: 102,
                 name: "Battle Skill",
