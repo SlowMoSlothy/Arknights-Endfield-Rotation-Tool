@@ -6,7 +6,14 @@ function renderSkills() {
 
     const activeOperators = operators.filter(op => selectedTeam.includes(op.id));
 
+    const wrapper = document.createElement("div");
+    wrapper.className = "operators-skills-grid";
+
     activeOperators.forEach(op => {
+        const card = document.createElement("div");
+        card.className = "operator-skill-card";
+
+        // Kopf mit Avatar + Name
         const opRow = document.createElement("div");
         opRow.className = "operator-row";
 
@@ -20,8 +27,8 @@ function renderSkills() {
 
         opRow.appendChild(opImg);
         opRow.appendChild(opName);
-        list.appendChild(opRow);
 
+        // Skills darunter
         const skillRow = document.createElement("div");
         skillRow.className = "skill-row";
 
@@ -40,9 +47,14 @@ function renderSkills() {
             skillRow.appendChild(div);
         });
 
-        list.appendChild(skillRow);
+        card.appendChild(opRow);
+        card.appendChild(skillRow);
+        wrapper.appendChild(card);
     });
+
+    list.appendChild(wrapper);
 }
+
 function getSkillById(id) {
     for (const op of operators) {
         const skill = op.skills.find(s => s.id === id);
