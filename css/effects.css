@@ -6,3 +6,58 @@
     width: 12px;
     height: 12px;
 }
+.remove-btn {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 18px;
+    height: 18px;
+    background: red;
+    color: white;
+    font-size: 12px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: 0.2s;
+    z-index: 20;
+}
+
+.rotation-skill:hover .remove-btn {
+    opacity: 1;
+}
+
+.tooltip {
+    position: absolute;
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e1e1e;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    opacity: 0;
+    transition: 0.2s;
+    white-space: nowrap;
+    border: 1px solid #555;
+    z-index: 30;
+    pointer-events: none;
+}
+
+.rotation-skill:hover .tooltip {
+    opacity: 1;
+}
+
+.arrow-debuff {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 12px;
+    object-fit: cover;
+    border-radius: 3px;
+    z-index: 20;
+}
