@@ -1,3 +1,46 @@
+.operator-card {
+    width: 100px;
+    height: 120px;
+    background: #2a2a2a;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: 0.2s;
+    padding: 5px;
+}
+
+.operator-card img {
+    width: 70px;
+    height: 70px;
+    border-radius: 8px;
+    object-fit: cover;
+    margin-bottom: 5px;
+}
+
+.operator-name {
+    font-size: 12px;
+    text-align: center;
+}
+
+.operator-card:hover {
+    transform: scale(1.04);
+    border-color: #4da6ff;
+}
+
+.operator-card.disabled {
+    opacity: 0.4;
+    filter: grayscale(100%);
+    cursor: not-allowed;
+}
+
+.operator-card.disabled:hover {
+    transform: none;
+    border-color: transparent;
+}
 .team-slots {
     display: flex;
     gap: 15px;
