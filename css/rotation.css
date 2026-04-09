@@ -1,0 +1,19 @@
+.rotation-panel {
+    background: #161616;
+    border: 2px dashed #555;
+    border-radius: 10px;
+    padding: 14px;
+}
+
+.rotation-slot {
+    width: 60px;
+    height: 60px;
+    border: 2px dashed #444;
+    border-radius: 8px;
+}
+
+.rotation-arrow {
+    font-size: 20px;
+    color: #888;
+    position: relative;
+}
