@@ -36,6 +36,20 @@ button:hover {
     gap: 20px;
 }
 
+/* =========================
+   BUILDER LAYOUT
+========================= */
+.builder-shell {
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.builder-top {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
 /* Team-Auswahl */
 .team-slots {
     display: flex;
@@ -402,4 +416,189 @@ button:hover {
     background: #111;
     border: 1px solid #777;
     box-shadow: 0 0 4px rgba(255, 100, 100, 0.5);
+}
+
+/* =========================
+   BUILDER LAYOUT
+========================= */
+.builder-shell {
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.builder-top {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.team-top-panel {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    min-height: 80px;
+    width: 100%;
+}
+
+.builder-divider {
+    width: 100%;
+    height: 1px;
+    background: #444;
+    margin: 20px 0;
+}
+
+.builder-content {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.builder-sidebar {
+    background: #181818;
+    border: 1px solid #444;
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: sticky;
+    top: 20px;
+}
+
+.builder-main {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.builder-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* =========================
+   TEAM PREVIEW TOP
+========================= */
+.team-preview-operator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #1e1e1e;
+    border: 1px solid #444;
+    border-radius: 10px;
+    padding: 10px 14px;
+}
+
+.team-preview-operator img {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+/* =========================
+   SKILLS PANEL
+========================= */
+.skills-panel {
+    background: #161616;
+    border: 2px dashed #555;
+    border-radius: 10px;
+    padding: 14px;
+    min-height: 180px;
+}
+
+.operator-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.operator-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    margin-right: 10px;
+    object-fit: cover;
+}
+
+.skill-row {
+    display: flex;
+    gap: 8px;
+    margin-left: 54px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+/* =========================
+   ROTATION PANEL
+========================= */
+.rotation-panel {
+    background: #161616;
+    border: 2px dashed #555;
+    border-radius: 10px;
+    padding: 14px;
+    width: fit-content;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+/* 10 Slots pro Reihe */
+#rotationDropZone {
+    display: grid;
+    grid-template-columns:
+        60px 20px 60px 20px 60px 20px 60px 20px 60px 20px 60px 20px 60px 20px 60px 20px 60px 20px 60px;
+    grid-auto-rows: minmax(24px, auto);
+    column-gap: 10px;
+    row-gap: 10px;
+    width: max-content;
+}
+
+/* Wenn du später 15 Slots willst, ersetzen wir das per JS oder CSS-Klasse */
+
+.rotation-slot {
+    width: 60px;
+    height: 60px;
+    border: 2px dashed #444;
+    border-radius: 8px;
+    position: relative;
+    overflow: visible;
+}
+
+.rotation-skill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 60px;
+    height: 60px;
+}
+
+.rotation-skill .skill-inner {
+    border-radius: 8px;
+}
+
+.rotation-skill img {
+    border-radius: 6px;
+}
+
+.rotation-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #888;
+    user-select: none;
+    pointer-events: none;
+    position: relative;
+}
+
+/* =========================
+   MENU BUTTONS
+========================= */
+.builder-sidebar button {
+    width: 100%;
+    text-align: left;
 }

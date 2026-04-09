@@ -9,40 +9,46 @@
 
 <body>
 
-  <div id="selectionScreen">
-    <h2>Wähle dein Team (max. 4)</h2>
-
-    <div id="teamSlots" class="team-slots"></div>
-
-    <h3>Operator auswählen</h3>
-    <div id="operatorList" class="operator-grid"></div>
-
-    <button onclick="confirmTeam()">Team bestätigen</button>
-  </div>
-
   <div id="builderScreen" style="display:none;">
     <h2>Rotation Builder</h2>
-
-    <button onclick="backToSelection()">← Zurück</button>
-    <button onclick="exportImage()">📸 Export</button>
-    <button onclick="clearRotation()">🗑️ Rotation löschen</button>
-
-    <div class="builder-layout">
-      <div>
-        <h3>Team</h3>
-        <div id="selectedOperators" class="box team-preview-box"></div>
+  
+    <div class="builder-shell">
+  
+      <!-- Team oben -->
+      <div class="builder-top">
+        <h3>Selected Team</h3>
+        <div id="selectedOperators" class="team-top-panel"></div>
       </div>
-
-      <div>
-        <h3>Skills</h3>
-        <div id="skillList" class="box"></div>
-      </div>
-
-      <div>
-        <h3>Rotation</h3>
-        <div id="rotation" class="box rotation-box">
-          <div id="rotationDropZone"></div>
-        </div>
+  
+      <div class="builder-divider"></div>
+  
+      <!-- Hauptbereich -->
+      <div class="builder-content">
+  
+        <!-- Linkes Menü -->
+        <aside class="builder-sidebar">
+          <h3>Menu</h3>
+  
+          <button onclick="backToSelection()">← Back to Team Selection</button>
+          <button onclick="exportImage()">📸 Export Rotation</button>
+          <button onclick="clearRotation()">🗑️ Clear Rotation</button>
+        </aside>
+  
+        <!-- Mitte -->
+        <main class="builder-main">
+          <section class="builder-panel">
+            <h3>Skills</h3>
+            <div id="skillList" class="skills-panel"></div>
+          </section>
+  
+          <section class="builder-panel">
+            <h3>Rotation</h3>
+            <div id="rotation" class="rotation-panel">
+              <div id="rotationDropZone"></div>
+            </div>
+          </section>
+        </main>
+  
       </div>
     </div>
   </div>

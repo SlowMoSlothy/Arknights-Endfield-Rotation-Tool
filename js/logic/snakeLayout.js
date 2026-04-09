@@ -1,3 +1,4 @@
+const SLOTS_PER_ROW = 10;
 function ensureExtraSlots() {
     const hasEmptySlot = rotation.some(slot => slot === null);
 
@@ -42,4 +43,49 @@ function trimTrailingEmptyRows() {
 
         rotation.splice(-5, 5);
     }
+}
+function getSnakeSlotMap() {
+    const map = [];
+    const rows = Math.ceil(rotation.length / SLOTS_PER_ROW);
+
+    for (let row = 0; row < rows; row++) {
+        const isReverse = row % 2 === 1;
+
+        for (let col = 0; col < SLOTS_PER_ROW; col++) {
+            const slotIndex = row * SLOTS_PER_ROW + col;
+            if (slotIndex >= rotation.length) break;
+
+            const visualCol = isReverse ? (SLOTS_PER_ROW - 1 - col) : col;
+            const gridColumn = visualCol * 2 + 1;
+            const gridRow = row * 2 + 1;
+
+            let arrow = null;
+            const hasNextSlot = slotIndex + 1 < rotation.length;
+            const isLastInRow = col === SLOTS_PER_ROW - 1;
+
+            if (hasNextSlot) {
+                if (!isLastInRow) {
+                    arrow = {
+                        text: isReverse ? "←" : "→",
+                        gridColumn: isReverse ? gridColumn - 1 : gridColumn + 1,
+                        gridRow
+                    };
+                } else {
+                    arrow = {
+                        text: "↓",
+                        gridColumn,
+                        gridRow: gridRow + 1
+                    };
+                }
+            }
+
+            map.push({
+                gridColumn,
+                gridRow,
+                arrow
+            });
+        }
+    }
+
+    return map;
 }
