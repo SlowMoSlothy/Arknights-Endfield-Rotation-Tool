@@ -7,4 +7,3 @@ loadTeam();
 loadRotation();
 renderTeamSlots();
 renderOperatorList();
-initTapInput();
