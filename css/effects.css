@@ -6,33 +6,38 @@
     width: 12px;
     height: 12px;
 }
+/* Container für mehrere Debuffs */
 .arrow-effects {
     position: absolute;
-    top: 18px;
+    top: 14px; /* etwas näher am Pfeil */
     left: 50%;
     transform: translateX(-50%);
+
     display: flex;
-    gap: 6px;
-    align-items: flex-start;
+    gap: 2px; /* 🔥 enger Abstand */
+
+    align-items: center;
     z-index: 20;
     pointer-events: none;
 }
 
+/* einzelnes Debuff Icon */
 .arrow-effect {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
 }
 
+/* Icon Styling */
 .arrow-effect-icon {
     width: 12px;
     height: 12px;
     object-fit: cover;
+
     border-radius: 3px;
+
     background: #111;
-    border: 1px solid #777;
-    box-shadow: 0 0 4px rgba(255, 100, 100, 0.5);
+    border: 1px solid #555;
+
+    box-shadow: 0 0 3px rgba(255, 120, 120, 0.5);
 }
 
 .arrow-effect-label {
