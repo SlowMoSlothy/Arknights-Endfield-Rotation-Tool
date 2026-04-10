@@ -118,12 +118,7 @@ function renderRotation() {
                             debuffItem.appendChild(debuffIcon);
                         }
 
-                        if (debuffData.name) {
-                            const debuffLabel = document.createElement("div");
-                            debuffLabel.className = "arrow-effect-label";
-                            debuffLabel.textContent = debuffData.name;
-                            debuffItem.appendChild(debuffLabel);
-                        }
+                      
 
                         debuffWrap.appendChild(debuffItem);
                     });
