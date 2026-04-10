@@ -1,0 +1,175 @@
+@media (max-width: 900px) {
+    body {
+        margin: 0;
+        padding: 10px;
+    }
+
+    .builder-shell {
+        max-width: 100%;
+        margin: 0;
+    }
+
+    .builder-top {
+        align-items: stretch;
+    }
+
+    .team-top-panel {
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 10px;
+        padding-bottom: 6px;
+    }
+
+    .team-preview-operator {
+        flex: 0 0 auto;
+        min-width: 120px;
+    }
+
+    .team-preview-operator img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .builder-divider {
+        margin: 14px 0;
+    }
+
+    .builder-content {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .builder-sidebar {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .builder-sidebar h3 {
+        grid-column: 1 / -1;
+        margin: 0 0 6px 0;
+    }
+
+    .builder-sidebar button {
+        width: 100%;
+        text-align: center;
+        padding: 10px 8px;
+        font-size: 14px;
+    }
+
+    .builder-main {
+        gap: 16px;
+    }
+
+    .skills-panel {
+        overflow-x: auto;
+        padding: 10px;
+    }
+
+    .operators-skills-grid {
+        flex-wrap: nowrap;
+        align-items: stretch;
+        gap: 12px;
+        width: max-content;
+    }
+
+    .operator-skill-card {
+        min-width: 150px;
+        padding: 8px;
+        gap: 8px;
+    }
+
+    .operator-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .skill-row {
+        gap: 6px;
+    }
+
+    .skill-small {
+        width: 44px;
+        height: 44px;
+    }
+
+    .rotation-panel {
+        width: 100%;
+        overflow-x: auto;
+        padding: 10px;
+    }
+
+    #rotationDropZone {
+        width: max-content;
+        min-width: 100%;
+    }
+
+    .rotation-slot {
+        width: 64px;
+        height: 64px;
+    }
+
+    .rotation-skill {
+        width: 64px;
+        height: 64px;
+    }
+
+    .rotation-arrow {
+        font-size: 18px;
+        min-width: 18px;
+    }
+
+    /* ganz wichtig für Touch */
+    .remove-btn {
+        opacity: 1;
+        width: 26px;
+        height: 26px;
+        top: -10px;
+        right: -10px;
+        font-size: 16px;
+        z-index: 40;
+    }
+
+    .rotation-skill:hover .remove-btn {
+        opacity: 1;
+    }
+
+    /* Tooltip auf Mobile ausblenden */
+    .tooltip {
+        display: none;
+    }
+
+    .arrow-effects {
+        top: 12px;
+        gap: 3px;
+    }
+
+    .arrow-effect-icon {
+        width: 14px;
+        height: 14px;
+    }
+
+    /* Team-Auswahl Startscreen */
+    .team-slots {
+        overflow-x: auto;
+        padding-bottom: 6px;
+    }
+
+    .operator-grid {
+        grid-template-columns: repeat(2, minmax(120px, 1fr));
+        gap: 12px;
+    }
+
+    .operator-card {
+        width: 100%;
+        height: 110px;
+    }
+
+    .operator-card img {
+        width: 56px;
+        height: 56px;
+    }
+}
