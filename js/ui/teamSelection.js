@@ -20,6 +20,7 @@ function confirmTeam() {
     renderSkills();
     renderRotation();
     initSkillDragDrop();
+    initTapInput();
 }
 function renderTeamSlots() {
     const container = document.getElementById("teamSlots");
