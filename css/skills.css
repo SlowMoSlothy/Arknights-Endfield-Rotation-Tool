@@ -145,6 +145,7 @@
     .skill-small {
         width: 42px;
         height: 42px;
+        touch-action: manipulation;
     }
 }
 .skill-small.selected {
