@@ -5,16 +5,46 @@ function initSkillDragDrop() {
     const skillRows = document.querySelectorAll("#skillList .skill-row");
 
     skillRows.forEach((row) => {
-        const sortable = new Sortable(row, {
-            group: {
-                name: "skills",
-                pull: "clone",
-                put: false
-            },
-            sort: false,
-            draggable: ".skill-small",
-            forceFallback: true,
-            fallbackOnBody: true,
+        const sortable = new Sortable(slot, {
+    group: {
+        name: "skills",
+        pull: true,
+        put: true
+    },
+    sort: false,
+    draggable: ".rotation-skill",
+    filter: ".remove-btn",
+    preventOnFilter: true,
+    forceFallback: true,
+    fallbackOnBody: true,
+
+    onFilter: (evt) => {
+        const removeBtn = evt.target.closest(".remove-btn");
+        if (!removeBtn) return;
+
+        const removeIndex = parseInt(removeBtn.dataset.index, 10);
+        if (Number.isNaN(removeIndex)) return;
+
+        rotation[removeIndex] = null;
+        compactRotation();
+        trimTrailingEmptyRows();
+        saveRotation();
+    },
+
+    onMove: () => {
+        document.querySelectorAll(".rotation-slot").forEach(s => s.classList.remove("drag-hover"));
+        slot.classList.add("drag-hover");
+        return true;
+    },
+
+    onEnd: () => {
+        document.querySelectorAll(".rotation-slot").forEach(s => s.classList.remove("drag-hover"));
+    },
+
+    onAdd: (evt) => {
+        // dein bestehender onAdd-Code bleibt hier unverändert
+    }
+});
             fallbackClass: "drag-ghost",
             removeCloneOnHide: true,
 
