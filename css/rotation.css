@@ -52,3 +52,31 @@
     min-width: 20px;
     min-height: 24px;
 }
+
+@media (max-width: 900px) {
+    .rotation-panel {
+        overflow-x: auto;
+        padding: 10px;
+        width: 100%;
+    }
+
+    #rotationDropZone {
+        width: max-content;
+        min-width: 100%;
+    }
+
+    .rotation-slot {
+        width: 64px;
+        height: 64px;
+    }
+
+    .rotation-skill {
+        width: 64px;
+        height: 64px;
+    }
+
+    .rotation-arrow {
+        font-size: 18px;
+        min-width: 18px;
+    }
+}
