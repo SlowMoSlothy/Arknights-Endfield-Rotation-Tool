@@ -18,6 +18,10 @@ function initSkillDragDrop() {
     forceFallback: true,
     fallbackOnBody: true,
 
+    delay: 120,
+    delayOnTouchOnly: true,
+    touchStartThreshold: 4,
+
     onFilter: (evt) => {
         const removeBtn = evt.target.closest(".remove-btn");
         if (!removeBtn) return;
@@ -42,129 +46,76 @@ function initSkillDragDrop() {
     },
 
     onAdd: (evt) => {
-        // dein bestehender onAdd-Code bleibt hier unverändert
-    }
-});
-            fallbackClass: "drag-ghost",
-            removeCloneOnHide: true,
+        const draggedUid = evt.item.dataset.uid;
+        const draggedId = parseInt(evt.item.dataset.id, 10);
 
-            onStart: (evt) => {
-                setTimeout(() => {
-                    const ghost = document.querySelector(".drag-ghost img");
-                    const largeIcon = evt.item.dataset.largeIcon;
+        evt.item.remove();
 
-                    if (ghost && largeIcon) {
-                        ghost.src = largeIcon;
-                    }
-                }, 0);
-            }
-        });
+        if (draggedUid) {
+            const oldIndex = rotation.findIndex(item => item && item.uid === draggedUid);
 
-        skillSourceSortables.push(sortable);
-    });
-}
-function initRotationDragDrop() {
-    slotSortables.forEach(sortable => sortable.destroy());
-    slotSortables = [];
+            if (oldIndex !== -1) {
+                const movedItem = rotation[oldIndex];
+                rotation.splice(oldIndex, 1);
 
-    const slots = document.querySelectorAll(".rotation-slot");
-
-    slots.forEach((slot, index) => {
-        const sortable = new Sortable(slot, {
-            group: {
-                name: "skills",
-                pull: true,
-                put: true
-            },
-            sort: false,
-            draggable: ".rotation-skill",
-            forceFallback: true,
-            fallbackOnBody: true,
-
-            onMove: () => {
-                document.querySelectorAll(".rotation-slot").forEach(s => s.classList.remove("drag-hover"));
-                slot.classList.add("drag-hover");
-                return true;
-            },
-
-            onEnd: () => {
-                document.querySelectorAll(".rotation-slot").forEach(s => s.classList.remove("drag-hover"));
-            },
-
-            onAdd: (evt) => {
-                const draggedUid = evt.item.dataset.uid;
-                const draggedId = parseInt(evt.item.dataset.id, 10);
-
-                evt.item.remove();
-
-                if (draggedUid) {
-                    const oldIndex = rotation.findIndex(item => item && item.uid === draggedUid);
-
-                    if (oldIndex !== -1) {
-                        const movedItem = rotation[oldIndex];
-                        rotation.splice(oldIndex, 1);
-
-                        let insertIndex = index;
-                        if (oldIndex < index) {
-                            insertIndex--;
-                        }
-
-                        rotation.splice(insertIndex, 0, movedItem);
-
-                        compactRotation();
-                        ensureExtraSlots();
-                        saveRotation();
-                        return;
-                    }
-                }
-                
-                if (!draggedId) return;
-
-                rotation[index] = {
-                    uid: crypto.randomUUID(),
-                    id: draggedId
-                };
-
-                const insertedSkillData = getSkillById(draggedId);
-                const sourceOperator = getOperatorBySkillId(draggedId);
-
-                if (
-                    insertedSkillData &&
-                    insertedSkillData.debuffs &&
-                    insertedSkillData.debuffs.length > 0 &&
-                    sourceOperator
-                ) {
-                    const effects = insertedSkillData.debuffs
-                        .map(d => d.appliesEffect)
-                        .filter(Boolean);
-
-                    const comboSkills = getComboSkillsFromEffects(effects, sourceOperator.id);
-
-                    let insertOffset = 1;
-
-                    comboSkills.forEach(comboSkill => {
-                        const comboIndex = index + insertOffset;
-
-                        const alreadyThere =
-                            rotation[comboIndex] &&
-                            rotation[comboIndex].id === comboSkill.id;
-
-                        if (!alreadyThere) {
-                            rotation.splice(comboIndex, 0, {
-                                uid: crypto.randomUUID(),
-                                id: comboSkill.id,
-                                autoInserted: true
-                            });
-                            insertOffset++;
-                        }
-                    });
+                let insertIndex = index;
+                if (oldIndex < index) {
+                    insertIndex--;
                 }
 
+                rotation.splice(insertIndex, 0, movedItem);
+
+                compactRotation();
                 ensureExtraSlots();
                 saveRotation();
+                return;
             }
-        });
+        }
 
-        slotSortables.push(sortable);
+        if (!draggedId) return;
+
+        rotation[index] = {
+            uid: crypto.randomUUID(),
+            id: draggedId
+        };
+
+        const insertedSkillData = getSkillById(draggedId);
+        const sourceOperator = getOperatorBySkillId(draggedId);
+
+        if (
+            insertedSkillData &&
+            insertedSkillData.debuffs &&
+            insertedSkillData.debuffs.length > 0 &&
+            sourceOperator
+        ) {
+            const effects = insertedSkillData.debuffs
+                .map(d => d.appliesEffect)
+                .filter(Boolean);
+
+            const comboSkills = getComboSkillsFromEffects(effects, sourceOperator.id);
+
+            let insertOffset = 1;
+
+            comboSkills.forEach(comboSkill => {
+                const comboIndex = index + insertOffset;
+                const alreadyThere =
+                    rotation[comboIndex] &&
+                    rotation[comboIndex].id === comboSkill.id;
+
+                if (!alreadyThere) {
+                    rotation.splice(comboIndex, 0, {
+                        uid: crypto.randomUUID(),
+                        id: comboSkill.id,
+                        autoInserted: true
+                    });
+                    insertOffset++;
+                }
+            });
+        }
+
+        ensureExtraSlots();
+        saveRotation();
+    }
+});slotSortables.push(sortable);
     });
 }
