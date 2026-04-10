@@ -21,9 +21,11 @@ function renderRotation() {
             if (skillData) {
                 const skillDiv = document.createElement("div");
                 skillDiv.className = "skill rotation-skill";
+
                 if (entry.autoInserted) {
                     skillDiv.classList.add("auto-inserted");
                 }
+
                 skillDiv.dataset.id = String(entry.id);
                 skillDiv.dataset.uid = entry.uid;
 
@@ -37,14 +39,20 @@ function renderRotation() {
 
                 inner.appendChild(img);
                 skillDiv.appendChild(inner);
-                
+
                 const removeBtn = document.createElement("button");
-removeBtn.className = "remove-btn";
-removeBtn.type = "button";
-removeBtn.textContent = "×";
-removeBtn.setAttribute("aria-label", "Remove skill");
-removeBtn.dataset.index = String(index);
-skillDiv.appendChild(removeBtn);
+                removeBtn.className = "remove-btn";
+                removeBtn.type = "button";
+                removeBtn.textContent = "×";
+                removeBtn.setAttribute("aria-label", "Remove skill");
+                removeBtn.dataset.index = String(index);
+
+                removeBtn.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+
+                skillDiv.appendChild(removeBtn);
 
                 const tooltip = document.createElement("div");
                 tooltip.className = "tooltip";
@@ -73,17 +81,14 @@ skillDiv.appendChild(removeBtn);
             const currentEntry = rotation[index];
             let isUsed = false;
 
-            // obere Reihe
             if (index >= 0 && index <= 3) {
                 isUsed = rotation[index] !== null && rotation[index + 1] !== null;
             }
 
-            // Pfeil nach unten
             if (index === 4) {
                 isUsed = rotation[4] !== null && rotation[5] !== null;
             }
 
-            // untere Reihe
             if (index >= 5 && index <= 8) {
                 isUsed = rotation[index] !== null && rotation[index + 1] !== null;
             }
@@ -92,7 +97,6 @@ skillDiv.appendChild(removeBtn);
                 arrow.classList.add("is-unused");
             }
 
-            // Debuff schon anzeigen, sobald der aktuelle Skill existiert
             if (currentEntry) {
                 const skillData = getSkillById(currentEntry.id);
 
@@ -112,8 +116,6 @@ skillDiv.appendChild(removeBtn);
                             debuffIcon.title = debuffData.name || "Effect";
                             debuffItem.appendChild(debuffIcon);
                         }
-
-                      
 
                         debuffWrap.appendChild(debuffItem);
                     });
