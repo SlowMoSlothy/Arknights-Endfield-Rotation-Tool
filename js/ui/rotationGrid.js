@@ -38,18 +38,13 @@ function renderRotation() {
                 inner.appendChild(img);
                 skillDiv.appendChild(inner);
                 
-                const removeBtn = document.createElement("div");
-                removeBtn.className = "remove-btn";
-                removeBtn.textContent = "×";
-                removeBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    rotation[index] = null;
-                    compactRotation();
-                    trimTrailingEmptyRows();
-                    saveRotation();
-                };
-
-                skillDiv.appendChild(removeBtn);
+                const removeBtn = document.createElement("button");
+removeBtn.className = "remove-btn";
+removeBtn.type = "button";
+removeBtn.textContent = "×";
+removeBtn.setAttribute("aria-label", "Remove skill");
+removeBtn.dataset.index = String(index);
+skillDiv.appendChild(removeBtn);
 
                 const tooltip = document.createElement("div");
                 tooltip.className = "tooltip";
