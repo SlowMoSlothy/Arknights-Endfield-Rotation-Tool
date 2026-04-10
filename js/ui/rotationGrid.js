@@ -115,6 +115,7 @@ function renderRotation() {
                             debuffIcon.src = debuffData.icon;
                             debuffIcon.alt = debuffData.name || "Effect";
                             debuffIcon.title = debuffData.name || "Effect";
+debuffIcon.title = debuffData.name || "Effect";
                             debuffItem.appendChild(debuffIcon);
                         }
 
