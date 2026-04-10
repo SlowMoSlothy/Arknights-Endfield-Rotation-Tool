@@ -147,3 +147,7 @@
         height: 42px;
     }
 }
+.skill-small.selected {
+    outline: 2px solid #4da6ff;
+    box-shadow: 0 0 8px rgba(77,166,255,0.8);
+}
