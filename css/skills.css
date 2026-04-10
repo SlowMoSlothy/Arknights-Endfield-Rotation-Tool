@@ -113,3 +113,37 @@
     transform: scale(1.05);
     box-shadow: 0 0 8px rgba(0, 150, 255, 0.6);
 }
+
+@media (max-width: 900px) {
+    .skills-panel {
+        overflow-x: auto;
+        padding: 10px;
+    }
+
+    .operators-skills-grid {
+        flex-wrap: nowrap;
+        align-items: stretch;
+        gap: 12px;
+        width: max-content;
+    }
+
+    .operator-skill-card {
+        min-width: 150px;
+        padding: 8px;
+        gap: 8px;
+    }
+
+    .operator-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .skill-row {
+        gap: 6px;
+    }
+
+    .skill-small {
+        width: 42px;
+        height: 42px;
+    }
+}
