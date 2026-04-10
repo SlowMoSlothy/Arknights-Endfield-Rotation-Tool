@@ -33,3 +33,44 @@
     flex-direction: column;
     gap: 24px;
 }
+
+@media (max-width: 900px) {
+    .builder-shell {
+        max-width: 100%;
+        padding: 0 10px;
+    }
+
+    .builder-content {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .builder-sidebar {
+        position: static;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .builder-sidebar h3 {
+        grid-column: 1 / -1;
+        margin: 0 0 6px 0;
+    }
+
+    .builder-sidebar button {
+        width: 100%;
+        text-align: center;
+        padding: 10px 8px;
+        font-size: 14px;
+    }
+
+    .builder-main {
+        gap: 16px;
+    }
+
+    .builder-divider {
+        margin: 14px 0;
+    }
+}
