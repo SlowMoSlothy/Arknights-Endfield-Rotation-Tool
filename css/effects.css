@@ -49,7 +49,6 @@
     border-radius: 4px;
     white-space: nowrap;
 }
-
 .remove-btn {
     position: absolute;
     top: -6px;
@@ -67,6 +66,9 @@
     opacity: 0;
     transition: 0.2s;
     z-index: 20;
+    border: none;
+    padding: 0;
+    line-height: 1;
 }
 
 .rotation-skill:hover .remove-btn {
