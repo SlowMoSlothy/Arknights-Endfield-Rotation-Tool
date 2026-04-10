@@ -129,4 +129,5 @@ function renderRotation() {
     });
 
     initRotationDragDrop();
+    initTapInput();
 }
