@@ -1,47 +1,56 @@
 let selectedSkill = null;
+let tapInputInitialized = false;
 
 function initTapInput() {
-    initSkillTap();
-    initSlotTap();
+    if (tapInputInitialized) return;
+    tapInputInitialized = true;
+
+    document.addEventListener("pointerup", handleTapInput, { passive: false });
 }
 
-function initSkillTap() {
-    document.querySelectorAll(".skill-small").forEach(el => {
-        el.addEventListener("click", () => {
-            const id = parseInt(el.dataset.id, 10);
+function handleTapInput(e) {
+    // Remove-Button nicht über Tap-to-place behandeln
+    if (e.target.closest(".remove-btn")) {
+        return;
+    }
 
-            if (!id) return;
+    const skillEl = e.target.closest(".skill-small");
+    if (skillEl) {
+        e.preventDefault();
+        e.stopPropagation();
 
-            // gleiche Auswahl -> abwählen
-            if (selectedSkill && selectedSkill.id === id) {
-                selectedSkill = null;
-                updateSelectedUI();
-                return;
-            }
+        const id = parseInt(skillEl.dataset.id, 10);
+        if (!id) return;
 
-            selectedSkill = {
-                id: id
-            };
-
-            updateSelectedUI();
-        });
-    });
-}
-
-function initSlotTap() {
-    document.querySelectorAll(".rotation-slot").forEach(slot => {
-        slot.addEventListener("click", () => {
-            if (!selectedSkill) return;
-
-            const index = parseInt(slot.dataset.index, 10);
-            if (Number.isNaN(index)) return;
-
-            placeSkillInSlot(index, selectedSkill.id);
-
+        if (selectedSkill && selectedSkill.id === id) {
             selectedSkill = null;
             updateSelectedUI();
-        });
-    });
+            updateSelectedSlotsUI();
+            return;
+        }
+
+        selectedSkill = { id };
+        updateSelectedUI();
+        updateSelectedSlotsUI();
+        return;
+    }
+
+    const slotEl = e.target.closest(".rotation-slot");
+    if (slotEl) {
+        if (!selectedSkill) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const index = parseInt(slotEl.dataset.index, 10);
+        if (Number.isNaN(index)) return;
+
+        placeSkillInSlot(index, selectedSkill.id);
+
+        selectedSkill = null;
+        updateSelectedUI();
+        updateSelectedSlotsUI();
+    }
 }
 
 function placeSkillInSlot(index, skillId) {
@@ -50,17 +59,16 @@ function placeSkillInSlot(index, skillId) {
         id: skillId
     };
 
-    const skillData = getSkillById(skillId);
+    const insertedSkillData = getSkillById(skillId);
     const sourceOperator = getOperatorBySkillId(skillId);
 
-    // Combo Logik (deine bestehende)
     if (
-        skillData &&
-        skillData.debuffs &&
-        skillData.debuffs.length > 0 &&
+        insertedSkillData &&
+        insertedSkillData.debuffs &&
+        insertedSkillData.debuffs.length > 0 &&
         sourceOperator
     ) {
-        const effects = skillData.debuffs
+        const effects = insertedSkillData.debuffs
             .map(d => d.appliesEffect)
             .filter(Boolean);
 
@@ -94,11 +102,12 @@ function placeSkillInSlot(index, skillId) {
 function updateSelectedUI() {
     document.querySelectorAll(".skill-small").forEach(el => {
         const id = parseInt(el.dataset.id, 10);
+        el.classList.toggle("selected", !!selectedSkill && selectedSkill.id === id);
+    });
+}
 
-        if (selectedSkill && selectedSkill.id === id) {
-            el.classList.add("selected");
-        } else {
-            el.classList.remove("selected");
-        }
+function updateSelectedSlotsUI() {
+    document.querySelectorAll(".rotation-slot").forEach(slot => {
+        slot.classList.toggle("tap-target", !!selectedSkill);
     });
 }
