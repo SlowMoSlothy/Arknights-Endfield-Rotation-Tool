@@ -90,11 +90,22 @@
     .skill-row {
         gap: 6px;
     }
-
-    .skill-small {
-        width: 44px;
-        height: 44px;
+    .skill-small.selected {
+        outline: 2px solid #4da6ff;
+        box-shadow: 0 0 8px rgba(77, 166, 255, 0.8);
     }
+
+    .rotation-slot.tap-target {
+        border-color: #4da6ff;
+        box-shadow: 0 0 10px rgba(77, 166, 255, 0.45);
+    }
+
+    .skill-small,
+    .rotation-slot,
+    .remove-btn {
+        touch-action: manipulation;
+    }
+}
 
     .rotation-panel {
         width: 100%;
