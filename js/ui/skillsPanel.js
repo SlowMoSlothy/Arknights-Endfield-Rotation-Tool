@@ -101,12 +101,6 @@ function getComboSkillsFromEffects(effects, sourceOperatorId) {
 
     for (const op of activeOperators) {
         if (op.id === sourceOperatorId) continue;
-function getComboSkillsFromEffects(effects, sourceOperatorId) {
-    const activeOperators = operators.filter(op => selectedTeam.includes(op.id));
-    const result = [];
-
-    for (const op of activeOperators) {
-        if (op.id === sourceOperatorId) continue;
 
         for (const skill of op.skills) {
             const triggers = Array.isArray(skill.comboTriggers)
