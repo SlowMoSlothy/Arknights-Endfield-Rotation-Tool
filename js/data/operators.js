@@ -14,20 +14,24 @@ const operators = [
                 energy: 60,
                 description: "Massiver AoE Schaden.",
                 debuffs: [
-                {
-                    icon: "assets/debuffs/heat.webp",
-                    name: "Heat DMG",
-                    appliesEffect: "Combustion ",
-                    stackable: true,
-                    maxStacks: 4,
-                    stacksApplied: 1
-                },
-                {
-                    icon: "assets/debuffs/lift.webp",
-                    name: "Lift",
-                    appliesEffect: "Lift",
-                    stackable: false
-                }]},
+                    {
+                        id: "heat",
+                        name: "Heat DMG",
+                        appliesEffect: "Heat DMG",
+                        stackable: true,
+                        maxStacks: 3,
+                        stacksApplied: 1,
+                        iconBase: "assets/debuffs/heat"
+                    },
+                    {
+                        id: "lift",
+                        name: "Lift",
+                        appliesEffect: "Lift",
+                        stackable: false,
+                        iconBase: "assets/debuffs/lift"
+                    }
+                ]
+},
             {
                 id: 102,
                 name: "Battle Skill",
@@ -36,7 +40,18 @@ const operators = [
                 type: "BS",
                 cooldown: 20,
                 energy: 60,
-                description: "Massiver AoE Schaden."
+                description: "Massiver AoE Schaden.",
+                debuffs: [
+                    {
+                        id: "heat",
+                        name: "Melting Flame",
+                        appliesEffect: "Melting Flame",
+                        stackable: true,
+                        maxStacks: 4,
+                        stacksApplied: 1,
+                        iconBase: "assets/debuffs/melting_flames"
+                    }
+                ]
             }
             ,
             {
