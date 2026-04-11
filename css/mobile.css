@@ -183,4 +183,38 @@
         width: 56px;
         height: 56px;
     }
+    .rotation-slot.menu-open {
+        border-color: #ffb347;
+        box-shadow: 0 0 10px rgba(255, 179, 71, 0.45);
+    }
+
+    .slot-action-menu {
+        position: absolute;
+        left: 50%;
+        top: 72px;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 6px;
+        z-index: 80;
+        background: rgba(15, 15, 15, 0.95);
+        border: 1px solid #555;
+        border-radius: 10px;
+        padding: 6px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+    }
+
+    .slot-action-btn {
+        border: none;
+        border-radius: 8px;
+        background: #2a2a2a;
+        color: white;
+        padding: 8px 10px;
+        font-size: 12px;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    .slot-action-btn:disabled {
+        opacity: 0.45;
+    }
 }
