@@ -48,17 +48,25 @@
 
       <!-- Mitte -->
       <main class="builder-main">
-        <section class="builder-panel">
-          <h3>Skills</h3>
-          <div id="skillList" class="skills-panel"></div>
-        </section>
-
-        <section class="builder-panel">
-          <h3>Rotation</h3>
-          <div id="rotation" class="rotation-panel">
-            <div id="rotationDropZone"></div>
-          </div>
-        </section>
+      <section class="builder-panel">
+        <h3>Skills</h3>
+        <div id="skillList" class="skills-panel"></div>
+      </section>
+      
+      <section class="builder-panel">
+        <h3>Enemy</h3>
+        <div id="enemyBox" class="enemy-panel">
+          <img id="enemyImage" src="assets/enemy/enemy.png" alt="Enemy">
+        </div>
+        <div id="enemyEffects" class="enemy-effects-panel"></div>
+      </section>
+      
+      <section class="builder-panel">
+        <h3>Rotation</h3>
+        <div id="rotation" class="rotation-panel">
+          <div id="rotationDropZone"></div>
+        </div>
+      </section>
       </main>
 
     </div>
@@ -77,6 +85,7 @@
 <script src="js/logic/snakeLayout.js"></script>
 <script src="js/logic/dragDrop.js"></script>
 
+<script src="js/ui/enemyPanel.js"></script>
 <script src="js/ui/teamPreview.js"></script>
 <script src="js/ui/skillsPanel.js"></script>
 <script src="js/ui/rotationGrid.js"></script>

@@ -17,12 +17,16 @@ const operators = [
                 {
                     icon: "assets/debuffs/heat.webp",
                     name: "Heat DMG",
-                    appliesEffect: "Combustion "
+                    appliesEffect: "Combustion ",
+                    stackable: true,
+                    maxStacks: 4,
+                    stacksApplied: 1
                 },
                 {
                     icon: "assets/debuffs/lift.webp",
                     name: "Lift",
-                    appliesEffect: "Lift"
+                    appliesEffect: "Lift",
+                    stackable: false
                 }]},
             {
                 id: 102,
