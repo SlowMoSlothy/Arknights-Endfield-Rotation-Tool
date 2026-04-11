@@ -17,7 +17,7 @@ const operators = [
                 {
                     icon: "assets/debuffs/heat.webp",
                     name: "Heat DMG",
-                    appliesEffect: "Heat DMG"
+                    appliesEffect: "Combustion "
                 },
                 {
                     icon: "assets/debuffs/lift.webp",
@@ -43,7 +43,8 @@ const operators = [
                 type: "CS",
                 cooldown: 20,
                 energy: 60,
-                description: "Massiver AoE Schaden."
+                description: "Massiver AoE Schaden.",
+                comboTriggers: ["Combustion", "Corrosion"]
             }
         ]
     },
