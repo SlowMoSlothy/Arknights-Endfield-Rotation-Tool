@@ -13,7 +13,7 @@ const operators = [
                 cooldown: 20,
                 energy: 60,
                 description: "Massiver AoE Schaden.",
-                debuffs: [
+                buffs: [
                     {
                         id: "final_strike",
                         name: "Final Strike",
@@ -92,13 +92,12 @@ const operators = [
                 cooldown: 20,
                 energy: 60,
                 description: "Massiver AoE Schaden.",
-                debuffs: [
+                buffs: [
                     {
                         id: "final_strike",
                         name: "Final Strike",
                         appliesEffect: "final_strike",
                         stackable: false,
-                        iconBase: "assets/buffs/laevatain/melting_flames",
                         visible: false
                     }
                 ]
@@ -149,7 +148,7 @@ const operators = [
                 cooldown: 20,
                 energy: 60,
                 description: "Massiver AoE Schaden.",
-                debuffs: [
+                buffs: [
                     {
                         id: "final_strike",
                         name: "Final Strike",
@@ -224,7 +223,7 @@ const operators = [
                 cooldown: 20,
                 energy: 60,
                 description: "Massiver AoE Schaden.",
-                debuffs: [
+                buffs: [
                     {
                         id: "final_strike",
                         name: "Final Strike",
