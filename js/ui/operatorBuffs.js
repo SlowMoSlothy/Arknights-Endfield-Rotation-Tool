@@ -20,6 +20,10 @@ function collectOperatorBuffs(operatorId) {
         if (!sourceOperator || sourceOperator.id !== operatorId) return;
 
         skillData.buffs.forEach(buff => {
+            // rein technische / unsichtbare Buffs überspringen
+            if (buff.visible === false) return;
+
+            // eindeutige ID ist Pflicht
             if (!buff.id) return;
 
             const buffId = buff.id;
@@ -63,13 +67,22 @@ function renderOperatorBuffs() {
         const buffs = collectOperatorBuffs(operatorId);
 
         buffs.forEach(buff => {
-            const icon = document.createElement("img");
-            icon.className = "operator-buff-icon";
-            icon.src = getBuffIcon(buff);
-            icon.alt = buff.name || "Buff";
-            icon.title = buff.name || "Buff";
+            if (buff.iconBase) {
+                const icon = document.createElement("img");
+                icon.className = "operator-buff-icon";
+                icon.src = getBuffIcon(buff);
+                icon.alt = buff.name || "Buff";
+                icon.title = buff.name || "Buff";
 
-            buffContainer.appendChild(icon);
+                buffContainer.appendChild(icon);
+            } else {
+                const badge = document.createElement("div");
+                badge.className = "operator-buff-badge";
+                badge.textContent = buff.name || "Buff";
+                badge.title = buff.name || "Buff";
+
+                buffContainer.appendChild(badge);
+            }
         });
     });
 }

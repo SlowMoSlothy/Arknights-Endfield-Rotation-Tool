@@ -13,10 +13,18 @@ const operators = [
                 cooldown: 20,
                 energy: 60,
                 description: "Massiver AoE Schaden.",
+                debuffs: [
+                    {
+                        id: "final_strike",
+                        name: "Final Strike",
+                        appliesEffect: "final_strike",
+                        visible: false
+                    }
+                ]
             },
             {
                 id: 102,
-                name: "Battle Skill",
+                name: "Smouldering Fire",
                 icon: "assets/operators/skills/laevatain/bs.png",
                 iconSmall: "assets/operators/skills/laevatain/bs_small.png",
                 type: "BS",
@@ -38,7 +46,7 @@ const operators = [
             ,
             {
                 id: 103,
-                name: "Combo Skill",
+                name: "Seethe",
                 icon: "assets/operators/skills/laevatain/cs.png",
                 iconSmall: "assets/operators/skills/laevatain/cs_small.png",
                 type: "CS",
@@ -57,6 +65,16 @@ const operators = [
                         iconBase: "assets/buffs/laevatain/melting_flames"
                     }
                 ]
+            },
+            {
+                id: 104,
+                name: "Twilight",
+                icon: "assets/operators/skills/laevatain/ult.png",
+                iconSmall: "assets/operators/skills/laevatain/ult_small.png",
+                type: "ult",
+                cooldown: 20,
+                energy: 60,
+                description: "Massiver AoE Schaden."
             }
         ]
     },
@@ -73,7 +91,17 @@ const operators = [
                 type: "ultimate",
                 cooldown: 20,
                 energy: 60,
-                description: "Massiver AoE Schaden."
+                description: "Massiver AoE Schaden.",
+                debuffs: [
+                    {
+                        id: "final_strike",
+                        name: "Final Strike",
+                        appliesEffect: "final_strike",
+                        stackable: false,
+                        iconBase: "assets/buffs/laevatain/melting_flames",
+                        visible: false
+                    }
+                ]
             },
             {
                 id: 202,
@@ -93,8 +121,7 @@ const operators = [
                 type: "cs",
                 cooldown: 20,
                 energy: 60,
-                description: "Massiver AoE Schaden.",
-                comboTrigger: "Lift"
+                description: "Massiver AoE Schaden."
             },
             {
                 id: 204,
@@ -121,7 +148,16 @@ const operators = [
                 type: "ultimate",
                 cooldown: 20,
                 energy: 60,
-                description: "Massiver AoE Schaden."
+                description: "Massiver AoE Schaden.",
+                debuffs: [
+                    {
+                        id: "final_strike",
+                        name: "Final Strike",
+                        appliesEffect: "final_strike",
+                        stackable: false,
+                        visible: false
+                    }
+                ]
             }
         ]
     },
@@ -132,10 +168,41 @@ const operators = [
         skills: [
             {
                 id: 401,
-                name: "Overdrive Burst",
+                name: "Protocol α: Breach",
                 icon: "assets/operators/skills/perlica/fs.png",
                 iconSmall: "assets/operators/skills/perlica/fs_small.png",
-                type: "ultimate",
+                type: "fs",
+                cooldown: 20,
+                energy: 60,
+                description: "Massiver AoE Schaden."
+            },
+            {
+                id: 402,
+                name: "Protocol ω: Strike",
+                icon: "assets/operators/skills/perlica/bs.png",
+                iconSmall: "assets/operators/skills/perlica/bs_small.png",
+                type: "bs",
+                cooldown: 20,
+                energy: 60,
+                description: "Massiver AoE Schaden."
+            },
+            {
+                id: 403,
+                name: "Instant Protocol: Chain",
+                icon: "assets/operators/skills/perlica/cs.png",
+                iconSmall: "assets/operators/skills/perlica/cs_small.png",
+                type: "CS",
+                cooldown: 20,
+                energy: 60,
+                description: "Massiver AoE Schaden.",
+                comboTriggers: ["final_strike"]
+            },
+            {
+                id: 404,
+                name: "Protocol ε: 70.41K",
+                icon: "assets/operators/skills/perlica/ult.png",
+                iconSmall: "assets/operators/skills/perlica/ult_small.png",
+                type: "ult",
                 cooldown: 20,
                 energy: 60,
                 description: "Massiver AoE Schaden."
@@ -156,7 +223,16 @@ const operators = [
                 type: "fs",
                 cooldown: 20,
                 energy: 60,
-                description: "Massiver AoE Schaden."
+                description: "Massiver AoE Schaden.",
+                debuffs: [
+                    {
+                        id: "final_strike",
+                        name: "Final Strike",
+                        appliesEffect: "final_strike",
+                        stackable: false,
+                        visible: false
+                    }
+                ]
             },
             {
                 id: 502,
