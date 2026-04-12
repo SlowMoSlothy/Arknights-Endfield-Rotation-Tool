@@ -45,7 +45,18 @@ const operators = [
                 cooldown: 20,
                 energy: 60,
                 description: "Massiver AoE Schaden.",
-                comboTriggers: ["Combustion", "Corrosion"]
+                comboTriggers: ["Combustion", "Corrosion"],
+                buffs: [
+                    {
+                        id: "melting_flames",
+                        name: "Melting Flame",
+                        appliesEffect: "Melting Flame",
+                        stackable: true,
+                        maxStacks: 4,
+                        stacksApplied: 1,
+                        iconBase: "assets/buffs/laevatain/melting_flames"
+                    }
+                ]
             }
         ]
     },
