@@ -16,19 +16,12 @@ const operators = [
                 debuffs: [
                     {
                         id: "heat",
-                        name: "Heat DMG",
+                        name: "Final Strike",
                         appliesEffect: "Heat DMG",
-                        stackable: true,
+                        stackable: false,
                         maxStacks: 3,
                         stacksApplied: 1,
                         iconBase: "assets/debuffs/heat"
-                    },
-                    {
-                        id: "lift",
-                        name: "Lift",
-                        appliesEffect: "Lift",
-                        stackable: false,
-                        iconBase: "assets/debuffs/lift"
                     }
                 ]
 },
@@ -49,7 +42,7 @@ const operators = [
                         stackable: true,
                         maxStacks: 4,
                         stacksApplied: 1,
-                        iconBase: "assets/debuffs/melting_flames"
+                        iconBase: "assets/debuffs/laevatain/melting_flames"
                     }
                 ]
             }
