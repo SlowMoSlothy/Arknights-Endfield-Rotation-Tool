@@ -13,18 +13,7 @@ const operators = [
                 cooldown: 20,
                 energy: 60,
                 description: "Massiver AoE Schaden.",
-                debuffs: [
-                    {
-                        id: "heat",
-                        name: "Final Strike",
-                        appliesEffect: "Heat DMG",
-                        stackable: false,
-                        maxStacks: 3,
-                        stacksApplied: 1,
-                        iconBase: "assets/debuffs/heat"
-                    }
-                ]
-},
+            },
             {
                 id: 102,
                 name: "Battle Skill",
@@ -34,15 +23,15 @@ const operators = [
                 cooldown: 20,
                 energy: 60,
                 description: "Massiver AoE Schaden.",
-                debuffs: [
+                buffs: [
                     {
-                        id: "heat",
+                        id: "melting_flames",
                         name: "Melting Flame",
                         appliesEffect: "Melting Flame",
                         stackable: true,
                         maxStacks: 4,
                         stacksApplied: 1,
-                        iconBase: "assets/debuffs/laevatain/melting_flames"
+                        iconBase: "assets/buffs/laevatain/melting_flames"
                     }
                 ]
             }

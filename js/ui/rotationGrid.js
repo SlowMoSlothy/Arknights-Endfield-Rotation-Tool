@@ -131,4 +131,5 @@ function renderRotation() {
     initRotationDragDrop();
     initTapInput();
     renderEnemyEffects();
+    renderOperatorBuffs();
 }
