@@ -1,10 +1,20 @@
 function getBuffIcon(buff) {
-    if (buff.stackable) {
-        const stacks = buff.stacks || 1;
-        return `${buff.iconBase}_${stacks}.png`;
+    if (!buff || typeof buff.iconBase !== "string") {
+        return null;
     }
 
-    return `${buff.iconBase}.png`;
+    const iconBase = buff.iconBase.trim();
+
+    if (!iconBase || iconBase === "undefined" || iconBase === "null") {
+        return null;
+    }
+
+    if (buff.stackable) {
+        const stacks = buff.stacks || 1;
+        return `${iconBase}_${stacks}.png`;
+    }
+
+    return `${iconBase}.png`;
 }
 
 function collectOperatorBuffs(operatorId) {
@@ -20,10 +30,7 @@ function collectOperatorBuffs(operatorId) {
         if (!sourceOperator || sourceOperator.id !== operatorId) return;
 
         skillData.buffs.forEach(buff => {
-            // rein technische / unsichtbare Buffs überspringen
             if (buff.visible === false) return;
-
-            // eindeutige ID ist Pflicht
             if (!buff.id) return;
 
             const buffId = buff.id;
@@ -67,10 +74,12 @@ function renderOperatorBuffs() {
         const buffs = collectOperatorBuffs(operatorId);
 
         buffs.forEach(buff => {
-            if (buff.iconBase) {
+            const iconPath = getBuffIcon(buff);
+
+            if (iconPath) {
                 const icon = document.createElement("img");
                 icon.className = "operator-buff-icon";
-                icon.src = getBuffIcon(buff);
+                icon.src = iconPath;
                 icon.alt = buff.name || "Buff";
                 icon.title = buff.name || "Buff";
 
