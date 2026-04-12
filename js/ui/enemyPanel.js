@@ -14,11 +14,13 @@ function collectEnemyEffects() {
         if (!entry) return;
 
         const skillData = getSkillById(entry.id);
-        if (!skillData || !skillData.debuffs) return;
+        if (!skillData || !skillData.debuffs || !Array.isArray(skillData.debuffs)) return;
 
         skillData.debuffs.forEach(debuff => {
-            const effectId = debuff.id || debuff.appliesEffect || debuff.name;
-            if (!effectId) return;
+            // Nur eindeutige IDs verwenden
+            if (!debuff.id) return;
+
+            const effectId = debuff.id;
 
             if (!effectMap.has(effectId)) {
                 effectMap.set(effectId, {
@@ -28,6 +30,7 @@ function collectEnemyEffects() {
             } else {
                 const existing = effectMap.get(effectId);
 
+                // Nur wirklich stackbare Effekte erhöhen
                 if (existing.stackable) {
                     existing.stacks += debuff.stacksApplied || 1;
 
