@@ -1,3 +1,21 @@
+function formatTooltipDescription(text) {
+    if (!text) return "";
+
+    return text
+        .replaceAll(
+            "[icon=heat]",
+            '<img class="tooltip-inline-icon" src="assets/debuffs/heat_1.png" alt="Heat">'
+        )
+        .replaceAll(
+            "[icon=lift]",
+            '<img class="tooltip-inline-icon" src="assets/debuffs/lift.png" alt="Lift">'
+        )
+        .replace(/\[heat\](.*?)\[\/heat\]/g, '<span class="tt-heat">$1</span>')
+        .replace(/\[lift\](.*?)\[\/lift\]/g, '<span class="tt-lift">$1</span>')
+        .replace(/\[buff\](.*?)\[\/buff\]/g, '<span class="tt-buff">$1</span>')
+        .replace(/\[debuff\](.*?)\[\/debuff\]/g, '<span class="tt-debuff">$1</span>')
+        .replace(/\[combo\](.*?)\[\/combo\]/g, '<span class="tt-combo">$1</span>');
+}
 function renderRotation() {
     const container = document.getElementById("rotationDropZone");
     if (!container) return;
