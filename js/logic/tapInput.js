@@ -149,6 +149,7 @@ if (rotationSkillEl && window.innerWidth <= 900) {
 
     // Klick außerhalb schließt Menü
     closeSlotMenu();
+    closeMobileTooltip();
 }
 
 function placeSkillInSlot(index, skillId, replaceExisting = false) {
