@@ -151,6 +151,12 @@
     /* Tooltip auf Mobile ausblenden */
     .tooltip {
         display: none;
+        opacity: 1;
+        pointer-events: none;
+    }
+
+    .rotation-skill.tooltip-open .tooltip {
+        display: block;
     }
 
     .arrow-effects {
