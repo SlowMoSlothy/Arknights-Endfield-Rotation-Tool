@@ -107,7 +107,45 @@
     border-radius: 3px;
     z-index: 20;
 }
+.tooltip-description {
+    margin-top: 8px;
+    white-space: normal;
+    line-height: 1.4;
+    max-width: 220px;
+}
 
+.tooltip-inline-icon {
+    width: 14px;
+    height: 14px;
+    object-fit: contain;
+    vertical-align: text-bottom;
+    margin-right: 3px;
+}
+
+.tt-heat {
+    color: #ff8a5c;
+    font-weight: 600;
+}
+
+.tt-lift {
+    color: #7ec8ff;
+    font-weight: 600;
+}
+
+.tt-buff {
+    color: #ffd166;
+    font-weight: 600;
+}
+
+.tt-debuff {
+    color: #ff6b6b;
+    font-weight: 600;
+}
+
+.tt-combo {
+    color: #c792ea;
+    font-weight: 600;
+}
 @media (max-width: 900px) {
     .remove-btn {
         opacity: 1;
