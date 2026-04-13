@@ -142,7 +142,6 @@ function initRotationDragDrop() {
 
                     comboSkills.forEach(comboSkill => {
                         const comboIndex = index + insertOffset;
-
                         const alreadyThere =
                             rotation[comboIndex] &&
                             rotation[comboIndex].id === comboSkill.id;
