@@ -75,11 +75,13 @@ function renderRotation() {
                 const tooltip = document.createElement("div");
                 tooltip.className = "tooltip";
                 tooltip.innerHTML = `
-                    <b>${skillData.name}</b><br>
-                    <i>${skillData.operator}</i><br>
-                    CD: ${skillData.cooldown}s<br>
-                    Energy: ${skillData.energy}
-                `;
+    <div class="tooltip-title">${skillData.name}</div>
+    <div class="tooltip-operator">${skillData.operator}</div>
+    <div class="tooltip-line">Type: ${skillData.type || "-"}</div>
+    <div class="tooltip-line">CD: ${skillData.cooldown}s</div>
+    <div class="tooltip-line">Energy: ${skillData.energy}</div>
+    <div class="tooltip-description">${formatTooltipDescription(skillData.description)}</div>
+`;
                 skillDiv.appendChild(tooltip);
 
                 slot.appendChild(skillDiv);
