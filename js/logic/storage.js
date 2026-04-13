@@ -20,6 +20,7 @@ function loadTeam() {
         selectedTeam = [null, null, null, null];
     }
 }
+
 function saveRotation() {
     localStorage.setItem("rotation", JSON.stringify(rotation));
     renderRotation();
@@ -27,7 +28,12 @@ function saveRotation() {
 
 function loadRotation() {
     const saved = localStorage.getItem("rotation");
-    if (!saved) return;
+
+    // Wenn nichts gespeichert ist: genau 1 leerer Slot
+    if (!saved) {
+        rotation = [null];
+        return;
+    }
 
     try {
         const parsed = JSON.parse(saved);
@@ -35,21 +41,21 @@ function loadRotation() {
         if (Array.isArray(parsed) && parsed.length > 0) {
             rotation = [...parsed];
 
-            // Falls weniger als 10 Slots gespeichert wurden, auf 10 auffüllen
-            while (rotation.length < 10) {
-                rotation.push(null);
+            // Mindestens 1 Slot behalten
+            if (rotation.length === 0) {
+                rotation = [null];
             }
         } else {
-            rotation = new Array(10).fill(null);
+            rotation = [null];
         }
     } catch (error) {
         console.error("Rotation konnte nicht geladen werden:", error);
-        rotation = new Array(10).fill(null);
+        rotation = [null];
     }
 }
 
 function clearRotation() {
-    rotation = new Array(10).fill(null);
+    rotation = [null];
     localStorage.removeItem("rotation");
     renderRotation();
 }
