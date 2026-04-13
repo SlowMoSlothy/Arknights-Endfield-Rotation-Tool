@@ -75,7 +75,19 @@ function handleTapInput(e) {
     }
 
     // Skill auswählen
-    const skillEl = e.target.closest(".skill-small");
+    const rotationSkillEl = e.target.closest(".rotation-skill");
+if (rotationSkillEl && window.innerWidth <= 900) {
+    // Remove-Button weiterhin normal behandeln
+    if (e.target.closest(".remove-btn")) {
+        return;
+    }
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    toggleMobileTooltip(rotationSkillEl);
+    return;
+}
     if (skillEl) {
         e.preventDefault();
         e.stopPropagation();
