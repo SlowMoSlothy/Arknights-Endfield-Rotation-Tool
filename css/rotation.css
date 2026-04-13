@@ -67,6 +67,7 @@
     #rotationDropZone {
         width: max-content;
         min-width: 100%;
+        overflow: visible;
     }
 
     .rotation-slot {
