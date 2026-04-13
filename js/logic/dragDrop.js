@@ -125,39 +125,55 @@ function initRotationDragDrop() {
                 const insertedSkillData = getSkillById(draggedId);
                 const sourceOperator = getOperatorBySkillId(draggedId);
 
-                // Combo-Skills anhand aller Debuff-Effekte eines Skills
-                if (
-                    insertedSkillData &&
-                    insertedSkillData.debuffs &&
-                    insertedSkillData.debuffs.length > 0 &&
-                    sourceOperator
-                ) {
-                    const effects = insertedSkillData.debuffs
-                        .map(d => d.appliesEffect)
-                        .filter(Boolean);
+                // merken, ob der letzte freie Slot benutzt wird
+                const lastEmptyIndexBeforeInsert = rotation.lastIndexOf(null);
 
-                    const comboSkills = getComboSkillsFromEffects(effects, sourceOperator.id);
+                // manuellen Skill setzen
+                rotation[index] = {
+                    uid: crypto.randomUUID(),
+                    id: draggedId
+                };
 
-                    let insertOffset = 1;
+                // Combo-Skills anhand aller Effekte
+                if (insertedSkillData && sourceOperator) {
+                    const debuffEffects = Array.isArray(insertedSkillData.debuffs)
+                        ? insertedSkillData.debuffs.map(d => d.appliesEffect).filter(Boolean)
+                        : [];
 
-                    comboSkills.forEach(comboSkill => {
-                        const comboIndex = index + insertOffset;
-                        const alreadyThere =
-                            rotation[comboIndex] &&
-                            rotation[comboIndex].id === comboSkill.id;
+                    const buffEffects = Array.isArray(insertedSkillData.buffs)
+                        ? insertedSkillData.buffs.map(b => b.appliesEffect).filter(Boolean)
+                        : [];
 
-                        if (!alreadyThere) {
-                            rotation.splice(comboIndex, 0, {
-                                uid: crypto.randomUUID(),
-                                id: comboSkill.id,
-                                autoInserted: true
-                            });
-                            insertOffset++;
-                        }
-                    });
+                    const effects = [...new Set([...debuffEffects, ...buffEffects])];
+
+                    if (effects.length > 0) {
+                        const comboSkills = getComboSkillsFromEffects(effects, sourceOperator.id);
+
+                        let insertOffset = 1;
+
+                        comboSkills.forEach(comboSkill => {
+                            const comboIndex = index + insertOffset;
+
+                            const alreadyThere =
+                                rotation[comboIndex] &&
+                                rotation[comboIndex].id === comboSkill.id;
+
+                            if (!alreadyThere) {
+                                rotation.splice(comboIndex, 0, {
+                                    uid: crypto.randomUUID(),
+                                    id: comboSkill.id,
+                                    autoInserted: true
+                                });
+                                insertOffset++;
+                            }
+                        });
+                    }
                 }
 
-                ensureExtraSlots();
+                // nur erweitern, wenn der manuelle Skill den letzten freien Slot belegt hat
+                if (index === lastEmptyIndexBeforeInsert) {
+                    ensureExtraSlots();
+                }
                 saveRotation();
             }
         });

@@ -201,7 +201,9 @@ function placeSkillInSlot(index, skillId, replaceExisting = false) {
     }
 
     compactRotation();
-    ensureExtraSlots();
+    if (index === lastEmptyIndexBeforeInsert) {
+        ensureExtraSlots();
+    }
     saveRotation();
 }
 
