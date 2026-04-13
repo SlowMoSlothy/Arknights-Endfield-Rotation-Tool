@@ -58,7 +58,15 @@ function insertComboChain(startSkillId, startIndex) {
         rotation.filter(Boolean).map(entry => entry.id)
     );
 
+    const MAX_CHAIN_LENGTH = 20;
+    let chainCount = 0;
+
     while (queue.length > 0) {
+        if (chainCount >= MAX_CHAIN_LENGTH) {
+            console.warn("Combo chain stopped: maximum chain length reached.");
+            break;
+        }
+
         const current = queue.shift();
         const currentSkillData = getSkillById(current.skillId);
         const sourceOperator = getOperatorBySkillId(current.skillId);
@@ -91,6 +99,7 @@ function insertComboChain(startSkillId, startIndex) {
             });
 
             insertOffset++;
+            chainCount++;
         });
     }
 }
@@ -148,7 +157,6 @@ function initRotationDragDrop() {
 
                 evt.item.remove();
 
-                // Bereits existierenden Skill innerhalb der Rotation verschieben
                 if (draggedUid) {
                     const oldIndex = rotation.findIndex(item => item && item.uid === draggedUid);
 
@@ -170,7 +178,6 @@ function initRotationDragDrop() {
                     }
                 }
 
-                // Neuer Skill aus der Skill-Liste
                 if (!draggedId) return;
 
                 rotation[index] = {
