@@ -25,6 +25,7 @@ function closeMobileTooltip() {
         el.classList.remove("tooltip-open");
     });
 }
+
 function initTapInput() {
     if (tapInputInitialized) return;
     tapInputInitialized = true;
@@ -32,8 +33,64 @@ function initTapInput() {
     document.addEventListener("pointerup", handleTapInput, { passive: false });
 }
 
+function collectSkillEffects(skillData) {
+    if (!skillData) return [];
+
+    const debuffEffects = Array.isArray(skillData.debuffs)
+        ? skillData.debuffs.map(d => d.appliesEffect).filter(Boolean)
+        : [];
+
+    const buffEffects = Array.isArray(skillData.buffs)
+        ? skillData.buffs.map(b => b.appliesEffect).filter(Boolean)
+        : [];
+
+    return [...new Set([...debuffEffects, ...buffEffects])];
+}
+
+function insertComboChain(startSkillId, startIndex) {
+    const queue = [{ skillId: startSkillId, insertAfterIndex: startIndex }];
+    const alreadyInsertedIds = new Set(
+        rotation.filter(Boolean).map(entry => entry.id)
+    );
+
+    while (queue.length > 0) {
+        const current = queue.shift();
+        const currentSkillData = getSkillById(current.skillId);
+        const sourceOperator = getOperatorBySkillId(current.skillId);
+
+        if (!currentSkillData || !sourceOperator) continue;
+
+        const effects = collectSkillEffects(currentSkillData);
+        if (effects.length === 0) continue;
+
+        const comboSkills = getComboSkillsFromEffects(effects, sourceOperator.id);
+
+        let insertOffset = 1;
+
+        comboSkills.forEach(comboSkill => {
+            if (alreadyInsertedIds.has(comboSkill.id)) return;
+
+            const comboIndex = current.insertAfterIndex + insertOffset;
+
+            rotation.splice(comboIndex, 0, {
+                uid: crypto.randomUUID(),
+                id: comboSkill.id,
+                autoInserted: true
+            });
+
+            alreadyInsertedIds.add(comboSkill.id);
+
+            queue.push({
+                skillId: comboSkill.id,
+                insertAfterIndex: comboIndex
+            });
+
+            insertOffset++;
+        });
+    }
+}
+
 function handleTapInput(e) {
-    // Menübuttons
     const menuBtn = e.target.closest(".slot-action-btn");
     if (menuBtn) {
         e.preventDefault();
@@ -69,25 +126,24 @@ function handleTapInput(e) {
         }
     }
 
-    // Remove-Button normal ignorieren, das erledigt Sortable
     if (e.target.closest(".remove-btn")) {
         return;
     }
 
-    // Skill auswählen
     const rotationSkillEl = e.target.closest(".rotation-skill");
-if (rotationSkillEl && window.innerWidth <= 900) {
-    // Remove-Button weiterhin normal behandeln
-    if (e.target.closest(".remove-btn")) {
+    if (rotationSkillEl && window.innerWidth <= 900) {
+        if (e.target.closest(".remove-btn")) {
+            return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        toggleMobileTooltip(rotationSkillEl);
         return;
     }
 
-    e.preventDefault();
-    e.stopPropagation();
-
-    toggleMobileTooltip(rotationSkillEl);
-    return;
-}
+    const skillEl = e.target.closest(".skill-small");
     if (skillEl) {
         e.preventDefault();
         e.stopPropagation();
@@ -109,7 +165,6 @@ if (rotationSkillEl && window.innerWidth <= 900) {
         return;
     }
 
-    // Slot antippen
     const slotEl = e.target.closest(".rotation-slot");
     if (slotEl) {
         const index = parseInt(slotEl.dataset.index, 10);
@@ -117,12 +172,12 @@ if (rotationSkillEl && window.innerWidth <= 900) {
 
         const hasSkill = !!rotation[index];
 
-        // Wenn Skill ausgewählt ist -> direkt einsetzen/ersetzen
         if (selectedSkill) {
             e.preventDefault();
             e.stopPropagation();
 
             placeSkillInSlot(index, selectedSkill.id, true);
+
             selectedSkill = null;
             closeSlotMenu();
             updateSelectedUI();
@@ -130,7 +185,6 @@ if (rotationSkillEl && window.innerWidth <= 900) {
             return;
         }
 
-        // Ohne ausgewählten Skill: Menü nur bei belegtem Slot öffnen
         if (hasSkill) {
             e.preventDefault();
             e.stopPropagation();
@@ -147,7 +201,6 @@ if (rotationSkillEl && window.innerWidth <= 900) {
         return;
     }
 
-    // Klick außerhalb schließt Menü
     closeSlotMenu();
     closeMobileTooltip();
 }
@@ -165,45 +218,10 @@ function placeSkillInSlot(index, skillId, replaceExisting = false) {
         });
     }
 
-    const insertedSkillData = getSkillById(skillId);
-    const sourceOperator = getOperatorBySkillId(skillId);
-
-    if (
-        insertedSkillData &&
-        insertedSkillData.debuffs &&
-        insertedSkillData.debuffs.length > 0 &&
-        sourceOperator
-    ) {
-        const effects = insertedSkillData.debuffs
-            .map(d => d.appliesEffect)
-            .filter(Boolean);
-
-        const comboSkills = getComboSkillsFromEffects(effects, sourceOperator.id);
-
-        let insertOffset = 1;
-
-        comboSkills.forEach(comboSkill => {
-            const comboIndex = index + insertOffset;
-
-            const alreadyThere =
-                rotation[comboIndex] &&
-                rotation[comboIndex].id === comboSkill.id;
-
-            if (!alreadyThere) {
-                rotation.splice(comboIndex, 0, {
-                    uid: crypto.randomUUID(),
-                    id: comboSkill.id,
-                    autoInserted: true
-                });
-                insertOffset++;
-            }
-        });
-    }
+    insertComboChain(skillId, index);
 
     compactRotation();
-    if (index === lastEmptyIndexBeforeInsert) {
-        ensureExtraSlots();
-    }
+    ensureSlotCount(rotation.filter(slot => slot !== null).length + 1);
     saveRotation();
 }
 
