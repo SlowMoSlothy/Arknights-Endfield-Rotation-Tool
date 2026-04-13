@@ -146,32 +146,28 @@
     color: #c792ea;
     font-weight: 600;
 }
-@media (max-width: 900px) {
-    .remove-btn {
-        opacity: 1;
-        width: 26px;
-        height: 26px;
-        top: -10px;
-        right: -10px;
-        font-size: 16px;
-        z-index: 40;
-    }
+/* Export-Modus */
+.export-mode .remove-btn {
+    display: none !important;
+}
 
-    .rotation-skill:hover .remove-btn {
-        opacity: 1;
-    }
+.export-mode .rotation-slot {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
 
-    .tooltip {
-        display: none;
-    }
+.export-mode .rotation-slot:empty {
+    display: none !important;
+}
 
-    .arrow-effects {
-        top: 12px;
-        gap: 3px;
-    }
+.export-mode .rotation-panel,
+.export-mode {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
 
-    .arrow-effect-icon {
-        width: 14px;
-        height: 14px;
-    }
+.export-mode .rotation-arrow.is-unused {
+    display: none !important;
 }

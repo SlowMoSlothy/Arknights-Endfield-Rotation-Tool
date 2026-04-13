@@ -90,37 +90,29 @@
     .skill-row {
         gap: 6px;
     }
+
     .skill-small.selected {
         outline: 2px solid #4da6ff;
         box-shadow: 0 0 8px rgba(77, 166, 255, 0.8);
     }
 
-    .rotation-slot.tap-target {
-        border-color: #4da6ff;
-        box-shadow: 0 0 10px rgba(77, 166, 255, 0.45);
-    }
-
-    .skill-small,
-    .rotation-slot,
-    .remove-btn {
-        touch-action: manipulation;
-    }
-}
-
     .rotation-panel {
         width: 100%;
         overflow-x: auto;
+        overflow-y: visible;
         padding: 10px;
     }
 
     #rotationDropZone {
         width: max-content;
         min-width: 100%;
+        overflow: visible;
     }
 
     .rotation-slot {
         width: 64px;
         height: 64px;
+        overflow: visible;
     }
 
     .rotation-skill {
@@ -133,7 +125,17 @@
         min-width: 18px;
     }
 
-    /* ganz wichtig für Touch */
+    .rotation-slot.tap-target {
+        border-color: #4da6ff;
+        box-shadow: 0 0 10px rgba(77, 166, 255, 0.45);
+    }
+
+    .skill-small,
+    .rotation-slot,
+    .remove-btn {
+        touch-action: manipulation;
+    }
+
     .remove-btn {
         opacity: 1;
         width: 26px;
@@ -148,7 +150,6 @@
         opacity: 1;
     }
 
-    /* Tooltip auf Mobile ausblenden */
     .tooltip {
         display: none;
         opacity: 1;
@@ -169,7 +170,6 @@
         height: 14px;
     }
 
-    /* Team-Auswahl Startscreen */
     .team-slots {
         overflow-x: auto;
         padding-bottom: 6px;
@@ -189,6 +189,7 @@
         width: 56px;
         height: 56px;
     }
+
     .rotation-slot.menu-open {
         border-color: #ffb347;
         box-shadow: 0 0 10px rgba(255, 179, 71, 0.45);
