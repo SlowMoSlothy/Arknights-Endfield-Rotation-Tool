@@ -125,6 +125,9 @@ function renderRotation() {
                     debuffWrap.className = "arrow-effects";
 
                     skillData.debuffs.forEach(debuffData => {
+
+                        if(debuffData.visible === false) return;
+                        
                         const debuffItem = document.createElement("div");
                         debuffItem.className = "arrow-effect";
 
