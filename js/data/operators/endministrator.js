@@ -52,7 +52,7 @@ const endministrator = {
             cooldown: 20,
             energy: 60,
             description: "Laevatain summons her Sviga Lævi and becomes the controlled operator. For a certain duration, her basic attacks (BATK) are enhanced and the Sviga Lævi strikes together with Laevatain, with each attack dealing Heat DMG. BATK sequence 3 also applies Heat Infliction.",
-            comboTriggers: ["Combustion", "Corrosion"],
+            comboTriggers: ["combo_skill"],
             buffs: [
                 {
                     id: "melting_flames",

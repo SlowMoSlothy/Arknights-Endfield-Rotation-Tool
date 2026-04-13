@@ -32,7 +32,15 @@ const perlica = {
             cooldown: 20,
             energy: 60,
             description: "Massiver AoE Schaden.",
-            comboTriggers: ["final_strike"]
+            comboTriggers: ["final_strike"],
+            debuffs: [
+                {
+                    id: "combo_skill",
+                    name: "Combo Skill",
+                    appliesEffect: "combo_skill",
+                    visible: false
+                }
+            ]
         },
         {
             id: 404,
