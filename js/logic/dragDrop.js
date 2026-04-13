@@ -18,6 +18,10 @@ function initSkillDragDrop() {
             fallbackClass: "drag-ghost",
             removeCloneOnHide: true,
 
+            delay: 120,
+            delayOnTouchOnly: true,
+            touchStartThreshold: 4,
+
             onStart: (evt) => {
                 setTimeout(() => {
                     const ghost = document.querySelector(".drag-ghost img");
@@ -32,6 +36,63 @@ function initSkillDragDrop() {
 
         skillSourceSortables.push(sortable);
     });
+}
+
+function collectSkillEffects(skillData) {
+    if (!skillData) return [];
+
+    const debuffEffects = Array.isArray(skillData.debuffs)
+        ? skillData.debuffs.map(d => d.appliesEffect).filter(Boolean)
+        : [];
+
+    const buffEffects = Array.isArray(skillData.buffs)
+        ? skillData.buffs.map(b => b.appliesEffect).filter(Boolean)
+        : [];
+
+    return [...new Set([...debuffEffects, ...buffEffects])];
+}
+
+function insertComboChain(startSkillId, startIndex) {
+    const queue = [{ skillId: startSkillId, insertAfterIndex: startIndex }];
+    const alreadyInsertedIds = new Set(
+        rotation.filter(Boolean).map(entry => entry.id)
+    );
+
+    while (queue.length > 0) {
+        const current = queue.shift();
+        const currentSkillData = getSkillById(current.skillId);
+        const sourceOperator = getOperatorBySkillId(current.skillId);
+
+        if (!currentSkillData || !sourceOperator) continue;
+
+        const effects = collectSkillEffects(currentSkillData);
+        if (effects.length === 0) continue;
+
+        const comboSkills = getComboSkillsFromEffects(effects, sourceOperator.id);
+
+        let insertOffset = 1;
+
+        comboSkills.forEach(comboSkill => {
+            if (alreadyInsertedIds.has(comboSkill.id)) return;
+
+            const comboIndex = current.insertAfterIndex + insertOffset;
+
+            rotation.splice(comboIndex, 0, {
+                uid: crypto.randomUUID(),
+                id: comboSkill.id,
+                autoInserted: true
+            });
+
+            alreadyInsertedIds.add(comboSkill.id);
+
+            queue.push({
+                skillId: comboSkill.id,
+                insertAfterIndex: comboIndex
+            });
+
+            insertOffset++;
+        });
+    }
 }
 
 function initRotationDragDrop() {
@@ -72,18 +133,13 @@ function initRotationDragDrop() {
             },
 
             onMove: () => {
-                document
-                    .querySelectorAll(".rotation-slot")
-                    .forEach(s => s.classList.remove("drag-hover"));
-
+                document.querySelectorAll(".rotation-slot").forEach(s => s.classList.remove("drag-hover"));
                 slot.classList.add("drag-hover");
                 return true;
             },
 
             onEnd: () => {
-                document
-                    .querySelectorAll(".rotation-slot")
-                    .forEach(s => s.classList.remove("drag-hover"));
+                document.querySelectorAll(".rotation-slot").forEach(s => s.classList.remove("drag-hover"));
             },
 
             onAdd: (evt) => {
@@ -108,7 +164,7 @@ function initRotationDragDrop() {
                         rotation.splice(insertIndex, 0, movedItem);
 
                         compactRotation();
-                        ensureExtraSlots();
+                        ensureSlotCount(rotation.filter(slot => slot !== null).length + 1);
                         saveRotation();
                         return;
                     }
@@ -122,57 +178,10 @@ function initRotationDragDrop() {
                     id: draggedId
                 };
 
-                const insertedSkillData = getSkillById(draggedId);
-                const sourceOperator = getOperatorBySkillId(draggedId);
+                insertComboChain(draggedId, index);
 
-                rotation[index] = {
-                    uid: crypto.randomUUID(),
-                    id: draggedId
-                };
-
-                let insertedComboCount = 0;
-
-                if (insertedSkillData && sourceOperator) {
-                    const debuffEffects = Array.isArray(insertedSkillData.debuffs)
-                        ? insertedSkillData.debuffs.map(d => d.appliesEffect).filter(Boolean)
-                        : [];
-
-                    const buffEffects = Array.isArray(insertedSkillData.buffs)
-                        ? insertedSkillData.buffs.map(b => b.appliesEffect).filter(Boolean)
-                        : [];
-
-                    const effects = [...new Set([...debuffEffects, ...buffEffects])];
-
-                    if (effects.length > 0) {
-                        const comboSkills = getComboSkillsFromEffects(effects, sourceOperator.id);
-
-                        let insertOffset = 1;
-
-                        comboSkills.forEach(comboSkill => {
-                            const comboIndex = index + insertOffset;
-
-                            const alreadyThere =
-                                rotation[comboIndex] &&
-                                rotation[comboIndex].id === comboSkill.id;
-
-                            if (!alreadyThere) {
-                                rotation.splice(comboIndex, 0, {
-                                    uid: crypto.randomUUID(),
-                                    id: comboSkill.id,
-                                    autoInserted: true
-                                });
-                                insertOffset++;
-                                insertedComboCount++;
-                            }
-                        });
-                    }
-                }
-
-                // genau so viele Slots vorhalten, wie gebraucht werden:
-                // aktuelle belegte/benutzte Länge + 1 freier Slot
-                const nextFreeSlotCount = rotation.filter(slot => slot !== null).length + 1;
-                ensureSlotCount(nextFreeSlotCount);
-
+                compactRotation();
+                ensureSlotCount(rotation.filter(slot => slot !== null).length + 1);
                 saveRotation();
             }
         });
