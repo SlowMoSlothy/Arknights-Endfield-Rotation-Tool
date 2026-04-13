@@ -1,0 +1,3 @@
+13.04.2026
+- Am Anfang wird ein leerer Slot angezeigt. Wird dieser leere Slot mit einem Skill belegt, wird automatisch ein neuer Leerer Slot genriert.
+- Der CS von Perlica wird automatisch eingefügt, wenn der Skill FS eingefügt wird und es wird automatisch ein zusätlicher leere Slot eingefügt.
