@@ -3,6 +3,9 @@
     border-radius: 10px;
     padding: 14px;
     width: fit-content;
+    overflow-x: auto;
+    overflow-y: visible;
+    position: relative;
 }
 
 #rotationDropZone {
