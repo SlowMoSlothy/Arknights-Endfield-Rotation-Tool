@@ -123,57 +123,57 @@ function initRotationDragDrop() {
                 };
 
                 const insertedSkillData = getSkillById(draggedId);
-const sourceOperator = getOperatorBySkillId(draggedId);
+                const sourceOperator = getOperatorBySkillId(draggedId);
 
-rotation[index] = {
-    uid: crypto.randomUUID(),
-    id: draggedId
-};
-
-let insertedComboCount = 0;
-
-if (insertedSkillData && sourceOperator) {
-    const debuffEffects = Array.isArray(insertedSkillData.debuffs)
-        ? insertedSkillData.debuffs.map(d => d.appliesEffect).filter(Boolean)
-        : [];
-
-    const buffEffects = Array.isArray(insertedSkillData.buffs)
-        ? insertedSkillData.buffs.map(b => b.appliesEffect).filter(Boolean)
-        : [];
-
-    const effects = [...new Set([...debuffEffects, ...buffEffects])];
-
-    if (effects.length > 0) {
-        const comboSkills = getComboSkillsFromEffects(effects, sourceOperator.id);
-
-        let insertOffset = 1;
-
-        comboSkills.forEach(comboSkill => {
-            const comboIndex = index + insertOffset;
-
-            const alreadyThere =
-                rotation[comboIndex] &&
-                rotation[comboIndex].id === comboSkill.id;
-
-            if (!alreadyThere) {
-                rotation.splice(comboIndex, 0, {
+                rotation[index] = {
                     uid: crypto.randomUUID(),
-                    id: comboSkill.id,
-                    autoInserted: true
-                });
-                insertOffset++;
-                insertedComboCount++;
-            }
-        });
-    }
-}
+                    id: draggedId
+                };
 
-// genau so viele Slots vorhalten, wie gebraucht werden:
-// aktuelle belegte/benutzte Länge + 1 freier Slot
-const nextFreeSlotCount = rotation.filter(slot => slot !== null).length + 1;
-ensureSlotCount(nextFreeSlotCount);
+                let insertedComboCount = 0;
 
-saveRotation();
+                if (insertedSkillData && sourceOperator) {
+                    const debuffEffects = Array.isArray(insertedSkillData.debuffs)
+                        ? insertedSkillData.debuffs.map(d => d.appliesEffect).filter(Boolean)
+                        : [];
+
+                    const buffEffects = Array.isArray(insertedSkillData.buffs)
+                        ? insertedSkillData.buffs.map(b => b.appliesEffect).filter(Boolean)
+                        : [];
+
+                    const effects = [...new Set([...debuffEffects, ...buffEffects])];
+
+                    if (effects.length > 0) {
+                        const comboSkills = getComboSkillsFromEffects(effects, sourceOperator.id);
+
+                        let insertOffset = 1;
+
+                        comboSkills.forEach(comboSkill => {
+                            const comboIndex = index + insertOffset;
+
+                            const alreadyThere =
+                                rotation[comboIndex] &&
+                                rotation[comboIndex].id === comboSkill.id;
+
+                            if (!alreadyThere) {
+                                rotation.splice(comboIndex, 0, {
+                                    uid: crypto.randomUUID(),
+                                    id: comboSkill.id,
+                                    autoInserted: true
+                                });
+                                insertOffset++;
+                                insertedComboCount++;
+                            }
+                        });
+                    }
+                }
+
+                // genau so viele Slots vorhalten, wie gebraucht werden:
+                // aktuelle belegte/benutzte Länge + 1 freier Slot
+                const nextFreeSlotCount = rotation.filter(slot => slot !== null).length + 1;
+                ensureSlotCount(nextFreeSlotCount);
+
+                saveRotation();
             }
         });
 
