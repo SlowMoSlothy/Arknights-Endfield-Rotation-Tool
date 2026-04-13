@@ -1,7 +1,30 @@
 let selectedSkill = null;
 let activeSlotMenuIndex = null;
 let tapInputInitialized = false;
+let activeTooltipUid = null;
 
+function toggleMobileTooltip(skillEl) {
+    const uid = skillEl.dataset.uid;
+
+    document.querySelectorAll(".rotation-skill").forEach(el => {
+        el.classList.remove("tooltip-open");
+    });
+
+    if (activeTooltipUid === uid) {
+        activeTooltipUid = null;
+        return;
+    }
+
+    skillEl.classList.add("tooltip-open");
+    activeTooltipUid = uid;
+}
+
+function closeMobileTooltip() {
+    activeTooltipUid = null;
+    document.querySelectorAll(".rotation-skill").forEach(el => {
+        el.classList.remove("tooltip-open");
+    });
+}
 function initTapInput() {
     if (tapInputInitialized) return;
     tapInputInitialized = true;
