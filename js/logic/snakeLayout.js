@@ -1,66 +1,29 @@
 const SLOTS_PER_ROW = 10;
-function ensureExtraSlots() {
-    const minSlots = 10;
-    const rowSize = 5;
 
-    if (!Array.isArray(rotation)) return;
-
-    // immer mindestens 10 Slots
-    while (rotation.length < minSlots) {
+function ensureSlotCount(minCount) {
+    while (rotation.length < minCount) {
         rotation.push(null);
     }
-
-    const hasEmptySlot = rotation.some(slot => slot === null);
-    if (hasEmptySlot) return;
-
-    // Nur erweitern, wenn wirklich der letzte sichtbare Slot belegt ist
-    const lastSlotFilled = rotation.length > 0 && rotation[rotation.length - 1] !== null;
-    if (!lastSlotFilled) return;
-
-    rotation.push(...Array(rowSize).fill(null));
 }
 
-function trimTrailingEmptyRows() {
-    const minimumSlots = 10;
-
-    while (rotation.length > minimumSlots) {
-        const lastFive = rotation.slice(-5);
-        const allEmpty = lastFive.every(slot => slot === null);
-
-        if (!allEmpty) {
-            break;
-        }
-
-        rotation.splice(-5, 5);
-    }
-}
-function ensureSlotCount(minCount) {
-        while(rotation.length < minCount){
-            rotation.push(null);
-        }
-}
 function compactRotation() {
     rotation = rotation.filter(slot => slot !== null);
 
-    while (rotation.length < 10) {
+    if (rotation.length === 0) {
         rotation.push(null);
     }
 }
 
 function trimTrailingEmptyRows() {
-    const minimumSlots = 10;
+    while (rotation.length > 1 && rotation[rotation.length - 1] === null) {
+        rotation.pop();
+    }
 
-    while (rotation.length > minimumSlots) {
-        const lastFive = rotation.slice(-5);
-        const allEmpty = lastFive.every(slot => slot === null);
-
-        if (!allEmpty) {
-            break;
-        }
-
-        rotation.splice(-5, 5);
+    if (rotation.length === 0) {
+        rotation.push(null);
     }
 }
+
 function getSnakeSlotMap() {
     const map = [];
     const rows = Math.ceil(rotation.length / SLOTS_PER_ROW);
