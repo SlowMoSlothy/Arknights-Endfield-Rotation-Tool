@@ -1,3 +1,18 @@
-13.04.2026
-- Am Anfang wird ein leerer Slot angezeigt. Wird dieser leere Slot mit einem Skill belegt, wird automatisch ein neuer Leerer Slot genriert.
-- Der CS von Perlica wird automatisch eingefügt, wenn der Skill FS eingefügt wird und es wird automatisch ein zusätlicher leere Slot eingefügt.
+CHANGELOG
+
+[2.0.0] - 2026-04-13
+
+Added
+- Dynamische Slot-Erstellung (Slots wachsen automatisch)
+- Erweiterte Combo-Skill-Ketten (Perlica → Endministrator)
+- Verbesserter Export als Bild
+
+Changed
+- Snake-Layout überarbeitet und stabilisiert
+- Slot-System komplett neu implementiert (kein statischer Start mehr)
+
+Fixed
+- Combo-Skills wurden nicht korrekt weiterverkettet
+- Export zeigt keine roten X mehr
+- Leere Slots werden nicht mehr exportiert
+- Mobile Darstellung (kein Abschneiden mehr)
