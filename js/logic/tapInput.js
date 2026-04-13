@@ -53,7 +53,15 @@ function insertComboChain(startSkillId, startIndex) {
         rotation.filter(Boolean).map(entry => entry.id)
     );
 
+    const MAX_CHAIN_LENGTH = 20;
+    let chainCount = 0;
+
     while (queue.length > 0) {
+        if (chainCount >= MAX_CHAIN_LENGTH) {
+            console.warn("Combo chain stopped: maximum chain length reached.");
+            break;
+        }
+
         const current = queue.shift();
         const currentSkillData = getSkillById(current.skillId);
         const sourceOperator = getOperatorBySkillId(current.skillId);
@@ -86,6 +94,7 @@ function insertComboChain(startSkillId, startIndex) {
             });
 
             insertOffset++;
+            chainCount++;
         });
     }
 }
@@ -132,13 +141,8 @@ function handleTapInput(e) {
 
     const rotationSkillEl = e.target.closest(".rotation-skill");
     if (rotationSkillEl && window.innerWidth <= 900) {
-        if (e.target.closest(".remove-btn")) {
-            return;
-        }
-
         e.preventDefault();
         e.stopPropagation();
-
         toggleMobileTooltip(rotationSkillEl);
         return;
     }
@@ -177,7 +181,6 @@ function handleTapInput(e) {
             e.stopPropagation();
 
             placeSkillInSlot(index, selectedSkill.id, true);
-
             selectedSkill = null;
             closeSlotMenu();
             updateSelectedUI();
