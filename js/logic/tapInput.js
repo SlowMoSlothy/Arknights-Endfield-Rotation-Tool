@@ -49,9 +49,7 @@ function collectSkillEffects(skillData) {
 
 function insertComboChain(startSkillId, startIndex) {
     const queue = [{ skillId: startSkillId, insertAfterIndex: startIndex }];
-    const alreadyInsertedIds = new Set(
-        rotation.filter(Boolean).map(entry => entry.id)
-    );
+    const alreadyInsertedIds = new Set([startSkillId]);
 
     const MAX_CHAIN_LENGTH = 20;
     let chainCount = 0;
