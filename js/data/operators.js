@@ -12,7 +12,7 @@ const operators = [
                 type: "FS",
                 cooldown: 20,
                 energy: 60,
-                description: "Massiver AoE Schaden.",
+                description: "An attack with up to 5 sequences that deals Heat DMG. As the controlled operator, Final Strike also deals 1 Stagger.",
                 buffs: [
                     {
                         id: "final_strike",
@@ -30,7 +30,7 @@ const operators = [
                 type: "BS",
                 cooldown: 20,
                 energy: 60,
-                description: "Massiver AoE Schaden.",
+                description: Summons a Magma Fragment to continuously attack enemies and deal Heat DMG. Hitting the enemy grants 1 stack of Melting Flame. If Laevatain already has 4 stack(s) of Melting Flame when casting the skill, then consume all the stacks and perform 1 additional attack that deals Heat DMG and forcibly trigger temporary Combustion to all enemies in a large area. When the additional attack hits the enemy, restore additional Ultimate Energy. Battle skill effects are enhanced while Laevatain's ultimate is active.",
                 buffs: [
                     {
                         id: "melting_flames",
@@ -52,7 +52,7 @@ const operators = [
                 type: "CS",
                 cooldown: 20,
                 energy: 60,
-                description: "Massiver AoE Schaden.",
+                description: "Laevatain summons her Sviga Lævi and becomes the controlled operator. For a certain duration, her basic attacks (BATK) are enhanced and the Sviga Lævi strikes together with Laevatain, with each attack dealing Heat DMG. BATK sequence 3 also applies Heat Infliction.",
                 comboTriggers: ["Combustion", "Corrosion"],
                 buffs: [
                     {
