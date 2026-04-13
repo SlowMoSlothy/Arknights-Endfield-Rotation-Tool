@@ -1,4 +1,4 @@
-let rotation = new Array(10).fill(null);
+let rotation = [null];
 let selectedTeam = [null, null, null, null];
 let activeSlotIndex = null;
 

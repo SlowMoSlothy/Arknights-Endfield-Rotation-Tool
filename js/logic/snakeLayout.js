@@ -34,7 +34,11 @@ function trimTrailingEmptyRows() {
         rotation.splice(-5, 5);
     }
 }
-
+function ensureSlotCount(minCount) {
+        while(rotation.length < minCount){
+            rotation.push(null);
+        }
+}
 function compactRotation() {
     rotation = rotation.filter(slot => slot !== null);
 
