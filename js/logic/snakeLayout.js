@@ -1,10 +1,23 @@
 const SLOTS_PER_ROW = 10;
 function ensureExtraSlots() {
-    const hasEmptySlot = rotation.some(slot => slot === null);
+    const minSlots = 10;
+    const rowSize = 5;
 
-    if (!hasEmptySlot) {
-        rotation.push(null, null, null, null, null);
+    if (!Array.isArray(rotation)) return;
+
+    // immer mindestens 10 Slots
+    while (rotation.length < minSlots) {
+        rotation.push(null);
     }
+
+    const hasEmptySlot = rotation.some(slot => slot === null);
+    if (hasEmptySlot) return;
+
+    // Nur erweitern, wenn wirklich der letzte sichtbare Slot belegt ist
+    const lastSlotFilled = rotation.length > 0 && rotation[rotation.length - 1] !== null;
+    if (!lastSlotFilled) return;
+
+    rotation.push(...Array(rowSize).fill(null));
 }
 
 function trimTrailingEmptyRows() {
