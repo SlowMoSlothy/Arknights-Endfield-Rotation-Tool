@@ -17,6 +17,7 @@ function collectEnemyEffects() {
         if (!skillData || !skillData.debuffs || !Array.isArray(skillData.debuffs)) return;
 
         skillData.debuffs.forEach(debuff => {
+            if(debuff.visible === false) return;
             // Nur eindeutige IDs verwenden
             if (!debuff.id) return;
 
