@@ -224,4 +224,21 @@
     .slot-action-btn:disabled {
         opacity: 0.45;
     }
+    .export-mode .remove-btn {
+    display: none !important;
+}
+
+.export-mode .rotation-slot:empty {
+    display: none !important;
+}
+
+.export-mode .rotation-slot {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.export-mode .rotation-arrow.is-unused {
+    display: none !important;
+}
 }
