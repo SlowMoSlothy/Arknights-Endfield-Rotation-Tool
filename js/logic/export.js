@@ -5,21 +5,17 @@ function exportImage() {
     const previousClass = element.className;
     const previousStyle = element.getAttribute("style") || "";
 
-    // Für Export volle Breite des Inhalts erzwingen
     element.classList.add("export-mode");
 
-// NEU
-element.style.overflow = "visible";
-element.style.width = "max-content";
-element.style.maxWidth = "none";
-
-// 👉 Hintergrund + Abstand
-element.style.background = "#000";
-element.style.padding = "20px";
-element.style.borderRadius = "12px";
+    element.style.overflow = "visible";
+    element.style.width = "max-content";
+    element.style.maxWidth = "none";
+    element.style.background = "#000";
+    element.style.padding = "24px";
+    element.style.borderRadius = "16px";
 
     html2canvas(element, {
-        backgroundColor: #000,
+        backgroundColor: "#000",
         scale: 2,
         useCORS: true,
         scrollX: 0,
@@ -34,8 +30,8 @@ element.style.borderRadius = "12px";
 
         element.className = previousClass;
         element.setAttribute("style", previousStyle);
-    }).catch(err => {
-        console.error("Export failed:", err);
+    }).catch(error => {
+        console.error("Export failed:", error);
         element.className = previousClass;
         element.setAttribute("style", previousStyle);
     });
