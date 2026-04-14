@@ -1,29 +1,29 @@
 function formatTooltipDescription(text) {
     if (!text) return "";
 
-    const ICON_MAP = {
-        heat: "assets/debuffs/elements/stacks/heat.png",
-        lift: "assets/debuffs/lift.png"
+    const EFFECT_MAP = {
+        heat: {
+            icon: "assets/debuffs/elements/stacks/heat.png",
+            label: "Head DMG"
+        },
+        lift: {
+            icon: "assets/debuffs/lift.png",
+            label: "Lift"
+        }
+        // beliebig erweiterbar
     };
 
-    // [heat] → Icon + Text
-    text = text.replace(/\[(\w+)\]/g, (match, key) => {
-        const src = ICON_MAP[key];
-        if (!src) return match;
+    return text.replace(/\[(\w+)\]/g, (match, key) => {
+        const effect = EFFECT_MAP[key];
+        if (!effect) return match;
 
         return `
             <span class="tooltip-effect">
-                <img class="tooltip-inline-icon" src="${src}" alt="${key}">
-                <span class="effect-text">${key}</span>
+                <img class="tooltip-inline-icon" src="${effect.icon}" alt="${key}">
+                <span class="effect-text">${effect.label}</span>
             </span>
         `;
     });
-
-    // Optional: weiterhin bestehende Tags behalten
-    return text
-        .replace(/\[buff\](.*?)\[\/buff\]/g, '<span class="tt-buff">$1</span>')
-        .replace(/\[debuff\](.*?)\[\/debuff\]/g, '<span class="tt-debuff">$1</span>')
-        .replace(/\[combo\](.*?)\[\/combo\]/g, '<span class="tt-combo">$1</span>');
 }
 
 function renderRotation() {

@@ -44,6 +44,12 @@
     width: 14px;
     height: 14px;
     vertical-align: middle;
+    margin: 0 2px;
+
+    filter: none !important;
+    /* ← entfernt Glow komplett */
+    opacity: 1 !important;
+    /* ← keine Transparenz */
 }
 
 .effect-text {
