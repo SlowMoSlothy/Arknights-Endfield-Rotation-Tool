@@ -1,21 +1,31 @@
 function formatTooltipDescription(text) {
     if (!text) return "";
 
+    const ICON_MAP = {
+        heat: "assets/buffs/heat.webp",
+        lift: "assets/debuffs/lift.png"
+    };
+
+    // [heat] → Icon + Text
+    text = text.replace(/\[(\w+)\]/g, (match, key) => {
+        const src = ICON_MAP[key];
+        if (!src) return match;
+
+        return `
+            <span class="tooltip-effect">
+                <img class="tooltip-inline-icon" src="${src}" alt="${key}">
+                <span class="effect-text">${key}</span>
+            </span>
+        `;
+    });
+
+    // Optional: weiterhin bestehende Tags behalten
     return text
-        .replaceAll(
-            "[icon=heat]",
-            '<img class="tooltip-inline-icon" src="assets/debuffs/heat_1.png" alt="Heat">'
-        )
-        .replaceAll(
-            "[icon=lift]",
-            '<img class="tooltip-inline-icon" src="assets/debuffs/lift.png" alt="Lift">'
-        )
-        .replace(/\[heat\](.*?)\[\/heat\]/g, '<span class="tt-heat">$1</span>')
-        .replace(/\[lift\](.*?)\[\/lift\]/g, '<span class="tt-lift">$1</span>')
         .replace(/\[buff\](.*?)\[\/buff\]/g, '<span class="tt-buff">$1</span>')
         .replace(/\[debuff\](.*?)\[\/debuff\]/g, '<span class="tt-debuff">$1</span>')
         .replace(/\[combo\](.*?)\[\/combo\]/g, '<span class="tt-combo">$1</span>');
 }
+
 function renderRotation() {
     const container = document.getElementById("rotationDropZone");
     if (!container) return;
@@ -72,18 +82,6 @@ function renderRotation() {
 
                 skillDiv.appendChild(removeBtn);
 
-                const tooltip = document.createElement("div");
-                tooltip.className = "tooltip";
-                tooltip.innerHTML = `
-    <div class="tooltip-title">${skillData.name}</div>
-    <div class="tooltip-operator">${skillData.operator}</div>
-    <div class="tooltip-line">Type: ${skillData.type || "-"}</div>
-    <div class="tooltip-line">CD: ${skillData.cooldown}s</div>
-    <div class="tooltip-line">Energy: ${skillData.energy}</div>
-    <div class="tooltip-description">${formatTooltipDescription(skillData.description)}</div>
-`;
-                skillDiv.appendChild(tooltip);
-
                 slot.appendChild(skillDiv);
             }
         }
@@ -125,9 +123,8 @@ function renderRotation() {
                     debuffWrap.className = "arrow-effects";
 
                     skillData.debuffs.forEach(debuffData => {
+                        if (debuffData.visible === false) return;
 
-                        if(debuffData.visible === false) return;
-                        
                         const debuffItem = document.createElement("div");
                         debuffItem.className = "arrow-effect";
 

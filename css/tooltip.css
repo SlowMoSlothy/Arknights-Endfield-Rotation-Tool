@@ -1,0 +1,59 @@
+.global-tooltip {
+    min-width: 260px;
+     max-width: 40vw; /* max 40% Bildschirmbreite */
+    /* ← wichtiger Wert */
+
+    width: max-content;
+    /* passt sich Inhalt an */
+    white-space: normal;
+    /* Zeilenumbruch erlaubt */
+
+    position: fixed;
+    z-index: 999999;
+    pointer-events: none;
+
+    background: #111;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 10px;
+
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.global-tooltip.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.tooltip-description {
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.tooltip-effect {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.tooltip-inline-icon {
+    width: 14px;
+    height: 14px;
+    vertical-align: middle;
+}
+
+.effect-text {
+    font-weight: 500;
+    text-transform: capitalize;
+}
+.effect-text {
+    text-transform: capitalize;
+}
+
+.tooltip-effect img {
+    filter: drop-shadow(0 0 3px rgba(0, 255, 200, 0.6));
+}
