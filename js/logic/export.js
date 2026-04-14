@@ -5,8 +5,6 @@ function exportImage() {
     const previousClass = element.className;
     const previousStyle = element.getAttribute("style") || "";
 
-    element.classList.add("export-mode");
-
     // Für Export volle Breite des Inhalts erzwingen
     element.classList.add("export-mode");
 
