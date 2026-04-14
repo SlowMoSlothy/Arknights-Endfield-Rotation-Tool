@@ -1,41 +1,13 @@
-function initSkillDragDrop() {
-    skillSourceSortables.forEach(sortable => sortable.destroy());
-    skillSourceSortables = [];
-
-    const skillRows = document.querySelectorAll("#skillList .skill-row");
-
-    skillRows.forEach((row) => {
-        const sortable = new Sortable(row, {
-            group: {
-                name: "skills",
-                pull: "clone",
-                put: false
-            },
-            sort: false,
-            draggable: ".skill-small",
-            forceFallback: true,
-            fallbackOnBody: true,
-            fallbackClass: "drag-ghost",
-            removeCloneOnHide: true,
-
-            delay: 120,
-            delayOnTouchOnly: true,
-            touchStartThreshold: 4,
-
-            onStart: (evt) => {
-                setTimeout(() => {
-                    const ghost = document.querySelector(".drag-ghost img");
-                    const largeIcon = evt.item.dataset.largeIcon;
-
-                    if (ghost && largeIcon) {
-                        ghost.src = largeIcon;
-                    }
-                }, 0);
-            }
-        });
-
-        skillSourceSortables.push(sortable);
+function cleanupDragArtifacts() {
+    document.querySelectorAll(".drag-ghost, .sortable-fallback, .sortable-ghost, .sortable-chosen, .sortable-drag").forEach(el => {
+        el.remove();
     });
+
+    document.querySelectorAll(".rotation-slot").forEach(slot => {
+        slot.classList.remove("drag-hover");
+    });
+
+    document.body.classList.remove("drag-in-progress");
 }
 
 function collectSkillEffects(skillData) {
@@ -102,9 +74,70 @@ function insertComboChain(startSkillId, startIndex) {
     }
 }
 
+function beginDrag() {
+    isDraggingSkill = true;
+    document.body.classList.add("drag-in-progress");
+}
+
+function endDrag() {
+    isDraggingSkill = false;
+
+    requestAnimationFrame(() => {
+        cleanupDragArtifacts();
+    });
+}
+
+function initSkillDragDrop() {
+    skillSourceSortables.forEach(sortable => sortable.destroy());
+    skillSourceSortables = [];
+
+    cleanupDragArtifacts();
+
+    const skillRows = document.querySelectorAll("#skillList .skill-row");
+
+    skillRows.forEach((row) => {
+        const sortable = new Sortable(row, {
+            group: {
+                name: "skills",
+                pull: "clone",
+                put: false
+            },
+            sort: false,
+            draggable: ".skill-small",
+            forceFallback: true,
+            fallbackOnBody: true,
+            fallbackClass: "drag-ghost",
+            removeCloneOnHide: true,
+
+            delay: 120,
+            delayOnTouchOnly: true,
+            touchStartThreshold: 4,
+            fallbackTolerance: 8,
+
+            onStart: (evt) => {
+                beginDrag();
+
+                
+            },
+
+            onEnd: () => {
+                endDrag();
+            },
+
+            onUnchoose: () => {
+                cleanupDragArtifacts();
+            }
+        });
+
+        skillSourceSortables.push(sortable);
+    });
+}
+
 function initRotationDragDrop() {
     slotSortables.forEach(sortable => sortable.destroy());
     slotSortables = [];
+
+    cleanupDragArtifacts();
 
     const slots = document.querySelectorAll(".rotation-slot");
 
@@ -121,10 +154,16 @@ function initRotationDragDrop() {
             preventOnFilter: true,
             forceFallback: true,
             fallbackOnBody: true,
+            removeCloneOnHide: true,
 
             delay: 120,
             delayOnTouchOnly: true,
             touchStartThreshold: 4,
+            fallbackTolerance: 8,
+
+            onStart: () => {
+                beginDrag();
+            },
 
             onFilter: (evt) => {
                 const removeBtn = evt.target.closest(".remove-btn");
@@ -139,14 +178,26 @@ function initRotationDragDrop() {
                 saveRotation();
             },
 
-            onMove: () => {
+            onMove: (evt) => {
                 document.querySelectorAll(".rotation-slot").forEach(s => s.classList.remove("drag-hover"));
-                slot.classList.add("drag-hover");
+
+                const targetSlot = evt.to?.classList?.contains("rotation-slot")
+                    ? evt.to
+                    : evt.to?.closest?.(".rotation-slot");
+
+                if (targetSlot) {
+                    targetSlot.classList.add("drag-hover");
+                }
+
                 return true;
             },
 
             onEnd: () => {
-                document.querySelectorAll(".rotation-slot").forEach(s => s.classList.remove("drag-hover"));
+                endDrag();
+            },
+
+            onUnchoose: () => {
+                cleanupDragArtifacts();
             },
 
             onAdd: (evt) => {

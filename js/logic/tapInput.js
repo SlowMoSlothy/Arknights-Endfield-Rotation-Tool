@@ -3,6 +3,7 @@ let activeSlotMenuIndex = null;
 let tapInputInitialized = false;
 let activeTooltipUid = null;
 
+
 function toggleMobileTooltip(skillEl) {
     const uid = skillEl.dataset.uid;
 
@@ -98,6 +99,9 @@ function insertComboChain(startSkillId, startIndex) {
 }
 
 function handleTapInput(e) {
+    if (isDraggingSkill) {
+        return;
+    }
     const menuBtn = e.target.closest(".slot-action-btn");
     if (menuBtn) {
         e.preventDefault();

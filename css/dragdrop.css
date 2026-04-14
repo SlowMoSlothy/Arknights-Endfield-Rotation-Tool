@@ -1,4 +1,27 @@
 .rotation-slot.drag-hover {
     border-color: #00ffcc;
-    box-shadow: 0 0 12px rgba(0,255,204,0.6);
+    box-shadow: 0 0 12px rgba(0, 255, 204, 0.6);
+}
+
+.drag-ghost,
+.sortable-fallback,
+.sortable-drag,
+.sortable-ghost,
+.sortable-chosen {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    z-index: 99999 !important;
+}
+
+.skill-small,
+.rotation-skill,
+.skill-small img,
+.rotation-skill img {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+}
+
+body.drag-in-progress {
+    cursor: grabbing;
 }
