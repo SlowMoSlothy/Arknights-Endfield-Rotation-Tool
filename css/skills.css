@@ -114,6 +114,15 @@
     box-shadow: 0 0 8px rgba(0, 150, 255, 0.6);
 }
 
+.skill-small {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: grab;
+    transition: transform 0.2s;
+}
+
 @media (max-width: 900px) {
     .skills-panel {
         overflow-x: auto;

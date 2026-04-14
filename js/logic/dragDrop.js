@@ -114,10 +114,15 @@ function initSkillDragDrop() {
             touchStartThreshold: 4,
             fallbackTolerance: 8,
 
-            onStart: (evt) => {
+            onStart: () => {
                 beginDrag();
 
-                
+                setTimeout(() => {
+                    const ghost = document.querySelector(".drag-ghost, .sortable-fallback");
+                    if (ghost) {
+                        ghost.classList.add("neutral-drag-preview");
+                    }
+                }, 0);
             },
 
             onEnd: () => {
@@ -163,6 +168,13 @@ function initRotationDragDrop() {
 
             onStart: () => {
                 beginDrag();
+                
+                setTimeout(() => {
+                    const ghost = document.querySelector(".drag-ghost, .sortable-fallback");
+                    if (ghost) {
+                        ghost.classList.add("neutral-drag-preview");
+                    }
+                }, 0);
             },
 
             onFilter: (evt) => {

@@ -7,10 +7,46 @@
 .sortable-fallback,
 .sortable-drag,
 .sortable-ghost,
-.sortable-chosen {
-    opacity: 0 !important;
+.sortable-chosen,
+.neutral-drag-preview {
     pointer-events: none !important;
     z-index: 99999 !important;
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+}
+
+.neutral-drag-preview {
+    width: 60px !important;
+    height: 60px !important;
+    border-radius: 10px !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 2px dashed rgba(255, 255, 255, 0.45) !important;
+    box-shadow: 0 0 12px rgba(0, 255, 204, 0.18) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+}
+
+.neutral-drag-preview:hover {
+    transform: none !important;
+}
+
+.neutral-drag-preview img {
+    display: none !important;
+}
+
+.neutral-drag-preview::before {
+    content: "+";
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.85);
 }
 
 .skill-small,
