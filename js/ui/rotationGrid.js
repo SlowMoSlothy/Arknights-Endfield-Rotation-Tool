@@ -2,7 +2,7 @@ function formatTooltipDescription(text) {
     if (!text) return "";
 
     const ICON_MAP = {
-        heat: "assets/buffs/heat.webp",
+        heat: "assets/debuffs/elements/stacks/heat.png",
         lift: "assets/debuffs/lift.png"
     };
 
