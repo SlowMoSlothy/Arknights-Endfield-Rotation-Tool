@@ -163,9 +163,9 @@
 
 .export-mode .rotation-panel,
 .export-mode {
-    border: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
+    background: #000 !important;
+    padding: 24px !important;
+    border-radius: 16px !important;
 }
 
 .export-mode .rotation-arrow.is-unused {
