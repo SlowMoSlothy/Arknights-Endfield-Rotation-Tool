@@ -8,12 +8,20 @@ function exportImage() {
     element.classList.add("export-mode");
 
     // Für Export volle Breite des Inhalts erzwingen
-    element.style.overflow = "visible";
-    element.style.width = "max-content";
-    element.style.maxWidth = "none";
+    element.classList.add("export-mode");
+
+// NEU
+element.style.overflow = "visible";
+element.style.width = "max-content";
+element.style.maxWidth = "none";
+
+// 👉 Hintergrund + Abstand
+element.style.background = "#000";
+element.style.padding = "20px";
+element.style.borderRadius = "12px";
 
     html2canvas(element, {
-        backgroundColor: null,
+        backgroundColor: #000,
         scale: 2,
         useCORS: true,
         scrollX: 0,
