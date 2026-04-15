@@ -59,23 +59,15 @@
 
 /* Normale Skills: halber Kreis, leicht nach unten verschoben */
 .ef-fill-half .ef-skill-fill {
-    bottom: -30%;
-    height: 75%;
-    width: 115%;
-}
-
-/* Ultimate: kompletter Kreis voll gefüllt */
-.ef-fill-half .ef-skill-fill {
     position: absolute;
-
     left: 50%;
-    top: -28%;                     /* ← statt bottom */
-    transform: translateX(-50%) rotate(180deg);  /* ← flip */
+    bottom: -30%;
+    transform: translateX(-50%);
 
-    width: 110%;
-    height: 70%;
+    width: 115%;
+    height: 75%;
 
-    border-radius: 999px;
+    border-radius: 0 0 999px 999px;
     background: var(--ef-bg-color);
 
     z-index: 1;
