@@ -1,0 +1,116 @@
+.ef-skill-icon {
+    --ef-size: 42px;
+    --ef-ring: rgba(255, 255, 255, 0.9);
+    --ef-bg-neutral: #8c8c8c;
+    --ef-bg-color: var(--ef-bg-neutral);
+
+    position: relative;
+    width: var(--ef-size);
+    height: var(--ef-size);
+    border-radius: 50%;
+    overflow: hidden;
+    flex: 0 0 auto;
+}
+
+.ef-size-small {
+    --ef-size: 42px;
+}
+
+.ef-size-large {
+    --ef-size: 60px;
+}
+
+.ef-skill-fill,
+.ef-skill-ring,
+.ef-skill-glyph-wrap {
+    position: absolute;
+    inset: 0;
+}
+
+.ef-skill-ring {
+    border: 2px solid var(--ef-ring);
+    border-radius: 50%;
+    box-sizing: border-box;
+    z-index: 3;
+    pointer-events: none;
+}
+
+.ef-skill-glyph-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.ef-skill-glyph {
+    width: 72%;
+    height: 72%;
+    object-fit: contain;
+    display: block;
+    filter: none !important;
+    opacity: 1 !important;
+}
+
+/* Falls dein transparentes Icon leicht grau sein soll */
+.ef-skill-glyph.is-muted {
+    opacity: 0.92;
+}
+
+/* Normale Skills: halber Kreis, leicht nach unten verschoben */
+.ef-fill-half .ef-skill-fill {
+    left: 50%;
+    bottom: -14%;
+    width: 88%;
+    height: 58%;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    background: var(--ef-bg-color);
+    z-index: 1;
+}
+
+/* Ultimate: kompletter Kreis voll gefüllt */
+.ef-fill-full .ef-skill-fill {
+    inset: 0;
+    border-radius: 50%;
+    background: var(--ef-bg-color);
+    z-index: 1;
+}
+
+/* Elementfarben */
+.ef-element-heat {
+    --ef-bg-color: #ef4b43;
+}
+
+.ef-element-frost {
+    --ef-bg-color: #5ab8ff;
+}
+
+.ef-element-thunder {
+    --ef-bg-color: #b268ff;
+}
+
+.ef-element-corrosion {
+    --ef-bg-color: #58d17a;
+}
+
+.ef-element-wind {
+    --ef-bg-color: #55d4c0;
+}
+
+.ef-element-physical {
+    --ef-bg-color: #b9b9b9;
+}
+
+.ef-element-neutral {
+    --ef-bg-color: #8c8c8c;
+}
+
+/* Optional etwas feiner für kleine Icons */
+.ef-size-small .ef-skill-ring {
+    border-width: 2px;
+}
+
+.ef-size-large .ef-skill-ring {
+    border-width: 2px;
+}
