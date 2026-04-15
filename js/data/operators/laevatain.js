@@ -28,6 +28,7 @@ const laevatain = {
             icon: "assets/operators/skills/laevatain/bs.png",
             iconSmall: "assets/operators/skills/laevatain/bs_small.png",
             type: "Battle Skill",
+            elementType: "heat",
             cooldown: 20,
             energy: 60,
             description: "Summons a Magma Fragment to continuously attack enemies and deal Heat DMG. Hitting the enemy grants 1 stack of Melting Flame. If Laevatain already has 4 stack(s) of Melting Flame when casting the skill, then consume all the stacks and perform 1 additional attack that deals Heat DMG and forcibly trigger temporary Combustion to all enemies in a large area. When the additional attack hits the enemy, restore additional Ultimate Energy. Battle skill effects are enhanced while Laevatain's ultimate is active.",
@@ -50,6 +51,7 @@ const laevatain = {
             icon: "assets/operators/skills/laevatain/cs.png",
             iconSmall: "assets/operators/skills/laevatain/cs_small.png",
             type: "Combo Skill",
+            elementType: "heat",
             cooldown: 20,
             energy: 60,
             description: "Laevatain summons her Sviga Lævi and becomes the controlled operator. For a certain duration, her basic attacks (BATK) are enhanced and the Sviga Lævi strikes together with Laevatain, with each attack dealing Heat DMG. BATK sequence 3 also applies Heat Infliction.",
@@ -72,6 +74,7 @@ const laevatain = {
             icon: "assets/operators/skills/laevatain/ult.png",
             iconSmall: "assets/operators/skills/laevatain/ult_small.png",
             type: "Ultimate",
+            elementType: "heat",
             cooldown: 20,
             energy: 60,
             description: "Massiver AoE Schaden."
