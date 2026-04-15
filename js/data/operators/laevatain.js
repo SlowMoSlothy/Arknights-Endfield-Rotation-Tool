@@ -9,6 +9,7 @@ const laevatain = {
             icon: "assets/operators/skills/laevatain/fs.png",
             iconSmall: "assets/operators/skills/laevatain/fs_small.png",
             type: "Final Strike",
+            elementType: "heat",
             cooldown: 0,
             energy: 0,
             description: "An attack with up to 5 sequences that deals [heat]. As the controlled operator, Final Strike also deals 1 Stagger.",

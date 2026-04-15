@@ -117,21 +117,21 @@ function renderSkills() {
 
         op.skills.forEach(skill => {
             const div = document.createElement("div");
-            div.className = "skill skill-small";
-            div.dataset.id = String(skill.id);
-            div.dataset.largeIcon = skill.icon;
+div.className = "skill skill-small";
+div.dataset.id = String(skill.id);
+div.dataset.largeIcon = skill.icon;
 
-            const skillData = { ...skill, operator: op.name };
+const skillData = { ...skill, operator: op.name };
 
-            const img = document.createElement("img");
-            img.src = skill.iconSmall || skill.icon;
-            img.alt = skill.name;
-            img.draggable = false;
+const icon = createSkillIcon(skillData, {
+    size: "small",
+    useSmallIcon: true
+});
 
-            div.appendChild(img);
-            skillRow.appendChild(div);
+div.appendChild(icon);
+skillRow.appendChild(div);
 
-            attachSkillTooltipEvents(div, skillData);
+attachSkillTooltipEvents(div, skillData);
         });
 
         card.appendChild(opRow);
