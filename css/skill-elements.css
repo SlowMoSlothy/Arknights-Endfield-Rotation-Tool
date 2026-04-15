@@ -24,6 +24,10 @@
 .ef-skill-ring,
 .ef-skill-glyph-wrap {
     position: absolute;
+}
+
+.ef-skill-ring,
+.ef-skill-glyph-wrap {
     inset: 0;
 }
 
@@ -52,46 +56,48 @@
     opacity: 1 !important;
 }
 
-/* Falls dein transparentes Icon leicht grau sein soll */
 .ef-skill-glyph.is-muted {
     opacity: 0.92;
 }
 
-/* Normale Skills: halber Kreis, leicht nach unten verschoben */
+/* Normale Skills: Farbe unten, oben offen */
 .ef-fill-half .ef-skill-fill {
     position: absolute;
     left: 50%;
-    bottom: -30%;
+    top: 52%;
     transform: translateX(-50%);
 
-    width: 115%;
-    height: 75%;
+    width: 122%;
+    height: 122%;
 
-    border-radius: 0 0 999px 999px;
+    border-radius: 50%;
     background: var(--ef-bg-color);
 
     z-index: 1;
 }
 
-/* Elementfarben */
+/* Ultimate: kompletter Kreis voll gefüllt */
+.ef-fill-full .ef-skill-fill {
+    inset: 0;
+    border-radius: 50%;
+    background: var(--ef-bg-color);
+    z-index: 1;
+}
+
 .ef-element-heat {
     --ef-bg-color: #ef4b43;
 }
 
-.ef-element-frost {
+.ef-element-cryo {
     --ef-bg-color: #5ab8ff;
 }
 
-.ef-element-thunder {
-    --ef-bg-color: #b268ff;
+.ef-element-electric {
+    --ef-bg-color: #f0d34a;
 }
 
-.ef-element-corrosion {
+.ef-element-nature {
     --ef-bg-color: #58d17a;
-}
-
-.ef-element-wind {
-    --ef-bg-color: #55d4c0;
 }
 
 .ef-element-physical {
@@ -101,12 +107,50 @@
 .ef-element-neutral {
     --ef-bg-color: #8c8c8c;
 }
+.ef-skill-icon {
+    transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
 
-/* Optional etwas feiner für kleine Icons */
+.ef-skill-icon:hover {
+    transform: translateY(-2px) scale(1.05);
+}
+
+.ef-element-heat:hover {
+    box-shadow:
+        0 0 6px rgba(239, 75, 67, 0.5),
+        0 0 16px rgba(239, 75, 67, 0.7);
+}
+
+.ef-element-cryo:hover {
+    box-shadow:
+        0 0 6px rgba(90, 184, 255, 0.5),
+        0 0 16px rgba(90, 184, 255, 0.7);
+}
+
+.ef-element-electric:hover {
+    box-shadow:
+        0 0 6px rgba(240, 211, 74, 0.55),
+        0 0 16px rgba(240, 211, 74, 0.75);
+}
+
+.ef-element-nature:hover {
+    box-shadow:
+        0 0 6px rgba(88, 209, 122, 0.5),
+        0 0 16px rgba(88, 209, 122, 0.7);
+}
+
+.ef-element-physical:hover {
+    box-shadow:
+        0 0 4px rgba(185, 185, 185, 0.4),
+        0 0 10px rgba(185, 185, 185, 0.55);
+}
 .ef-size-small .ef-skill-ring {
     border-width: 2px;
 }
 
 .ef-size-large .ef-skill-ring {
     border-width: 2px;
+}
+.ef-skill-icon {
+    transition: transform 0.15s ease, box-shadow 0.2s ease;
 }

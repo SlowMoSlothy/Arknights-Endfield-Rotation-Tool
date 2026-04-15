@@ -8,9 +8,10 @@ const perlica = {
             name: "Protocol α: Breach",
             icon: "assets/operators/skills/perlica/fs.png",
             iconSmall: "assets/operators/skills/perlica/fs_small.png",
-            type: "fs",
+            type: "final_strike",
             cooldown: 20,
             energy: 60,
+            elementType: "electro",
             description: "Massiver AoE Schaden."
         },
         {
@@ -18,9 +19,10 @@ const perlica = {
             name: "Protocol ω: Strike",
             icon: "assets/operators/skills/perlica/bs.png",
             iconSmall: "assets/operators/skills/perlica/bs_small.png",
-            type: "bs",
-            cooldown: 20,
-            energy: 60,
+            type: "Battle Skill",
+            cooldown: 0,
+            energy: 40,
+            elementType: "electro",
             description: "Massiver AoE Schaden."
         },
         {
@@ -28,9 +30,10 @@ const perlica = {
             name: "Instant Protocol: Chain",
             icon: "assets/operators/skills/perlica/cs.png",
             iconSmall: "assets/operators/skills/perlica/cs_small.png",
-            type: "CS",
+            type: "Combo Skill",
             cooldown: 20,
             energy: 60,
+            elementType: "electro",
             description: "Massiver AoE Schaden.",
             comboTriggers: ["final_strike"],
             debuffs: [
@@ -47,9 +50,10 @@ const perlica = {
             name: "Protocol ε: 70.41K",
             icon: "assets/operators/skills/perlica/ult.png",
             iconSmall: "assets/operators/skills/perlica/ult_small.png",
-            type: "ult",
+            type: "Ultimate",
             cooldown: 20,
             energy: 60,
+            elementType: "electro",
             description: "Massiver AoE Schaden."
         }
     ]

@@ -73,7 +73,7 @@ const laevatain = {
             name: "Twilight",
             icon: "assets/operators/skills/laevatain/ult.png",
             iconSmall: "assets/operators/skills/laevatain/ult_small.png",
-            type: "ultimate",
+            type: "Ultimate",
             elementType: "heat",
             cooldown: 20,
             energy: 60,

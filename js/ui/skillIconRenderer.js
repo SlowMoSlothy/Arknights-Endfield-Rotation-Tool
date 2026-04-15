@@ -4,27 +4,33 @@ function normalizeSkillElementType(elementType) {
     const key = String(elementType).trim().toLowerCase();
 
     const map = {
+        // HEAT
         heat: "heat",
         fire: "heat",
         burn: "heat",
 
-        frost: "frost",
-        ice: "frost",
-        freeze: "frost",
+        // CRYO
+        cryo: "cryo",
+        ice: "cryo",
+        frost: "cryo",
 
-        thunder: "thunder",
-        electric: "thunder",
-        lightning: "thunder",
+        // ELECTRIC (Elektro = gelb)
+        electric: "electric",
+        electro: "electric",
+        thunder: "electric",
+        lightning: "electric",
 
-        corrosion: "corrosion",
-        acid: "corrosion",
-        liquefy: "corrosion",
+        // NATURE
+        nature: "nature",
+        plant: "nature",
+        poison: "nature",
 
-        wind: "wind",
-        aero: "wind",
-
+        // PHYSICAL
         physical: "physical",
-        neutral: "neutral"
+        neutral: "physical",
+
+        // optional fallback
+        default: "neutral"
     };
 
     return map[key] || "neutral";
