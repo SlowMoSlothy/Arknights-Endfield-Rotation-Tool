@@ -1,3 +1,5 @@
+let activeSkillTooltipElement = null;
+
 function ensureGlobalSkillTooltip() {
     let tooltip = document.getElementById("globalSkillTooltip");
 
@@ -13,7 +15,8 @@ function ensureGlobalSkillTooltip() {
 
 function buildSkillTooltipHtml(skillData) {
     return `
-        <div class="tooltip-title"><b>${skillData.name}</b></div>
+        <div class="tooltip-title">${skillData.name}</div>
+        <div class="tooltip-operator">${skillData.operator}</div>
         <div class="tooltip-line">Type: ${skillData.type || "-"}</div>
         <div class="tooltip-line">CD: ${skillData.cooldown}s</div>
         <div class="tooltip-line">Energy: ${skillData.energy}</div>
@@ -48,8 +51,6 @@ function positionSkillTooltip(targetEl) {
 }
 
 function showSkillTooltip(targetEl, skillData) {
-    if (window.innerWidth <= 900) return;
-
     const tooltip = ensureGlobalSkillTooltip();
     tooltip.innerHTML = buildSkillTooltipHtml(skillData);
     tooltip.classList.add("visible");
@@ -57,6 +58,8 @@ function showSkillTooltip(targetEl, skillData) {
     requestAnimationFrame(() => {
         positionSkillTooltip(targetEl);
     });
+
+    activeSkillTooltipElement = targetEl;
 }
 
 function hideSkillTooltip() {
@@ -64,22 +67,72 @@ function hideSkillTooltip() {
     if (!tooltip) return;
 
     tooltip.classList.remove("visible");
+    activeSkillTooltipElement = null;
+}
+
+function toggleSkillTooltip(targetEl, skillData) {
+    if (activeSkillTooltipElement === targetEl) {
+        hideSkillTooltip();
+        return;
+    }
+
+    showSkillTooltip(targetEl, skillData);
 }
 
 function attachSkillTooltipEvents(skillEl, skillData) {
     skillEl.addEventListener("mouseenter", () => {
+        if (window.innerWidth <= 900) return;
         showSkillTooltip(skillEl, skillData);
     });
 
     skillEl.addEventListener("mouseleave", () => {
+        if (window.innerWidth <= 900) return;
         hideSkillTooltip();
     });
 
     skillEl.addEventListener("mousemove", () => {
+        if (window.innerWidth <= 900) return;
+
         const tooltip = document.getElementById("globalSkillTooltip");
         if (!tooltip || !tooltip.classList.contains("visible")) return;
+
         positionSkillTooltip(skillEl);
     });
+
+    skillEl.addEventListener("click", (e) => {
+        if (window.innerWidth > 900) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        toggleSkillTooltip(skillEl, skillData);
+    });
+}
+
+function initMobileSkillTooltipClose() {
+    if (window.mobileSkillTooltipCloseInitialized) return;
+    window.mobileSkillTooltipCloseInitialized = true;
+
+    document.addEventListener("click", (e) => {
+        if (window.innerWidth > 900) return;
+
+        const clickedSkill = e.target.closest(".skill-small");
+        const clickedTooltip = e.target.closest("#globalSkillTooltip");
+
+        if (clickedSkill || clickedTooltip) return;
+
+        hideSkillTooltip();
+    });
+
+    window.addEventListener("resize", () => {
+        hideSkillTooltip();
+    });
+
+    window.addEventListener("scroll", () => {
+        if (window.innerWidth <= 900 && activeSkillTooltipElement) {
+            positionSkillTooltip(activeSkillTooltipElement);
+        }
+    }, true);
 }
 
 function renderSkills() {
@@ -88,6 +141,7 @@ function renderSkills() {
 
     list.innerHTML = "";
     hideSkillTooltip();
+    initMobileSkillTooltipClose();
 
     const activeOperators = operators.filter(op => selectedTeam.includes(op.id));
 
@@ -117,21 +171,21 @@ function renderSkills() {
 
         op.skills.forEach(skill => {
             const div = document.createElement("div");
-div.className = "skill skill-small";
-div.dataset.id = String(skill.id);
-div.dataset.largeIcon = skill.icon;
+            div.className = "skill skill-small";
+            div.dataset.id = String(skill.id);
+            div.dataset.largeIcon = skill.icon;
 
-const skillData = { ...skill, operator: op.name };
+            const skillData = { ...skill, operator: op.name };
 
-const icon = createSkillIcon(skillData, {
-    size: "small",
-    useSmallIcon: true
-});
+            const icon = createSkillIcon(skillData, {
+                size: "small",
+                useSmallIcon: true
+            });
 
-div.appendChild(icon);
-skillRow.appendChild(div);
+            div.appendChild(icon);
+            skillRow.appendChild(div);
 
-attachSkillTooltipEvents(div, skillData);
+            attachSkillTooltipEvents(div, skillData);
         });
 
         card.appendChild(opRow);
