@@ -178,17 +178,21 @@ function initRotationDragDrop() {
             },
 
             onFilter: (evt) => {
-                const removeBtn = evt.target.closest(".remove-btn");
-                if (!removeBtn) return;
-
-                const removeIndex = parseInt(removeBtn.dataset.index, 10);
-                if (Number.isNaN(removeIndex)) return;
-
-                rotation[removeIndex] = null;
-                compactRotation();
-                trimTrailingEmptyRows();
-                saveRotation();
-            },
+    const removeBtn = evt.target.closest(".remove-btn");
+    if (!removeBtn) return;
+    
+    const removeIndex = parseInt(removeBtn.dataset.index, 10);
+    if (Number.isNaN(removeIndex)) return;
+    
+    rotation[removeIndex] = null;
+    
+    compactRotation();
+    
+    // 🔥 WICHTIG: immer mindestens 1 freien Slot behalten
+    ensureSlotCount(rotation.filter(slot => slot !== null).length + 1);
+    
+    saveRotation();
+},
 
             onMove: (evt) => {
                 document.querySelectorAll(".rotation-slot").forEach(s => s.classList.remove("drag-hover"));

@@ -8,9 +8,10 @@ const rossi = {
             name: "Seething Wolfblood",
             icon: "assets/operators/skills/rossi/fs.png",
             iconSmall: "assets/operators/skills/rossi/fs_small.png",
-            type: "fs",
+            type: "FinalStrike",
             cooldown: 20,
             energy: 60,
+            elementType: "physical",
             description: "Massiver AoE Schaden.",
             debuffs: [
                 {
@@ -26,9 +27,10 @@ const rossi = {
             name: "Crimson Shadow",
             icon: "assets/operators/skills/rossi/bs.png",
             iconSmall: "assets/operators/skills/rossi/bs_small.png",
-            type: "bs",
+            type: "BattleSkill",
             cooldown: 20,
             energy: 60,
+            elementType: "physical",
             description: "Massiver AoE Schaden."
         },
         {
@@ -46,9 +48,10 @@ const rossi = {
             name: '"Razorclaw" Ambuscade',
             icon: "assets/operators/skills/rossi/ult.png",
             iconSmall: "assets/operators/skills/rossi/ult_small.png",
-            type: "ult",
+            type: "Ultimate",
             cooldown: 20,
             energy: 60,
+            elementType: "heat",
             description: "Massiver AoE Schaden."
         }
     ]

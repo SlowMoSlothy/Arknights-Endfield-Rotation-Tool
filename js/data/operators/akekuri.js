@@ -8,9 +8,10 @@ const akekuri = {
             name: "Sword of Aspiration",
             icon: "assets/operators/skills/akekuri/fs.png",
             iconSmall: "assets/operators/skills/akekuri/fs_small.png",
-            type: "ultimate",
+            type: "FinalStrike",
             cooldown: 20,
             energy: 60,
+            elementType: "physical",
             description: "Massiver AoE Schaden.",
             debuffs: [
                 {
@@ -26,19 +27,21 @@ const akekuri = {
             name: "Burst of Passion",
             icon: "assets/operators/skills/akekuri/bs.png",
             iconSmall: "assets/operators/skills/akekuri/bs_small.png",
-            type: "bs",
+            type: "Battle Skill",
             cooldown: 20,
             energy: 60,
-            description: "Massiver AoE Schaden."
+            elementType: "heat",
+            description: "Ein Hieb nach vorn, der Hitze-SDN und [heat] verursacht."
         },
         {
             id: 203,
             name: "Flash and Dash",
             icon: "assets/operators/skills/akekuri/cs.png",
             iconSmall: "assets/operators/skills/akekuri/cs_small.png",
-            type: "cs",
-            cooldown: 20,
-            energy: 60,
+            type: "ComboSkill",
+            cooldown: 0,
+            energy: 100,
+            elementType: "physical",
             description: "Massiver AoE Schaden."
         },
         {
@@ -46,9 +49,10 @@ const akekuri = {
             name: "SQUAD! ON ME!",
             icon: "assets/operators/skills/akekuri/ult.png",
             iconSmall: "assets/operators/skills/akekuri/ult_small.png",
-            type: "ult",
+            type: "Ultimate",
             cooldown: 20,
             energy: 60,
+            elementType: "heat",
             description: "Massiver AoE Schaden."
         }
     ]
