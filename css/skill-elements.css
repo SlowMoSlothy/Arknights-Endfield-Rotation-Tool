@@ -154,3 +154,29 @@
 .ef-skill-icon {
     transition: transform 0.15s ease, box-shadow 0.2s ease;
 }
+/* === Rotation Skill Rahmen nutzt Element-Farbe === */
+
+.rotation-skill.ef-element-heat .skill-inner {
+    border: 2px solid var(--ef-bg-color);
+    box-shadow: 0 0 10px var(--ef-bg-color);
+}
+
+.rotation-skill.ef-element-cryo .skill-inner {
+    border: 2px solid var(--ef-bg-color);
+    box-shadow: 0 0 10px var(--ef-bg-color);
+}
+
+.rotation-skill.ef-element-electric .skill-inner {
+    border: 2px solid var(--ef-bg-color);
+    box-shadow: 0 0 10px var(--ef-bg-color);
+}
+
+.rotation-skill.ef-element-nature .skill-inner {
+    border: 2px solid var(--ef-bg-color);
+    box-shadow: 0 0 10px var(--ef-bg-color);
+}
+
+.rotation-skill.ef-element-physical .skill-inner {
+    border: 2px solid var(--ef-bg-color);
+    box-shadow: 0 0 8px var(--ef-bg-color);
+}

@@ -18,8 +18,12 @@ function renderRotation() {
         if (entry) {
             const skillData = getSkillById(entry.id);
 
+
             if (skillData) {
                 const skillDiv = document.createElement("div");
+                if (skillData.elementType) {
+    skillDiv.classList.add(`ef-element-${skillData.elementType}`);
+}
                 skillDiv.className = "skill rotation-skill";
 
                 if (entry.autoInserted) {
