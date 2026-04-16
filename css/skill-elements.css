@@ -92,7 +92,7 @@
     --ef-bg-color: #5ab8ff;
 }
 
-.ef-element-electric {
+.ef-element-electro {
     --ef-bg-color: #f0d34a;
 }
 
@@ -127,7 +127,7 @@
         0 0 16px rgba(90, 184, 255, 0.7);
 }
 
-.ef-element-electric:hover {
+.ef-element-electro:hover {
     box-shadow:
         0 0 6px rgba(240, 211, 74, 0.55),
         0 0 16px rgba(240, 211, 74, 0.75);
@@ -166,7 +166,7 @@
     box-shadow: 0 0 10px var(--ef-bg-color);
 }
 
-.rotation-skill.ef-element-electric .skill-inner {
+.rotation-skill.ef-element-electro .skill-inner {
     border: 2px solid var(--ef-bg-color);
     box-shadow: 0 0 10px var(--ef-bg-color);
 }

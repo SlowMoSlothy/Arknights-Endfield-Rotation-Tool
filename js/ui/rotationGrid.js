@@ -21,10 +21,11 @@ function renderRotation() {
 
             if (skillData) {
                 const skillDiv = document.createElement("div");
-                if (skillData.elementType) {
+skillDiv.className = "skill rotation-skill";
+
+if (skillData.elementType) {
     skillDiv.classList.add(`ef-element-${skillData.elementType}`);
 }
-                skillDiv.className = "skill rotation-skill";
 
                 if (entry.autoInserted) {
                     skillDiv.classList.add("auto-inserted");
