@@ -11,7 +11,7 @@ const perlica = {
             type: "final_strike",
             cooldown: 20,
             energy: 60,
-            elementType: "electro",
+            elementType: "electric",
             description: "Massiver AoE Schaden."
         },
         {
@@ -22,7 +22,7 @@ const perlica = {
             type: "Battle Skill",
             cooldown: 0,
             energy: 40,
-            elementType: "electro",
+            elementType: "electric",
             description: "Massiver AoE Schaden."
         },
         {
@@ -33,7 +33,7 @@ const perlica = {
             type: "Combo Skill",
             cooldown: 20,
             energy: 60,
-            elementType: "electro",
+            elementType: "electric",
             description: "Massiver AoE Schaden.",
             comboTriggers: ["final_strike"],
             debuffs: [
@@ -53,7 +53,7 @@ const perlica = {
             type: "Ultimate",
             cooldown: 20,
             energy: 60,
-            elementType: "electro",
+            elementType: "electric",
             description: "Massiver AoE Schaden."
         }
     ]

@@ -27,6 +27,10 @@ if (skillData.elementType) {
     skillDiv.classList.add(`ef-element-${skillData.elementType}`);
 }
 
+if (skillData.elementType) {
+    skillDiv.classList.add(`ef-element-${skillData.elementType}`);
+}
+
                 if (entry.autoInserted) {
                     skillDiv.classList.add("auto-inserted");
                 }
