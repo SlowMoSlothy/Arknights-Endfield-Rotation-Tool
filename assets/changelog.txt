@@ -1,0 +1,7 @@
+style(Skills)           = Die Skills sind jetzt farblich gestalltet wie in Game.
+feat(Leader)            = Der Erste ausgewählte Operator ist immer der Leader.
+style(Leader)           = Der Leader wird mit der Farbe Gold gekennzeichnet.
+add(Edmin)              = Der CS des Edmin wird automatisch hinzugefügt, wenn der andere Operator einen CS auslöst.
+style(Team Selection)   = Selected Teams wurde oberhalb entfernt.
+style(Rotation)         = Die Skills in der Rotation bekommen eine vom Elementtyp farbliche kontur.
+add(Tooltip)            = Ein Tooltip für die Skillbeschreibung wurde hinzugefügt. (Skillbeschreibung wird noch geändert :P)

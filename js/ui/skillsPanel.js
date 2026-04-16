@@ -143,14 +143,21 @@ function renderSkills() {
     hideSkillTooltip();
     initMobileSkillTooltipClose();
 
-    const activeOperators = operators.filter(op => selectedTeam.includes(op.id));
+    const activeOperators = selectedTeam
+        .filter(id => id !== null)
+        .map(id => operators.find(op => op.id === id))
+        .filter(Boolean);
 
     const wrapper = document.createElement("div");
     wrapper.className = "operators-skills-grid";
 
-    activeOperators.forEach(op => {
+    activeOperators.forEach((op, index) => {
         const card = document.createElement("div");
         card.className = "operator-skill-card";
+
+        if (index === 0) {
+            card.classList.add("leader");
+        }
 
         const opRow = document.createElement("div");
         opRow.className = "operator-row";
@@ -162,6 +169,13 @@ function renderSkills() {
 
         const opName = document.createElement("div");
         opName.textContent = op.name;
+
+        if (index === 0) {
+            const leaderBadge = document.createElement("div");
+            leaderBadge.className = "leader-badge";
+            leaderBadge.textContent = "Leader";
+            card.appendChild(leaderBadge);
+        }
 
         opRow.appendChild(opImg);
         opRow.appendChild(opName);

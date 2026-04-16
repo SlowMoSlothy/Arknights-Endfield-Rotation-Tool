@@ -173,7 +173,9 @@
     border-radius: 6px;
     object-fit: cover;
 }
-
+.builder-top {
+    display: none;
+}
 @media (max-width: 900px) {
     .team-top-panel {
         justify-content: flex-start;
