@@ -180,7 +180,7 @@
 .leader-badge {
     position: absolute;
     top: 0;
-    left: -8;
+    left: -8px;
     transform: translate(30%, -50%); 
     background: #ffd54f;
     color: #111;

@@ -3,7 +3,7 @@ function formatTooltipDescription(text) {
 
     const EFFECT_MAP = {
         heat: {
-            icon: "/assets/debuffs/elements/heat.webp",
+            icon: "assets/debuffs/heat.png",
             label: "Hitze"
         },
         lift: {

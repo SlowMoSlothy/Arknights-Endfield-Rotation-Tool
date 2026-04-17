@@ -8,7 +8,7 @@ const akekuri = {
             name: "Sword of Aspiration",
             icon: "assets/operators/skills/akekuri/fs.png",
             iconSmall: "assets/operators/skills/akekuri/fs_small.png",
-            type: "FinalStrike",
+            type: "Final Strike",
             cooldown: 20,
             energy: 60,
             elementType: "physical",
@@ -31,6 +31,12 @@ const akekuri = {
             cooldown: 20,
             energy: 60,
             elementType: "heat",
+            debuffs: [
+                {
+                    appliesEffect: "heat",
+                    stacks: 2
+                }
+            ],
             description: "Ein Hieb nach vorn, der Hitze-SDN und [heat] verursacht."
         },
         {
