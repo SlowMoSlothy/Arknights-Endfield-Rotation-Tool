@@ -12,7 +12,6 @@ const laevatain = {
             elementType: "heat",
             cooldown: 0,
             energy: 0,
-            description: "Final Strike deals 1 Stagger.",
             debuffs: [
                 {
                     id: "final_strike",
@@ -20,7 +19,8 @@ const laevatain = {
                     appliesEffect: "final_strike",
                     visible: false
                 }
-            ]
+            ],
+            description: "Final Strike deals 1 Stagger."     
         },
         {
             id: 102,
