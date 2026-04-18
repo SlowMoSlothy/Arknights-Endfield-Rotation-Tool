@@ -9,6 +9,7 @@ function cleanupDragArtifacts() {
 
     document.body.classList.remove("drag-in-progress");
 }
+<<<<<<< Updated upstream
 
 function collectSkillEffects(skillData) {
     if (!skillData) return [];
@@ -74,6 +75,8 @@ function insertComboChain(startSkillId, startIndex) {
     }
 }
 
+=======
+>>>>>>> Stashed changes
 function beginDrag() {
     isDraggingSkill = true;
     document.body.classList.add("drag-in-progress");
