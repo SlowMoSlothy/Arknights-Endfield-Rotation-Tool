@@ -12,7 +12,17 @@ const perlica = {
             cooldown: 20,
             energy: 60,
             elementType: "electric",
-            description: "Massiver AoE Schaden."
+            cooldown: 0,
+            energy: 0,
+            debuffs: [
+                {
+                    id: "final_strike",
+                    name: "Final Strike",
+                    appliesEffect: "final_strike",
+                    visible: false
+                }
+            ],
+            description: "Final Strike deals 1 Stagger."    
         },
         {
             id: 402,
@@ -36,6 +46,7 @@ const perlica = {
             elementType: "electric",
             description: "Massiver AoE Schaden.",
             comboTriggers: ["final_strike"],
+            allowSelfTrigger: true,
             debuffs: [
                 {
                     id: "combo_skill",

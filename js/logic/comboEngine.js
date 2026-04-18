@@ -55,14 +55,20 @@ function collectEffectsFromRotationUpToIndex(endIndex) {
 }
 
 function getComboSkillsFromEffects(effectMap, sourceOperatorId) {
-    const activeOperators = operators.filter(op => selectedTeam.includes(op.id));
+    const activeOperators = selectedTeam
+        .filter(id => id !== null)
+        .map(id => operators.find(op => op.id === id))
+        .filter(Boolean);
+
     const result = [];
     const seen = new Set();
 
     for (const op of activeOperators) {
-        if (op.id === sourceOperatorId) continue;
+        const isSameOperator = op.id === sourceOperatorId;
 
         for (const skill of op.skills) {
+            if (isSameOperator && !skill.allowSelfTrigger) continue;
+
             const triggers = Array.isArray(skill.comboTriggers)
                 ? skill.comboTriggers
                 : (skill.comboTrigger ? [{ effect: skill.comboTrigger, minStacks: 1 }] : []);
@@ -74,7 +80,6 @@ function getComboSkillsFromEffects(effectMap, sourceOperatorId) {
 
                 const effectName = trigger.effect;
                 const minStacks = trigger.minStacks || 1;
-
                 return (effectMap[effectName] || 0) >= minStacks;
             });
 
@@ -95,6 +100,9 @@ function insertComboChain(startSkillId, startIndex) {
     const MAX_CHAIN_LENGTH = 20;
     let chainCount = 0;
 
+    // Nur Effekte der AKTUELLEN Combo-Kette
+    const chainEffectMap = {};
+
     while (queue.length > 0) {
         if (chainCount >= MAX_CHAIN_LENGTH) {
             console.warn("Combo chain stopped: maximum chain length reached.");
@@ -107,8 +115,18 @@ function insertComboChain(startSkillId, startIndex) {
 
         if (!currentSkillData || !sourceOperator) continue;
 
-        const effectMap = collectEffectsFromRotationUpToIndex(current.insertAfterIndex);
-        const comboSkills = getComboSkillsFromEffects(effectMap, sourceOperator.id);
+        // Nur Effekte dieses aktuellen Skills sammeln
+        const currentEffects = collectEffectsFromSkill(currentSkillData);
+
+        // In die aktuelle Kette addieren
+        Object.entries(currentEffects).forEach(([effectName, amount]) => {
+            if (!chainEffectMap[effectName]) {
+                chainEffectMap[effectName] = 0;
+            }
+            chainEffectMap[effectName] += amount;
+        });
+
+        const comboSkills = getComboSkillsFromEffects(chainEffectMap, sourceOperator.id);
 
         let insertOffset = 1;
 
