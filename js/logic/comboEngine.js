@@ -76,6 +76,18 @@ function collectEffectsFromRotationUpToIndex(endIndex) {
         console.log("checking operator:", op.name, "isSameOperator:", isSameOperator);
 
         for (const skill of op.skills) {
+
+            if (op.name === "Perlica") {
+                console.log("PERLICA DEBUG =>", {
+                    skillName: skill.name,
+                    skillId: skill.id,
+                    allowSelfTrigger: skill.allowSelfTrigger,
+                    comboTriggers: skill.comboTriggers,
+                    isSameOperator,
+                    finalStrikeValue: effectMap["final_strike"] || 0
+                });
+            }
+            
             console.log("  skill:", skill.name, "allowSelfTrigger:", skill.allowSelfTrigger, "comboTriggers:", skill.comboTriggers);
 
             if (isSameOperator && !skill.allowSelfTrigger) {
