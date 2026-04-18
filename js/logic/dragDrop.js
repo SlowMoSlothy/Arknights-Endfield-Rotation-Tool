@@ -9,7 +9,36 @@ function cleanupDragArtifacts() {
 
     document.body.classList.remove("drag-in-progress");
 }
+function collectEffectsFromRotationUpToIndex(endIndex) {
+    const effectMap = {};
 
+    for (let i = 0; i <= endIndex; i++) {
+        const entry = rotation[i];
+        if (!entry) continue;
+
+        const skillData = getSkillById(entry.id);
+        if (!skillData) continue;
+
+        const allEffects = [
+            ...(Array.isArray(skillData.debuffs) ? skillData.debuffs : []),
+            ...(Array.isArray(skillData.buffs) ? skillData.buffs : [])
+        ];
+
+        allEffects.forEach(effect => {
+            if (!effect.appliesEffect) return;
+
+            const amount = effect.stackable ? (effect.stacksApplied || 1) : 1;
+
+            if (!effectMap[effect.appliesEffect]) {
+                effectMap[effect.appliesEffect] = 0;
+            }
+
+            effectMap[effect.appliesEffect] += amount;
+        });
+    }
+
+    return effectMap;
+}
 function collectSkillEffects(skillData) {
     if (!skillData) return [];
 
@@ -94,6 +123,9 @@ function insertComboChain(startSkillId, startIndex) {
     const MAX_CHAIN_LENGTH = 20;
     let chainCount = 0;
 
+    // 🔥 Kumulierte Effekte über die ganze Combo-Kette
+    const cumulativeEffectMap = {};
+
     while (queue.length > 0) {
         if (chainCount >= MAX_CHAIN_LENGTH) {
             console.warn("Combo chain stopped: maximum chain length reached.");
@@ -106,8 +138,13 @@ function insertComboChain(startSkillId, startIndex) {
 
         if (!currentSkillData || !sourceOperator) continue;
 
-        const effectMap = collectSkillEffectsWithStacks(currentSkillData);
-        const comboSkills = getComboSkillsFromEffects(effectMap, sourceOperator.id);
+        const currentEffectMap = collectEffectsFromRotationUpToIndex(current.insertAfterIndex);
+
+        console.log("skill:", currentSkillData.name);
+        console.log("currentEffectMap:", currentEffectMap);
+        console.log("cumulativeEffectMap:", cumulativeEffectMap);
+
+        const comboSkills = getComboSkillsFromEffects(cumulativeEffectMap, sourceOperator.id);
 
         let insertOffset = 1;
 
