@@ -1,5 +1,5 @@
 const zhuang = {
-    id: 6,
+    id: 9,
     name: "Zhuang",
     icon: "assets/operators/avatars/zhuang.png",
     canEnterUltimateState: true,

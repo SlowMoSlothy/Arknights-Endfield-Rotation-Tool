@@ -1,5 +1,5 @@
 const antal = {
-    id: 6,
+    id: 8,
     name: "Antal",
     icon: "assets/operators/avatars/Antal.png",
     skills: [
