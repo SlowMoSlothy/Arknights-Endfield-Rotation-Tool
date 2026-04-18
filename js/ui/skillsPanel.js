@@ -255,7 +255,7 @@ function getComboSkillFromSelectedTeam(trigger, sourceOperatorId) {
     return null;
 }
 
-function getComboSkillsFromEffects(effectMap, sourceOperatorId) {
+function getComboSkillsFromEffects(effects, sourceOperatorId) {
     const activeOperators = operators.filter(op => selectedTeam.includes(op.id));
     const result = [];
     const seen = new Set();
@@ -266,20 +266,9 @@ function getComboSkillsFromEffects(effectMap, sourceOperatorId) {
         for (const skill of op.skills) {
             const triggers = Array.isArray(skill.comboTriggers)
                 ? skill.comboTriggers
-                : (skill.comboTrigger ? [{ effect: skill.comboTrigger, minStacks: 1 }] : []);
+                : (skill.comboTrigger ? [skill.comboTrigger] : []);
 
-            const matches = triggers.some(trigger => {
-                // alter String-Support
-                if (typeof trigger === "string") {
-                    return (effectMap[trigger] || 0) >= 1;
-                }
-
-                // neues Objektformat
-                const effectName = trigger.effect;
-                const minStacks = trigger.minStacks || 1;
-
-                return (effectMap[effectName] || 0) >= minStacks;
-            });
+            const matches = triggers.some(trigger => effects.includes(trigger));
 
             if (matches && !seen.has(skill.id)) {
                 result.push(skill);
