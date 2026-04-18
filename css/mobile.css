@@ -103,11 +103,10 @@
         padding: 10px;
     }
 
-    #rotationDropZone {
-        width: max-content;
-        min-width: 100%;
-        overflow: visible;
-    }
+        #rotationDropZone {
+            width: max-content;
+            min-width: 0;
+        }
 
     .rotation-slot {
         width: 64px;

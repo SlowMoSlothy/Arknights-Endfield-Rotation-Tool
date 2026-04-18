@@ -6,10 +6,10 @@ function exportImage() {
     const previousStyle = element.getAttribute("style") || "";
 
     element.classList.add("export-mode");
-
-    element.style.overflow = "visible";
     element.style.width = "max-content";
+    element.style.minWidth = "0";
     element.style.maxWidth = "none";
+    element.style.overflow = "visible";
     element.style.background = "#000";
     element.style.padding = "24px";
     element.style.borderRadius = "16px";
