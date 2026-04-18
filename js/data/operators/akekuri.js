@@ -12,7 +12,7 @@ const akekuri = {
             cooldown: 20,
             energy: 60,
             elementType: "physical",
-            description: "Massiver AoE Schaden.",
+            description: "FS",
             debuffs: [
                 {
                     id: "final_strike",
@@ -37,7 +37,7 @@ const akekuri = {
                     stacks: 2
                 }
             ],
-            description: "Ein Hieb nach vorn, der Hitze-SDN und [heat] verursacht."
+            description: "Ein Hieb nach vorn, der [heat] verursacht."
         },
         {
             id: 203,
@@ -48,7 +48,7 @@ const akekuri = {
             cooldown: 0,
             energy: 100,
             elementType: "physical",
-            description: "Massiver AoE Schaden."
+            description: "CS"
         },
         {
             id: 204,
@@ -59,7 +59,7 @@ const akekuri = {
             cooldown: 20,
             energy: 60,
             elementType: "heat",
-            description: "Massiver AoE Schaden."
+            description: "Ultimate"
         }
     ]
 }

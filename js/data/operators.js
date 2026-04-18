@@ -1,4 +1,6 @@
 const operators = [
+    zhuang,
+    antal,
     avywenna,
     arclight,
     laevatain,

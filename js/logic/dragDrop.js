@@ -179,12 +179,21 @@ function initRotationDragDrop() {
 
                 if (!draggedId) return;
 
+                const originalSkill = getSkillById(draggedId);
+
+                let finalSkillId = draggedId;
+                if (!originalSkill?.togglesUltimateState) {
+                    finalSkillId = getMappedSkillIdForOperatorState(draggedId);
+                }
+
                 rotation[index] = {
                     uid: crypto.randomUUID(),
-                    id: draggedId
+                    id: finalSkillId
                 };
 
-                insertComboChain(draggedId, index);
+                handleUltimateStateToggle(draggedId);
+
+                insertComboChain(finalSkillId, index);
 
                 compactRotation();
                 ensureSlotCount(rotation.filter(slot => slot !== null).length + 1);

@@ -176,19 +176,28 @@ function handleTapInput(e) {
 }
 
 function placeSkillInSlot(index, skillId, replaceExisting = false) {
+    const originalSkill = getSkillById(skillId);
+
+    let finalSkillId = skillId;
+    if (!originalSkill?.togglesUltimateState) {
+        finalSkillId = getMappedSkillIdForOperatorState(skillId);
+    }
+
     if (replaceExisting) {
         rotation[index] = {
             uid: crypto.randomUUID(),
-            id: skillId
+            id: finalSkillId
         };
     } else {
         rotation.splice(index, 0, {
             uid: crypto.randomUUID(),
-            id: skillId
+            id: finalSkillId
         });
     }
 
-    insertComboChain(skillId, index);
+    handleUltimateStateToggle(skillId);
+
+    insertComboChain(finalSkillId, index);
 
     compactRotation();
     ensureSlotCount(rotation.filter(slot => slot !== null).length + 1);

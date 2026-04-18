@@ -21,7 +21,6 @@ const avywenna = {
                     visible: false
                 }
             ],
-
         },
         {
             id: 702,
@@ -32,7 +31,7 @@ const avywenna = {
             cooldown: 20,
             energy: 60,
             elementType: "electric",
-            description: "Ein Hieb nach vorn, der Hitze-SDN und [heat] verursacht."
+            description: "FS"
         },
         {
             id: 703,
@@ -43,7 +42,7 @@ const avywenna = {
             cooldown: 0,
             energy: 100,
             elementType: "electric",
-            description: "Massiver AoE Schaden."
+            description: "CS"
         },
         {
             id: 704,
@@ -54,7 +53,7 @@ const avywenna = {
             cooldown: 20,
             energy: 60,
             elementType: "electric",
-            description: "Massiver AoE Schaden."
+            description: "Ultimate"
         }
     ]
 }

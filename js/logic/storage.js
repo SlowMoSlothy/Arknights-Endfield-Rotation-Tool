@@ -20,9 +20,24 @@ function loadTeam() {
         selectedTeam = [null, null, null, null];
     }
 }
+function loadOperatorUltimateStates() {
+    const saved = localStorage.getItem("operatorUltimateStates");
+    if (!saved) {
+        operatorUltimateStates = {};
+        return;
+    }
 
+    try {
+        const parsed = JSON.parse(saved);
+        operatorUltimateStates = parsed && typeof parsed === "object" ? parsed : {};
+    } catch (error) {
+        console.error("Ultimate states could not be loaded:", error);
+        operatorUltimateStates = {};
+    }
+}
 function saveRotation() {
     localStorage.setItem("rotation", JSON.stringify(rotation));
+    localStorage.setItem("operatorUltimateStates", JSON.stringify(operatorUltimateStates));
     renderRotation();
 }
 
@@ -55,6 +70,8 @@ function loadRotation() {
 }
 
 function clearRotation() {
+    operatorUltimateStates = {};
+    localStorage.removeItem("operatorUltimateStates");
     rotation = [null];
     localStorage.removeItem("rotation");
     renderRotation();

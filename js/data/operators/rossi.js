@@ -12,7 +12,7 @@ const rossi = {
             cooldown: 20,
             energy: 60,
             elementType: "physical",
-            description: "Massiver AoE Schaden.",
+            description: "Final Strike",
             debuffs: [
                 {
                     id: "final_strike",
@@ -31,7 +31,7 @@ const rossi = {
             cooldown: 20,
             energy: 60,
             elementType: "physical",
-            description: "Massiver AoE Schaden."
+            description: "BS"
         },
         {
             id: 503,
@@ -41,7 +41,7 @@ const rossi = {
             type: "cs",
             cooldown: 20,
             energy: 60,
-            description: "Massiver AoE Schaden."
+            description: "CS"
         },
         {
             id: 504,
@@ -52,7 +52,7 @@ const rossi = {
             cooldown: 20,
             energy: 60,
             elementType: "heat",
-            description: "Massiver AoE Schaden."
+            description: "Ultimate"
         }
     ]
 }

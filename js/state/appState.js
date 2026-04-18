@@ -5,3 +5,5 @@ let activeSlotIndex = null;
 let skillSourceSortables = [];
 let slotSortables = [];
 let isDraggingSkill = false;
+
+let operatorUltimateStates = {};
