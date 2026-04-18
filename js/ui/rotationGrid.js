@@ -21,15 +21,15 @@ function renderRotation() {
 
             if (skillData) {
                 const skillDiv = document.createElement("div");
-skillDiv.className = "skill rotation-skill";
+                skillDiv.className = "skill rotation-skill";
 
-if (skillData.elementType) {
-    skillDiv.classList.add(`ef-element-${skillData.elementType}`);
-}
+                if (skillData.elementType) {
+                    skillDiv.classList.add(`ef-element-${skillData.elementType}`);
+                }
 
-if (skillData.elementType) {
-    skillDiv.classList.add(`ef-element-${skillData.elementType}`);
-}
+                if (skillData.elementType) {
+                    skillDiv.classList.add(`ef-element-${skillData.elementType}`);
+                }
 
                 if (entry.autoInserted) {
                     skillDiv.classList.add("auto-inserted");
@@ -78,18 +78,11 @@ if (skillData.elementType) {
             arrow.style.gridRow = String(slotInfo.arrow.gridRow);
 
             const currentEntry = rotation[index];
+            const nextIndex = index + 1;
+
             let isUsed = false;
-
-            if (index >= 0 && index <= 3) {
-                isUsed = rotation[index] !== null && rotation[index + 1] !== null;
-            }
-
-            if (index === 4) {
-                isUsed = rotation[4] !== null && rotation[5] !== null;
-            }
-
-            if (index >= 5 && index <= 8) {
-                isUsed = rotation[index] !== null && rotation[index + 1] !== null;
+            if (nextIndex < rotation.length) {
+                isUsed = currentEntry !== null && rotation[nextIndex] !== null;
             }
 
             if (!isUsed) {
