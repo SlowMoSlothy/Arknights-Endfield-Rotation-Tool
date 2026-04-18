@@ -10,70 +10,6 @@ function cleanupDragArtifacts() {
     document.body.classList.remove("drag-in-progress");
 }
 
-function collectSkillEffects(skillData) {
-    if (!skillData) return [];
-
-    const debuffEffects = Array.isArray(skillData.debuffs)
-        ? skillData.debuffs.map(d => d.appliesEffect).filter(Boolean)
-        : [];
-
-    const buffEffects = Array.isArray(skillData.buffs)
-        ? skillData.buffs.map(b => b.appliesEffect).filter(Boolean)
-        : [];
-
-    return [...new Set([...debuffEffects, ...buffEffects])];
-}
-
-function insertComboChain(startSkillId, startIndex) {
-    const queue = [{ skillId: startSkillId, insertAfterIndex: startIndex }];
-    const alreadyInsertedIds = new Set([startSkillId]);
-
-    const MAX_CHAIN_LENGTH = 20;
-    let chainCount = 0;
-
-    while (queue.length > 0) {
-        if (chainCount >= MAX_CHAIN_LENGTH) {
-            console.warn("Combo chain stopped: maximum chain length reached.");
-            break;
-        }
-
-        const current = queue.shift();
-        const currentSkillData = getSkillById(current.skillId);
-        const sourceOperator = getOperatorBySkillId(current.skillId);
-
-        if (!currentSkillData || !sourceOperator) continue;
-
-        const effects = collectSkillEffects(currentSkillData);
-        if (effects.length === 0) continue;
-
-        const comboSkills = getComboSkillsFromEffects(effects, sourceOperator.id);
-
-        let insertOffset = 1;
-
-        comboSkills.forEach(comboSkill => {
-            if (alreadyInsertedIds.has(comboSkill.id)) return;
-
-            const comboIndex = current.insertAfterIndex + insertOffset;
-
-            rotation.splice(comboIndex, 0, {
-                uid: crypto.randomUUID(),
-                id: comboSkill.id,
-                autoInserted: true
-            });
-
-            alreadyInsertedIds.add(comboSkill.id);
-
-            queue.push({
-                skillId: comboSkill.id,
-                insertAfterIndex: comboIndex
-            });
-
-            insertOffset++;
-            chainCount++;
-        });
-    }
-}
-
 function beginDrag() {
     isDraggingSkill = true;
     document.body.classList.add("drag-in-progress");
@@ -168,7 +104,7 @@ function initRotationDragDrop() {
 
             onStart: () => {
                 beginDrag();
-                
+
                 setTimeout(() => {
                     const ghost = document.querySelector(".drag-ghost, .sortable-fallback");
                     if (ghost) {
@@ -178,21 +114,19 @@ function initRotationDragDrop() {
             },
 
             onFilter: (evt) => {
-    const removeBtn = evt.target.closest(".remove-btn");
-    if (!removeBtn) return;
-    
-    const removeIndex = parseInt(removeBtn.dataset.index, 10);
-    if (Number.isNaN(removeIndex)) return;
-    
-    rotation[removeIndex] = null;
-    
-    compactRotation();
-    
-    // 🔥 WICHTIG: immer mindestens 1 freien Slot behalten
-    ensureSlotCount(rotation.filter(slot => slot !== null).length + 1);
-    
-    saveRotation();
-},
+                const removeBtn = evt.target.closest(".remove-btn");
+                if (!removeBtn) return;
+
+                const removeIndex = parseInt(removeBtn.dataset.index, 10);
+                if (Number.isNaN(removeIndex)) return;
+
+                rotation[removeIndex] = null;
+
+                compactRotation();
+                ensureSlotCount(rotation.filter(slot => slot !== null).length + 1);
+
+                saveRotation();
+            },
 
             onMove: (evt) => {
                 document.querySelectorAll(".rotation-slot").forEach(s => s.classList.remove("drag-hover"));

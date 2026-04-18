@@ -3,7 +3,6 @@ let activeSlotMenuIndex = null;
 let tapInputInitialized = false;
 let activeTooltipUid = null;
 
-
 function toggleMobileTooltip(skillEl) {
     const uid = skillEl.dataset.uid;
 
@@ -34,74 +33,39 @@ function initTapInput() {
     document.addEventListener("pointerup", handleTapInput, { passive: false });
 }
 
-function collectSkillEffects(skillData) {
-    if (!skillData) return [];
+function handleTapInput(e) {
+    const basicPoint = e.target.closest(".rotation-basic-point");
+    if (basicPoint) {
+        e.preventDefault();
+        e.stopPropagation();
 
-    const debuffEffects = Array.isArray(skillData.debuffs)
-        ? skillData.debuffs.map(d => d.appliesEffect).filter(Boolean)
-        : [];
+        const value = parseInt(basicPoint.dataset.point, 10);
+        if (Number.isNaN(value)) return;
 
-    const buffEffects = Array.isArray(skillData.buffs)
-        ? skillData.buffs.map(b => b.appliesEffect).filter(Boolean)
-        : [];
+        if (leaderAttackSelectionStep === "start") {
+            leaderAttackStart = value;
 
-    return [...new Set([...debuffEffects, ...buffEffects])];
-}
+            if (leaderAttackStart > leaderAttackEnd) {
+                leaderAttackEnd = leaderAttackStart;
+            }
 
-function insertComboChain(startSkillId, startIndex) {
-    const queue = [{ skillId: startSkillId, insertAfterIndex: startIndex }];
-    const alreadyInsertedIds = new Set([startSkillId]);
+            leaderAttackSelectionStep = "end";
+        } else {
+            leaderAttackEnd = value;
 
-    const MAX_CHAIN_LENGTH = 20;
-    let chainCount = 0;
+            if (leaderAttackStart > leaderAttackEnd) {
+                const temp = leaderAttackStart;
+                leaderAttackStart = leaderAttackEnd;
+                leaderAttackEnd = temp;
+            }
 
-    while (queue.length > 0) {
-        if (chainCount >= MAX_CHAIN_LENGTH) {
-            console.warn("Combo chain stopped: maximum chain length reached.");
-            break;
+            leaderAttackSelectionStep = "start";
         }
 
-        const current = queue.shift();
-        const currentSkillData = getSkillById(current.skillId);
-        const sourceOperator = getOperatorBySkillId(current.skillId);
-
-        if (!currentSkillData || !sourceOperator) continue;
-
-        const effects = collectSkillEffects(currentSkillData);
-        if (effects.length === 0) continue;
-
-        const comboSkills = getComboSkillsFromEffects(effects, sourceOperator.id);
-
-        let insertOffset = 1;
-
-        comboSkills.forEach(comboSkill => {
-            if (alreadyInsertedIds.has(comboSkill.id)) return;
-
-            const comboIndex = current.insertAfterIndex + insertOffset;
-
-            rotation.splice(comboIndex, 0, {
-                uid: crypto.randomUUID(),
-                id: comboSkill.id,
-                autoInserted: true
-            });
-
-            alreadyInsertedIds.add(comboSkill.id);
-
-            queue.push({
-                skillId: comboSkill.id,
-                insertAfterIndex: comboIndex
-            });
-
-            insertOffset++;
-            chainCount++;
-        });
-    }
-}
-
-function handleTapInput(e) {
-    if (isDraggingSkill) {
+        saveRotation();
         return;
     }
+
     const menuBtn = e.target.closest(".slot-action-btn");
     if (menuBtn) {
         e.preventDefault();
@@ -183,6 +147,7 @@ function handleTapInput(e) {
             e.stopPropagation();
 
             placeSkillInSlot(index, selectedSkill.id, true);
+
             selectedSkill = null;
             closeSlotMenu();
             updateSelectedUI();
