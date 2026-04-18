@@ -54,11 +54,18 @@ function collectEffectsFromRotationUpToIndex(endIndex) {
     return effectMap;
 }
 
-function getComboSkillsFromEffects(effectMap, sourceOperatorId) {
+ function getComboSkillsFromEffects(effectMap, sourceOperatorId) {
+    console.log("=== getComboSkillsFromEffects ===");
+    console.log("effectMap:", effectMap);
+    console.log("sourceOperatorId:", sourceOperatorId);
+    console.log("selectedTeam:", selectedTeam);
+
     const activeOperators = selectedTeam
         .filter(id => id !== null)
         .map(id => operators.find(op => op.id === id))
         .filter(Boolean);
+
+    console.log("activeOperators:", activeOperators.map(op => `${op.id} ${op.name}`));
 
     const result = [];
     const seen = new Set();
@@ -66,8 +73,15 @@ function getComboSkillsFromEffects(effectMap, sourceOperatorId) {
     for (const op of activeOperators) {
         const isSameOperator = op.id === sourceOperatorId;
 
+        console.log("checking operator:", op.name, "isSameOperator:", isSameOperator);
+
         for (const skill of op.skills) {
-            if (isSameOperator && !skill.allowSelfTrigger) continue;
+            console.log("  skill:", skill.name, "allowSelfTrigger:", skill.allowSelfTrigger, "comboTriggers:", skill.comboTriggers);
+
+            if (isSameOperator && !skill.allowSelfTrigger) {
+                console.log("   -> skipped because self trigger not allowed");
+                continue;
+            }
 
             const triggers = Array.isArray(skill.comboTriggers)
                 ? skill.comboTriggers
@@ -75,21 +89,28 @@ function getComboSkillsFromEffects(effectMap, sourceOperatorId) {
 
             const matches = triggers.some(trigger => {
                 if (typeof trigger === "string") {
-                    return (effectMap[trigger] || 0) >= 1;
+                    const ok = (effectMap[trigger] || 0) >= 1;
+                    console.log("   string trigger:", trigger, "=>", ok);
+                    return ok;
                 }
 
                 const effectName = trigger.effect;
                 const minStacks = trigger.minStacks || 1;
-                return (effectMap[effectName] || 0) >= minStacks;
+                const ok = (effectMap[effectName] || 0) >= minStacks;
+
+                console.log("   object trigger:", effectName, "minStacks:", minStacks, "current:", effectMap[effectName] || 0, "=>", ok);
+                return ok;
             });
 
             if (matches && !seen.has(skill.id)) {
+                console.log("   -> MATCH:", skill.name);
                 result.push(skill);
                 seen.add(skill.id);
             }
         }
     }
 
+    console.log("result:", result.map(skill => skill.name));
     return result;
 }
 
@@ -125,6 +146,10 @@ function insertComboChain(startSkillId, startIndex) {
             }
             chainEffectMap[effectName] += amount;
         });
+
+        console.log("current skill:", currentSkillData.name);
+        console.log("source operator:", sourceOperator.name, sourceOperator.id);
+        console.log("chainEffectMap before combo search:", chainEffectMap);
 
         const comboSkills = getComboSkillsFromEffects(chainEffectMap, sourceOperator.id);
 
