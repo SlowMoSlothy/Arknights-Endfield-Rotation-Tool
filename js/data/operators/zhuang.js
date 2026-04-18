@@ -1,7 +1,7 @@
 const zhuang = {
     id: 9,
     name: "Zhuang",
-    icon: "assets/operators/avatars/zhuang.png",
+    icon: "assets/operators/avatars/Zhuang.png",
     canEnterUltimateState: true,
     skills: [
         {
