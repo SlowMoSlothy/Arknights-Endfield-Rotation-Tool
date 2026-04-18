@@ -35,7 +35,9 @@ const perlica = {
             energy: 60,
             elementType: "electric",
             description: "Massiver AoE Schaden.",
-            comboTriggers: ["final_strike"],
+            comboTriggers: [
+                { effect: "final_strike", minStacks: 1 }
+            ],
             debuffs: [
                 {
                     id: "combo_skill",

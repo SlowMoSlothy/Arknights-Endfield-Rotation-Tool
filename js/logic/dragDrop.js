@@ -24,6 +24,69 @@ function collectSkillEffects(skillData) {
     return [...new Set([...debuffEffects, ...buffEffects])];
 }
 
+function collectSkillEffectsWithStacks(skillData) {
+    const effectMap = {};
+
+    if (!skillData) return effectMap;
+
+    const allEffects = [
+        ...(Array.isArray(skillData.debuffs) ? skillData.debuffs : []),
+        ...(Array.isArray(skillData.buffs) ? skillData.buffs : [])
+    ];
+
+    allEffects.forEach(effect => {
+        if (!effect.appliesEffect) return;
+
+        const amount = effect.stackable ? (effect.stacksApplied || 1) : 1;
+
+        if (!effectMap[effect.appliesEffect]) {
+            effectMap[effect.appliesEffect] = 0;
+        }
+
+        effectMap[effect.appliesEffect] += amount;
+
+        if (effect.maxStacks) {
+            effectMap[effect.appliesEffect] = Math.min(
+                effectMap[effect.appliesEffect],
+                effect.maxStacks
+            );
+        }
+    });
+
+    return effectMap;
+}
+function getComboSkillsFromEffects(effectMap, sourceOperatorId) {
+    const activeOperators = operators.filter(op => selectedTeam.includes(op.id));
+    const result = [];
+    const seen = new Set();
+
+    for (const op of activeOperators) {
+        if (op.id === sourceOperatorId) continue;
+
+        for (const skill of op.skills) {
+            const triggers = Array.isArray(skill.comboTriggers)
+                ? skill.comboTriggers
+                : (skill.comboTrigger ? [{ effect: skill.comboTrigger, minStacks: 1 }] : []);
+
+            const matches = triggers.some(trigger => {
+                if (typeof trigger === "string") {
+                    return (effectMap[trigger] || 0) >= 1;
+                }
+
+                const effectName = trigger.effect;
+                const minStacks = trigger.minStacks || 1;
+                return (effectMap[effectName] || 0) >= minStacks;
+            });
+
+            if (matches && !seen.has(skill.id)) {
+                result.push(skill);
+                seen.add(skill.id);
+            }
+        }
+    }
+
+    return result;
+}
 function insertComboChain(startSkillId, startIndex) {
     const queue = [{ skillId: startSkillId, insertAfterIndex: startIndex }];
     const alreadyInsertedIds = new Set([startSkillId]);
@@ -43,10 +106,8 @@ function insertComboChain(startSkillId, startIndex) {
 
         if (!currentSkillData || !sourceOperator) continue;
 
-        const effects = collectSkillEffects(currentSkillData);
-        if (effects.length === 0) continue;
-
-        const comboSkills = getComboSkillsFromEffects(effects, sourceOperator.id);
+        const effectMap = collectSkillEffectsWithStacks(currentSkillData);
+        const comboSkills = getComboSkillsFromEffects(effectMap, sourceOperator.id);
 
         let insertOffset = 1;
 

@@ -17,7 +17,10 @@ const laevatain = {
                     id: "final_strike",
                     name: "Final Strike",
                     appliesEffect: "final_strike",
-                    visible: false
+                    visible: false,
+                    stackable: true,
+                    stacksApplied: 1,
+                    maxStacks: 1
                 }
             ],
             description: "Final Strike deals 1 Stagger."     
