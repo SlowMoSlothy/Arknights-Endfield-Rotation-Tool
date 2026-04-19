@@ -8,3 +8,5 @@ loadTeam();
 loadRotation();
 renderTeamSlots();
 renderOperatorList();
+
+initUiSettings();

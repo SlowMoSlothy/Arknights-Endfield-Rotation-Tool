@@ -1,0 +1,145 @@
+.settings-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 16px;
+}
+
+.settings-modal.open {
+    display: flex;
+}
+
+.settings-dialog {
+    width: min(420px, 100%);
+    background: #151515;
+    border: 1px solid #444;
+    border-radius: 16px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+    padding: 18px;
+    color: #fff;
+}
+
+.settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.settings-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.settings-close {
+    border: none;
+    background: #2a2a2a;
+    color: #fff;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.settings-section {
+    margin-top: 10px;
+}
+
+.settings-label {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.settings-option-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.settings-option-btn {
+    border: 1px solid #555;
+    background: #222;
+    color: #fff;
+    border-radius: 12px;
+    padding: 10px 12px;
+    cursor: pointer;
+    min-width: 110px;
+    transition: 0.15s ease;
+}
+
+.settings-option-btn.active {
+    border-color: #ffd54f;
+    box-shadow: 0 0 10px rgba(255, 213, 79, 0.35);
+}
+
+.settings-option-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.settings-preview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50px;
+}
+
+.settings-preview-box {
+    border-radius: 10px;
+    border: 2px solid #666;
+    background: #111;
+}
+
+.settings-size-label {
+    margin-top: 6px;
+    font-size: 11px;
+    color: #aaa;
+    text-align: center;
+}
+
+/* Rotationsgrößen */
+:root.rotation-size-small {
+    --rotation-slot-size: 56px;
+    --rotation-gap: 10px;
+    --rotation-arrow-size: 16px;
+    --rotation-arrow-width: 20px;
+}
+
+:root.rotation-size-medium {
+    --rotation-slot-size: 72px;
+    --rotation-gap: 14px;
+    --rotation-arrow-size: 18px;
+    --rotation-arrow-width: 24px;
+}
+
+:root.rotation-size-large {
+    --rotation-slot-size: 88px;
+    --rotation-gap: 18px;
+    --rotation-arrow-size: 22px;
+    --rotation-arrow-width: 30px;
+}
+
+/* NEU */
+:root.rotation-size-xl {
+    --rotation-slot-size: 104px;
+    --rotation-gap: 22px;
+    --rotation-arrow-size: 26px;
+    --rotation-arrow-width: 36px;
+}
+
+/* NEU */
+:root.rotation-size-xxl {
+    --rotation-slot-size: 120px;
+    --rotation-gap: 26px;
+    --rotation-arrow-size: 30px;
+    --rotation-arrow-width: 42px;
+}
