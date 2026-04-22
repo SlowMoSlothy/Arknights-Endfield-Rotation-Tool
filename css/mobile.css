@@ -135,15 +135,14 @@
         touch-action: manipulation;
     }
 
-    .remove-btn {
-        opacity: 1;
-        width: 26px;
-        height: 26px;
-        top: -10px;
-        right: -10px;
-        font-size: 16px;
-        z-index: 40;
-    }
+    .team-slot .remove-btn {
+    width: 22px;
+    height: 22px;
+    top: -6px;
+    right: -6px;
+    font-size: 13px;
+    line-height: 1;
+}
 
     .rotation-skill:hover .remove-btn {
         opacity: 1;
@@ -168,25 +167,40 @@
         width: 14px;
         height: 14px;
     }
-
     .team-slots {
-        overflow-x: auto;
-        padding-bottom: 6px;
-    }
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+    align-items: stretch;
+}
 
+.team-slot {
+    width: 100%;
+    min-width: 0;
+    aspect-ratio: 1 / 1;
+    padding: 2px;
+    box-sizing: border-box;
+    position: relative;
+    overflow: visible;
+}
+
+.team-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    border-radius: 18px;
+}
     .operator-grid {
         grid-template-columns: repeat(2, minmax(120px, 1fr));
         gap: 12px;
     }
 
-    .operator-card {
-        width: 100%;
-        height: 110px;
-    }
-
     .operator-card img {
-        width: 56px;
-        height: 56px;
+        width: 50px;
+        height: 50px;
+        border-radius: 15px;
     }
 
     .rotation-slot.menu-open {
