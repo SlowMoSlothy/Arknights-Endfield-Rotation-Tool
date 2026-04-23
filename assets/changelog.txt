@@ -5,3 +5,8 @@ add(Edmin)              = Der CS des Edmin wird automatisch hinzugefügt, wenn d
 style(Team Selection)   = Selected Teams wurde oberhalb entfernt.
 style(Rotation)         = Die Skills in der Rotation bekommen eine vom Elementtyp farbliche kontur.
 add(Tooltip)            = Ein Tooltip für die Skillbeschreibung wurde hinzugefügt. (Skillbeschreibung wird noch geändert :P)
+
+24.04.2026
+style(Team-Auswahl) Fehler behoben, dass nicht alle 4 operators angezeigt wurden.
+style(Team-Auswahl) unterhalten der Team-Auswahl sind die Avatars der operators kleiner und runder gemacht.
+style(Enemy Panel) Wird vorerst ausgeblendet, weil es noch keine Funktion hat ausser Platz zu klauen^^.
