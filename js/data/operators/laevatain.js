@@ -17,6 +17,7 @@ const laevatain = {
                     id: "final_strike",
                     name: "Final Strike",
                     appliesEffect: "final_strike",
+                    persistsForCombo: false,
                     visible: false
                 }
             ],

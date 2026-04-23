@@ -19,7 +19,7 @@ const perlica = {
                     id: "final_strike",
                     name: "Final Strike",
                     appliesEffect: "final_strike",
-                    visible: false
+persistsForCombo: false,                    visible: false
                 }
             ],
             description: "Final Strike"    
@@ -35,14 +35,13 @@ const perlica = {
             elementType: "electric",
             debuffs: [
     {
-        id: "electrification",
-        name: "Electrification",
-        appliesEffect: "electrification",
+        name: "Elektrik",
+        appliesEffect: "electric",
         visible: true,
         stackable: true,
         stacksApplied: 1,
         maxStacks: 4,
-        iconBase: "assets/debuffs/electrification"
+        iconBase: "assets/debuffs/electric"
     }
 ],
             description: "BS"
@@ -64,6 +63,7 @@ const perlica = {
                     id: "combo_skill",
                     name: "Combo Skill",
                     appliesEffect: "combo_skill",
+                    persistsForCombo: false,
                     visible: false
                 }
             ]

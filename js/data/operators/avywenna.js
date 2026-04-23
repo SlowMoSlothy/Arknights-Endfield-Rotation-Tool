@@ -18,6 +18,7 @@ const avywenna = {
                     id: "final_strike",
                     name: "Final Strike",
                     appliesEffect: "final_strike",
+                    persistsForCombo: false,
                     visible: false
                 }
             ],
@@ -45,8 +46,17 @@ const avywenna = {
             comboTriggerMode: "all",
 comboTriggers: [
     { effect: "final_strike"},
-    { effect: "electrification", minStacks: 1 }
+    { effect: "electric", minStacks: 1 }
 ],
+debuffs: [
+                {
+                    id: "electrification",
+                    name: "Electrification",
+                    appliesEffect: "electrification",
+                    persistsForCombo: true,
+                    visible: false
+                }]
+            ,
             description: "CS"
         },
         {
