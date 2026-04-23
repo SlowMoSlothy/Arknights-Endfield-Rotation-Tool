@@ -33,6 +33,18 @@ const perlica = {
             cooldown: 0,
             energy: 40,
             elementType: "electric",
+            debuffs: [
+    {
+        id: "electrification",
+        name: "Electrification",
+        appliesEffect: "electrification",
+        visible: true,
+        stackable: true,
+        stacksApplied: 1,
+        maxStacks: 4,
+        iconBase: "assets/debuffs/electrification"
+    }
+],
             description: "BS"
         },
         {

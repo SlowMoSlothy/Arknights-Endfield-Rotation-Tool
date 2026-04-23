@@ -40,8 +40,13 @@ const avywenna = {
             iconSmall: "assets/operators/skills/avywenna/cs_small.png",
             type: "ComboSkill",
             cooldown: 0,
-            energy: 100,
+            energy: 0,
             elementType: "electric",
+            comboTriggerMode: "all",
+comboTriggers: [
+    { effect: "final_strike"},
+    { effect: "electrification", minStacks: 1 }
+],
             description: "CS"
         },
         {
