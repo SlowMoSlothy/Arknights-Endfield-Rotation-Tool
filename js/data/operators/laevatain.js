@@ -43,7 +43,24 @@ const laevatain = {
                     stacksApplied: 1,
                     iconBase: "assets/buffs/laevatain/melting_flames"
                 }
-            ]
+            ],
+            debuffs: [
+        {
+            id: "heat_infliction",
+            name: "Heat Infliction",
+            appliesEffect: "heat_infliction",
+
+            visible: true,
+
+            // 🔥 wichtig für Reactions
+            stackable: true,
+            stacksApplied: 1,
+            maxStacks: 4,
+
+            // 🔥 bleibt im System gespeichert
+            persistsForCombo: true
+        }
+    ]
         }
         ,
         {

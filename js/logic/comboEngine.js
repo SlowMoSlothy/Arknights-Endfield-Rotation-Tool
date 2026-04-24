@@ -72,30 +72,30 @@ function collectEffectsFromSkill(skillData) {
 
 function collectEffectsFromRotationUpToIndex(endIndex) {
     const effectMap = {};
-    
+
     for (let i = 0; i <= endIndex; i++) {
         const entry = rotation[i];
         if (!entry) continue;
-        
+
         const skillData = getSkillById(entry.id);
         if (!skillData) continue;
-        
+
         const allEffects = [
             ...(Array.isArray(skillData.debuffs) ? skillData.debuffs : []),
             ...(Array.isArray(skillData.buffs) ? skillData.buffs : [])
         ];
-        
+
         allEffects.forEach(effect => {
             if (!effect.appliesEffect) return;
-            
+
             const amount = effect.stackable ? (effect.stacksApplied || 1) : 1;
-            
+
             if (!effectMap[effect.appliesEffect]) {
                 effectMap[effect.appliesEffect] = 0;
             }
-            
+
             effectMap[effect.appliesEffect] += amount;
-            
+
             if (effect.maxStacks) {
                 effectMap[effect.appliesEffect] = Math.min(
                     effectMap[effect.appliesEffect],
@@ -104,7 +104,7 @@ function collectEffectsFromRotationUpToIndex(endIndex) {
             }
         });
     }
-    
+
     return effectMap;
 }
 
@@ -201,7 +201,12 @@ function insertComboChain(startSkillId, startIndex) {
             effectMap[effectName] += amount;
         });
         
-        const comboSkills = getComboSkillsFromEffects(effectMap, sourceOperator.id);
+        const resolvedEffectMap =
+    typeof resolveArtsReactions === "function"
+        ? resolveArtsReactions(effectMap)
+        : effectMap;
+
+const comboSkills = getComboSkillsFromEffects(resolvedEffectMap, sourceOperator.id);
         
         let insertOffset = 1;
         

@@ -10,4 +10,6 @@ add(Tooltip)            = Ein Tooltip f체r die Skillbeschreibung wurde hinzugef�
 style(Team-Auswahl) Fehler behoben, dass nicht alle 4 operators angezeigt wurden.
 style(Team-Auswahl) unterhalten der Team-Auswahl sind die Avatars der operators kleiner und runder gemacht.
 style(Enemy Panel) Wird vorerst ausgeblendet, weil es noch keine Funktion hat ausser Platz zu klauen^^.
-add(CS Avywenna) Der CS von Avywenna wird jetzt automatisch hinzugef체gt 
+add(CS Avywenna) Der CS von Avywenna wird automatisch hinzugef체gt wenn die Bedingungen erf체llt sind.
+add(Alesh) Der Operator Alesh hinzugef체gt.
+add(CS Alesh) Der CS von Alesh wird automatisch hinzugef체gt wenn die Bedingungen erf체llt sind.

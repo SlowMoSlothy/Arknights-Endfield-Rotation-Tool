@@ -1,4 +1,6 @@
 const operators = [
+    antal,
+    alesh,
     zhuang,
     antal,
     avywenna,

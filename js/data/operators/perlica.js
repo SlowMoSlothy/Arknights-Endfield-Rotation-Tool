@@ -42,6 +42,18 @@ persistsForCombo: false,                    visible: false
         stacksApplied: 1,
         maxStacks: 4,
         iconBase: "assets/debuffs/electric"
+    },
+    
+                {
+        id: "electric_infliction",
+        name: "Electric Infliction",
+        appliesEffect: "electric_infliction",
+        visible: true,
+        stackable: true,
+        stacksApplied: 1,
+        maxStacks: 4,
+        persistsForCombo: true,
+        iconBase: "assets/debuffs/electric_infliction"
     }
 ],
             description: "BS"
