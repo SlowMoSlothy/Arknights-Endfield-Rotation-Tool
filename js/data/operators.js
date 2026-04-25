@@ -2,6 +2,8 @@ const operators = [
     ardelia,
     antal,
     alesh,
+    chen,
+    catcher,
     zhuang,
     avywenna,
     arclight,

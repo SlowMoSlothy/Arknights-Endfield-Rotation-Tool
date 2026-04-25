@@ -43,7 +43,6 @@ const perlica = {
                     maxStacks: 4,
                     iconBase: "assets/debuffs/electric"
                 },
-
                 {
                     id: "electric_infliction",
                     name: "Electric Infliction",

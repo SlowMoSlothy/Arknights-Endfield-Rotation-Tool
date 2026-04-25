@@ -13,6 +13,15 @@ avywenna.skills = [
         type: "Final Strike",
         cooldown: 20,
         energy: 60,
+        debuffs: [
+            {
+                id: "final_strike",
+                name: "Final Strike",
+                appliesEffect: "final_strike",
+                persistsForCombo: false,
+                visible: false
+            }
+        ],
         elementType: "physical"
     },
     {
@@ -33,7 +42,12 @@ avywenna.skills = [
         type: "Combo Skill",
         cooldown: 0,
         energy: 0,
-        elementType: "electric"
+        elementType: "electric",
+        comboTriggerMode: "all",
+        comboTriggers: [
+            { effect: "final_strike" },
+            { effect: "electric_infliction", minStacks: 1 }
+        ]
     },
     {
         id: (avywenna.id * 100) + 4,
