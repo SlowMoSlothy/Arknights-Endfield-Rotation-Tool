@@ -1,3 +1,13 @@
+function getShortSkillType(type) {
+    const value = (type || "").toLowerCase();
+
+    if (value.includes("final") || value === "fs") return "FS";
+    if (value.includes("battle") || value === "bs") return "BS";
+    if (value.includes("combo") || value === "cs") return "CS";
+    if (value.includes("ultimate") || value === "ult") return "Ult";
+
+    return type || "";
+}
 function renderRotation() {
     const container = document.getElementById("rotationDropZone");
     if (!container) return;
@@ -39,14 +49,32 @@ function renderRotation() {
                 skillDiv.dataset.uid = entry.uid;
 
                 const inner = document.createElement("div");
-                inner.className = "skill-inner";
+                inner.className = "rotation-skill-composite";
 
-                const img = document.createElement("img");
-                img.src = skillData.icon;
-                img.alt = skillData.name;
-                img.draggable = false;
+                const portrait = document.createElement("img");
+                portrait.className = "rotation-skill-portrait";
+                portrait.src = skillData.icon;
+                portrait.alt = skillData.name;
+                portrait.draggable = false;
 
-                inner.appendChild(img);
+                const typeBadge = document.createElement("div");
+                typeBadge.className = "rotation-skill-type-badge";
+                typeBadge.textContent = skillData.shortType || getShortSkillType(skillData.type);
+
+                const glyphBadge = document.createElement("div");
+                glyphBadge.className = "rotation-skill-glyph-badge";
+
+                const glyph = document.createElement("img");
+                glyph.src = skillData.iconSmall;
+                glyph.alt = skillData.type || "Skill";
+                glyph.draggable = false;
+
+                glyphBadge.appendChild(glyph);
+
+                inner.appendChild(portrait);
+                inner.appendChild(typeBadge);
+                inner.appendChild(glyphBadge);
+
                 skillDiv.appendChild(inner);
 
                 const removeBtn = document.createElement("button");

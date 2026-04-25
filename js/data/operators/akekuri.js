@@ -6,7 +6,7 @@ const akekuri = {
         {
             id: 201,
             name: "Sword of Aspiration",
-            icon: "assets/operators/skills/akekuri/fs.png",
+            icon: "assets/operators/avatars/Akekuri.png",
             iconSmall: "assets/operators/skills/akekuri/fs_small.png",
             type: "Final Strike",
             cooldown: 20,
@@ -26,7 +26,7 @@ const akekuri = {
         {
             id: 202,
             name: "Burst of Passion",
-            icon: "assets/operators/skills/akekuri/bs.png",
+            icon: "assets/operators/avatars/Akekuri.png",
             iconSmall: "assets/operators/skills/akekuri/bs_small.png",
             type: "Battle Skill",
             cooldown: 20,
@@ -43,7 +43,7 @@ const akekuri = {
         {
             id: 203,
             name: "Flash and Dash",
-            icon: "assets/operators/skills/akekuri/cs.png",
+            icon: "assets/operators/avatars/Akekuri.png",
             iconSmall: "assets/operators/skills/akekuri/cs_small.png",
             type: "ComboSkill",
             cooldown: 0,
@@ -54,7 +54,7 @@ const akekuri = {
         {
             id: 204,
             name: "SQUAD! ON ME!",
-            icon: "assets/operators/skills/akekuri/ult.png",
+            icon: "assets/operators/avatars/Akekuri.png",
             iconSmall: "assets/operators/skills/akekuri/ult_small.png",
             type: "Ultimate",
             cooldown: 20,

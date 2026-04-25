@@ -6,7 +6,7 @@ const endministrator = {
         {
             id: 301,
             name: "Destructive Sequence",
-            icon: "assets/operators/skills/endmin/fs.png",
+            icon: "assets/operators/avatars/Endmin.png",
             iconSmall: "assets/operators/skills/endmin/fs_small.png",
             type: "Final Strike",
             cooldown: 0,
@@ -26,7 +26,7 @@ const endministrator = {
         {
             id: 302,
             name: "Constructive Sequence",
-            icon: "assets/operators/skills/endmin/bs.png",
+            icon: "assets/operators/avatars/Endmin.png",
             iconSmall: "assets/operators/skills/endmin/bs_small.png",
             type: "Battle Skill",
             cooldown: 20,
@@ -38,7 +38,7 @@ const endministrator = {
         {
             id: 303,
             name: "Sealing Sequence",
-            icon: "assets/operators/skills/endmin/cs.png",
+            icon: "assets/operators/avatars/Endmin.png",
             iconSmall: "assets/operators/skills/endmin/cs_small.png",
             type: "Combo Skil",
             cooldown: 20,
@@ -50,7 +50,7 @@ const endministrator = {
         {
             id: 304,
             name: "Bombardment Sequence",
-            icon: "assets/operators/skills/endmin/ult.png",
+            icon: "assets/operators/avatars/Endmin.png",
             iconSmall: "assets/operators/skills/endmin/ult_small.png",
             elementType: "physical",
             type: "Ultimate",

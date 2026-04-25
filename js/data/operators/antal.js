@@ -5,8 +5,8 @@ const antal = {
     skills: [
         {
             id: 801,
-            name: "Seek and Hunt",
-            icon: "assets/operators/skills/antal/fs.png",
+            name: "Exchange Current",
+            icon: "assets/operators/avatars/Antal.png",
             iconSmall: "assets/operators/skills/antal/fs_small.png",
             type: "Final Strike",
             cooldown: 20,
@@ -26,8 +26,8 @@ const antal = {
         },
         {
             id: 802,
-            name: "Tempestuous Arc",
-            icon: "assets/operators/skills/antal/bs.png",
+            name: "Specified Research Subject",
+            icon: "assets/operators/avatars/Antal.png",
             iconSmall: "assets/operators/skills/antal/bs_small.png",
             type: "Battle Skill",
             cooldown: 20,
@@ -37,8 +37,8 @@ const antal = {
         },
         {
             id: 803,
-            name: "Peal of Thunder",
-            icon: "assets/operators/skills/antal/cs.png",
+            name: "EMP Test Site",
+            icon: "assets/operators/avatars/Antal.png",
             iconSmall: "assets/operators/skills/antal/cs_small.png",
             type: "ComboSkill",
             cooldown: 0,
@@ -48,8 +48,8 @@ const antal = {
         },
         {
             id: 804,
-            name: "Exploding Blitz",
-            icon: "assets/operators/skills/antal/ult.png",
+            name: "Overclocked Moment",
+            icon: "assets/operators/avatars/Antal.png",
             iconSmall: "assets/operators/skills/antal/ult_small.png",
             type: "Ultimate",
             cooldown: 20,

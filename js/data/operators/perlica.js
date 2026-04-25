@@ -6,7 +6,7 @@ const perlica = {
         {
             id: 401,
             name: "Protocol α: Breach",
-            icon: "assets/operators/skills/perlica/fs.png",
+            icon: "assets/operators/avatars/Perlica.png",
             iconSmall: "assets/operators/skills/perlica/fs_small.png",
             type: "final_strike",
             cooldown: 20,
@@ -19,49 +19,49 @@ const perlica = {
                     id: "final_strike",
                     name: "Final Strike",
                     appliesEffect: "final_strike",
-persistsForCombo: false,                    visible: false
+                    persistsForCombo: false, visible: false
                 }
             ],
-            description: "Final Strike"    
+            description: "Final Strike"
         },
         {
             id: 402,
             name: "Protocol ω: Strike",
-            icon: "assets/operators/skills/perlica/bs.png",
+            icon: "assets/operators/avatars/Perlica.png",
             iconSmall: "assets/operators/skills/perlica/bs_small.png",
             type: "Battle Skill",
             cooldown: 0,
             energy: 40,
             elementType: "electric",
             debuffs: [
-    {
-        name: "Elektrik",
-        appliesEffect: "electric",
-        visible: true,
-        stackable: true,
-        stacksApplied: 1,
-        maxStacks: 4,
-        iconBase: "assets/debuffs/electric"
-    },
-    
                 {
-        id: "electric_infliction",
-        name: "Electric Infliction",
-        appliesEffect: "electric_infliction",
-        visible: true,
-        stackable: true,
-        stacksApplied: 1,
-        maxStacks: 4,
-        persistsForCombo: true,
-        iconBase: "assets/debuffs/electric_infliction"
-    }
-],
+                    name: "Elektrik",
+                    appliesEffect: "electric",
+                    visible: true,
+                    stackable: true,
+                    stacksApplied: 1,
+                    maxStacks: 4,
+                    iconBase: "assets/debuffs/electric"
+                },
+
+                {
+                    id: "electric_infliction",
+                    name: "Electric Infliction",
+                    appliesEffect: "electric_infliction",
+                    visible: true,
+                    stackable: true,
+                    stacksApplied: 1,
+                    maxStacks: 4,
+                    persistsForCombo: true,
+                    iconBase: "assets/debuffs/electric_infliction"
+                }
+            ],
             description: "BS"
         },
         {
             id: 403,
             name: "Instant Protocol: Chain",
-            icon: "assets/operators/skills/perlica/cs.png",
+            icon: "assets/operators/avatars/Perlica.png",
             iconSmall: "assets/operators/skills/perlica/cs_small.png",
             type: "Combo Skill",
             cooldown: 20,
@@ -83,7 +83,7 @@ persistsForCombo: false,                    visible: false
         {
             id: 404,
             name: "Protocol ε: 70.41K",
-            icon: "assets/operators/skills/perlica/ult.png",
+            icon: "assets/operators/avatars/Perlica.png",
             iconSmall: "assets/operators/skills/perlica/ult_small.png",
             type: "Ultimate",
             cooldown: 20,

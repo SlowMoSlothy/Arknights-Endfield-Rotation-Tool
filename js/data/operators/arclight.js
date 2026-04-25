@@ -1,12 +1,14 @@
+const opImg = "assets/operators/avatars/Arclight.png";
+const opId = 6;
 const arclight = {
-    id: 6,
+    id: opId,
     name: "Arclight",
-    icon: "assets/operators/avatars/Arclight.png",
+    icon: opImg,
     skills: [
         {
-            id: 601,
+            id: (opId * 100) + 1 ,
             name: "Seek and Hunt",
-            icon: "assets/operators/skills/arclight/fs.png",
+            icon: opImg,
             iconSmall: "assets/operators/skills/arclight/fs_small.png",
             type: "Final Strike",
             cooldown: 20,
@@ -25,9 +27,9 @@ const arclight = {
 
         },
         {
-            id: 602,
+            id: (opId * 100) + 2,
             name: "Tempestuous Arc",
-            icon: "assets/operators/skills/arclight/bs.png",
+            icon: opImg,
             iconSmall: "assets/operators/skills/arclight/bs_small.png",
             type: "Battle Skill",
             cooldown: 20,
@@ -36,9 +38,9 @@ const arclight = {
             description: "BS"
         },
         {
-            id: 603,
+            id: (opId * 100) + 3,
             name: "Peal of Thunder",
-            icon: "assets/operators/skills/arclight/cs.png",
+            icon: opImg,
             iconSmall: "assets/operators/skills/arclight/cs_small.png",
             type: "ComboSkill",
             cooldown: 0,
@@ -47,9 +49,9 @@ const arclight = {
             description: "CS"
         },
         {
-            id: 604,
+            id: (opId * 100) + 4,
             name: "Exploding Blitz",
-            icon: "assets/operators/skills/arclight/ult.png",
+            icon: opImg,
             iconSmall: "assets/operators/skills/arclight/ult_small.png",
             type: "Ultimate",
             cooldown: 20,

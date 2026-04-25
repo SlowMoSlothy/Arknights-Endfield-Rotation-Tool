@@ -6,7 +6,7 @@ const laevatain = {
         {
             id: 101,
             name: "Flaming Cinders",
-            icon: "assets/operators/skills/laevatain/fs.png",
+            icon: "assets/operators/avatars/Laevatain.png",
             iconSmall: "assets/operators/skills/laevatain/fs_small.png",
             type: "Final Strike",
             elementType: "heat",
@@ -26,7 +26,7 @@ const laevatain = {
         {
             id: 102,
             name: "Smouldering Fire",
-            icon: "assets/operators/skills/laevatain/bs.png",
+            icon: "assets/operators/avatars/Laevatain.png",
             iconSmall: "assets/operators/skills/laevatain/bs_small.png",
             type: "Battle Skill",
             elementType: "heat",
@@ -66,7 +66,7 @@ const laevatain = {
         {
             id: 103,
             name: "Seethe",
-            icon: "assets/operators/skills/laevatain/cs.png",
+            icon: "assets/operators/avatars/Laevatain.png",
             iconSmall: "assets/operators/skills/laevatain/cs_small.png",
             type: "Combo Skill",
             elementType: "heat",
@@ -89,7 +89,7 @@ const laevatain = {
         {
             id: 104,
             name: "Twilight",
-            icon: "assets/operators/skills/laevatain/ult.png",
+            icon: "assets/operators/avatars/Laevatain.png",
             iconSmall: "assets/operators/skills/laevatain/ult_small.png",
             type: "Ultimate",
             elementType: "heat",

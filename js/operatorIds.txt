@@ -1,0 +1,12 @@
+1   = Laevatain
+2   = Akekuri
+3   = Endmin
+4   = Perlica
+5   = Rossi
+6   = Arclight
+7   = Avy
+8   = Antal
+9   = Zhuang
+10  = Alesh
+11  = Gilberta
+12  = Ardelia

@@ -6,7 +6,7 @@ const rossi = {
         {
             id: 501,
             name: "Seething Wolfblood",
-            icon: "assets/operators/skills/rossi/fs.png",
+            icon: "assets/operators/avatars/Rossi.png",
             iconSmall: "assets/operators/skills/rossi/fs_small.png",
             type: "FinalStrike",
             cooldown: 20,
@@ -26,7 +26,7 @@ const rossi = {
         {
             id: 502,
             name: "Crimson Shadow",
-            icon: "assets/operators/skills/rossi/bs.png",
+            icon: "assets/operators/avatars/Rossi.png",
             iconSmall: "assets/operators/skills/rossi/bs_small.png",
             type: "BattleSkill",
             cooldown: 20,
@@ -37,7 +37,7 @@ const rossi = {
         {
             id: 503,
             name: "Moment of Blazing Shadow",
-            icon: "assets/operators/skills/rossi/cs.png",
+            icon: "assets/operators/avatars/Rossi.png",
             iconSmall: "assets/operators/skills/rossi/cs_small.png",
             type: "cs",
             cooldown: 20,
@@ -47,7 +47,7 @@ const rossi = {
         {
             id: 504,
             name: '"Razorclaw" Ambuscade',
-            icon: "assets/operators/skills/rossi/ult.png",
+            icon: "assets/operators/avatars/Rossi.png",
             iconSmall: "assets/operators/skills/rossi/ult_small.png",
             type: "Ultimate",
             cooldown: 20,
