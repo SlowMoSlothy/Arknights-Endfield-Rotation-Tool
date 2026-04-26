@@ -13,3 +13,8 @@ style(Enemy Panel) Wird vorerst ausgeblendet, weil es noch keine Funktion hat au
 add(CS Avywenna) Der CS von Avywenna wird automatisch hinzugefügt wenn die Bedingungen erfüllt sind.
 add(Alesh) Der Operator Alesh hinzugefügt.
 add(CS Alesh) Der CS von Alesh wird automatisch hinzugefügt wenn die Bedingungen erfüllt sind.
+
+add(CS Arclight)
+add(CS Gilberta)
+add(CS Zhuang)
+add(CS Chen)

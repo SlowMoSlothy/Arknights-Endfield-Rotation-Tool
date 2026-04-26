@@ -9,9 +9,11 @@ const laevatain = {
             icon: "assets/operators/avatars/Laevatain.png",
             iconSmall: "assets/operators/skills/laevatain/fs_small.png",
             type: "Final Strike",
+            shortType: "FS",
             elementType: "heat",
             cooldown: 0,
             energy: 0,
+            description: "FS",
             debuffs: [
                 {
                     id: "final_strike",
@@ -20,8 +22,7 @@ const laevatain = {
                     persistsForCombo: false,
                     visible: false
                 }
-            ],
-            description: "FS"     
+            ]
         },
         {
             id: 102,
@@ -29,15 +30,18 @@ const laevatain = {
             icon: "assets/operators/avatars/Laevatain.png",
             iconSmall: "assets/operators/skills/laevatain/bs_small.png",
             type: "Battle Skill",
+            shortType: "BS",
             elementType: "heat",
             cooldown: 20,
             energy: 60,
-            description: "BS",
+            description: "Applies Heat Infliction and grants Melting Flame.",
             buffs: [
                 {
                     id: "melting_flames",
                     name: "Melting Flame",
-                    appliesEffect: "Melting Flame",
+                    appliesEffect: "melting_flames",
+                    persistsForCombo: true,
+                    visible: true,
                     stackable: true,
                     maxStacks: 4,
                     stacksApplied: 1,
@@ -45,40 +49,42 @@ const laevatain = {
                 }
             ],
             debuffs: [
-        {
-            id: "heat_infliction",
-            name: "Heat Infliction",
-            appliesEffect: "heat_infliction",
-
-            visible: true,
-
-            // 🔥 wichtig für Reactions
-            stackable: true,
-            stacksApplied: 1,
-            maxStacks: 4,
-
-            // 🔥 bleibt im System gespeichert
-            persistsForCombo: true
-        }
-    ]
-        }
-        ,
+                {
+                    id: "heat_infliction",
+                    name: "Heat Infliction",
+                    appliesEffect: "heat_infliction",
+                    visible: true,
+                    stackable: true,
+                    stacksApplied: 1,
+                    maxStacks: 4,
+                    persistsForCombo: true,
+                    iconBase: "assets/debuffs/heat_infliction"
+                }
+            ]
+        },
         {
             id: 103,
             name: "Seethe",
             icon: "assets/operators/avatars/Laevatain.png",
             iconSmall: "assets/operators/skills/laevatain/cs_small.png",
             type: "Combo Skill",
+            shortType: "CS",
             elementType: "heat",
             cooldown: 20,
             energy: 60,
-            description: "CS",
-            comboTriggers: ["Combustion", "Corrosion"],
+            description: "Triggers on Combustion or Corrosion.",
+            comboTriggerMode: "any",
+            comboTriggers: [
+                { effect: "combustion", minStacks: 1 },
+                { effect: "corrosion", minStacks: 1 }
+            ],
             buffs: [
                 {
                     id: "melting_flames",
                     name: "Melting Flame",
-                    appliesEffect: "Melting Flame",
+                    appliesEffect: "melting_flames",
+                    persistsForCombo: true,
+                    visible: true,
                     stackable: true,
                     maxStacks: 4,
                     stacksApplied: 1,
@@ -92,10 +98,11 @@ const laevatain = {
             icon: "assets/operators/avatars/Laevatain.png",
             iconSmall: "assets/operators/skills/laevatain/ult_small.png",
             type: "Ultimate",
+            shortType: "Ult",
             elementType: "heat",
             cooldown: 20,
             energy: 60,
             description: "Ultimate"
         }
     ]
-}
+};
