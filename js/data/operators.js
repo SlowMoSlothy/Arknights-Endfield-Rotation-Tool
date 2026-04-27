@@ -13,6 +13,7 @@ const operators = [
     snowshine,
     wulfgard,
     xaihi,
+    pogranichnik,
     zhuang,
     avywenna,
     arclight,

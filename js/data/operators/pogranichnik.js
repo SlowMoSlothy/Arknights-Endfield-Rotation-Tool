@@ -1,0 +1,118 @@
+const pogranichnik = {
+    id: 22,
+    name: "Pogranichnik",
+    icon: "assets/operators/avatars/Pogranichnik.png"
+};
+
+pogranichnik.skills = [
+    {
+        id: (pogranichnik.id * 100) + 1,
+        name: "All-Out Offensive",
+        icon: pogranichnik.icon,
+        iconSmall: "assets/operators/skills/pogranichnik/fs_small.png",
+        type: "Final Strike",
+        shortType: "FS",
+        cooldown: 20,
+        energy: 60,
+        elementType: "physical",
+        description: "Physical Final Strike. As controlled operator, Final Strike also deals Stagger.",
+        debuffs: [
+            {
+                id: "final_strike",
+                name: "Final Strike",
+                appliesEffect: "final_strike",
+                persistsForCombo: false,
+                visible: false
+            },
+            {
+                id: "stagger",
+                name: "Stagger",
+                appliesEffect: "stagger",
+                persistsForCombo: false,
+                visible: true,
+                iconBase: "assets/debuffs/stagger"
+            }
+        ]
+    },
+
+    {
+        id: (pogranichnik.id * 100) + 2,
+        name: "The Pulverizing Front",
+        icon: pogranichnik.icon,
+        iconSmall: "assets/operators/skills/pogranichnik/bs_small.png",
+        type: "Battle Skill",
+        shortType: "BS",
+        cooldown: 0,
+        energy: 100,
+        elementType: "physical",
+        description: "Deals Physical DMG, applies Breach, and consumes Vulnerability stacks for SP recovery.",
+        consumesEffects: [
+            {
+                effect: "vulnerable",
+                amount: "all"
+            }
+        ],
+        debuffs: [
+            {
+                id: "breach",
+                name: "Breach",
+                appliesEffect: "breach",
+                persistsForCombo: false,
+                visible: true,
+                iconBase: "assets/debuffs/breach"
+            }
+        ]
+    },
+
+    {
+        id: (pogranichnik.id * 100) + 3,
+        name: "Full Moon Slash",
+        icon: pogranichnik.icon,
+        iconSmall: "assets/operators/skills/pogranichnik/cs_small.png",
+        type: "Combo Skill",
+        shortType: "CS",
+        cooldown: 16,
+        energy: 0,
+        elementType: "physical",
+        description: "Triggers when Breach or Crush consumes Vulnerability stacks. Deals Physical DMG and recovers SP.",
+        comboTriggerMode: "any",
+        comboTriggers: [
+            { effect: "breach", minStacks: 1 },
+            { effect: "crush", minStacks: 1 }
+        ]
+    },
+
+    {
+        id: (pogranichnik.id * 100) + 4,
+        name: "Shieldguard Banner, Forward",
+        icon: pogranichnik.icon,
+        iconSmall: "assets/operators/skills/pogranichnik/ult_small.png",
+        type: "Ultimate",
+        shortType: "Ult",
+        cooldown: 20,
+        energy: 90,
+        elementType: "physical",
+        description: "Summons Shieldguards, generates Steel Oath, pushes enemies, deals Physical DMG, and reacts to Physical Status or Pogranichnik combo damage.",
+        debuffs: [
+            {
+                id: "push",
+                name: "Push",
+                appliesEffect: "push",
+                persistsForCombo: false,
+                visible: true,
+                iconBase: "assets/debuffs/push"
+            },
+            {
+                id: "steel_oath",
+                name: "Steel Oath",
+                appliesEffect: "steel_oath",
+                persistsForCombo: true,
+                visible: true,
+                stackable: true,
+                stacksApplied: 5,
+                maxStacks: 5,
+                iconBase: "assets/buffs/steel_oath"
+            }
+        ]
+    }
+];
