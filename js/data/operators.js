@@ -12,5 +12,6 @@ const operators = [
     endministrator,
     perlica,
     rossi,
+    tangtang,
     gilberta
 ];

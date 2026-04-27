@@ -35,7 +35,6 @@ function resolveArtsReactions(effectMap) {
 
         if (!hasAllRequiredEffects) return;
 
-        // benötigte Inflictions verbrauchen
         reaction.requires.forEach(effectName => {
             reactionMap[effectName] -= 1;
 
@@ -44,11 +43,11 @@ function resolveArtsReactions(effectMap) {
             }
         });
 
-        // allgemeiner Arts-Reaction-Trigger
-        reactionMap[reaction.appliesEffect] = (reactionMap[reaction.appliesEffect] || 0) + 1;
+        reactionMap[reaction.appliesEffect] =
+            (reactionMap[reaction.appliesEffect] || 0) + 1;
 
-        // spezifischer Reaction-Trigger, z. B. combustion
-        reactionMap[reaction.reactionEffect] = (reactionMap[reaction.reactionEffect] || 0) + 1;
+        reactionMap[reaction.reactionEffect] =
+            (reactionMap[reaction.reactionEffect] || 0) + 1;
     });
 
     return reactionMap;
