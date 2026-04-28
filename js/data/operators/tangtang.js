@@ -52,35 +52,52 @@ tangtang.skills = [
         ]
     },
     {
-    id: (tangtang.id * 100) + 3,
-    name: "RIVER, TO ME!",
-    icon: tangtang.icon,
-    iconSmall: "assets/operators/skills/tangtang/65px-Combo-Tangtang.webp",
-    type: "Combo Skill",
-    shortType: "CS",
-    cooldown: 0,
-    energy: 0,
-    elementType: "cryo",
-    description: "Triggers on Cryo Infliction or Cryo Burst. Adds Arts Susceptibility.",
-    comboTriggerMode: "any",
-    comboTriggers: [
-        { effect: "cryo_infliction", minStacks: 1 },
-        { effect: "cryo_burst", minStacks: 1 }
-    ],
-    debuffs: [
-        {
-            id: "arts_susceptibility",
-            name: "Arts Susceptibility",
-            appliesEffect: "arts_susceptibility",
-            persistsForCombo: true,
-            visible: true,
-            stackable: true,
-            stacksApplied: 1,
-            maxStacks: 4,
-            iconBase: "assets/debuffs/arts_susceptibility"
-        }
-    ]
-},
+        id: (tangtang.id * 100) + 3,
+        name: "RIVER, TO ME!",
+        icon: tangtang.icon,
+        iconSmall: "assets/operators/skills/tangtang/65px-Combo-Tangtang.webp",
+        type: "Combo Skill",
+        shortType: "CS",
+        cooldown: 0,
+        energy: 0,
+        elementType: "cryo",
+        description: "Triggers on Cryo Infliction or Cryo Burst. Adds Arts Susceptibility.",
+        comboTriggerMode: "all",
+        comboTriggers: [
+            {
+                anyOf: [
+                    { effect: "cryo_infliction", minStacks: 1 },
+                    { effect: "cryo_burst", minStacks: 1 }
+                ]
+            }
+        ],
+        buffs: [
+            {
+                id: "whirlpool",
+                name: "Whirlpool",
+                appliesEffect: "whirlpool",
+                persistsForCombo: true,
+                visible: true,
+                stackable: true,
+                stacksApplied: 1,
+                maxStacks: 2,
+                iconBase: "assets/buffs/tangtang/whirlpool"
+            }
+        ],
+        debuffs: [
+            {
+                id: "arts_susceptibility",
+                name: "Arts Susceptibility",
+                appliesEffect: "arts_susceptibility",
+                persistsForCombo: true,
+                visible: true,
+                stackable: true,
+                stacksApplied: 1,
+                maxStacks: 4,
+                iconBase: "assets/debuffs/arts_susceptibility"
+            }
+        ]
+    },
     {
         id: (tangtang.id * 100) + 4,
         name: "Ultimate",
@@ -103,6 +120,13 @@ tangtang.skills = [
                 stacksApplied: 1,
                 maxStacks: 4,
                 iconBase: "assets/debuffs/cryo_infliction"
+            },
+            {
+                id: "cryo_burst",
+                name: "Cryo Burst",
+                appliesEffect: "cryo_burst",
+                persistsForCombo: false,
+                visible: false
             }
         ]
     }
