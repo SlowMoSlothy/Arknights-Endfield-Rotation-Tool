@@ -89,6 +89,7 @@ function renderOperatorList() {
 
         if (isSelected) {
             card.classList.add("disabled");
+            card.classList.add("selected");
             card.title = "Bereits im Team";
         }
 
