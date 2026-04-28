@@ -2,7 +2,7 @@ const gilberta = {
     id: 11,
     name: "Gilberta",
     icon: "assets/operators/avatars/Gilberta.png",
-    elementType: "physical"
+    elementType: "nature"
 };
 
 gilberta.skills = [
