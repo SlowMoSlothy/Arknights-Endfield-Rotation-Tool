@@ -38,28 +38,60 @@
     overflow: hidden;
 }
 
-/* ELEMENT ICON */
+/* ELEMENT BADGE (TOP LEFT) */
 .operator-card::before {
     content: "";
     position: absolute;
     top: 6px;
-    right: auto;
     left: 6px;
-    width: 18px;
-    height: 18px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    opacity: 0.9;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-size: 14px, cover;
+    background-position: center, center;
+    background-repeat: no-repeat, no-repeat;
+    box-shadow:
+        0 0 6px var(--element-color),
+        inset 0 0 4px rgba(255,255,255,0.2);
     z-index: 2;
     pointer-events: none;
 }
 
-.operator-element-heat::before { background-image: url("../assets/ui/elements/heat.webp"); }
-.operator-element-electric::before { background-image: url("../assets/ui/elements/electric.webp"); }
-.operator-element-cryo::before { background-image: url("../assets/ui/elements/cryo.webp"); }
-.operator-element-nature::before { background-image: url("../assets/ui/elements/nature.webp"); }
-.operator-element-physical::before { background-image: url("../assets/ui/elements/physical.webp"); }
-.operator-element-neutral::before { background-image: url("../assets/ui/elements/neutral.webp"); }
+.operator-element-heat::before {
+    background-image:
+        url("../assets/ui/elements/heat.webp"),
+        radial-gradient(circle, rgba(0,0,0,0.6), rgba(0,0,0,0.9));
+}
+
+.operator-element-electric::before {
+    background-image:
+        url("../assets/ui/elements/electric.webp"),
+        radial-gradient(circle, rgba(0,0,0,0.6), rgba(0,0,0,0.9));
+}
+
+.operator-element-cryo::before {
+    background-image:
+        url("../assets/ui/elements/cryo.webp"),
+        radial-gradient(circle, rgba(0,0,0,0.6), rgba(0,0,0,0.9));
+}
+
+.operator-element-nature::before {
+    background-image:
+        url("../assets/ui/elements/nature.webp"),
+        radial-gradient(circle, rgba(0,0,0,0.6), rgba(0,0,0,0.9));
+}
+
+.operator-element-physical::before {
+    background-image:
+        url("../assets/ui/elements/physical.webp"),
+        radial-gradient(circle, rgba(0,0,0,0.6), rgba(0,0,0,0.9));
+}
+
+.operator-element-neutral::before {
+    background-image:
+        url("../assets/ui/elements/neutral.webp"),
+        radial-gradient(circle, rgba(0,0,0,0.6), rgba(0,0,0,0.9));
+}
 
 .operator-card::after {
     content: "";
