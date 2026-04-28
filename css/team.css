@@ -43,7 +43,8 @@
     content: "";
     position: absolute;
     top: 6px;
-    right: 6px;
+    right: auto;
+    left: 6px;
     width: 18px;
     height: 18px;
     background-size: contain;
