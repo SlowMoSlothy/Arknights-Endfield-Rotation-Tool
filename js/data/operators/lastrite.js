@@ -1,7 +1,7 @@
 const lastrite = {
     id: 20,
     name: "Last Rite",
-    icon: "assets/operators/avatars/LastRite.png"
+    icon: "assets/operators/avatars/Last_Rite.png"
 };
 
 lastrite.skills = [

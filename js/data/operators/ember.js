@@ -1,7 +1,7 @@
 const ember = {
     id: 17,
     name: "Ember",
-    icon: "assets/operators/avatars/Ember.svg"
+    icon: "assets/operators/avatars/Ember.png"
 };
 
 ember.skills = [
