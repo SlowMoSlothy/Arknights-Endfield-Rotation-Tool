@@ -35,15 +35,6 @@ const perlica = {
             elementType: "electric",
             debuffs: [
                 {
-                    name: "Elektrik",
-                    appliesEffect: "electric",
-                    visible: true,
-                    stackable: true,
-                    stacksApplied: 1,
-                    maxStacks: 4,
-                    iconBase: "assets/debuffs/electric"
-                },
-                {
                     id: "electric_infliction",
                     name: "Electric Infliction",
                     appliesEffect: "electric_infliction",
@@ -71,11 +62,15 @@ const perlica = {
             allowSelfTrigger: true,
             debuffs: [
                 {
-                    id: "combo_skill",
-                    name: "Combo Skill",
-                    appliesEffect: "combo_skill",
-                    persistsForCombo: false,
-                    visible: false
+                    id: "electrification",
+                    name: "Electrification",
+                    appliesEffect: "electrification",
+                    persistsForCombo: true,
+                    visible: true,
+                    stackable: true,
+                    stacksApplied: 1,
+                    maxStacks: 4,
+                    iconBase: "assets/debuffs/electrification"
                 }
             ]
         },
