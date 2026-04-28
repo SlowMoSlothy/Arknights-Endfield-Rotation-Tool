@@ -49,7 +49,7 @@ avywenna.skills = [
             {
                 anyOf: [
                     { effect: "electrification", minStacks: 1 },
-                    { effect: "electric_infliction", minStacks: 1 }
+                    { effect: "electric", minStacks: 1 }
                 ]
             }
         ]
