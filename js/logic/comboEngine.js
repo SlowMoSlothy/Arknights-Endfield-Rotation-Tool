@@ -18,9 +18,9 @@ function collectPersistentEffectsFromRotationUpToIndex(endIndex) {
 
             // Nur persistente Effekte aus der alten Rotation übernehmen
             if (effect.persistsForCombo === false) return;
-
+            if (effect.availableAfterChain === true) return;
             const amount = effect.stackable ? (effect.stacksApplied || 1) : 1;
-
+            
             if (!effectMap[effect.appliesEffect]) {
                 effectMap[effect.appliesEffect] = 0;
             }
