@@ -71,17 +71,7 @@ function renderTeamSlots() {
 }
 
 function getOperatorMainElement(op) {
-    if (!op || !Array.isArray(op.skills)) return "neutral";
-
-    const elementCounts = {};
-
-    op.skills.forEach(skill => {
-        const element = skill.elementType || "neutral";
-        elementCounts[element] = (elementCounts[element] || 0) + 1;
-    });
-
-    return Object.entries(elementCounts)
-        .sort((a, b) => b[1] - a[1])[0]?.[0] || "neutral";
+    return op?.elementType || "neutral";
 }
 
 function renderOperatorList() {
