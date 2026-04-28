@@ -63,11 +63,18 @@ const rossi = {
             cooldown: 15,
             energy: 60,
             elementType: "physical",
-            description: "Triggers when the enemy has Vulnerability and Arts Infliction. Consumes Arts Infliction, applies Lift and buffs Rossi's Crit stats.",
+            description: "Triggers when the enemy has Vulnerability and any Arts Infliction. Applies Lift and buffs Rossi's Crit stats.",
             comboTriggerMode: "all",
             comboTriggers: [
                 { effect: "vulnerable", minStacks: 1 },
-                { effect: "arts_infliction", minStacks: 1 }
+                {
+                    anyOf: [
+                        { effect: "heat_infliction", minStacks: 1 },
+                        { effect: "electric_infliction", minStacks: 1 },
+                        { effect: "nature_infliction", minStacks: 1 },
+                        { effect: "cryo_infliction", minStacks: 1 }
+                    ]
+                }
             ],
             debuffs: [
                 {
@@ -111,7 +118,7 @@ const rossi = {
         },
         {
             id: 504,
-            name: '"Razorclaw" Ambuscade',
+            name: '\"Razorclaw\" Ambuscade',
             icon: "assets/operators/avatars/Rossi.png",
             iconSmall: "assets/operators/skills/rossi/ult_small.png",
             type: "Ultimate",
