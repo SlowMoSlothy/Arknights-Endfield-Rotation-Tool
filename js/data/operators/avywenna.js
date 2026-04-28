@@ -45,8 +45,13 @@ avywenna.skills = [
         elementType: "electric",
         comboTriggerMode: "all",
         comboTriggers: [
-            { effect: "final_strike" },
-            { effect: "electrification", minStacks: 1 }
+            { effect: "final_strike", minStacks: 1 },
+            {
+                anyOf: [
+                    { effect: "electrification", minStacks: 1 },
+                    { effect: "electric_infliction", minStacks: 1 }
+                ]
+            }
         ]
     },
     {
