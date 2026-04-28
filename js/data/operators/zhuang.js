@@ -3,6 +3,7 @@ const zhuang = {
     name: "Zhuang",
     icon: "assets/operators/avatars/Zhuang.png",
     canEnterUltimateState: true,
+    elementType: "electric",
     skills: [
         {
             id: 901,

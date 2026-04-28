@@ -1,7 +1,8 @@
 const catcher = {
     id: 13,
     name: "Catcher",
-    icon: "assets/operators/avatars/Catcher.png"
+    icon: "assets/operators/avatars/Catcher.png",
+    elementType: "physical"
 };
 
 catcher.skills = [

@@ -2,6 +2,7 @@ const perlica = {
     id: 4,
     name: "Perlica",
     icon: "assets/operators/avatars/Perlica.png",
+    elementType: "electric",
     skills: [
         {
             id: 401,

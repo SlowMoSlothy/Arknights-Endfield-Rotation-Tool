@@ -2,6 +2,7 @@ const laevatain = {
     id: 1,
     name: "Laevatain",
     icon: "assets/operators/avatars/Laevatain.png",
+    elementType: "heat",
     skills: [
         {
             id: 101,

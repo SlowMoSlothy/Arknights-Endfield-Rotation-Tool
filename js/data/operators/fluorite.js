@@ -1,7 +1,8 @@
 const fluorite = {
     id: 19,
     name: "Fluorite",
-    icon: "assets/operators/avatars/Fluorite.png"
+    icon: "assets/operators/avatars/Fluorite.png",
+    elementType: "nature"
 };
 
 fluorite.skills = [

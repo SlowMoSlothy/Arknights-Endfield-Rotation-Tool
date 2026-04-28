@@ -1,7 +1,8 @@
 const wulfgard = {
     id: 24,
     name: "Wulfgard",
-    icon: "assets/operators/avatars/Wulfgard.png"
+    icon: "assets/operators/avatars/Wulfgard.png",
+    elementType: "heat"
 };
 
 wulfgard.skills = [

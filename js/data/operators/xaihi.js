@@ -1,7 +1,8 @@
 const xaihi = {
     id: 25,
     name: "Xaihi",
-    icon: "assets/operators/avatars/Xaihi.png"
+    icon: "assets/operators/avatars/Xaihi.png",
+    elementType: "cryo"
 };
 
 xaihi.skills = [

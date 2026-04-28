@@ -1,7 +1,8 @@
 const ardelia = {
     id: 12,
     name: "Ardelia",
-    icon: "assets/operators/avatars/Ardelia.png"
+    icon: "assets/operators/avatars/Ardelia.png",
+    elementType: "nature"
 };
 
 ardelia.skills = [

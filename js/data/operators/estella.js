@@ -1,7 +1,8 @@
 const estella = {
     id: 18,
     name: "Estella",
-    icon: "assets/operators/avatars/Estella.png"
+    icon: "assets/operators/avatars/Estella.png",
+    elementType: "cryo"
 };
 
 estella.skills = [

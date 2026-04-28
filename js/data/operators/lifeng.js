@@ -1,7 +1,8 @@
 const lifeng = {
     id: 21,
     name: "Lifeng",
-    icon: "assets/operators/avatars/Lifeng.png"
+    icon: "assets/operators/avatars/Lifeng.png",
+    elementType: "physical"
 };
 
 lifeng.skills = [

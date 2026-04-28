@@ -1,7 +1,8 @@
 const tangtang = {
     id: 15,
     name: "Tangtang",
-    icon: "assets/operators/avatars/Tangtang.png"
+    icon: "assets/operators/avatars/Tangtang.png",
+    elementType: "cryo"
 };
 
 tangtang.skills = [

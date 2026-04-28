@@ -1,7 +1,8 @@
 const pogranichnik = {
     id: 22,
     name: "Pogranichnik",
-    icon: "assets/operators/avatars/Pogranichnik.png"
+    icon: "assets/operators/avatars/Pogranichnik.png",
+    elementType: "physical"
 };
 
 pogranichnik.skills = [

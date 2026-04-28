@@ -1,7 +1,8 @@
 const snowshine = {
     id: 23,
     name: "Snowshine",
-    icon: "assets/operators/avatars/Snowshine.png"
+    icon: "assets/operators/avatars/Snowshine.png",
+    elementType: "cryo"
 };
 
 snowshine.skills = [

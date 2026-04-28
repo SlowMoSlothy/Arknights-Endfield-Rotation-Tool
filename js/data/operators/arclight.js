@@ -5,6 +5,7 @@ const arclight = {
     id: opId,
     name: "Arclight",
     icon: opImg,
+    elementType: "electric",
     skills: [
         {
             id: (opId * 100) + 1,

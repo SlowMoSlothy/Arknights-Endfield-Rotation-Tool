@@ -2,6 +2,7 @@ const rossi = {
     id: 5,
     name: "Rossi",
     icon: "assets/operators/avatars/Rossi.png",
+    elementType: "physical",
     skills: [
         {
             id: 501,

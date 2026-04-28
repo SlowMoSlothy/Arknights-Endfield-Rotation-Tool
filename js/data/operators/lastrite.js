@@ -1,7 +1,8 @@
 const lastrite = {
     id: 20,
     name: "Last Rite",
-    icon: "assets/operators/avatars/Last_Rite.png"
+    icon: "assets/operators/avatars/Last_Rite.png",
+    elementType: "cryo"
 };
 
 lastrite.skills = [

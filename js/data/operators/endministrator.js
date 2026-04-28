@@ -2,6 +2,7 @@ const endministrator = {
     id: 3,
     name: "Endministrator",
     icon: "assets/operators/avatars/Endmin.png",
+    elementType: "physical",
     skills: [
         {
             id: 301,

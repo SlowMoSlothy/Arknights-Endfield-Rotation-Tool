@@ -1,7 +1,8 @@
 const chen = {
     id: 14,
     name: "Chen Qianyu",
-    icon: "assets/operators/avatars/Chen.png"
+    icon: "assets/operators/avatars/Chen.png",
+    elementType: "physical"
 };
 
 chen.skills = [

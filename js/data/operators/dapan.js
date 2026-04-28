@@ -1,7 +1,8 @@
 const dapan = {
     id: 16,
     name: "Da Pan",
-    icon: "assets/operators/avatars/Dapan.png"
+    icon: "assets/operators/avatars/Dapan.png",
+    elementType: "physical"
 };
 
 dapan.skills = [

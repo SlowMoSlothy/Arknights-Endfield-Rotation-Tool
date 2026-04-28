@@ -1,7 +1,8 @@
 const avywenna = {
     id: 7,
     name: "Avywenna",
-    icon: "assets/operators/avatars/Avywenna.png"
+    icon: "assets/operators/avatars/Avywenna.png",
+    elementType: "electric"
 };
 
 avywenna.skills = [
