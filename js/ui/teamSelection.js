@@ -70,6 +70,20 @@ function renderTeamSlots() {
     highlightActiveSlot();
 }
 
+function getOperatorMainElement(op) {
+    if (!op || !Array.isArray(op.skills)) return "neutral";
+
+    const elementCounts = {};
+
+    op.skills.forEach(skill => {
+        const element = skill.elementType || "neutral";
+        elementCounts[element] = (elementCounts[element] || 0) + 1;
+    });
+
+    return Object.entries(elementCounts)
+        .sort((a, b) => b[1] - a[1])[0]?.[0] || "neutral";
+}
+
 function renderOperatorList() {
     const grid = document.getElementById("operatorList");
     if (!grid) return;
@@ -78,9 +92,10 @@ function renderOperatorList() {
 
     operators.forEach(op => {
         const isSelected = selectedTeam.includes(op.id);
+        const elementType = getOperatorMainElement(op);
 
         const card = document.createElement("div");
-        card.className = "operator-card";
+        card.className = `operator-card operator-element-${elementType}`;
 
         if (isSelected) {
             card.classList.add("disabled");
