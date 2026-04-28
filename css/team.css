@@ -49,14 +49,16 @@
     background-size: contain;
     background-repeat: no-repeat;
     opacity: 0.9;
+    z-index: 2;
+    pointer-events: none;
 }
 
-.operator-element-heat::before { background-image: url("assets/ui/elements/heat.webp"); }
-.operator-element-electric::before { background-image: url("assets/ui/elements/electric.webp"); }
-.operator-element-cryo::before { background-image: url("assets/ui/elements/cryo.webp"); }
-.operator-element-nature::before { background-image: url("assets/ui/elements/nature.webp"); }
-.operator-element-physical::before { background-image: url("assets/ui/elements/physical.webp"); }
-.operator-element-neutral::before { background-image: url("assets/ui/elements/neutral.webp"); }
+.operator-element-heat::before { background-image: url("../assets/ui/elements/heat.webp"); }
+.operator-element-electric::before { background-image: url("../assets/ui/elements/electric.webp"); }
+.operator-element-cryo::before { background-image: url("../assets/ui/elements/cryo.webp"); }
+.operator-element-nature::before { background-image: url("../assets/ui/elements/nature.webp"); }
+.operator-element-physical::before { background-image: url("../assets/ui/elements/physical.webp"); }
+.operator-element-neutral::before { background-image: url("../assets/ui/elements/neutral.webp"); }
 
 .operator-card::after {
     content: "";
