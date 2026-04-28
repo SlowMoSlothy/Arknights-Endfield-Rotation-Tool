@@ -3,6 +3,7 @@ const alesh = {
     name: "Alesh",
     icon: "assets/operators/avatars/Alesh.png",
     canEnterUltimateState: false,
+    elementType: "cryo",
     skills: [
         {
             id: 1001,

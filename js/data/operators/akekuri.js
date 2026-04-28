@@ -2,6 +2,7 @@ const akekuri = {
     id: 2,
     name: "Akekuri",
     icon: "assets/operators/avatars/Akekuri.png",
+    elementType: "heat",
     skills: [
         {
             id: 201,

@@ -2,6 +2,7 @@ const antal = {
     id: 8,
     name: "Antal",
     icon: "assets/operators/avatars/Antal.png",
+    elementType: "electric",
     skills: [
         {
             id: 801,
