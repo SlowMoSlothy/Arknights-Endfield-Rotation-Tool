@@ -62,16 +62,17 @@ const perlica = {
             allowSelfTrigger: true,
             debuffs: [
                 {
-                    id: "electrification",
-                    name: "Electrification",
-                    appliesEffect: "electrification",
-                    persistsForCombo: true,
-                    visible: true,
-                    stackable: true,
-                    stacksApplied: 1,
-                    maxStacks: 4,
-                    iconBase: "assets/debuffs/electrification"
-                }
+    id: "electrification",
+    name: "Electrification",
+    appliesEffect: "electrification",
+    persistsForCombo: true,
+    availableAfterChain: true,
+    visible: true,
+    stackable: true,
+    stacksApplied: 1,
+    maxStacks: 4,
+    iconBase: "assets/debuffs/electrification"
+}
             ]
         },
         {
