@@ -15,12 +15,10 @@ function collectPersistentEffectsFromRotationUpToIndex(endIndex) {
 
         allEffects.forEach(effect => {
             if (!effect.appliesEffect) return;
-
-            // Nur persistente Effekte aus der alten Rotation übernehmen
             if (effect.persistsForCombo === false) return;
-            if (effect.availableAfterChain === true) return;
+
             const amount = effect.stackable ? (effect.stacksApplied || 1) : 1;
-            
+
             if (!effectMap[effect.appliesEffect]) {
                 effectMap[effect.appliesEffect] = 0;
             }
@@ -38,6 +36,7 @@ function collectPersistentEffectsFromRotationUpToIndex(endIndex) {
 
     return effectMap;
 }
+
 function collectEffectsFromSkill(skillData) {
     const effectMap = {};
 
@@ -50,6 +49,7 @@ function collectEffectsFromSkill(skillData) {
 
     allEffects.forEach(effect => {
         if (!effect.appliesEffect) return;
+        if (effect.availableAfterChain === true) return;
 
         const amount = effect.stackable ? (effect.stacksApplied || 1) : 1;
 
@@ -159,75 +159,70 @@ function getComboSkillsFromEffects(effectMap, sourceOperatorId) {
 function insertComboChain(startSkillId, startIndex) {
     const queue = [{ skillId: startSkillId, insertAfterIndex: startIndex }];
     const alreadyInsertedIds = new Set([startSkillId]);
-    
+
     const MAX_CHAIN_LENGTH = 20;
     let chainCount = 0;
-    
-    // Persistente Effekte aus der Rotation BIS VOR den neu eingefügten Skill
+
     const persistentEffectMap = collectPersistentEffectsFromRotationUpToIndex(startIndex - 1);
-    
-    // Flüchtige / aktuelle Trigger-Effekte nur für diese Kette
     const chainEffectMap = {};
-    
+
     while (queue.length > 0) {
         if (chainCount >= MAX_CHAIN_LENGTH) {
             console.warn("Combo chain stopped: maximum chain length reached.");
             break;
         }
-        
+
         const current = queue.shift();
         const currentSkillData = getSkillById(current.skillId);
         const sourceOperator = getOperatorBySkillId(current.skillId);
-        
+
         if (!currentSkillData || !sourceOperator) continue;
-        
+
         const currentEffects = collectEffectsFromSkill(currentSkillData);
-        
-        // Aktuelle Skill-Effekte zur Kette addieren
+
         Object.entries(currentEffects).forEach(([effectName, amount]) => {
             if (!chainEffectMap[effectName]) {
                 chainEffectMap[effectName] = 0;
             }
             chainEffectMap[effectName] += amount;
         });
-        
-        // Persistente + aktuelle Ketteneffekte zusammenführen
+
         const effectMap = { ...persistentEffectMap };
-        
+
         Object.entries(chainEffectMap).forEach(([effectName, amount]) => {
             if (!effectMap[effectName]) {
                 effectMap[effectName] = 0;
             }
             effectMap[effectName] += amount;
         });
-        
-        const resolvedEffectMap =
-    typeof resolveArtsReactions === "function"
-        ? resolveArtsReactions(effectMap)
-        : effectMap;
 
-const comboSkills = getComboSkillsFromEffects(resolvedEffectMap, sourceOperator.id);
-        
+        const resolvedEffectMap =
+            typeof resolveArtsReactions === "function"
+                ? resolveArtsReactions(effectMap)
+                : effectMap;
+
+        const comboSkills = getComboSkillsFromEffects(resolvedEffectMap, sourceOperator.id);
+
         let insertOffset = 1;
-        
+
         comboSkills.forEach(comboSkill => {
             if (alreadyInsertedIds.has(comboSkill.id)) return;
-            
+
             const comboIndex = current.insertAfterIndex + insertOffset;
-            
+
             rotation.splice(comboIndex, 0, {
                 uid: crypto.randomUUID(),
                 id: comboSkill.id,
                 autoInserted: true
             });
-            
+
             alreadyInsertedIds.add(comboSkill.id);
-            
+
             queue.push({
                 skillId: comboSkill.id,
                 insertAfterIndex: comboIndex
             });
-            
+
             insertOffset++;
             chainCount++;
         });
