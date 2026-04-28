@@ -1,7 +1,7 @@
 const dapan = {
     id: 16,
     name: "Da Pan",
-    icon: "assets/operators/avatars/DaPan.png"
+    icon: "assets/operators/avatars/Dapan.png"
 };
 
 dapan.skills = [
