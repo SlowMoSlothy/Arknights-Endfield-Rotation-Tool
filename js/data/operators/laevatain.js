@@ -73,10 +73,14 @@ const laevatain = {
             cooldown: 20,
             energy: 60,
             description: "Triggers on Combustion or Corrosion.",
-            comboTriggerMode: "any",
+            comboTriggerMode: "all",
             comboTriggers: [
-                { effect: "combustion", minStacks: 1 },
-                { effect: "corrosion", minStacks: 1 }
+                {
+                    anyOf: [
+                        { effect: "combustion", minStacks: 1 },
+                        { effect: "corrosion", minStacks: 1 }
+                    ]
+                }
             ],
             buffs: [
                 {
