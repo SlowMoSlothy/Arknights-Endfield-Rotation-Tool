@@ -21,12 +21,10 @@
         radial-gradient(circle at 50% 18%, var(--element-glow), transparent 48%),
         linear-gradient(180deg, #242424, #181818);
     border-radius: 14px;
-
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-
     cursor: pointer;
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow:
@@ -39,7 +37,8 @@
 }
 
 /* ELEMENT BADGE (TOP LEFT) */
-.operator-card::before {
+.operator-card::before,
+.team-slot.filled::before {
     content: "";
     position: absolute;
     top: 6px;
@@ -50,50 +49,20 @@
     background-size: 14px, cover;
     background-position: center, center;
     background-repeat: no-repeat, no-repeat;
-    box-shadow:
-        0 0 6px var(--element-color),
-        inset 0 0 4px rgba(255,255,255,0.2);
+    box-shadow: 0 0 6px var(--element-color), inset 0 0 4px rgba(255,255,255,0.2);
     z-index: 2;
     pointer-events: none;
 }
 
-.operator-element-heat::before {
-    background-image:
-        url("../assets/ui/elements/heat.webp"),
-        radial-gradient(circle, rgba(0,0,0,0.6), rgba(0,0,0,0.9));
-}
+.operator-element-heat::before { background-image: url("../assets/ui/elements/heat.webp"), radial-gradient(circle, rgba(0,0,0,0.6), rgba(0,0,0,0.9)); }
+.operator-element-electric::before { background-image: url("../assets/ui/elements/electric.webp"), radial-gradient(circle, rgba(0,0,0,0.6), rgba(0,0,0,0.9)); }
+.operator-element-cryo::before { background-image: url("../assets/ui/elements/cryo.webp"), radial-gradient(circle, rgba(0,0,0,0.6), rgba(0,0,0,0.9)); }
+.operator-element-nature::before { background-image: url("../assets/ui/elements/nature.webp"), radial-gradient(circle, rgba(0,0,0,0.6), rgba(0,0,0,0.9)); }
+.operator-element-physical::before { background-image: url("../assets/ui/elements/physical.webp"), radial-gradient(circle, rgba(0,0,0,0.6), rgba(0,0,0,0.9)); }
+.operator-element-neutral::before { background-image: url("../assets/ui/elements/neutral.webp"), radial-gradient(circle, rgba(0,0,0,0.6), rgba(0,0,0,0.9)); }
 
-.operator-element-electric::before {
-    background-image:
-        url("../assets/ui/elements/electric.webp"),
-        radial-gradient(circle, rgba(0,0,0,0.6), rgba(0,0,0,0.9));
-}
-
-.operator-element-cryo::before {
-    background-image:
-        url("../assets/ui/elements/cryo.webp"),
-        radial-gradient(circle, rgba(0,0,0,0.6), rgba(0,0,0,0.9));
-}
-
-.operator-element-nature::before {
-    background-image:
-        url("../assets/ui/elements/nature.webp"),
-        radial-gradient(circle, rgba(0,0,0,0.6), rgba(0,0,0,0.9));
-}
-
-.operator-element-physical::before {
-    background-image:
-        url("../assets/ui/elements/physical.webp"),
-        radial-gradient(circle, rgba(0,0,0,0.6), rgba(0,0,0,0.9));
-}
-
-.operator-element-neutral::before {
-    background-image:
-        url("../assets/ui/elements/neutral.webp"),
-        radial-gradient(circle, rgba(0,0,0,0.6), rgba(0,0,0,0.9));
-}
-
-.operator-card::after {
+.operator-card::after,
+.team-slot.filled::after {
     content: "";
     position: absolute;
     left: 12px;
@@ -116,13 +85,12 @@
 
 .operator-card.selected {
     border-color: var(--element-color);
-    box-shadow:
-        0 0 18px var(--element-glow),
-        0 0 6px var(--element-color) inset;
+    box-shadow: 0 0 18px var(--element-glow), 0 0 6px var(--element-color) inset;
 }
 
 .operator-card img,
-.operator-name { position: relative; z-index: 1; }
+.operator-name,
+.team-slot img { position: relative; z-index: 1; }
 
 .operator-card img {
     width: 70px;
@@ -178,7 +146,7 @@
     width: 100px;
     height: 100px;
     border: 2px dashed #555;
-    border-radius: 10px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -186,12 +154,26 @@
     cursor: pointer;
     position: relative;
     flex: 0 0 100px;
+    transition: all 0.18s ease;
+}
+
+.team-slot.filled {
+    border: 1px solid rgba(255,255,255,0.08);
+    background:
+        radial-gradient(circle at 50% 18%, var(--element-glow), transparent 55%),
+        linear-gradient(180deg, #242424, #181818);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+}
+
+.team-slot.active {
+    border-color: #00ffcc;
+    box-shadow: 0 0 14px rgba(0,255,204,0.35);
 }
 
 .team-slot img {
     width: 80px;
     height: 80px;
-    border-radius: 8px;
+    border-radius: 10px;
     object-fit: cover;
 }
 
@@ -199,21 +181,25 @@
     content: "+";
     font-size: 28px;
     color: #777;
+    background: none;
+    box-shadow: none;
 }
 
 .slot-remove {
     position: absolute;
-    top: -6px;
-    right: -6px;
-    background: red;
-    width: 18px;
-    height: 18px;
+    top: 6px;
+    right: 6px;
+    background: rgba(255,50,50,0.9);
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     font-size: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    z-index: 3;
+    box-shadow: 0 0 8px rgba(255,0,0,0.35);
 }
 
 /* =========================
@@ -278,34 +264,10 @@
         flex-wrap: nowrap;
         padding-bottom: 6px;
     }
-
-    .team-preview-operator {
-        flex: 0 0 auto;
-        min-width: 120px;
-    }
-
-    .team-preview-operator img {
-        width: 40px;
-        height: 40px;
-    }
-
-    .team-slots {
-        overflow-x: auto;
-        padding-bottom: 6px;
-    }
-
-    .operator-grid {
-        grid-template-columns: repeat(2, minmax(120px, 1fr));
-        gap: 12px;
-    }
-
-    .operator-card {
-        width: 100%;
-        height: 110px;
-    }
-
-    .operator-card img {
-        width: 56px;
-        height: 56px;
-    }
+    .team-preview-operator { flex: 0 0 auto; min-width: 120px; }
+    .team-preview-operator img { width: 40px; height: 40px; }
+    .team-slots { overflow-x: auto; padding-bottom: 6px; }
+    .operator-grid { grid-template-columns: repeat(2, minmax(120px, 1fr)); gap: 12px; }
+    .operator-card { width: 100%; height: 110px; }
+    .operator-card img { width: 56px; height: 56px; }
 }
