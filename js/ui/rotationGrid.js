@@ -8,6 +8,42 @@ function getShortSkillType(type) {
 
     return type || "";
 }
+
+function getVisibleRotationDebuffs(skillData) {
+    return (skillData?.debuffs || []).filter(debuff => debuff.visible !== false);
+}
+
+function createRotationDebuffTray(skillData) {
+    const debuffs = getVisibleRotationDebuffs(skillData);
+    if (debuffs.length === 0) return null;
+
+    const tray = document.createElement("div");
+    tray.className = "rotation-debuff-tray";
+
+    debuffs.forEach(debuffData => {
+        const item = document.createElement("div");
+        item.className = "rotation-debuff-item";
+        item.title = debuffData.name || debuffData.id || "Debuff";
+
+        if (debuffData.icon) {
+            const icon = document.createElement("img");
+            icon.className = "rotation-debuff-icon";
+            icon.src = debuffData.icon;
+            icon.alt = debuffData.name || "Debuff";
+            item.appendChild(icon);
+        } else {
+            const fallback = document.createElement("span");
+            fallback.className = "rotation-debuff-fallback";
+            fallback.textContent = (debuffData.name || debuffData.id || "D").trim().slice(0, 2).toUpperCase();
+            item.appendChild(fallback);
+        }
+
+        tray.appendChild(item);
+    });
+
+    return tray;
+}
+
 function renderRotation() {
     const container = document.getElementById("rotationDropZone");
     if (!container) return;
@@ -28,14 +64,9 @@ function renderRotation() {
         if (entry) {
             const skillData = getSkillById(entry.id);
 
-
             if (skillData) {
                 const skillDiv = document.createElement("div");
                 skillDiv.className = "skill rotation-skill";
-
-                if (skillData.elementType) {
-                    skillDiv.classList.add(`ef-element-${skillData.elementType}`);
-                }
 
                 if (skillData.elementType) {
                     skillDiv.classList.add(`ef-element-${skillData.elementType}`);
@@ -77,6 +108,11 @@ function renderRotation() {
 
                 skillDiv.appendChild(inner);
 
+                const debuffTray = createRotationDebuffTray(skillData);
+                if (debuffTray) {
+                    skillDiv.appendChild(debuffTray);
+                }
+
                 const removeBtn = document.createElement("button");
                 removeBtn.className = "remove-btn";
                 removeBtn.type = "button";
@@ -115,35 +151,6 @@ function renderRotation() {
 
             if (!isUsed) {
                 arrow.classList.add("is-unused");
-            }
-
-            if (currentEntry) {
-                const skillData = getSkillById(currentEntry.id);
-
-                if (skillData && skillData.debuffs && skillData.debuffs.length > 0) {
-                    const debuffWrap = document.createElement("div");
-                    debuffWrap.className = "arrow-effects";
-
-                    skillData.debuffs.forEach(debuffData => {
-                        if (debuffData.visible === false) return;
-
-                        const debuffItem = document.createElement("div");
-                        debuffItem.className = "arrow-effect";
-
-                        if (debuffData.icon) {
-                            const debuffIcon = document.createElement("img");
-                            debuffIcon.className = "arrow-effect-icon";
-                            debuffIcon.src = debuffData.icon;
-                            debuffIcon.alt = debuffData.name || "Effect";
-                            debuffIcon.title = debuffData.name || "Effect";
-                            debuffItem.appendChild(debuffIcon);
-                        }
-
-                        debuffWrap.appendChild(debuffItem);
-                    });
-
-                    arrow.appendChild(debuffWrap);
-                }
             }
 
             container.appendChild(arrow);
