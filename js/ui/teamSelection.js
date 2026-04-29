@@ -37,6 +37,9 @@ function renderTeamSlots() {
         } else {
             const op = operators.find(o => o.id === opId);
             if (op) {
+                const elementType = getOperatorMainElement(op);
+                slot.classList.add("filled", `operator-element-${elementType}`);
+
                 const img = document.createElement("img");
                 img.src = op.icon;
                 img.alt = op.name;
@@ -127,6 +130,10 @@ function renderOperatorList() {
 function highlightActiveSlot() {
     const slots = document.querySelectorAll(".team-slot");
     slots.forEach((slot, index) => {
-        slot.style.borderColor = index === activeSlotIndex ? "#00ffcc" : "#555";
+        if (index === activeSlotIndex) {
+            slot.classList.add("active");
+        } else {
+            slot.classList.remove("active");
+        }
     });
 }
