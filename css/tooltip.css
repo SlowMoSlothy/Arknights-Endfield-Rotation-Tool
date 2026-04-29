@@ -25,7 +25,7 @@
     background: linear-gradient(180deg, #0f1114 0%, #090b0e 100%);
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 12px;
-    padding: 14px;
+    padding: 18px 14px 14px;
     box-shadow: 0 12px 30px rgba(0,0,0,0.45);
     overflow: hidden;
 }
@@ -34,13 +34,31 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at top center, rgba(255,255,255,0.03), transparent 60%);
+    background:
+        radial-gradient(circle at top center, rgba(255,255,255,0.035), transparent 58%),
+        repeating-linear-gradient(-45deg, rgba(255,255,255,0.012) 0 2px, transparent 2px 8px);
+    pointer-events: none;
+}
+
+.tooltip-card::after {
+    content: "";
+    position: absolute;
+    inset: 8px;
+    border-radius: 8px;
+    background:
+        linear-gradient(#f8f546, #f8f546) left top / 28px 1px no-repeat,
+        linear-gradient(#f8f546, #f8f546) left top / 1px 16px no-repeat,
+        linear-gradient(rgba(160,170,169,0.55), rgba(160,170,169,0.55)) right bottom / 28px 1px no-repeat,
+        linear-gradient(rgba(160,170,169,0.55), rgba(160,170,169,0.55)) right bottom / 1px 16px no-repeat;
+    opacity: 0.85;
     pointer-events: none;
 }
 
 .tooltip-header {
     text-align: center;
     margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
 }
 
 .tooltip-title {
@@ -56,6 +74,14 @@
     border-radius: 999px;
     background: #f8f546;
     box-shadow: 0 0 10px rgba(248,245,70,0.35);
+}
+
+.tooltip-operator,
+.tooltip-type,
+.tooltip-stat-row,
+.tooltip-description {
+    position: relative;
+    z-index: 1;
 }
 
 .tooltip-operator,
