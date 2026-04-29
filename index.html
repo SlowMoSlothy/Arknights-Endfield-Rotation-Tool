@@ -39,14 +39,32 @@
   <div id="globalTooltip" class="global-tooltip"></div>
 
   <div id="selectionScreen">
-    <h2>Wähle dein Team (max. 4)</h2>
+    <div class="selection-hero">
+      <div class="selection-brand">
+        <span>TEAM BUILDER</span>
+        <strong>END FIELD</strong>
+      </div>
+
+      <button class="selection-confirm-btn" onclick="confirmTeam()">
+        <span class="confirm-check">✓</span>
+        <span>Team bestätigen</span>
+      </button>
+    </div>
+
+    <div class="selection-divider"></div>
+
+    <div class="selection-title-row">
+      <h2 class="selection-section-title">Wähle dein Team</h2>
+      <span class="selection-max-label">// MAX. 4</span>
+    </div>
 
     <div id="teamSlots" class="team-slots"></div>
 
-    <h3>Operator auswählen</h3>
-    <div id="operatorList" class="operator-grid"></div>
+    <div class="selection-title-row operator-title-row">
+      <h3 class="selection-section-title">Operator auswählen</h3>
+    </div>
 
-    <button onclick="confirmTeam()">Team bestätigen</button>
+    <div id="operatorList" class="operator-grid"></div>
   </div>
 
   <div id="builderScreen" style="display:none;">
