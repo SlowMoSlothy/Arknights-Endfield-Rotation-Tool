@@ -14,13 +14,34 @@ function ensureGlobalSkillTooltip() {
 }
 
 function buildSkillTooltipHtml(skillData) {
+    const elementType = normalizeSkillElementType(skillData.elementType);
+    const cooldown = skillData.cooldown ?? "-";
+    const energy = skillData.energy ?? "-";
+
     return `
-        <div class="tooltip-title">${skillData.name}</div>
-        <div class="tooltip-operator">${skillData.operator}</div>
-        <div class="tooltip-line">Type: ${skillData.type || "-"}</div>
-        <div class="tooltip-line">CD: ${skillData.cooldown}s</div>
-        <div class="tooltip-line">Energy: ${skillData.energy}</div>
-        <div class="tooltip-description">${formatTooltipDescription(skillData.description)}</div>
+        <div class="tooltip-card tooltip-element-${elementType}">
+            <div class="tooltip-header">
+                <div class="tooltip-title">${skillData.name || "Skill"}</div>
+                <div class="tooltip-accent-line"></div>
+            </div>
+
+            <div class="tooltip-operator">${skillData.operator || "-"}</div>
+            <div class="tooltip-type">${skillData.type || "-"}</div>
+
+            <div class="tooltip-stat-row">
+                <div class="tooltip-stat">
+                    <span>CD</span>
+                    <strong>${cooldown}s</strong>
+                </div>
+                <div class="tooltip-stat-divider"></div>
+                <div class="tooltip-stat">
+                    <span>EN</span>
+                    <strong>${energy}</strong>
+                </div>
+            </div>
+
+            <div class="tooltip-description">${formatTooltipDescription(skillData.description)}</div>
+        </div>
     `;
 }
 
