@@ -91,15 +91,6 @@
         </aside>
 
         <main class="builder-main">
-          <!--
-          <section class="builder-panel">
-            <h3>Enemy</h3>
-            <div id="enemyBox" class="enemy-panel">
-              <img id="enemyImage" src="assets/enemy/enemy.png" alt="Enemy">
-            </div>
-            <div id="enemyEffects" class="enemy-effects-panel"></div>
-          </section>
--->
           <section class="builder-panel">
             <h3>Skills</h3>
             <div id="skillList" class="skills-panel"></div>
@@ -127,52 +118,11 @@
       <div class="settings-section">
         <span class="settings-label">Rotation Skill Size</span>
           <div class="settings-option-row">
-          
-            <!-- Small -->
-            <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="small">
-              <div class="settings-option-title">Small</div>
-              <div class="settings-preview">
-                <div class="settings-preview-box" style="width: 38px; height: 38px;"></div>
-              </div>
-              <div class="settings-size-label">56px</div>
-            </button>
-          
-            <!-- Medium -->
-            <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="medium">
-              <div class="settings-option-title">Medium</div>
-              <div class="settings-preview">
-                <div class="settings-preview-box" style="width: 52px; height: 52px;"></div>
-              </div>
-              <div class="settings-size-label">72px</div>
-            </button>
-          
-            <!-- Large -->
-            <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="large">
-              <div class="settings-option-title">Large</div>
-              <div class="settings-preview">
-                <div class="settings-preview-box" style="width: 66px; height: 66px;"></div>
-              </div>
-              <div class="settings-size-label">88px</div>
-            </button>
-          
-            <!-- XL -->
-            <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="xl">
-              <div class="settings-option-title">XL</div>
-              <div class="settings-preview">
-                <div class="settings-preview-box" style="width: 78px; height: 78px;"></div>
-              </div>
-              <div class="settings-size-label">104px</div>
-            </button>
-          
-            <!-- XXL -->
-            <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="xxl">
-              <div class="settings-option-title">XXL</div>
-              <div class="settings-preview">
-                <div class="settings-preview-box" style="width: 92px; height: 92px;"></div>
-              </div>
-              <div class="settings-size-label">120px</div>
-            </button>
-          
+            <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="small"><div class="settings-option-title">Small</div><div class="settings-preview"><div class="settings-preview-box" style="width: 38px; height: 38px;"></div></div><div class="settings-size-label">56px</div></button>
+            <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="medium"><div class="settings-option-title">Medium</div><div class="settings-preview"><div class="settings-preview-box" style="width: 52px; height: 52px;"></div></div><div class="settings-size-label">72px</div></button>
+            <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="large"><div class="settings-option-title">Large</div><div class="settings-preview"><div class="settings-preview-box" style="width: 66px; height: 66px;"></div></div><div class="settings-size-label">88px</div></button>
+            <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="xl"><div class="settings-option-title">XL</div><div class="settings-preview"><div class="settings-preview-box" style="width: 78px; height: 78px;"></div></div><div class="settings-size-label">104px</div></button>
+            <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="xxl"><div class="settings-option-title">XXL</div><div class="settings-preview"><div class="settings-preview-box" style="width: 92px; height: 92px;"></div></div><div class="settings-size-label">120px</div></button>
           </div>
         </div>
       </div>
@@ -183,13 +133,14 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <script src="js/utils/tooltipFormatter.js"></script>
+  <script src="js/data/debuffRegistry.js"></script>
 
   <script src="js/data/operators/alesh.js"></script>
   <script src="js/data/operators/antal.js"></script>
   <script src="js/data/operators/akekuri.js"></script>
   <script src="js/data/operators/arclight.js"></script>
   <script src="js/data/operators/ardelia.js"></script>
-  <script src="js/data/operators/avywenna.js"></script> 
+  <script src="js/data/operators/avywenna.js"></script>
   <script src="js/data/operators/catcher.js"></script>
   <script src="js/data/operators/chen.js"></script>
   <script src="js/data/operators/dapan.js"></script>
@@ -212,7 +163,6 @@
   <script src="js/data/operators.js"></script>
 
   <script src="js/state/appState.js"></script>
-
   <script src="js/logic/operatorStateEngine.js"></script>
   <script src="js/logic/storage.js"></script>
   <script src="js/logic/export.js"></script>
