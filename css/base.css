@@ -1,9 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap');
+
 body {
     background:
         radial-gradient(circle at top, rgba(101,113,54,0.10), transparent 35%),
         linear-gradient(180deg, #313739 0%, #1c1f21 100%);
     color: white;
-    font-family: Arial;
+    font-family: 'Rajdhani', Arial, sans-serif;
 }
 
 h2, h3 {
