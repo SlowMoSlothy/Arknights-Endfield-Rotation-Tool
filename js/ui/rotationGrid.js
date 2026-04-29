@@ -23,18 +23,20 @@ function createRotationDebuffTray(skillData) {
     debuffs.forEach(debuffData => {
         const item = document.createElement("div");
         item.className = "rotation-debuff-item";
-        item.title = debuffData.name || debuffData.id || "Debuff";
+        item.title = getDebuffDisplayName(debuffData);
 
-        if (debuffData.icon) {
+        const resolvedIcon = resolveDebuffIcon(debuffData);
+
+        if (resolvedIcon) {
             const icon = document.createElement("img");
             icon.className = "rotation-debuff-icon";
-            icon.src = debuffData.icon;
-            icon.alt = debuffData.name || "Debuff";
+            icon.src = resolvedIcon;
+            icon.alt = getDebuffDisplayName(debuffData);
             item.appendChild(icon);
         } else {
             const fallback = document.createElement("span");
             fallback.className = "rotation-debuff-fallback";
-            fallback.textContent = (debuffData.name || debuffData.id || "D").trim().slice(0, 2).toUpperCase();
+            fallback.textContent = getDebuffDisplayName(debuffData).trim().slice(0, 2).toUpperCase();
             item.appendChild(fallback);
         }
 
