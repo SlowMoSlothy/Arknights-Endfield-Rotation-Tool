@@ -36,9 +36,8 @@
     overflow: hidden;
 }
 
-/* ELEMENT BADGE (TOP LEFT) */
-.operator-card::before,
-.team-slot.filled::before {
+/* ELEMENT BADGE ONLY FOR OPERATOR CARDS */
+.operator-card::before {
     content: "";
     position: absolute;
     top: 6px;
@@ -154,7 +153,7 @@
     cursor: pointer;
     position: relative;
     flex: 0 0 100px;
-    transition: all 0.18s ease;
+    transition: all 0.22s ease;
 }
 
 .team-slot.filled {
@@ -162,12 +161,23 @@
     background:
         radial-gradient(circle at 50% 18%, var(--element-glow), transparent 55%),
         linear-gradient(180deg, #242424, #181818);
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.03),
+        0 0 12px rgba(0,0,0,0.25);
+}
+
+.team-slot.filled:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow:
+        0 0 14px var(--element-glow),
+        inset 0 0 0 1px rgba(255,255,255,0.05);
 }
 
 .team-slot.active {
     border-color: #00ffcc;
-    box-shadow: 0 0 14px rgba(0,255,204,0.35);
+    box-shadow:
+        0 0 16px rgba(0,255,204,0.45),
+        inset 0 0 6px rgba(0,255,204,0.15);
 }
 
 .team-slot img {
