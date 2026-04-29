@@ -30,9 +30,6 @@
     opacity: 0.35;
 }
 
-/* =========================
-   OPERATOR GRID
-========================= */
 .operators-skills-grid {
     display: flex;
     gap: 18px;
@@ -41,9 +38,6 @@
     width: max-content;
 }
 
-/* =========================
-   OPERATOR SKILL CARD
-========================= */
 .operator-skill-card {
     position: relative;
     display: flex;
@@ -84,9 +78,6 @@
     pointer-events: none;
 }
 
-/* =========================
-   LEADER BADGE
-========================= */
 .leader-badge {
     position: absolute;
     top: 12px;
@@ -101,9 +92,6 @@
     box-shadow: 0 0 12px rgba(248,245,70,0.22);
 }
 
-/* =========================
-   OPERATOR HEADER
-========================= */
 .operator-row {
     display: flex;
     align-items: center;
@@ -126,18 +114,12 @@
     letter-spacing: 0.03em;
 }
 
-/* =========================
-   SKILL ROW
-========================= */
 .skill-row {
     display: flex;
     gap: 14px;
     flex-wrap: nowrap;
 }
 
-/* =========================
-   SKILL ICONS
-========================= */
 .skill-small {
     width: 58px;
     height: 58px;
@@ -174,9 +156,6 @@
     object-fit: cover;
 }
 
-/* =========================
-   MOBILE
-========================= */
 @media (max-width: 900px) {
     .skills-panel {
         overflow-x: auto;
@@ -188,16 +167,27 @@
     }
 
     .operator-skill-card {
-        min-width: 280px;
-        padding: 14px;
+        min-width: 260px;
+        padding: 12px;
+        gap: 10px;
     }
 
     .operator-row span {
-        font-size: 22px;
+        font-size: 20px;
+    }
+
+    .operator-icon {
+        width: 34px;
+        height: 34px;
+    }
+
+    .skill-row {
+        gap: 10px;
     }
 
     .skill-small {
-        width: 52px;
-        height: 52px;
+        width: 44px;
+        height: 44px;
+        border-width: 2px;
     }
 }
