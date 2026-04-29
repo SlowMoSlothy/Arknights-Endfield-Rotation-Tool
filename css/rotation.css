@@ -4,13 +4,19 @@
 }
 
 .rotation-panel {
-    border: 2px dashed #555;
-    border-radius: 10px;
-    padding: 14px;
+    border: 1px solid rgba(160,170,169,0.18);
+    border-radius: 18px;
+    padding: 16px;
     width: fit-content;
     overflow-x: auto;
     overflow-y: visible;
     position: relative;
+    background:
+        radial-gradient(circle at 20% 10%, rgba(248,245,70,0.045), transparent 36%),
+        linear-gradient(180deg, rgba(18,20,22,0.96), rgba(10,12,14,0.98));
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.025),
+        0 10px 26px rgba(0,0,0,0.28);
 }
 
 #rotationDropZone {
@@ -23,10 +29,47 @@
 .rotation-slot {
     width: var(--rotation-slot-size, 72px);
     height: var(--rotation-slot-size, 72px);
-    border: 2px dashed #444;
-    border-radius: 8px;
+    border: 1px dashed rgba(160,170,169,0.28);
+    border-radius: 12px;
     position: relative;
     overflow: visible;
+    background:
+        radial-gradient(circle at 50% 45%, rgba(255,255,255,0.05), transparent 48%),
+        linear-gradient(180deg, rgba(49,55,57,0.28), rgba(12,14,16,0.76));
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.025),
+        0 0 10px rgba(0,0,0,0.22);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.rotation-slot::before {
+    content: "";
+    position: absolute;
+    inset: 7px;
+    border-radius: 9px;
+    border: 1px solid rgba(255,255,255,0.045);
+    pointer-events: none;
+}
+
+.rotation-slot:hover {
+    transform: translateY(-1px);
+    border-color: rgba(248,245,70,0.46);
+    box-shadow:
+        0 0 14px rgba(248,245,70,0.13),
+        inset 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+.rotation-slot:empty::after {
+    content: "+";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(160,170,169,0.38);
+    font-size: calc(var(--rotation-slot-size, 72px) * 0.34);
+    font-weight: 700;
+    pointer-events: none;
 }
 
 .rotation-skill {
@@ -38,14 +81,14 @@
 .skill-inner {
     width: 100%;
     height: 100%;
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: hidden;
 }
 
 .skill-inner img {
     width: 100%;
     height: 100%;
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: visible;
 }
 
@@ -53,26 +96,38 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
-    color: #888;
+    color: rgba(248,245,70,0.74);
     user-select: none;
     pointer-events: none;
     position: relative;
     margin: 0 calc(var(--rotation-gap, 12px) * 0.3);
-
     min-height: 24px;
     width: var(--rotation-arrow-width, 24px);
     min-width: var(--rotation-arrow-width, 24px);
     font-size: var(--rotation-arrow-size, 18px);
     line-height: 1;
+    text-shadow: 0 0 8px rgba(248,245,70,0.28);
 }
+
+.rotation-arrow::before {
+    content: "";
+    position: absolute;
+    width: 70%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(248,245,70,0.45), transparent);
+    bottom: 2px;
+}
+
 .rotation-skill-composite {
     position: relative;
     width: 100%;
     height: 100%;
-    border-radius: 10px;
+    border-radius: 12px;
     overflow: hidden;
     background: #111;
+    box-shadow:
+        0 0 0 1px rgba(255,255,255,0.08),
+        0 0 12px rgba(0,0,0,0.38);
 }
 
 .rotation-skill-portrait {
@@ -80,58 +135,43 @@
     height: 100%;
     object-fit: cover;
     display: block;
-    border-radius: 10px;
+    border-radius: 12px;
 }
 
-/* BS / FS / CS Badge */
 .rotation-skill-type-badge {
     position: absolute;
     left: 7%;
     bottom: 0%;
-
     min-width: 30%;
     height: 28%;
     padding: 0 4%;
-
     border-radius: 9px;
-    background: #fff;
-    color: #000;
-    border: 2px solid #000;
-
+    background: #F8F546;
+    color: #111;
+    border: 2px solid rgba(0,0,0,0.75);
     font-size: calc(var(--rotation-slot-size, 72px) * 0.22);
     font-weight: 900;
     line-height: 1.15;
     text-align: center;
-
     z-index: 5;
     box-sizing: border-box;
+    box-shadow: 0 0 10px rgba(248,245,70,0.22);
 }
 
-/* schwarzer Kreis mit Skill-Symbol */
 .rotation-skill-glyph-badge {
     position: absolute;
     left: 56%;
     bottom: 0%;
-
     width: 28%;
     height: 28%;
-
     border-radius: 25%;
-    background: #000;
-    border: 2px solid #000;
-
+    background: rgba(0,0,0,0.88);
+    border: 2px solid rgba(0,0,0,0.75);
     display: flex;
     align-items: center;
     justify-content: center;
-
     z-index: 4;
     box-sizing: border-box;
-}
-
-.rotation-skill-glyph-badge img {
-    width: 76%;
-    height: 76%;
-    object-fit: contain;
 }
 
 .rotation-skill-glyph-badge img {
@@ -139,6 +179,7 @@
     height: 100%;
     object-fit: contain;
 }
+
 @media (max-width: 900px) {
     .rotation-panel {
         overflow-x: auto;
