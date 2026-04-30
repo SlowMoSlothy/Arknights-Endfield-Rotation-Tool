@@ -37,7 +37,7 @@ chen.skills = [
         cooldown: 20,
         energy: 60,
         elementType: "physical",
-        description: "Applies Vulnerable.",
+        description: "Applies Lift.",
         debuffs: [
             {
                 id: "lift",
@@ -52,7 +52,7 @@ chen.skills = [
     {
         id: (chen.id * 100) + 3,
         name: "Soar to the Stars",
-        allowSelfTrigger: true,
+        allowSelfTrigger: false,
         icon: chen.icon,
         iconSmall: "assets/operators/skills/chen/cs_small.png",
         type: "Combo Skill",
@@ -88,6 +88,6 @@ chen.skills = [
         shortType: "Ult",
         cooldown: 20,
         energy: 60,
-        elementType: "physical"        
+        elementType: "physical"
     }
 ];
