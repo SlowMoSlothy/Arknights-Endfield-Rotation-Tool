@@ -57,7 +57,24 @@ const akekuri = {
             cooldown: 0,
             energy: 100,
             elementType: "physical",
-            description: "CS"
+            description: "Triggers when an enemy becomes Staggered or hits a Stagger Node. Recovers SP.",
+            comboTriggers: [
+                {
+                    effect: "stagger",
+                    minStacks: 1
+                }
+            ],
+            buffs: [
+                {
+                    id: "sp_recovery",
+                    name: "SP Recovery",
+                    appliesEffect: "sp_recovery",
+                    persistsForCombo: false,
+                    visible: true,
+                    stackable: false,
+                    iconBase: "assets/buffs/sp_recovery"
+                }
+            ]
         },
         {
             id: 204,
