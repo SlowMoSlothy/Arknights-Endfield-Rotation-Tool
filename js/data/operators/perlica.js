@@ -9,7 +9,7 @@ const perlica = {
             name: "Protocol α: Breach",
             icon: "assets/operators/avatars/Perlica.png",
             iconSmall: "assets/operators/skills/perlica/fs_small.png",
-            type: "final_strike",
+            type: "Final Strike",
             cooldown: 0,
             energy: 0,
             elementType: "electric",
