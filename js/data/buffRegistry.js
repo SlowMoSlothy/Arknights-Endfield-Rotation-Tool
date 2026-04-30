@@ -1,7 +1,7 @@
 const BUFF_REGISTRY = {
     melting_flames: {
         name: "Melting Flames",
-        iconBase: "assets/ui/buffs/melting_flames",
+        iconBase: "assets/ui/buffs/laevatain/melting_flames",
         stackable: true,
         maxStacks: 4,
         extension: "png"
