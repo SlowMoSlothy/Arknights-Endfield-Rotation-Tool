@@ -65,12 +65,12 @@ const zhuang = {
             name: "Breath of Transformation",
             icon: "assets/operators/avatars/Zhuang.png",
             iconSmall: "assets/operators/skills/zhuang/cs_small.png",
-            type: "ComboSkill",
+            type: "Combo Skill",
             cooldown: 0,
             energy: 100,
             elementType: "electric",
             shortType: "CS",
-            description: "CS",
+            description: "Triggers on Final Strike against a target with Electric Infliction. Applies Electrification.",
             comboTriggerMode: "all",
             comboTriggers: [
                 { effect: "final_strike", minStacks: 1 },
@@ -86,8 +86,7 @@ const zhuang = {
                     visible: true,
                     stackable: true,
                     stacksApplied: 1,
-                    maxStacks: 2,
-                    iconBase: "assets/debuffs/electrification"
+                    maxStacks: 2
                 }
             ]
         },
