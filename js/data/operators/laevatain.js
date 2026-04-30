@@ -45,8 +45,7 @@ const laevatain = {
                     visible: true,
                     stackable: true,
                     maxStacks: 4,
-                    stacksApplied: 1,
-                    iconBase: "assets/buffs/laevatain/melting_flames"
+                    stacksApplied: 1
                 }
             ],
             debuffs: [
