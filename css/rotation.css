@@ -1,21 +1,317 @@
 :root {
     --rotation-slot-size: 72px;
     --rotation-gap: 12px;
+    --rotation-arrow-width: 24px;
+    --rotation-arrow-size: 18px;
 }
 
-.rotation-panel { border: 1px solid rgba(160,170,169,0.18); border-radius: 18px; padding: 16px; width: fit-content; overflow-x: auto; overflow-y: visible; position: relative; background: radial-gradient(circle at 20% 10%, rgba(248,245,70,0.045), transparent 36%), linear-gradient(180deg, rgba(18,20,22,0.96), rgba(10,12,14,0.98)); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.025), 0 10px 26px rgba(0,0,0,0.28); }
-#rotationDropZone { display: grid; grid-auto-rows: auto; column-gap: 0; row-gap: var(--rotation-gap, 14px); }
-.rotation-slot { width: var(--rotation-slot-size, 72px); height: var(--rotation-slot-size, 72px); border: 1px dashed rgba(160,170,169,0.28); border-radius: 12px; position: relative; overflow: visible; margin: 26px 0 24px; background: radial-gradient(circle at 50% 45%, rgba(255,255,255,0.05), transparent 48%), linear-gradient(180deg, rgba(49,55,57,0.28), rgba(12,14,16,0.76)); }
-.rotation-skill { --rotation-element-color: #d0d4d8; --rotation-element-glow: rgba(208,212,216,0.34); position: absolute; width: 100%; height: 100%; }
-.rotation-buff-tray, .rotation-debuff-tray { position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 4px; z-index: 9; }
-.rotation-buff-tray { top: -22px; }
-.rotation-debuff-tray { bottom: -22px; }
-.rotation-buff-item, .rotation-debuff-item { width: 18px; height: 18px; border-radius: 6px; background: rgba(10,12,14,0.94); display:flex; align-items:center; justify-content:center; overflow:hidden; }
-.rotation-buff-item { border: 1px solid rgba(83,255,140,0.45); }
-.rotation-debuff-item { border: 1px solid rgba(248,245,70,0.35); }
-.rotation-buff-icon, .rotation-debuff-icon { width:100%; height:100%; object-fit:contain; }
-.rotation-skill-composite { position: relative; width:100%; height:100%; border-radius:12px; overflow:visible; background:#111; }
-.rotation-skill-composite::after { content:""; position:absolute; left:8%; right:8%; bottom:-7px; height:5px; border-radius:999px; background:var(--rotation-element-color); }
-.rotation-skill-portrait { width:100%; height:100%; object-fit:cover; display:block; border-radius:12px; }
-.rotation-skill-type-badge { position:absolute; left:7%; bottom:0%; min-width:30%; height:28%; }
-.rotation-skill-glyph-badge { position:absolute; left:56%; bottom:0%; width:28%; height:28%; }
+.rotation-panel {
+    border: 1px solid rgba(160,170,169,0.18);
+    border-radius: 18px;
+    padding: 18px 16px 26px;
+    width: fit-content;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    position: relative;
+    background:
+        radial-gradient(circle at 20% 10%, rgba(248,245,70,0.045), transparent 36%),
+        linear-gradient(180deg, rgba(18,20,22,0.96), rgba(10,12,14,0.98));
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.025),
+        0 10px 26px rgba(0,0,0,0.28);
+}
+
+#rotationDropZone {
+    display: grid;
+    grid-auto-rows: auto;
+    column-gap: 0;
+    row-gap: var(--rotation-gap);
+    align-items: center;
+    overflow: visible;
+    padding: 22px 0 28px;
+}
+
+.rotation-slot {
+    width: var(--rotation-slot-size);
+    height: var(--rotation-slot-size);
+    border: 1px dashed rgba(160,170,169,0.28);
+    border-radius: 12px;
+    position: relative;
+    overflow: visible;
+    background:
+        radial-gradient(circle at 50% 45%, rgba(255,255,255,0.05), transparent 48%),
+        linear-gradient(180deg, rgba(49,55,57,0.28), rgba(12,14,16,0.76));
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.025),
+        0 0 10px rgba(0,0,0,0.22);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.rotation-slot::before {
+    content: "";
+    position: absolute;
+    inset: 7px;
+    border-radius: 9px;
+    border: 1px solid rgba(255,255,255,0.045);
+    pointer-events: none;
+}
+
+.rotation-slot:hover {
+    transform: translateY(-1px);
+    border-color: rgba(248,245,70,0.46);
+    box-shadow:
+        0 0 14px rgba(248,245,70,0.13),
+        inset 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+.rotation-slot:empty::after {
+    content: "+";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(160,170,169,0.38);
+    font-size: calc(var(--rotation-slot-size) * 0.34);
+    font-weight: 700;
+    pointer-events: none;
+}
+
+.rotation-skill {
+    --rotation-element-color: #d0d4d8;
+    --rotation-element-glow: rgba(208,212,216,0.34);
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.rotation-skill.ef-element-heat {
+    --rotation-element-color: #ff5a4a;
+    --rotation-element-glow: rgba(255,90,74,0.42);
+}
+
+.rotation-skill.ef-element-electric {
+    --rotation-element-color: #f8f546;
+    --rotation-element-glow: rgba(248,245,70,0.36);
+}
+
+.rotation-skill.ef-element-cryo {
+    --rotation-element-color: #56d8ff;
+    --rotation-element-glow: rgba(86,216,255,0.38);
+}
+
+.rotation-skill.ef-element-nature {
+    --rotation-element-color: #53ff8c;
+    --rotation-element-glow: rgba(83,255,140,0.36);
+}
+
+.rotation-skill.ef-element-physical,
+.rotation-skill.ef-element-neutral {
+    --rotation-element-color: #d0d4d8;
+    --rotation-element-glow: rgba(208,212,216,0.26);
+}
+
+.rotation-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(248,245,70,0.74);
+    user-select: none;
+    pointer-events: none;
+    position: relative;
+    margin: 0 calc(var(--rotation-gap) * 0.3);
+    min-height: 24px;
+    width: var(--rotation-arrow-width);
+    min-width: var(--rotation-arrow-width);
+    font-size: var(--rotation-arrow-size);
+    line-height: 1;
+    text-shadow: 0 0 8px rgba(248,245,70,0.28);
+}
+
+.rotation-arrow::before {
+    content: "";
+    position: absolute;
+    width: 70%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(248,245,70,0.45), transparent);
+    bottom: 2px;
+}
+
+.rotation-arrow.is-unused {
+    opacity: 0.35;
+}
+
+.rotation-skill-composite {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    overflow: visible;
+    background: #111;
+    border: 1px solid color-mix(in srgb, var(--rotation-element-color) 78%, transparent);
+    box-shadow:
+        0 0 0 1px rgba(0,0,0,0.66),
+        0 0 10px var(--rotation-element-glow),
+        inset 0 0 12px rgba(0,0,0,0.35);
+}
+
+.rotation-skill-composite::after {
+    content: "";
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    bottom: -7px;
+    height: 5px;
+    border-radius: 999px;
+    background: var(--rotation-element-color);
+    box-shadow:
+        0 0 10px var(--rotation-element-color),
+        0 0 18px var(--rotation-element-glow);
+    z-index: 8;
+    pointer-events: none;
+}
+
+.rotation-skill-portrait {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 12px;
+}
+
+.rotation-skill-type-badge {
+    position: absolute;
+    left: 7%;
+    bottom: 0;
+    min-width: 30%;
+    height: 28%;
+    padding: 0 4%;
+    border-radius: 9px;
+    background: #F8F546;
+    color: #111;
+    border: 2px solid rgba(0,0,0,0.75);
+    font-size: calc(var(--rotation-slot-size) * 0.22);
+    font-weight: 900;
+    line-height: 1.15;
+    text-align: center;
+    z-index: 7;
+    box-sizing: border-box;
+    box-shadow: 0 0 10px rgba(248,245,70,0.22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rotation-skill-glyph-badge {
+    position: absolute;
+    left: 56%;
+    bottom: 0;
+    width: 28%;
+    height: 28%;
+    border-radius: 25%;
+    background: rgba(0,0,0,0.88);
+    border: 2px solid rgba(0,0,0,0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 7;
+    box-sizing: border-box;
+}
+
+.rotation-skill-glyph-badge img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.rotation-buff-tray,
+.rotation-debuff-tray {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+    z-index: 9;
+    pointer-events: none;
+}
+
+.rotation-buff-tray {
+    top: -22px;
+}
+
+.rotation-debuff-tray {
+    bottom: -24px;
+}
+
+.rotation-buff-item,
+.rotation-debuff-item {
+    width: 18px;
+    height: 18px;
+    border-radius: 6px;
+    background: rgba(10,12,14,0.94);
+    box-shadow: 0 0 8px rgba(0,0,0,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.rotation-buff-item {
+    border: 1px solid rgba(83,255,140,0.45);
+}
+
+.rotation-debuff-item {
+    border: 1px solid rgba(248,245,70,0.35);
+}
+
+.rotation-buff-icon,
+.rotation-debuff-icon {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.rotation-buff-fallback,
+.rotation-debuff-fallback {
+    font-size: 9px;
+    font-weight: 700;
+    color: #f8f546;
+}
+
+.remove-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    padding: 0;
+    z-index: 10;
+}
+
+@media (max-width: 900px) {
+    .rotation-panel {
+        overflow-x: auto;
+        padding: 12px 10px 28px;
+        width: 100%;
+    }
+
+    #rotationDropZone {
+        width: max-content;
+        min-width: 100%;
+        overflow: visible;
+        padding: 22px 0 30px;
+    }
+
+    .rotation-slot {
+        width: 80px;
+        height: 80px;
+    }
+
+    .rotation-arrow {
+        font-size: 18px;
+        min-width: 18px;
+    }
+}
