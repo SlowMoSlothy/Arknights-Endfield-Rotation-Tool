@@ -83,6 +83,41 @@ const DEBUFF_REGISTRY = {
         maxStacks: 0,
         extension: "webp"
     },
+    stagger: {
+        name: "Stagger",
+        iconBase: "assets/ui/debuffs/stagger",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+    knock_down: {
+        name: "Knock Down",
+        iconBase: "assets/ui/debuffs/knock_down",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+    operator_attacked: {
+        name: "Operator Attacked",
+        iconBase: "assets/ui/debuffs/operator_attacked",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+    hp_treatment: {
+        name: "HP Treatment",
+        iconBase: "assets/ui/debuffs/hp_treatment",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+    shield: {
+        name: "Shield",
+        iconBase: "assets/ui/debuffs/shield",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
     focus: {
         name: "Focus",
         iconBase: "assets/ui/debuffs/focus",
