@@ -167,6 +167,13 @@ const DEBUFF_REGISTRY = {
         maxStacks: 0,
         extension: "png"
     },
+    operator_attacked_low_hp: {
+        name: "Operator Attacked (Low HP)",
+        iconBase: "assets/ui/debuffs/operator_attacked_low_hp",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
     hp_treatment: {
         name: "HP Treatment",
         iconBase: "assets/ui/debuffs/hp_treatment",
