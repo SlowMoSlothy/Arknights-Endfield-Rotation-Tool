@@ -8,7 +8,7 @@ const chen = {
 chen.skills = [
     {
         id: (chen.id * 100) + 1,
-        name: "Basic Tactics",
+        name: "Soaring Break",
         icon: chen.icon,
         iconSmall: "assets/operators/skills/chen/fs_small.png",
         type: "Final Strike",
@@ -29,7 +29,7 @@ chen.skills = [
 
     {
         id: (chen.id * 100) + 2,
-        name: "Rigid Interdiction",
+        name: "Ascending Strike",
         icon: chen.icon,
         iconSmall: "assets/operators/skills/chen/bs_small.png",
         type: "Battle Skill",
@@ -40,21 +40,18 @@ chen.skills = [
         description: "Applies Vulnerable.",
         debuffs: [
             {
-                id: "vulnerable",
-                name: "Vulnerable",
-                appliesEffect: "vulnerable",
-                persistsForCombo: true,
-                visible: true,
-                stackable: true,
-                stacksApplied: 1,
-                maxStacks: 4
+                id: "lift",
+                name: "Lift",
+                appliesEffect: "lift",
+                persistsForCombo: false,
+                visible: true
             }
         ]
     },
 
     {
         id: (chen.id * 100) + 3,
-        name: "Timely Suppression",
+        name: "Soar to the Stars",
         allowSelfTrigger: true,
         icon: chen.icon,
         iconSmall: "assets/operators/skills/chen/cs_small.png",
@@ -70,20 +67,7 @@ chen.skills = [
                 effect: "vulnerable",
                 minStacks: 1
             }
-        ]
-    },
-
-    {
-        id: (chen.id * 100) + 4,
-        name: "Textbook Assault",
-        icon: chen.icon,
-        iconSmall: "assets/operators/skills/chen/ult_small.png",
-        type: "Ultimate",
-        shortType: "Ult",
-        cooldown: 20,
-        energy: 60,
-        elementType: "physical",
-        description: "Applies Lift.",
+        ],
         debuffs: [
             {
                 id: "lift",
@@ -91,17 +75,19 @@ chen.skills = [
                 appliesEffect: "lift",
                 persistsForCombo: false,
                 visible: true
-            },
-            {
-                id: "vulnerable",
-                name: "Vulnerable",
-                appliesEffect: "vulnerable",
-                persistsForCombo: true,
-                visible: true,
-                stackable: true,
-                stacksApplied: 1,
-                maxStacks: 4
             }
         ]
+    },
+
+    {
+        id: (chen.id * 100) + 4,
+        name: "Blade Gale",
+        icon: chen.icon,
+        iconSmall: "assets/operators/skills/chen/ult_small.png",
+        type: "Ultimate",
+        shortType: "Ult",
+        cooldown: 20,
+        energy: 60,
+        elementType: "physical"        
     }
 ];
