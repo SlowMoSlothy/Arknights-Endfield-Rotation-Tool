@@ -39,26 +39,26 @@ const zhuang = {
             shortType: "BS",
             description: "BS",
             debuffs: [
-    {
-        id: "electrification_consumed",
-        name: "Electrification Consumed",
-        appliesEffect: "electrification_consumed",
-        persistsForCombo: false,
-        visible: false
-    }
-],
-buffs: [
-    {
-        id: "electric_amp",
-        name: "Electric Amp",
-        appliesEffect: "electric_amp",
-        persistsForCombo: true,
-        visible: true,
-        stackable: true,
-        stacksApplied: 1,
-        maxStacks: 99
-    }
-]
+                {
+                    id: "electrification_consumed",
+                    name: "Electrification Consumed",
+                    appliesEffect: "electrification_consumed",
+                    persistsForCombo: false,
+                    visible: false
+                }
+            ],
+            buffs: [
+                {
+                    id: "electric_amp",
+                    name: "Electric Amp",
+                    appliesEffect: "electric_amp",
+                    persistsForCombo: true,
+                    visible: true,
+                    stackable: true,
+                    stacksApplied: 1,
+                    maxStacks: 99
+                }
+            ]
         },
         {
             id: 903,
@@ -72,24 +72,24 @@ buffs: [
             shortType: "CS",
             description: "CS",
             comboTriggerMode: "all",
-comboTriggers: [
-    { effect: "final_strike", minStacks: 1 },
-    { effect: "electric_infliction", minStacks: 1 }
-],
-allowSelfTrigger: true,
-debuffs: [
-    {
-        id: "electrification",
-        name: "Electrification",
-        appliesEffect: "electrification",
-        persistsForCombo: true,
-        visible: true,
-        stackable: true,
-        stacksApplied: 1,
-        maxStacks: 2,
-        iconBase: "assets/debuffs/electrification"
-    }
-]
+            comboTriggers: [
+                { effect: "final_strike", minStacks: 1 },
+                { effect: "electric_infliction", minStacks: 1 }
+            ],
+            allowSelfTrigger: true,
+            debuffs: [
+                {
+                    id: "electrification",
+                    name: "Electrification",
+                    appliesEffect: "electrification",
+                    persistsForCombo: true,
+                    visible: true,
+                    stackable: true,
+                    stacksApplied: 1,
+                    maxStacks: 2,
+                    iconBase: "assets/debuffs/electrification"
+                }
+            ]
         },
         {
             id: 904,

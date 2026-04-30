@@ -35,8 +35,15 @@ const akekuri = {
             elementType: "heat",
             debuffs: [
                 {
-                    appliesEffect: "heat",
-                    stacks: 2
+                    id: "heat_infliction",
+                    name: "Heat Infliction",
+                    appliesEffect: "heat_infliction",
+                    visible: true,
+                    stackable: true,
+                    stacksApplied: 1,
+                    maxStacks: 4,
+                    persistsForCombo: true,
+                    iconBase: "assets/debuffs/heat_infliction"
                 }
             ],
             description: "Ein Hieb nach vorn, der [heat] verursacht."
@@ -46,7 +53,7 @@ const akekuri = {
             name: "Flash and Dash",
             icon: "assets/operators/avatars/Akekuri.png",
             iconSmall: "assets/operators/skills/akekuri/cs_small.png",
-            type: "ComboSkill",
+            type: "Combo Skill",
             cooldown: 0,
             energy: 100,
             elementType: "physical",
