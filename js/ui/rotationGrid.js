@@ -12,7 +12,13 @@ const ROTATION_EXCLUSIVE_INFLICTIONS = new Set([
     "heat_infliction",
     "cryo_infliction",
     "nature_infliction",
-    "arts_infliction"
+    "arts_infliction",
+    "electrification",
+    "hydro",
+    "hyperthermia",
+    "burning",
+    "frozen",
+    "chilled"
 ]);
 
 function getVisibleRotationDebuffs(skillData) {
