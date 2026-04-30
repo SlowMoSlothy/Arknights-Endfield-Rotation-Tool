@@ -6,26 +6,154 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- SEO -->
     <title>Arknights Endfield Rotation Builder</title>
-    <meta name="description" content="Build and optimize Arknights Endfield rotations with combo triggers, arts reactions, buffs and debuffs.">
-    <meta name="keywords" content="Arknights Endfield, Rotation Builder, Combo Planner, Team Builder">
-    <meta property="og:title" content="Arknights Endfield Rotation Builder">
-    <meta property="og:description" content="Interactive combo and rotation planner for Arknights Endfield.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://github.com/SlowMoSlothy/Arknights-Endfield-Rotation-Tool">
-    <meta property="og:image" content="https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/assets/banner.png">
-    <meta property="og:image:width" content="1128">
-    <meta property="og:image:height" content="449">
-    <meta name="twitter:card" content="summary_large_image">
+
+    <meta name="description"
+          content="Build and optimize Arknights Endfield rotations with combo triggers, arts reactions, buffs and debuffs.">
+
+    <meta name="keywords"
+          content="Arknights Endfield, Rotation Builder, Combo Planner, Team Builder">
+
+    <meta property="og:title"
+          content="Arknights Endfield Rotation Builder">
+
+    <meta property="og:description"
+          content="Interactive combo and rotation planner for Arknights Endfield.">
+
+    <meta property="og:type"
+          content="website">
+
+    <meta property="og:url"
+          content="https://github.com/SlowMoSlothy/Arknights-Endfield-Rotation-Tool">
+<meta property="og:image" content="https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/assets/banner.png">
+<meta property="og:image:width" content="1128">
+<meta property="og:image:height" content="449">
+<meta name="twitter:card" content="summary_large_image">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/mobile.css">
 </head>
+
 <body>
   <link rel="stylesheet" href="css/settings.css?v=3">
   <div id="globalTooltip" class="global-tooltip"></div>
-  <div id="selectionScreen"></div>
-  <div id="builderScreen" style="display:none;"></div>
-  <div id="settingsModal" class="settings-modal"></div>
+
+  <div id="selectionScreen">
+    <div class="selection-hero">
+      <div class="selection-brand">
+        <span>TEAM BUILDER</span>
+        <strong>END FIELD</strong>
+      </div>
+
+      <button class="selection-confirm-btn" onclick="confirmTeam()">
+        <span class="confirm-check">✓</span>
+        <span>Team bestätigen</span>
+      </button>
+    </div>
+
+    <div class="selection-divider"></div>
+
+    <div class="selection-title-row">
+      <h2 class="selection-section-title">Wähle dein Team</h2>
+      <span class="selection-max-label">// MAX. 4</span>
+    </div>
+
+    <div id="teamSlots" class="team-slots"></div>
+
+    <div class="selection-title-row operator-title-row">
+      <h3 class="selection-section-title">Operator auswählen</h3>
+    </div>
+
+    <div id="operatorList" class="operator-grid"></div>
+  </div>
+
+  <div id="builderScreen" style="display:none;">
+    <h2>Rotation Builder</h2>
+
+    <div class="builder-shell">
+
+      <div class="builder-top">
+        <h3>Selected Team</h3>
+        <div id="selectedOperators" class="team-top-panel"></div>
+      </div>
+
+      <div class="builder-divider"></div>
+
+      <div class="builder-content">
+
+        <aside class="builder-sidebar">
+          <h3>Menu</h3>
+
+          <button onclick="backToSelection()">← Back to Team Selection</button>
+          <button onclick="exportImage()">📸 Export Rotation</button>
+          <button onclick="clearRotation()">🗑️ Clear Rotation</button>
+          <button id="openSettingsBtn" type="button">⚙️ Settings</button>
+        </aside>
+
+        <main class="builder-main">
+          <section class="builder-panel">
+            <h3>Skills</h3>
+            <div id="skillList" class="skills-panel"></div>
+          </section>
+
+          <section class="builder-panel">
+            <h3>Rotation</h3>
+            <div id="rotation" class="rotation-panel">
+              <div id="rotationDropZone"></div>
+            </div>
+          </section>
+        </main>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="settingsModal" class="settings-modal">
+    <div class="settings-dialog">
+      <div class="settings-header">
+        <h2 class="settings-title">Settings</h2>
+        <button id="closeSettingsBtn" class="settings-close" type="button">×</button>
+      </div>
+
+      <div class="settings-section">
+        <span class="settings-label">Rotation Skill Size</span>
+          <div class="settings-option-row">
+          
+            <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="small">
+              <div class="settings-option-title">Small</div>
+              <div class="settings-preview"><div class="settings-preview-box" style="width: 38px; height: 38px;"></div></div>
+              <div class="settings-size-label">56px</div>
+            </button>
+          
+            <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="medium">
+              <div class="settings-option-title">Medium</div>
+              <div class="settings-preview"><div class="settings-preview-box" style="width: 52px; height: 52px;"></div></div>
+              <div class="settings-size-label">72px</div>
+            </button>
+          
+            <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="large">
+              <div class="settings-option-title">Large</div>
+              <div class="settings-preview"><div class="settings-preview-box" style="width: 66px; height: 66px;"></div></div>
+              <div class="settings-size-label">88px</div>
+            </button>
+          
+            <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="xl">
+              <div class="settings-option-title">XL</div>
+              <div class="settings-preview"><div class="settings-preview-box" style="width: 78px; height: 78px;"></div></div>
+              <div class="settings-size-label">104px</div>
+            </button>
+          
+            <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="xxl">
+              <div class="settings-option-title">XXL</div>
+              <div class="settings-preview"><div class="settings-preview-box" style="width: 92px; height: 92px;"></div></div>
+              <div class="settings-size-label">120px</div>
+            </button>
+          
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -39,7 +167,7 @@
   <script src="js/data/operators/akekuri.js"></script>
   <script src="js/data/operators/arclight.js"></script>
   <script src="js/data/operators/ardelia.js"></script>
-  <script src="js/data/operators/avywenna.js"></script>
+  <script src="js/data/operators/avywenna.js"></script> 
   <script src="js/data/operators/catcher.js"></script>
   <script src="js/data/operators/chen.js"></script>
   <script src="js/data/operators/dapan.js"></script>
@@ -62,6 +190,7 @@
   <script src="js/data/operators.js"></script>
 
   <script src="js/state/appState.js"></script>
+
   <script src="js/logic/operatorStateEngine.js"></script>
   <script src="js/logic/storage.js"></script>
   <script src="js/logic/export.js"></script>
@@ -79,6 +208,8 @@
   <script src="js/ui/operatorBuffs.js"></script>
   <script src="js/ui/rotationGrid.js"></script>
   <script src="js/ui/teamSelection.js"></script>
+
   <script src="js/main.js"></script>
 </body>
+
 </html>
