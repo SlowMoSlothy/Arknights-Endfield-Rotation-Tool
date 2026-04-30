@@ -7,34 +7,6 @@ function getShortSkillType(type) {
     return type || "";
 }
 
-const EXCLUSIVE_INFLICTIONS = new Set([
-    "electric_infliction",
-    "heat_infliction",
-    "cryo_infliction",
-    "nature_infliction",
-    "arts_infliction",
-    "electrification",
-    "hydro",
-    "hyperthermia",
-    "burning",
-    "frozen",
-    "chilled"
-]);
-
-const PHYSICAL_DEBUFFS = new Set([
-    "vulnerable",
-    "lift",
-    "knock_down",
-    "crush",
-    "breach"
-]);
-
-const UTILITY_DEBUFFS = new Set([
-    "defense_down",
-    "resistance_down",
-    "slow"
-]);
-
 function getVisibleRotationDebuffs(skillData) {
     return (skillData?.debuffs || []).filter(x => x.visible !== false);
 }
@@ -236,12 +208,7 @@ function renderRotation() {
                 inner.appendChild(glyphBadge);
                 skillDiv.appendChild(inner);
 
-                const activeDebuffs = applySkillDebuffsAndGetActiveState(
-                    skillData,
-                    rotationDebuffStackState,
-                    rotationDebuffMetaState
-                );
-
+                const activeDebuffs = applySkillDebuffsAndGetActiveState(skillData, rotationDebuffStackState, rotationDebuffMetaState);
                 const debuffTray = createEffectTray(activeDebuffs, 'debuff');
                 if (debuffTray) skillDiv.appendChild(debuffTray);
 
