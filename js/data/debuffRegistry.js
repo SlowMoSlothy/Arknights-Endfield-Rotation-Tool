@@ -48,6 +48,13 @@ const DEBUFF_REGISTRY = {
         maxStacks: 4,
         extension: "png"
     },
+    arts_susceptibility: {
+        name: "Arts Susceptibility",
+        iconBase: "assets/ui/debuffs/arts_susceptibility",
+        stackable: true,
+        maxStacks: 4,
+        extension: "png"
+    },
     heat_infliction: {
         name: "Heat Infliction",
         iconBase: "assets/ui/debuffs/heat_infliction",
@@ -124,6 +131,13 @@ const DEBUFF_REGISTRY = {
         stackable: false,
         maxStacks: 0,
         extension: "webp"
+    },
+    lift: {
+        name: "Lift",
+        iconBase: "assets/ui/debuffs/lift",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
     },
     stagger: {
         name: "Stagger",
