@@ -23,5 +23,6 @@ const operators = [
     perlica,
     rossi,
     tangtang,
-    gilberta
+    gilberta,
+    yvonne
 ];
