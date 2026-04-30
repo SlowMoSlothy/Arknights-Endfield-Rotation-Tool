@@ -13,6 +13,13 @@ const DEBUFF_REGISTRY = {
         maxStacks: 0,
         extension: "png"
     },
+    combustion: {
+        name: "Combustion",
+        iconBase: "assets/ui/debuffs/combustion",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
     arts_infliction: {
         name: "Arts Infliction",
         iconBase: "assets/ui/debuffs/arts",
