@@ -64,8 +64,12 @@ chen.skills = [
         elementType: "physical",
         description: "Triggers when enemy is Lifted.",
         comboTriggerMode: "all",
+        description: "Triggers when enemy becomes Vulnerable.",
         comboTriggers: [
-            { effect: "lift", minStacks: 1 }
+            {
+                effect: "vulnerable",
+                minStacks: 1
+            }
         ]
     },
 
@@ -87,6 +91,16 @@ chen.skills = [
                 appliesEffect: "lift",
                 persistsForCombo: false,
                 visible: true
+            },
+            {
+                id: "vulnerable",
+                name: "Vulnerable",
+                appliesEffect: "vulnerable",
+                persistsForCombo: true,
+                visible: true,
+                stackable: true,
+                stacksApplied: 1,
+                maxStacks: 4
             }
         ]
     }
