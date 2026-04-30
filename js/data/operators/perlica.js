@@ -35,9 +35,9 @@ const perlica = {
             elementType: "electric",
             debuffs: [
                 {
-                    id: "electric_infliction",
-                    name: "Electric Infliction",
-                    appliesEffect: "electric_infliction",
+                    id: "electric",
+                    name: "Electric",
+                    appliesEffect: "electric",
                     visible: true,
                     stackable: true,
                     stacksApplied: 1,
