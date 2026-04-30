@@ -20,6 +20,27 @@ const DEBUFF_REGISTRY = {
         maxStacks: 0,
         extension: "png"
     },
+    corrosion: {
+        name: "Corrosion",
+        iconBase: "assets/ui/debuffs/corrosion",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+    solidification: {
+        name: "Solidification",
+        iconBase: "assets/ui/debuffs/solidification",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+    arts_reaction: {
+        name: "Arts Reaction",
+        iconBase: "assets/ui/debuffs/arts_reaction",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
     arts_infliction: {
         name: "Arts Infliction",
         iconBase: "assets/ui/debuffs/arts",
