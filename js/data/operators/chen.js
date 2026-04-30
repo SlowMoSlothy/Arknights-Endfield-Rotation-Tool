@@ -55,6 +55,7 @@ chen.skills = [
     {
         id: (chen.id * 100) + 3,
         name: "Timely Suppression",
+        allowSelfTrigger: true,
         icon: chen.icon,
         iconSmall: "assets/operators/skills/chen/cs_small.png",
         type: "Combo Skill",
@@ -62,7 +63,6 @@ chen.skills = [
         cooldown: 0,
         energy: 0,
         elementType: "physical",
-        description: "Triggers when enemy is Lifted.",
         comboTriggerMode: "all",
         description: "Triggers when enemy becomes Vulnerable.",
         comboTriggers: [
