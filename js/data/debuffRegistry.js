@@ -7,7 +7,7 @@ const DEBUFF_REGISTRY = {
         extension: "png"
     },
     electrification: {
-        name: "Electrificationtric",
+        name: "Electrification",
         iconBase: "assets/ui/debuffs/electrification",
         stackable: false,
         maxStacks: 0,
@@ -54,6 +54,41 @@ const DEBUFF_REGISTRY = {
         stackable: false,
         maxStacks: 0,
         extension: "webp"
+    },
+    focus: {
+        name: "Focus",
+        iconBase: "assets/ui/debuffs/focus",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+    electric_susceptibility: {
+        name: "Electric Susceptibility",
+        iconBase: "assets/ui/debuffs/electric_susceptibility",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+    heat_susceptibility: {
+        name: "Heat Susceptibility",
+        iconBase: "assets/ui/debuffs/heat_susceptibility",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+    electric_amp: {
+        name: "Electric Amp",
+        iconBase: "assets/ui/debuffs/electric_amp",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+    heat_amp: {
+        name: "Heat Amp",
+        iconBase: "assets/ui/debuffs/heat_amp",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
     },
     final_strike: {
         name: "Final Strike",
