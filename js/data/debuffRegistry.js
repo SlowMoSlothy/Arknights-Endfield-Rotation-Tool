@@ -62,6 +62,20 @@ const DEBUFF_REGISTRY = {
         maxStacks: 4,
         extension: "png"
     },
+    cryo_susceptibility: {
+        name: "Cryo Susceptibility",
+        iconBase: "assets/ui/debuffs/cryo_susceptibility",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+    hypothermic_perfusion: {
+        name: "Hypothermic Perfusion",
+        iconBase: "assets/ui/debuffs/hypothermic_perfusion",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
     nature_infliction: {
         name: "Nature Infliction",
         iconBase: "assets/ui/debuffs/nature_infliction",
