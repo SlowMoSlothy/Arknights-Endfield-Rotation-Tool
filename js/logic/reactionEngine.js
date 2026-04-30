@@ -1,30 +1,3 @@
-const ARTS_REACTIONS = [
-    {
-        id: "combustion",
-        name: "Combustion",
-        requires: ["heat_infliction", "electric_infliction"],
-        appliesEffect: "arts_reaction",
-        reactionEffect: "combustion",
-        persistsForCombo: false
-    },
-    {
-        id: "corrosion",
-        name: "Corrosion",
-        requires: ["nature_infliction", "electric_infliction"],
-        appliesEffect: "arts_reaction",
-        reactionEffect: "corrosion",
-        persistsForCombo: false
-    },
-    {
-        id: "solidification",
-        name: "Solidification",
-        requires: ["cryo_infliction", "nature_infliction"],
-        appliesEffect: "arts_reaction",
-        reactionEffect: "solidification",
-        persistsForCombo: false
-    }
-];
-
 function addEffectToMap(effectMap, effectName, amount = 1) {
     if (!effectName) return;
     effectMap[effectName] = (effectMap[effectName] || 0) + amount;
@@ -60,6 +33,7 @@ function resolveSingleArtsReaction(reactionMap, reaction) {
 
 function resolveArtsReactions(effectMap) {
     const reactionMap = { ...effectMap };
+    const reactionRules = Array.isArray(ARTS_REACTIONS) ? ARTS_REACTIONS : [];
 
     let reactionResolved = true;
     let safetyCounter = 0;
@@ -69,7 +43,7 @@ function resolveArtsReactions(effectMap) {
         reactionResolved = false;
         safetyCounter++;
 
-        for (const reaction of ARTS_REACTIONS) {
+        for (const reaction of reactionRules) {
             const resolved = resolveSingleArtsReaction(reactionMap, reaction);
 
             if (resolved) {
