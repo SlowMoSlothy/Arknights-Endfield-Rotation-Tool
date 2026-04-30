@@ -6,6 +6,13 @@ const DEBUFF_REGISTRY = {
         maxStacks: 4,
         extension: "png"
     },
+    electrification: {
+        name: "Electrificationtric",
+        iconBase: "assets/ui/debuffs/electrification",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
     arts_infliction: {
         name: "Arts Infliction",
         iconBase: "assets/ui/debuffs/arts",
@@ -15,21 +22,21 @@ const DEBUFF_REGISTRY = {
     },
     heat_infliction: {
         name: "Heat Infliction",
-        iconBase: "assets/ui/debuffs/heat",
+        iconBase: "assets/ui/debuffs/heat_infliction",
         stackable: true,
         maxStacks: 4,
         extension: "png"
     },
     cryo_infliction: {
         name: "Cryo Infliction",
-        iconBase: "assets/ui/debuffs/cryo",
+        iconBase: "assets/ui/debuffs/cryo_infliction",
         stackable: true,
         maxStacks: 4,
         extension: "png"
     },
     nature_infliction: {
         name: "Nature Infliction",
-        iconBase: "assets/ui/debuffs/nature",
+        iconBase: "assets/ui/debuffs/nature_infliction",
         stackable: true,
         maxStacks: 4,
         extension: "png"
