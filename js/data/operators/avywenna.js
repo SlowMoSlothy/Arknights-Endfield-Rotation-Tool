@@ -32,8 +32,21 @@ avywenna.skills = [
         iconSmall: "assets/operators/skills/avywenna/bs_small.png",
         type: "Battle Skill",
         cooldown: 20,
-        energy: 60,
-        elementType: "electric"
+        energy: 100,
+        elementType: "electric",
+        description: "Deals Electric DMG and applies Electric Infliction via Thunderlance EX.",
+        debuffs: [
+            {
+                id: "electric_infliction",
+                name: "Electric Infliction",
+                appliesEffect: "electric_infliction",
+                persistsForCombo: true,
+                visible: true,
+                stackable: true,
+                stacksApplied: 1,
+                maxStacks: 4
+            }
+        ]
     },
     {
         id: (avywenna.id * 100) + 3,
@@ -50,7 +63,7 @@ avywenna.skills = [
             {
                 anyOf: [
                     { effect: "electrification", minStacks: 1 },
-                    { effect: "electric", minStacks: 1 }
+                    { effect: "electric_infliction", minStacks: 1 }
                 ]
             }
         ]
