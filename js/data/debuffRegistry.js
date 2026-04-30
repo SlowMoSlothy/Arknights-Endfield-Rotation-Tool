@@ -76,6 +76,34 @@ const DEBUFF_REGISTRY = {
         maxStacks: 0,
         extension: "png"
     },
+    auxiliary_crystal: {
+        name: "Auxiliary Crystal",
+        iconBase: "assets/ui/debuffs/auxiliary_crystal",
+        stackable: true,
+        maxStacks: 2,
+        extension: "png"
+    },
+    auxiliary_crystal_used_up: {
+        name: "Auxiliary Crystal Used Up",
+        iconBase: "assets/ui/debuffs/auxiliary_crystal_used_up",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+    arts_amp: {
+        name: "Arts Amp",
+        iconBase: "assets/ui/debuffs/arts_amp",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+    cryo_amp: {
+        name: "Cryo Amp",
+        iconBase: "assets/ui/debuffs/cryo_amp",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
     nature_infliction: {
         name: "Nature Infliction",
         iconBase: "assets/ui/debuffs/nature_infliction",
