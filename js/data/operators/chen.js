@@ -47,8 +47,7 @@ chen.skills = [
                 visible: true,
                 stackable: true,
                 stacksApplied: 1,
-                maxStacks: 4,
-                iconBase: "assets/debuffs/vulnerable"
+                maxStacks: 4
             }
         ]
     },
@@ -87,8 +86,7 @@ chen.skills = [
                 name: "Lift",
                 appliesEffect: "lift",
                 persistsForCombo: false,
-                visible: true,
-                iconBase: "assets/debuffs/lift"
+                visible: true
             }
         ]
     }
