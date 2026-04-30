@@ -48,6 +48,13 @@ const DEBUFF_REGISTRY = {
         maxStacks: 4,
         extension: "png"
     },
+    slow: {
+        name: "Slow",
+        iconBase: "assets/ui/debuffs/slow",
+        stackable: false,
+        maxStacks: 0,
+        extension: "webp"
+    },
     final_strike: {
         name: "Final Strike",
         icon: "assets/ui/debuffs/final_strike.png"
