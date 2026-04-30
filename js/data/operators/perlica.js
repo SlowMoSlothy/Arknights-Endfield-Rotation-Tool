@@ -72,9 +72,7 @@ const perlica = {
                     persistsForCombo: true,
                     availableAfterChain: true,
                     visible: true,
-                    stackable: true,
-                    stacksApplied: 1,
-                    maxStacks: 4,
+                    stackable: false,
                     iconBase: "assets/debuffs/electrification"
                 }
             ]
