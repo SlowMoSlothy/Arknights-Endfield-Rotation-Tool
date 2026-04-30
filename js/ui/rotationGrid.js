@@ -13,8 +13,37 @@ function getVisibleRotationDebuffs(skillData) {
     return (skillData?.debuffs || []).filter(debuff => debuff.visible !== false);
 }
 
-function createRotationDebuffTray(skillData) {
-    const debuffs = getVisibleRotationDebuffs(skillData);
+function cloneDebuffWithRotationStack(debuffData, stackState) {
+    const key = normalizeDebuffKey(debuffData);
+    const registryEntry = DEBUFF_REGISTRY?.[key];
+    const isStackable = debuffData?.stackable === true || registryEntry?.stackable === true;
+
+    if (!isStackable) {
+        return { ...debuffData };
+    }
+
+    const maxStacks = Number(debuffData?.maxStacks || registryEntry?.maxStacks || 4);
+    const stacksApplied = Number(debuffData?.stacksApplied || debuffData?.stackCount || 1);
+    const safeApplied = Number.isFinite(stacksApplied) ? stacksApplied : 1;
+    const safeMax = Number.isFinite(maxStacks) ? maxStacks : 4;
+
+    const previousStack = stackState[key] || 0;
+    const nextStack = Math.max(1, Math.min(previousStack + safeApplied, safeMax));
+
+    stackState[key] = nextStack;
+
+    return {
+        ...debuffData,
+        stackCount: nextStack,
+        currentStacks: nextStack,
+        stacks: nextStack
+    };
+}
+
+function createRotationDebuffTray(skillData, stackState) {
+    const debuffs = getVisibleRotationDebuffs(skillData)
+        .map(debuffData => cloneDebuffWithRotationStack(debuffData, stackState));
+
     if (debuffs.length === 0) return null;
 
     const tray = document.createElement("div");
@@ -53,6 +82,7 @@ function renderRotation() {
     container.innerHTML = "";
 
     const slotMap = getSnakeSlotMap();
+    const rotationDebuffStackState = {};
 
     slotMap.forEach((slotInfo, index) => {
         const slot = document.createElement("div");
@@ -110,7 +140,7 @@ function renderRotation() {
 
                 skillDiv.appendChild(inner);
 
-                const debuffTray = createRotationDebuffTray(skillData);
+                const debuffTray = createRotationDebuffTray(skillData, rotationDebuffStackState);
                 if (debuffTray) {
                     skillDiv.appendChild(debuffTray);
                 }
