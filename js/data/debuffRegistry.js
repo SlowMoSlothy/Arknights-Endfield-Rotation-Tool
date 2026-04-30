@@ -62,6 +62,13 @@ const DEBUFF_REGISTRY = {
         maxStacks: 4,
         extension: "png"
     },
+    heat_followup: {
+        name: "Heat Follow-Up",
+        iconBase: "assets/ui/debuffs/heat_followup",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
     cryo_infliction: {
         name: "Cryo Infliction",
         iconBase: "assets/ui/debuffs/cryo_infliction",
