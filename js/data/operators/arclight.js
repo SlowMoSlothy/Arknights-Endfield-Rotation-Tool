@@ -17,7 +17,7 @@ const arclight = {
             cooldown: 20,
             energy: 60,
             elementType: "physical",
-            description: "FS",
+            description: "Final Strike.",
             debuffs: [
                 {
                     id: "final_strike",
@@ -36,9 +36,9 @@ const arclight = {
             type: "Battle Skill",
             shortType: "BS",
             cooldown: 20,
-            energy: 60,
+            energy: 100,
             elementType: "electric",
-            description: "Consumes Electrification.",
+            description: "Consumes Electrification to launch an additional Electric attack and recover SP.",
             debuffs: [
                 {
                     id: "electrification_consumed",
@@ -46,6 +46,16 @@ const arclight = {
                     appliesEffect: "electrification_consumed",
                     persistsForCombo: false,
                     visible: false
+                }
+            ],
+            buffs: [
+                {
+                    id: "sp_recovery",
+                    name: "SP Recovery",
+                    appliesEffect: "sp_recovery",
+                    persistsForCombo: false,
+                    visible: true,
+                    stackable: false
                 }
             ]
         },
@@ -59,13 +69,23 @@ const arclight = {
             cooldown: 3,
             energy: 100,
             elementType: "physical",
-            description: "Triggers when Electrification is applied or consumed.",
+            description: "Triggers when Electrification is applied or consumed. Recovers SP.",
             comboTriggerMode: "any",
             comboTriggers: [
                 { effect: "electrification", minStacks: 1 },
                 { effect: "electrification_consumed", minStacks: 1 }
             ],
-            allowSelfTrigger: true
+            allowSelfTrigger: true,
+            buffs: [
+                {
+                    id: "sp_recovery",
+                    name: "SP Recovery",
+                    appliesEffect: "sp_recovery",
+                    persistsForCombo: false,
+                    visible: true,
+                    stackable: false
+                }
+            ]
         },
         {
             id: (opId * 100) + 4,
@@ -77,18 +97,25 @@ const arclight = {
             cooldown: 20,
             energy: 60,
             elementType: "electric",
-            description: "Applies Electrification.",
+            description: "Applies Electric Infliction. Lingering arcs can consume Electric Infliction to forcibly apply Electrification.",
             debuffs: [
+                {
+                    id: "electric_infliction",
+                    name: "Electric Infliction",
+                    appliesEffect: "electric_infliction",
+                    persistsForCombo: true,
+                    visible: true,
+                    stackable: true,
+                    stacksApplied: 1,
+                    maxStacks: 4
+                },
                 {
                     id: "electrification",
                     name: "Electrification",
                     appliesEffect: "electrification",
                     persistsForCombo: true,
                     visible: true,
-                    stackable: true,
-                    stacksApplied: 1,
-                    maxStacks: 4,
-                    iconBase: "assets/debuffs/electrification"
+                    stackable: false
                 }
             ]
         }
