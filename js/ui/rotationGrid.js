@@ -7,6 +7,14 @@ function getShortSkillType(type) {
     return type || "";
 }
 
+const ROTATION_EXCLUSIVE_INFLICTIONS = new Set([
+    "electric_infliction",
+    "heat_infliction",
+    "cryo_infliction",
+    "nature_infliction",
+    "arts_infliction"
+]);
+
 function getVisibleRotationDebuffs(skillData) {
     return (skillData?.debuffs || []).filter(x => x.visible !== false);
 }
@@ -21,9 +29,21 @@ function getRotationDebuffKey(effect) {
     });
 }
 
+function clearOtherExclusiveInflictions(activeKey, stackState, metaState) {
+    if (!ROTATION_EXCLUSIVE_INFLICTIONS.has(activeKey)) return;
+
+    ROTATION_EXCLUSIVE_INFLICTIONS.forEach(key => {
+        if (key === activeKey) return;
+        delete stackState[key];
+        delete metaState[key];
+    });
+}
+
 function addDebuffToRotationState(effect, stackState, metaState) {
     const key = getRotationDebuffKey(effect);
     if (!key) return;
+
+    clearOtherExclusiveInflictions(key, stackState, metaState);
 
     const registryEntry = DEBUFF_REGISTRY?.[key];
     const isStackable = effect?.stackable === true || registryEntry?.stackable === true;
