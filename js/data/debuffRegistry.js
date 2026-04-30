@@ -41,6 +41,13 @@ const DEBUFF_REGISTRY = {
         maxStacks: 4,
         extension: "png"
     },
+    vulnerable: {
+        name: "Vulnerable",
+        iconBase: "assets/ui/debuffs/vulnerable",
+        stackable: true,
+        maxStacks: 4,
+        extension: "png"
+    },
     final_strike: {
         name: "Final Strike",
         icon: "assets/ui/debuffs/final_strike.png"
