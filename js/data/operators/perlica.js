@@ -57,7 +57,12 @@ const perlica = {
             energy: 60,
             elementType: "electric",
             description: "CS",
-            comboTriggers: ["final_strike"],
+            comboTriggers: [
+                {
+                    effect: "final_strike",
+                    minStacks: 1
+                }
+            ],
             allowSelfTrigger: true,
             debuffs: [
                 {
