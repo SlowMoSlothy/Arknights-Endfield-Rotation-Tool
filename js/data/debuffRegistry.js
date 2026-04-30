@@ -1,7 +1,7 @@
 const DEBUFF_REGISTRY = {
-    electric: {
-        name: "Electric",
-        iconBase: "assets/ui/debuffs/electric",
+    electric_infliction: {
+        name: "Electric Infliction",
+        iconBase: "assets/ui/debuffs/electric_infliction",
         stackable: true,
         maxStacks: 4,
         extension: "png"
