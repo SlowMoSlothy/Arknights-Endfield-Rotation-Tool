@@ -10,17 +10,16 @@ const perlica = {
             icon: "assets/operators/avatars/Perlica.png",
             iconSmall: "assets/operators/skills/perlica/fs_small.png",
             type: "final_strike",
-            cooldown: 20,
-            energy: 60,
-            elementType: "electric",
             cooldown: 0,
             energy: 0,
+            elementType: "electric",
             debuffs: [
                 {
                     id: "final_strike",
                     name: "Final Strike",
                     appliesEffect: "final_strike",
-                    persistsForCombo: false, visible: false
+                    persistsForCombo: false,
+                    visible: false
                 }
             ],
             description: "Final Strike"
@@ -36,15 +35,14 @@ const perlica = {
             elementType: "electric",
             debuffs: [
                 {
-                    id: "electric",
-                    name: "Electric",
-                    appliesEffect: "electric",
+                    id: "electric_infliction",
+                    name: "Electric Infliction",
+                    appliesEffect: "electric_infliction",
                     visible: true,
                     stackable: true,
                     stacksApplied: 1,
                     maxStacks: 4,
-                    persistsForCombo: true,
-                    iconBase: "assets/debuffs/electric"
+                    persistsForCombo: true
                 }
             ],
             description: "BS"
@@ -63,17 +61,17 @@ const perlica = {
             allowSelfTrigger: true,
             debuffs: [
                 {
-    id: "electrification",
-    name: "Electrification",
-    appliesEffect: "electrification",
-    persistsForCombo: true,
-    availableAfterChain: true,
-    visible: true,
-    stackable: true,
-    stacksApplied: 1,
-    maxStacks: 4,
-    iconBase: "assets/debuffs/electrification"
-}
+                    id: "electrification",
+                    name: "Electrification",
+                    appliesEffect: "electrification",
+                    persistsForCombo: true,
+                    availableAfterChain: true,
+                    visible: true,
+                    stackable: true,
+                    stacksApplied: 1,
+                    maxStacks: 4,
+                    iconBase: "assets/debuffs/electrification"
+                }
             ]
         },
         {
