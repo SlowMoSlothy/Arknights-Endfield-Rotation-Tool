@@ -7,7 +7,7 @@ function getShortSkillType(type) {
     return type || "";
 }
 
-const ROTATION_EXCLUSIVE_INFLICTIONS = new Set([
+const EXCLUSIVE_INFLICTIONS = new Set([
     "electric_infliction",
     "heat_infliction",
     "cryo_infliction",
@@ -19,6 +19,20 @@ const ROTATION_EXCLUSIVE_INFLICTIONS = new Set([
     "burning",
     "frozen",
     "chilled"
+]);
+
+const PHYSICAL_DEBUFFS = new Set([
+    "vulnerable",
+    "lift",
+    "knock_down",
+    "crush",
+    "breach"
+]);
+
+const UTILITY_DEBUFFS = new Set([
+    "defense_down",
+    "resistance_down",
+    "slow"
 ]);
 
 function getVisibleRotationDebuffs(skillData) {
@@ -36,9 +50,9 @@ function getRotationDebuffKey(effect) {
 }
 
 function clearOtherExclusiveInflictions(activeKey, stackState, metaState) {
-    if (!ROTATION_EXCLUSIVE_INFLICTIONS.has(activeKey)) return;
+    if (!EXCLUSIVE_INFLICTIONS.has(activeKey)) return;
 
-    ROTATION_EXCLUSIVE_INFLICTIONS.forEach(key => {
+    EXCLUSIVE_INFLICTIONS.forEach(key => {
         if (key === activeKey) return;
         delete stackState[key];
         delete metaState[key];
