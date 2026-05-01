@@ -90,6 +90,20 @@ const DEBUFF_REGISTRY = {
         maxStacks: 0,
         extension: "png"
     },
+    physical_susceptibility: {
+        name: "Physical Susceptibility",
+        iconBase: "assets/ui/debuffs/physical_susceptibility",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+    pull: {
+        name: "Pull",
+        iconBase: "assets/ui/debuffs/pull",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
     auxiliary_crystal: {
         name: "Auxiliary Crystal",
         iconBase: "assets/ui/debuffs/auxiliary_crystal",
