@@ -62,9 +62,10 @@ tangtang.skills = [
         cooldown: 0,
         energy: 0,
         elementType: "cryo",
-        description: "Triggers on Cryo Infliction or Cryo Burst. Adds Arts Susceptibility.",
+        description: "Triggers on Final Strike against an enemy with Cryo Infliction or Cryo Burst. Adds Arts Susceptibility.",
         comboTriggerMode: "all",
         comboTriggers: [
+            { effect: "final_strike", minStacks: 1 },
             {
                 anyOf: [
                     { effect: "cryo_infliction", minStacks: 1 },
