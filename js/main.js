@@ -10,3 +10,4 @@ renderTeamSlots();
 renderOperatorList();
 
 initUiSettings();
+initEnemyPanel();
