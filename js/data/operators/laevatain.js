@@ -82,6 +82,7 @@ const laevatain = {
                         buff: "melting_flames",
                         amount: 4
                     },
+                    skipNormalBuffs: true,
                     debuffs: [
                         {
                             id: "combustion",
