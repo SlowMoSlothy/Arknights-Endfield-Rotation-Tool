@@ -1,15 +1,25 @@
 function addAmountToEffectMap(effectMap, effectName, amount = 1, maxStacks = null) {
     if (!effectName) return;
-
-    if (!effectMap[effectName]) {
-        effectMap[effectName] = 0;
-    }
-
+    if (!effectMap[effectName]) effectMap[effectName] = 0;
     effectMap[effectName] += amount;
+    if (maxStacks) effectMap[effectName] = Math.min(effectMap[effectName], maxStacks);
+}
 
-    if (maxStacks) {
-        effectMap[effectName] = Math.min(effectMap[effectName], maxStacks);
-    }
+function consumeInflictionToBuffFromEffectMap(skillData, effectMap) {
+    const config = skillData?.consumeInflictionToBuff;
+    if (!config || !config.infliction) return null;
+
+    const infliction = config.infliction;
+    const consumedStacks = Number(effectMap[infliction] || 0);
+    if (consumedStacks <= 0) return null;
+
+    delete effectMap[infliction];
+
+    return {
+        buffName: config.grantBuff,
+        amount: consumedStacks * Number(config.ratio || 1),
+        maxStacks: Number(config.maxStacks || 4)
+    };
 }
 
 function getMatchingInflictionEffect(skillData, effectMap) {
@@ -30,6 +40,34 @@ function getMatchingInflictionEffect(skillData, effectMap) {
     };
 }
 
+function applySkillEffectsToComboMap(skillData, effectMap, includeAvailableAfterChain = false) {
+    const allEffects = [
+        ...(Array.isArray(skillData?.debuffs) ? skillData.debuffs : []),
+        ...(Array.isArray(skillData?.buffs) ? skillData.buffs : [])
+    ];
+
+    allEffects.forEach(effect => {
+        if (!effect.appliesEffect) return;
+        if (!includeAvailableAfterChain && effect.availableAfterChain === true) return;
+        if (effect.persistsForCombo === false) return;
+
+        const amount = effect.stackable ? (effect.stacksApplied || 1) : 1;
+        addAmountToEffectMap(effectMap, effect.appliesEffect, amount, effect.maxStacks || null);
+    });
+
+    consumeInflictionToBuffFromEffectMap(skillData, effectMap);
+
+    const matchingInfliction = getMatchingInflictionEffect(skillData, effectMap);
+    if (matchingInfliction) {
+        addAmountToEffectMap(
+            effectMap,
+            matchingInfliction.effectName,
+            matchingInfliction.amount,
+            matchingInfliction.maxStacks
+        );
+    }
+}
+
 function collectPersistentEffectsFromRotationUpToIndex(endIndex) {
     const effectMap = {};
 
@@ -40,28 +78,7 @@ function collectPersistentEffectsFromRotationUpToIndex(endIndex) {
         const skillData = getSkillById(entry.id);
         if (!skillData) continue;
 
-        const allEffects = [
-            ...(Array.isArray(skillData.debuffs) ? skillData.debuffs : []),
-            ...(Array.isArray(skillData.buffs) ? skillData.buffs : [])
-        ];
-
-        allEffects.forEach(effect => {
-            if (!effect.appliesEffect) return;
-            if (effect.persistsForCombo === false) return;
-
-            const amount = effect.stackable ? (effect.stacksApplied || 1) : 1;
-            addAmountToEffectMap(effectMap, effect.appliesEffect, amount, effect.maxStacks || null);
-        });
-
-        const matchingInfliction = getMatchingInflictionEffect(skillData, effectMap);
-        if (matchingInfliction) {
-            addAmountToEffectMap(
-                effectMap,
-                matchingInfliction.effectName,
-                matchingInfliction.amount,
-                matchingInfliction.maxStacks
-            );
-        }
+        applySkillEffectsToComboMap(skillData, effectMap, true);
     }
 
     return effectMap;
@@ -69,22 +86,8 @@ function collectPersistentEffectsFromRotationUpToIndex(endIndex) {
 
 function collectEffectsFromSkill(skillData) {
     const effectMap = {};
-
     if (!skillData) return effectMap;
-
-    const allEffects = [
-        ...(Array.isArray(skillData.debuffs) ? skillData.debuffs : []),
-        ...(Array.isArray(skillData.buffs) ? skillData.buffs : [])
-    ];
-
-    allEffects.forEach(effect => {
-        if (!effect.appliesEffect) return;
-        if (effect.availableAfterChain === true) return;
-
-        const amount = effect.stackable ? (effect.stacksApplied || 1) : 1;
-        addAmountToEffectMap(effectMap, effect.appliesEffect, amount, effect.maxStacks || null);
-    });
-
+    applySkillEffectsToComboMap(skillData, effectMap, false);
     return effectMap;
 }
 
@@ -98,27 +101,7 @@ function collectEffectsFromRotationUpToIndex(endIndex) {
         const skillData = getSkillById(entry.id);
         if (!skillData) continue;
 
-        const allEffects = [
-            ...(Array.isArray(skillData.debuffs) ? skillData.debuffs : []),
-            ...(Array.isArray(skillData.buffs) ? skillData.buffs : [])
-        ];
-
-        allEffects.forEach(effect => {
-            if (!effect.appliesEffect) return;
-
-            const amount = effect.stackable ? (effect.stacksApplied || 1) : 1;
-            addAmountToEffectMap(effectMap, effect.appliesEffect, amount, effect.maxStacks || null);
-        });
-
-        const matchingInfliction = getMatchingInflictionEffect(skillData, effectMap);
-        if (matchingInfliction) {
-            addAmountToEffectMap(
-                effectMap,
-                matchingInfliction.effectName,
-                matchingInfliction.amount,
-                matchingInfliction.maxStacks
-            );
-        }
+        applySkillEffectsToComboMap(skillData, effectMap, true);
     }
 
     return effectMap;
@@ -148,17 +131,10 @@ function getComboSkillsFromEffects(effectMap, sourceOperatorId) {
             const triggerMode = (skill.comboTriggerMode || "any").toLowerCase();
 
             const checkTrigger = (trigger) => {
-                if (typeof trigger === "string") {
-                    return (effectMap[trigger] || 0) >= 1;
-                }
+                if (typeof trigger === "string") return (effectMap[trigger] || 0) >= 1;
 
-                if (Array.isArray(trigger.anyOf)) {
-                    return trigger.anyOf.some(option => checkTrigger(option));
-                }
-
-                if (Array.isArray(trigger.allOf)) {
-                    return trigger.allOf.every(option => checkTrigger(option));
-                }
+                if (Array.isArray(trigger.anyOf)) return trigger.anyOf.some(option => checkTrigger(option));
+                if (Array.isArray(trigger.allOf)) return trigger.allOf.every(option => checkTrigger(option));
 
                 const effectName = trigger.effect;
                 const minStacks = trigger.minStacks || 1;
@@ -212,6 +188,8 @@ function insertComboChain(startSkillId, startIndex) {
         Object.entries(currentEffects).forEach(([effectName, amount]) => {
             addAmountToEffectMap(chainEffectMap, effectName, amount);
         });
+
+        consumeInflictionToBuffFromEffectMap(currentSkillData, chainEffectMap);
 
         const matchingInfliction = getMatchingInflictionEffect(currentSkillData, effectMapBeforeSkill);
         if (matchingInfliction) {
