@@ -36,7 +36,7 @@ const BUFF_REGISTRY = {
     },
     hypothermic_perfusion: {
         name: "Hypothermic Perfusion",
-        iconBase: "assets/ui/buffs/hypothermic_perfusion",
+        iconBase: "assets/operators/skills/lastrite/bs_small",
         stackable: false,
         maxStacks: 0,
         extension: "png"
