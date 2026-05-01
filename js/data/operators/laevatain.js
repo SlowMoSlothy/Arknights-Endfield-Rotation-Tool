@@ -45,7 +45,7 @@ const laevatain = {
             elementType: "heat",
             cooldown: 20,
             energy: 60,
-            description: "Applies Heat Infliction and grants Melting Flame. At 4 Melting Flame, consumes all stacks and applies Combustion.",
+            description: "Applies Heat Infliction and grants Melting Flame. At 4 Melting Flame, consumes all stacks and applies Combustion instead of the normal Heat Infliction.",
             buffs: [
                 {
                     id: "melting_flames",
@@ -83,6 +83,7 @@ const laevatain = {
                         amount: 4
                     },
                     skipNormalBuffs: true,
+                    skipNormalDebuffs: true,
                     debuffs: [
                         {
                             id: "combustion",
