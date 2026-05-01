@@ -24,6 +24,17 @@ lastrite.skills = [
                 appliesEffect: "final_strike",
                 persistsForCombo: false,
                 visible: false
+            },
+            {
+                id: "cryo_infliction",
+                name: "Cryo Infliction",
+                appliesEffect: "cryo_infliction",
+                persistsForCombo: true,
+                visible: true,
+                stackable: true,
+                stacksApplied: 1,
+                maxStacks: 4,
+                iconBase: "assets/debuffs/cryo_infliction"
             }
         ]
     },
