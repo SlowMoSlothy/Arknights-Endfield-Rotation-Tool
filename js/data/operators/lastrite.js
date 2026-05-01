@@ -16,7 +16,7 @@ lastrite.skills = [
         cooldown: 20,
         energy: 60,
         elementType: "cryo",
-        description: "Cryo Final Strike. Applies Cryo Infliction.",
+        description: "Final Strike. Applies Cryo Infliction only while Hypothermic Perfusion is active.",
         debuffs: [
             {
                 id: "final_strike",
@@ -24,17 +24,24 @@ lastrite.skills = [
                 appliesEffect: "final_strike",
                 persistsForCombo: false,
                 visible: false
-            },
+            }
+        ],
+        conditionalDebuffs: [
             {
-                id: "cryo_infliction",
-                name: "Cryo Infliction",
-                appliesEffect: "cryo_infliction",
-                persistsForCombo: true,
-                visible: true,
-                stackable: true,
-                stacksApplied: 1,
-                maxStacks: 4,
-                iconBase: "assets/debuffs/cryo_infliction"
+                requiresBuff: "hypothermic_perfusion",
+                debuffs: [
+                    {
+                        id: "cryo_infliction",
+                        name: "Cryo Infliction",
+                        appliesEffect: "cryo_infliction",
+                        persistsForCombo: true,
+                        visible: true,
+                        stackable: true,
+                        stacksApplied: 1,
+                        maxStacks: 4,
+                        iconBase: "assets/debuffs/cryo_infliction"
+                    }
+                ]
             }
         ]
     },
