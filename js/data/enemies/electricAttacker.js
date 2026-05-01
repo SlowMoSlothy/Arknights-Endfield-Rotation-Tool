@@ -1,7 +1,7 @@
 const electricAttacker = {
     id: "electric_attacker",
     name: "Electric Attacker",
-    icon: "assets/enemies/training_dummy.png",
+    icon: "assets/enemies/electric_attacker.png",
     description: "Enemy with Electric attacks.",
     skills: [
         {
