@@ -45,7 +45,7 @@ const laevatain = {
             elementType: "heat",
             cooldown: 20,
             energy: 60,
-            description: "Applies Heat Infliction and grants Melting Flame.",
+            description: "Applies Heat Infliction and grants Melting Flame. At 4 Melting Flame, consumes all stacks and applies Combustion.",
             buffs: [
                 {
                     id: "melting_flames",
@@ -70,6 +70,29 @@ const laevatain = {
                     maxStacks: 4,
                     persistsForCombo: true,
                     iconBase: "assets/debuffs/heat_infliction"
+                }
+            ],
+            conditionalDebuffs: [
+                {
+                    requiresBuffStacks: {
+                        buff: "melting_flames",
+                        minStacks: 4
+                    },
+                    consumeBuffStacks: {
+                        buff: "melting_flames",
+                        amount: 4
+                    },
+                    debuffs: [
+                        {
+                            id: "combustion",
+                            name: "Combustion",
+                            appliesEffect: "combustion",
+                            persistsForCombo: true,
+                            visible: true,
+                            stackable: false,
+                            iconBase: "assets/debuffs/combustion"
+                        }
+                    ]
                 }
             ]
         },
