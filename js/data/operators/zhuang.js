@@ -24,8 +24,7 @@ const zhuang = {
                     persistsForCombo: false,
                     visible: false
                 }
-            ],
-
+            ]
         },
         {
             id: 902,
@@ -84,9 +83,7 @@ const zhuang = {
                     appliesEffect: "electrification",
                     persistsForCombo: true,
                     visible: true,
-                    stackable: true,
-                    stacksApplied: 1,
-                    maxStacks: 2
+                    stackable: false
                 }
             ]
         },
@@ -112,4 +109,4 @@ const zhuang = {
             iconSmall: "assets/operators/skills/zhuang/fs_ex_small.png"
         }
     ]
-}
+};
