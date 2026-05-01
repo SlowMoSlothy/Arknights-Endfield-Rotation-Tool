@@ -145,6 +145,32 @@ function applySkillBuffsAndGetActiveState(skillData, stackState, metaState) {
     return getActiveBuffsFromRotationState(stackState, metaState);
 }
 
+function hasRequiredRotationBuff(rule, activeBuffMetaState) {
+    const required = rule?.requiresBuff;
+    if (!required) return false;
+
+    const requiredList = Array.isArray(required) ? required : [required];
+
+    return requiredList.every(buffName => {
+        const key = normalizeRotationConsumeKey(buffName);
+        return Boolean(activeBuffMetaState[key]);
+    });
+}
+
+function applyConditionalDebuffsToRotationState(skillData, activeBuffMetaState, stackState, metaState) {
+    if (!Array.isArray(skillData?.conditionalDebuffs)) return;
+
+    skillData.conditionalDebuffs.forEach(rule => {
+        if (!hasRequiredRotationBuff(rule, activeBuffMetaState)) return;
+        if (!Array.isArray(rule.debuffs)) return;
+
+        rule.debuffs.forEach(effect => {
+            if (effect.persistsForCombo === false) return;
+            addDebuffToRotationState(effect, stackState, metaState);
+        });
+    });
+}
+
 function applyMatchingInflictionToRotationState(skillData, stackState, metaState) {
     const config = skillData?.matchingInfliction;
     if (!config || !Array.isArray(config.candidateEffects)) return;
@@ -219,14 +245,14 @@ function getActiveDebuffsFromRotationState(stackState, metaState) {
         }));
 }
 
-function applySkillDebuffsAndGetActiveState(skillData, stackState, metaState) {
+function applySkillDebuffsAndGetActiveState(skillData, activeBuffMetaState, stackState, metaState) {
     getVisibleRotationDebuffs(skillData).forEach(effect => {
         if (effect.persistsForCombo === false) return;
         addDebuffToRotationState(effect, stackState, metaState);
     });
 
+    applyConditionalDebuffsToRotationState(skillData, activeBuffMetaState, stackState, metaState);
     applyMatchingInflictionToRotationState(skillData, stackState, metaState);
-
     resolveRotationArtsReactionsWithFullConsume(stackState, metaState);
 
     return getActiveDebuffsFromRotationState(stackState, metaState);
@@ -303,6 +329,8 @@ function renderRotation() {
                 skillDiv.dataset.id = String(entry.id);
                 skillDiv.dataset.uid = entry.uid;
 
+                const activeBuffsBeforeSkill = { ...rotationBuffMetaState };
+
                 const activeBuffs = applySkillBuffsAndGetActiveState(
                     skillData,
                     rotationBuffStackState,
@@ -341,6 +369,7 @@ function renderRotation() {
 
                 const activeDebuffs = applySkillDebuffsAndGetActiveState(
                     skillData,
+                    activeBuffsBeforeSkill,
                     rotationDebuffStackState,
                     rotationDebuffMetaState
                 );
