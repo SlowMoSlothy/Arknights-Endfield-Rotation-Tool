@@ -17,6 +17,33 @@ function getBuffIcon(buff) {
     return `${iconBase}.png`;
 }
 
+function normalizeConsumeKey(value) {
+    return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "_");
+}
+
+function skillConsumesBuff(skillData, buff) {
+    if (!buff.consumeOnSkillType) return false;
+
+    const consumeKey = normalizeConsumeKey(buff.consumeOnSkillType);
+    const skillTypeKey = normalizeConsumeKey(skillData.type);
+
+    if (consumeKey === skillTypeKey) return true;
+
+    const allEffects = [
+        ...(Array.isArray(skillData.debuffs) ? skillData.debuffs : []),
+        ...(Array.isArray(skillData.buffs) ? skillData.buffs : [])
+    ];
+
+    return allEffects.some(effect => {
+        return normalizeConsumeKey(effect?.id) === consumeKey ||
+            normalizeConsumeKey(effect?.appliesEffect) === consumeKey ||
+            normalizeConsumeKey(effect?.name) === consumeKey;
+    });
+}
+
 function collectOperatorBuffs(operatorId) {
     const buffMap = new Map();
 
@@ -30,8 +57,7 @@ function collectOperatorBuffs(operatorId) {
         if (!sourceOperator || sourceOperator.id !== operatorId) return;
 
         for (const [buffId, buff] of Array.from(buffMap.entries())) {
-            if (!buff.consumeOnSkillType) continue;
-            if (String(skillData.type).toLowerCase() !== String(buff.consumeOnSkillType).toLowerCase()) continue;
+            if (!skillConsumesBuff(skillData, buff)) continue;
             buffMap.delete(buffId);
         }
 
