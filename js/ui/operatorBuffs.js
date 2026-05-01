@@ -24,24 +24,32 @@ function collectOperatorBuffs(operatorId) {
         if (!entry) return;
 
         const skillData = getSkillById(entry.id);
-        if (!skillData || !skillData.buffs || !Array.isArray(skillData.buffs)) return;
+        if (!skillData) return;
 
         const sourceOperator = getOperatorBySkillId(entry.id);
         if (!sourceOperator || sourceOperator.id !== operatorId) return;
+
+        for (const [buffId, buff] of Array.from(buffMap.entries())) {
+            if (!buff.consumeOnSkillType) continue;
+            if (String(skillData.type).toLowerCase() !== String(buff.consumeOnSkillType).toLowerCase()) continue;
+            buffMap.delete(buffId);
+        }
+
+        if (!skillData.buffs || !Array.isArray(skillData.buffs)) return;
 
         skillData.buffs.forEach(buff => {
             if (buff.visible === false) return;
             if (!buff.id) return;
 
-            const buffId = buff.id;
+            const id = buff.id;
 
-            if (!buffMap.has(buffId)) {
-                buffMap.set(buffId, {
+            if (!buffMap.has(id)) {
+                buffMap.set(id, {
                     ...buff,
                     stacks: buff.stackable ? (buff.stacksApplied || 1) : 1
                 });
             } else {
-                const existing = buffMap.get(buffId);
+                const existing = buffMap.get(id);
 
                 if (existing.stackable) {
                     existing.stacks += buff.stacksApplied || 1;
