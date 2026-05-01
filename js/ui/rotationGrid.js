@@ -16,9 +16,11 @@ function getVisibleRotationBuffs(skillData) {
 }
 
 function getRotationDebuffKey(effect) {
-    return normalizeDebuffKey({
-        id: effect?.appliesEffect || effect?.id || effect?.name
-    });
+    return normalizeDebuffKey({ id: effect?.appliesEffect || effect?.id || effect?.name });
+}
+
+function getRotationBuffKey(effect) {
+    return normalizeBuffKey({ id: effect?.appliesEffect || effect?.id || effect?.name });
 }
 
 function clearOtherExclusiveInflictions(activeKey, stackState, metaState) {
@@ -58,6 +60,89 @@ function addDebuffToRotationState(effect, stackState, metaState) {
         stackable: isStackable,
         maxStacks: safeMax
     };
+}
+
+function addBuffToRotationState(effect, stackState, metaState) {
+    const key = getRotationBuffKey(effect);
+    if (!key) return;
+
+    const registryEntry = BUFF_REGISTRY?.[key];
+    const isStackable = effect?.stackable === true || registryEntry?.stackable === true;
+    const maxStacks = Number(effect?.maxStacks || registryEntry?.maxStacks || 4);
+    const stacksApplied = Number(effect?.stacksApplied || effect?.stackCount || 1);
+
+    const safeMax = Number.isFinite(maxStacks) ? maxStacks : 4;
+    const safeApplied = Number.isFinite(stacksApplied) ? stacksApplied : 1;
+
+    if (isStackable) {
+        stackState[key] = Math.max(1, Math.min((stackState[key] || 0) + safeApplied, safeMax));
+    } else {
+        stackState[key] = 1;
+    }
+
+    metaState[key] = {
+        ...effect,
+        id: key,
+        appliesEffect: key,
+        stackable: isStackable,
+        maxStacks: safeMax
+    };
+}
+
+function normalizeRotationConsumeKey(value) {
+    return String(value || "").trim().toLowerCase().replace(/\s+/g, "_");
+}
+
+function skillConsumesRotationBuff(skillData, buff) {
+    if (!buff.consumeOnSkillType) return false;
+
+    const consumeKey = normalizeRotationConsumeKey(buff.consumeOnSkillType);
+    const skillTypeKey = normalizeRotationConsumeKey(skillData.type);
+
+    if (consumeKey === skillTypeKey) return true;
+
+    const allEffects = [
+        ...(Array.isArray(skillData.debuffs) ? skillData.debuffs : []),
+        ...(Array.isArray(skillData.buffs) ? skillData.buffs : [])
+    ];
+
+    return allEffects.some(effect => {
+        return normalizeRotationConsumeKey(effect?.id) === consumeKey ||
+            normalizeRotationConsumeKey(effect?.appliesEffect) === consumeKey ||
+            normalizeRotationConsumeKey(effect?.name) === consumeKey;
+    });
+}
+
+function consumeRotationBuffsForSkill(skillData, stackState, metaState) {
+    Object.entries(metaState).forEach(([buffId, buff]) => {
+        if (!skillConsumesRotationBuff(skillData, buff)) return;
+        delete stackState[buffId];
+        delete metaState[buffId];
+    });
+}
+
+function getActiveBuffsFromRotationState(stackState, metaState) {
+    return Object.entries(stackState)
+        .filter(([, amount]) => amount > 0)
+        .map(([key, amount]) => ({
+            ...(metaState[key] || { id: key }),
+            id: key,
+            appliesEffect: key,
+            stackCount: amount,
+            currentStacks: amount,
+            stacks: amount
+        }));
+}
+
+function applySkillBuffsAndGetActiveState(skillData, stackState, metaState) {
+    consumeRotationBuffsForSkill(skillData, stackState, metaState);
+
+    getVisibleRotationBuffs(skillData).forEach(effect => {
+        if (effect.persistsForCombo === false) return;
+        addBuffToRotationState(effect, stackState, metaState);
+    });
+
+    return getActiveBuffsFromRotationState(stackState, metaState);
 }
 
 function applyMatchingInflictionToRotationState(skillData, stackState, metaState) {
@@ -188,6 +273,8 @@ function renderRotation() {
     const slotMap = getSnakeSlotMap();
     const rotationDebuffStackState = {};
     const rotationDebuffMetaState = {};
+    const rotationBuffStackState = {};
+    const rotationBuffMetaState = {};
 
     slotMap.forEach((slotInfo, index) => {
         const slot = document.createElement("div");
@@ -216,7 +303,13 @@ function renderRotation() {
                 skillDiv.dataset.id = String(entry.id);
                 skillDiv.dataset.uid = entry.uid;
 
-                const buffTray = createEffectTray(getVisibleRotationBuffs(skillData), "buff");
+                const activeBuffs = applySkillBuffsAndGetActiveState(
+                    skillData,
+                    rotationBuffStackState,
+                    rotationBuffMetaState
+                );
+
+                const buffTray = createEffectTray(activeBuffs, "buff");
                 if (buffTray) skillDiv.appendChild(buffTray);
 
                 const inner = document.createElement("div");
