@@ -1,3 +1,35 @@
+function addAmountToEffectMap(effectMap, effectName, amount = 1, maxStacks = null) {
+    if (!effectName) return;
+
+    if (!effectMap[effectName]) {
+        effectMap[effectName] = 0;
+    }
+
+    effectMap[effectName] += amount;
+
+    if (maxStacks) {
+        effectMap[effectName] = Math.min(effectMap[effectName], maxStacks);
+    }
+}
+
+function getMatchingInflictionEffect(skillData, effectMap) {
+    const config = skillData?.matchingInfliction;
+    if (!config || !Array.isArray(config.candidateEffects)) return null;
+
+    const minStacks = Number(config.minStacks || 1);
+    const matchingEffect = config.candidateEffects.find(effectName => {
+        return (effectMap[effectName] || 0) >= minStacks;
+    });
+
+    if (!matchingEffect) return null;
+
+    return {
+        effectName: matchingEffect,
+        amount: Number(config.stacksApplied || 1),
+        maxStacks: Number(config.maxStacks || 4)
+    };
+}
+
 function collectPersistentEffectsFromRotationUpToIndex(endIndex) {
     const effectMap = {};
 
@@ -18,20 +50,18 @@ function collectPersistentEffectsFromRotationUpToIndex(endIndex) {
             if (effect.persistsForCombo === false) return;
 
             const amount = effect.stackable ? (effect.stacksApplied || 1) : 1;
-
-            if (!effectMap[effect.appliesEffect]) {
-                effectMap[effect.appliesEffect] = 0;
-            }
-
-            effectMap[effect.appliesEffect] += amount;
-
-            if (effect.maxStacks) {
-                effectMap[effect.appliesEffect] = Math.min(
-                    effectMap[effect.appliesEffect],
-                    effect.maxStacks
-                );
-            }
+            addAmountToEffectMap(effectMap, effect.appliesEffect, amount, effect.maxStacks || null);
         });
+
+        const matchingInfliction = getMatchingInflictionEffect(skillData, effectMap);
+        if (matchingInfliction) {
+            addAmountToEffectMap(
+                effectMap,
+                matchingInfliction.effectName,
+                matchingInfliction.amount,
+                matchingInfliction.maxStacks
+            );
+        }
     }
 
     return effectMap;
@@ -52,19 +82,7 @@ function collectEffectsFromSkill(skillData) {
         if (effect.availableAfterChain === true) return;
 
         const amount = effect.stackable ? (effect.stacksApplied || 1) : 1;
-
-        if (!effectMap[effect.appliesEffect]) {
-            effectMap[effect.appliesEffect] = 0;
-        }
-
-        effectMap[effect.appliesEffect] += amount;
-
-        if (effect.maxStacks) {
-            effectMap[effect.appliesEffect] = Math.min(
-                effectMap[effect.appliesEffect],
-                effect.maxStacks
-            );
-        }
+        addAmountToEffectMap(effectMap, effect.appliesEffect, amount, effect.maxStacks || null);
     });
 
     return effectMap;
@@ -89,20 +107,18 @@ function collectEffectsFromRotationUpToIndex(endIndex) {
             if (!effect.appliesEffect) return;
 
             const amount = effect.stackable ? (effect.stacksApplied || 1) : 1;
-
-            if (!effectMap[effect.appliesEffect]) {
-                effectMap[effect.appliesEffect] = 0;
-            }
-
-            effectMap[effect.appliesEffect] += amount;
-
-            if (effect.maxStacks) {
-                effectMap[effect.appliesEffect] = Math.min(
-                    effectMap[effect.appliesEffect],
-                    effect.maxStacks
-                );
-            }
+            addAmountToEffectMap(effectMap, effect.appliesEffect, amount, effect.maxStacks || null);
         });
+
+        const matchingInfliction = getMatchingInflictionEffect(skillData, effectMap);
+        if (matchingInfliction) {
+            addAmountToEffectMap(
+                effectMap,
+                matchingInfliction.effectName,
+                matchingInfliction.amount,
+                matchingInfliction.maxStacks
+            );
+        }
     }
 
     return effectMap;
@@ -186,22 +202,31 @@ function insertComboChain(startSkillId, startIndex) {
 
         if (!currentSkillData || !sourceOperator) continue;
 
+        const effectMapBeforeSkill = { ...persistentEffectMap };
+        Object.entries(chainEffectMap).forEach(([effectName, amount]) => {
+            addAmountToEffectMap(effectMapBeforeSkill, effectName, amount);
+        });
+
         const currentEffects = collectEffectsFromSkill(currentSkillData);
 
         Object.entries(currentEffects).forEach(([effectName, amount]) => {
-            if (!chainEffectMap[effectName]) {
-                chainEffectMap[effectName] = 0;
-            }
-            chainEffectMap[effectName] += amount;
+            addAmountToEffectMap(chainEffectMap, effectName, amount);
         });
+
+        const matchingInfliction = getMatchingInflictionEffect(currentSkillData, effectMapBeforeSkill);
+        if (matchingInfliction) {
+            addAmountToEffectMap(
+                chainEffectMap,
+                matchingInfliction.effectName,
+                matchingInfliction.amount,
+                matchingInfliction.maxStacks
+            );
+        }
 
         const effectMap = { ...persistentEffectMap };
 
         Object.entries(chainEffectMap).forEach(([effectName, amount]) => {
-            if (!effectMap[effectName]) {
-                effectMap[effectName] = 0;
-            }
-            effectMap[effectName] += amount;
+            addAmountToEffectMap(effectMap, effectName, amount);
         });
 
         const resolvedEffectMap =
