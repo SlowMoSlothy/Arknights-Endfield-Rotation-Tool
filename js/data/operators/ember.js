@@ -137,8 +137,7 @@ ember.skills = [
                 name: "Shield",
                 appliesEffect: "shield",
                 persistsForCombo: true,
-                visible: true,
-                iconBase: "assets/buffs/shield"
+                visible: true
             }
         ]
     }

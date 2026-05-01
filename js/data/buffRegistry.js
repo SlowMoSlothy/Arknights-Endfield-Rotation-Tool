@@ -41,6 +41,14 @@ const BUFF_REGISTRY = {
         maxStacks: 0,
         extension: "png"
     }
+    ,
+    shield: {
+        name: "Shield",
+        iconBase: "assets/ui/buffs/ember/shield",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    }
 };
 
 function normalizeBuffKey(buffData) {
