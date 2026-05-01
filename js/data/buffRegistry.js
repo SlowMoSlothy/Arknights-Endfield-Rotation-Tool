@@ -33,6 +33,13 @@ const BUFF_REGISTRY = {
         stackable: false,
         maxStacks: 0,
         extension: "png"
+    },
+    hypothermic_perfusion: {
+        name: "Hypothermic Perfusion",
+        iconBase: "assets/ui/buffs/hypothermic_perfusion",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
     }
 };
 
