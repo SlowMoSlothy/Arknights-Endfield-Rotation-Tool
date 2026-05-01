@@ -26,6 +26,13 @@ const BUFF_REGISTRY = {
         stackable: true,
         maxStacks: 4,
         extension: "png"
+    },
+    link: {
+        name: "Link",
+        iconBase: "assets/ui/buffs/link",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
     }
 };
 
