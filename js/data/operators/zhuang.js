@@ -43,7 +43,7 @@ const zhuang = {
                     name: "Electrification Consumed",
                     appliesEffect: "electrification_consumed",
                     persistsForCombo: false,
-                    visible: false
+                    visible: true
                 }
             ],
             buffs: [
@@ -53,9 +53,7 @@ const zhuang = {
                     appliesEffect: "electric_amp",
                     persistsForCombo: true,
                     visible: true,
-                    stackable: true,
-                    stacksApplied: 1,
-                    maxStacks: 99
+                    stackable: false
                 }
             ]
         },
