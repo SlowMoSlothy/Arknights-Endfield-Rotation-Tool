@@ -14,3 +14,13 @@
 14  = Chen
 15  = Tangtang 
 16  = Da Pan
+17  = Ember
+18  = Estella
+19  = Fluorite
+20  = Last Rite
+21  = Lifeng
+22  = Pogranichnik
+23  = Snowshine
+24  = Wulfgard
+25  = Xaihi
+26  = Yvonne
