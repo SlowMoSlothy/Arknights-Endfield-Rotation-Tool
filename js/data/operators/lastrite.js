@@ -57,7 +57,7 @@ lastrite.skills = [
                 appliesEffect: "hypothermic_perfusion",
                 persistsForCombo: true,
                 visible: true,
-                consumeOnSkillType: "Final Strike",
+                consumeOnSkillType: "final_strike",
                 iconBase: "assets/buffs/hypothermic_perfusion"
             }
         ]
