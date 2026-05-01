@@ -116,11 +116,11 @@ function renderEnemyModal() {
 
 function openEnemyModal() {
     renderEnemyModal();
-    document.getElementById("enemyModal")?.classList.add("visible");
+    document.getElementById("enemyModal")?.classList.add("open");
 }
 
 function closeEnemyModal() {
-    document.getElementById("enemyModal")?.classList.remove("visible");
+    document.getElementById("enemyModal")?.classList.remove("open");
 }
 
 function initEnemyPanel() {
