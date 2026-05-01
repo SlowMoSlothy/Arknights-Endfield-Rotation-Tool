@@ -23,55 +23,55 @@ function endDrag() {
     });
 }
 
+function createSourceSortable(target) {
+    return new Sortable(target, {
+        group: {
+            name: "skills",
+            pull: "clone",
+            put: false
+        },
+        sort: false,
+        draggable: ".skill-small",
+        forceFallback: true,
+        fallbackOnBody: true,
+        fallbackClass: "drag-ghost",
+        removeCloneOnHide: true,
+        delay: 120,
+        delayOnTouchOnly: true,
+        touchStartThreshold: 4,
+        fallbackTolerance: 8,
+        onStart: () => {
+            beginDrag();
+            setTimeout(() => {
+                const ghost = document.querySelector(".drag-ghost, .sortable-fallback");
+                if (ghost) ghost.classList.add("neutral-drag-preview");
+            }, 0);
+        },
+        onEnd: endDrag,
+        onUnchoose: cleanupDragArtifacts
+    });
+}
+
 function initSkillDragDrop() {
     skillSourceSortables.forEach(sortable => sortable.destroy());
     skillSourceSortables = [];
 
     cleanupDragArtifacts();
 
-    const skillRows = document.querySelectorAll("#skillList .skill-row");
-
-    skillRows.forEach((row) => {
-        const sortable = new Sortable(row, {
-            group: {
-                name: "skills",
-                pull: "clone",
-                put: false
-            },
-            sort: false,
-            draggable: ".skill-small",
-            forceFallback: true,
-            fallbackOnBody: true,
-            fallbackClass: "drag-ghost",
-            removeCloneOnHide: true,
-
-            delay: 120,
-            delayOnTouchOnly: true,
-            touchStartThreshold: 4,
-            fallbackTolerance: 8,
-
-            onStart: () => {
-                beginDrag();
-
-                setTimeout(() => {
-                    const ghost = document.querySelector(".drag-ghost, .sortable-fallback");
-                    if (ghost) {
-                        ghost.classList.add("neutral-drag-preview");
-                    }
-                }, 0);
-            },
-
-            onEnd: () => {
-                endDrag();
-            },
-
-            onUnchoose: () => {
-                cleanupDragArtifacts();
-            }
-        });
-
-        skillSourceSortables.push(sortable);
+    document.querySelectorAll("#skillList .skill-row").forEach(row => {
+        skillSourceSortables.push(createSourceSortable(row));
     });
+}
+
+function initEnemySkillDragDrop() {
+    const enemyBar = document.getElementById("enemySkillBar");
+    if (!enemyBar) return;
+
+    if (enemySkillSourceSortable) {
+        enemySkillSourceSortable.destroy();
+    }
+
+    enemySkillSourceSortable = createSourceSortable(enemyBar);
 }
 
 function initRotationDragDrop() {
@@ -96,111 +96,67 @@ function initRotationDragDrop() {
             forceFallback: true,
             fallbackOnBody: true,
             removeCloneOnHide: true,
-
             delay: 120,
             delayOnTouchOnly: true,
             touchStartThreshold: 4,
             fallbackTolerance: 8,
-
             onStart: () => {
                 beginDrag();
-
                 setTimeout(() => {
                     const ghost = document.querySelector(".drag-ghost, .sortable-fallback");
-                    if (ghost) {
-                        ghost.classList.add("neutral-drag-preview");
-                    }
+                    if (ghost) ghost.classList.add("neutral-drag-preview");
                 }, 0);
             },
-
             onFilter: (evt) => {
                 const removeBtn = evt.target.closest(".remove-btn");
                 if (!removeBtn) return;
-
                 const removeIndex = parseInt(removeBtn.dataset.index, 10);
                 if (Number.isNaN(removeIndex)) return;
-
                 rotation[removeIndex] = null;
-
                 compactRotation();
                 ensureSlotCount(rotation.filter(slot => slot !== null).length + 1);
-
                 saveRotation();
             },
-
             onMove: (evt) => {
                 document.querySelectorAll(".rotation-slot").forEach(s => s.classList.remove("drag-hover"));
-
-                const targetSlot = evt.to?.classList?.contains("rotation-slot")
-                    ? evt.to
-                    : evt.to?.closest?.(".rotation-slot");
-
-                if (targetSlot) {
-                    targetSlot.classList.add("drag-hover");
-                }
-
+                const targetSlot = evt.to?.classList?.contains("rotation-slot") ? evt.to : evt.to?.closest?.(".rotation-slot");
+                if (targetSlot) targetSlot.classList.add("drag-hover");
                 return true;
             },
-
-            onEnd: () => {
-                endDrag();
-            },
-
-            onUnchoose: () => {
-                cleanupDragArtifacts();
-            },
-
+            onEnd: endDrag,
+            onUnchoose: cleanupDragArtifacts,
             onAdd: (evt) => {
                 const draggedUid = evt.item.dataset.uid;
                 const draggedId = parseInt(evt.item.dataset.id, 10);
-
                 evt.item.remove();
-
                 if (draggedUid) {
                     const oldIndex = rotation.findIndex(item => item && item.uid === draggedUid);
-
                     if (oldIndex !== -1) {
                         const movedItem = rotation[oldIndex];
                         rotation.splice(oldIndex, 1);
-
                         let insertIndex = index;
-                        if (oldIndex < index) {
-                            insertIndex--;
-                        }
-
+                        if (oldIndex < index) insertIndex--;
                         rotation.splice(insertIndex, 0, movedItem);
-
                         compactRotation();
                         ensureSlotCount(rotation.filter(slot => slot !== null).length + 1);
                         saveRotation();
                         return;
                     }
                 }
-
                 if (!draggedId) return;
-
                 const originalSkill = getSkillById(draggedId);
-
                 let finalSkillId = draggedId;
                 if (!originalSkill?.togglesUltimateState) {
                     finalSkillId = getMappedSkillIdForOperatorState(draggedId);
                 }
-
-                rotation[index] = {
-                    uid: crypto.randomUUID(),
-                    id: finalSkillId
-                };
-
+                rotation[index] = { uid: crypto.randomUUID(), id: finalSkillId };
                 handleUltimateStateToggle(draggedId);
-
                 insertComboChain(finalSkillId, index);
-
                 compactRotation();
                 ensureSlotCount(rotation.filter(slot => slot !== null).length + 1);
                 saveRotation();
             }
         });
-
         slotSortables.push(sortable);
     });
 }
