@@ -83,13 +83,6 @@ const DEBUFF_REGISTRY = {
         maxStacks: 0,
         extension: "png"
     },
-    hypothermic_perfusion: {
-        name: "Hypothermic Perfusion",
-        iconBase: "assets/ui/debuffs/hypothermic_perfusion",
-        stackable: false,
-        maxStacks: 0,
-        extension: "png"
-    },
     physical_susceptibility: {
         name: "Physical Susceptibility",
         iconBase: "assets/ui/debuffs/physical_susceptibility",
