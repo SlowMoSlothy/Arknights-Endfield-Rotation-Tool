@@ -10,9 +10,11 @@ const perlica = {
             icon: "assets/operators/avatars/Perlica.png",
             iconSmall: "assets/operators/skills/perlica/fs_small.png",
             type: "Final Strike",
-            cooldown: 0,
-            energy: 0,
+            shortType: "FS",
+            cooldown: 20,
+            energy: 60,
             elementType: "electric",
+            description: "Electric Final Strike. As the controlled operator, Final Strike also deals Stagger.",
             debuffs: [
                 {
                     id: "final_strike",
@@ -20,9 +22,16 @@ const perlica = {
                     appliesEffect: "final_strike",
                     persistsForCombo: false,
                     visible: false
+                },
+                {
+                    id: "stagger",
+                    name: "Stagger",
+                    appliesEffect: "stagger",
+                    persistsForCombo: false,
+                    visible: true,
+                    iconBase: "assets/debuffs/stagger"
                 }
-            ],
-            description: "Final Strike"
+            ]
         },
         {
             id: 402,
@@ -30,9 +39,11 @@ const perlica = {
             icon: "assets/operators/avatars/Perlica.png",
             iconSmall: "assets/operators/skills/perlica/bs_small.png",
             type: "Battle Skill",
-            cooldown: 0,
-            energy: 40,
+            shortType: "BS",
+            cooldown: 20,
+            energy: 100,
             elementType: "electric",
+            description: "Deals Electric DMG and applies Electric Infliction.",
             debuffs: [
                 {
                     id: "electric_infliction",
@@ -43,9 +54,16 @@ const perlica = {
                     stacksApplied: 1,
                     maxStacks: 4,
                     persistsForCombo: true
+                },
+                {
+                    id: "stagger",
+                    name: "Stagger",
+                    appliesEffect: "stagger",
+                    persistsForCombo: false,
+                    visible: true,
+                    iconBase: "assets/debuffs/stagger"
                 }
-            ],
-            description: "BS"
+            ]
         },
         {
             id: 403,
@@ -53,10 +71,12 @@ const perlica = {
             icon: "assets/operators/avatars/Perlica.png",
             iconSmall: "assets/operators/skills/perlica/cs_small.png",
             type: "Combo Skill",
+            shortType: "CS",
             cooldown: 20,
-            energy: 60,
+            energy: 0,
             elementType: "electric",
-            description: "CS",
+            description: "Triggers when the controlled operator performs a Final Strike. Forcibly applies temporary Electrification.",
+            comboTriggerMode: "all",
             comboTriggers: [
                 {
                     effect: "final_strike",
@@ -74,6 +94,14 @@ const perlica = {
                     visible: true,
                     stackable: false,
                     iconBase: "assets/debuffs/electrification"
+                },
+                {
+                    id: "stagger",
+                    name: "Stagger",
+                    appliesEffect: "stagger",
+                    persistsForCombo: false,
+                    visible: true,
+                    iconBase: "assets/debuffs/stagger"
                 }
             ]
         },
@@ -83,10 +111,21 @@ const perlica = {
             icon: "assets/operators/avatars/Perlica.png",
             iconSmall: "assets/operators/skills/perlica/ult_small.png",
             type: "Ultimate",
+            shortType: "Ult",
             cooldown: 20,
-            energy: 60,
+            energy: 80,
             elementType: "electric",
-            description: "Ultimate"
+            description: "Deals massive Electric DMG and Stagger.",
+            debuffs: [
+                {
+                    id: "stagger",
+                    name: "Stagger",
+                    appliesEffect: "stagger",
+                    persistsForCombo: false,
+                    visible: true,
+                    iconBase: "assets/debuffs/stagger"
+                }
+            ]
         }
     ]
-}
+};
