@@ -7,6 +7,14 @@ function getEffectIcon(effect) {
     return `${effect.iconBase}.png`;
 }
 
+function getEnemyRank(enemy) {
+    return enemy.enemyRank || enemy.rank || "normal";
+}
+
+function getEnemyType(enemy) {
+    return enemy.enemyType || enemy.elementType || "neutral";
+}
+
 function collectEnemyEffects() {
     const effectMap = new Map();
 
@@ -69,9 +77,23 @@ function renderEnemySkillBar() {
     const enemy = getSelectedEnemy();
     if (!enemy) return;
 
+    const header = document.createElement("div");
+    header.className = `enemy-card enemy-rank-${getEnemyRank(enemy)} enemy-type-${getEnemyType(enemy)}`;
+    header.innerHTML = `
+        <img class="enemy-card-icon" src="${enemy.icon}" alt="${enemy.name}">
+        <div class="enemy-card-info">
+            <div class="enemy-card-name">${enemy.name}</div>
+            <div class="enemy-card-meta">${getEnemyRank(enemy).toUpperCase()} · ${getEnemyType(enemy).toUpperCase()}</div>
+        </div>
+    `;
+    container.appendChild(header);
+
+    const skillRow = document.createElement("div");
+    skillRow.className = "enemy-skill-row";
+
     enemy.skills.forEach(skill => {
         const div = document.createElement("div");
-        div.className = "skill skill-small enemy-skill";
+        div.className = `skill skill-small enemy-skill enemy-skill-rank-${getEnemyRank(enemy)} enemy-skill-type-${getEnemyType(enemy)}`;
         div.dataset.id = String(skill.id);
         div.dataset.largeIcon = skill.icon;
 
@@ -80,12 +102,14 @@ function renderEnemySkillBar() {
             useSmallIcon: true
         }));
 
-        container.appendChild(div);
+        skillRow.appendChild(div);
 
         if (typeof attachSkillTooltipEvents === "function") {
             attachSkillTooltipEvents(div, skill);
         }
     });
+
+    container.appendChild(skillRow);
 
     if (typeof initEnemySkillDragDrop === "function") {
         initEnemySkillDragDrop();
@@ -100,9 +124,16 @@ function renderEnemyModal() {
 
     enemies.forEach(enemy => {
         const btn = document.createElement("button");
-        btn.className = "settings-option-btn";
+        btn.className = `settings-option-btn enemy-select-btn enemy-rank-${getEnemyRank(enemy)} enemy-type-${getEnemyType(enemy)}`;
         btn.type = "button";
-        btn.innerHTML = `<div class="settings-option-title">${enemy.name}</div><div style="font-size:12px;opacity:.8;">${enemy.description || ""}</div>`;
+        btn.innerHTML = `
+            <img class="enemy-select-icon" src="${enemy.icon}" alt="${enemy.name}">
+            <div class="enemy-select-text">
+                <div class="settings-option-title">${enemy.name}</div>
+                <div class="enemy-select-meta">${getEnemyRank(enemy).toUpperCase()} · ${getEnemyType(enemy).toUpperCase()}</div>
+                <div style="font-size:12px;opacity:.8;">${enemy.description || ""}</div>
+            </div>
+        `;
 
         btn.addEventListener("click", () => {
             setSelectedEnemy(enemy.id);
