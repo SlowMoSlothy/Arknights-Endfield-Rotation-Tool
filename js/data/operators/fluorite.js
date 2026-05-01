@@ -80,36 +80,18 @@ fluorite.skills = [
         cooldown: 40,
         energy: 0,
         elementType: "nature",
-        description: "Triggers when the enemy has at least 2 Cryo or Nature Infliction stacks. Adds another matching Arts Infliction.",
+        description: "Triggers when the enemy has at least 2 Cryo or Nature Infliction stacks. Adds another stack of the matching Arts Infliction.",
         comboTriggerMode: "any",
         comboTriggers: [
             { effect: "cryo_infliction", minStacks: 2 },
             { effect: "nature_infliction", minStacks: 2 }
         ],
-        debuffs: [
-            {
-                id: "nature_infliction",
-                name: "Nature Infliction",
-                appliesEffect: "nature_infliction",
-                persistsForCombo: true,
-                visible: true,
-                stackable: true,
-                stacksApplied: 1,
-                maxStacks: 4,
-                iconBase: "assets/debuffs/nature_infliction"
-            },
-            {
-                id: "cryo_infliction",
-                name: "Cryo Infliction",
-                appliesEffect: "cryo_infliction",
-                persistsForCombo: true,
-                visible: true,
-                stackable: true,
-                stacksApplied: 1,
-                maxStacks: 4,
-                iconBase: "assets/debuffs/cryo_infliction"
-            }
-        ]
+        matchingInfliction: {
+            candidateEffects: ["cryo_infliction", "nature_infliction"],
+            minStacks: 2,
+            stacksApplied: 1,
+            maxStacks: 4
+        }
     },
 
     {
@@ -123,18 +105,11 @@ fluorite.skills = [
         energy: 100,
         elementType: "nature",
         description: "Deals Nature DMG. If the target has at least 2 Cryo or Nature Infliction stacks, applies the same Arts Infliction again.",
-        debuffs: [
-            {
-                id: "nature_infliction",
-                name: "Nature Infliction",
-                appliesEffect: "nature_infliction",
-                persistsForCombo: true,
-                visible: true,
-                stackable: true,
-                stacksApplied: 1,
-                maxStacks: 4,
-                iconBase: "assets/debuffs/nature_infliction"
-            }
-        ]
+        matchingInfliction: {
+            candidateEffects: ["cryo_infliction", "nature_infliction"],
+            minStacks: 2,
+            stacksApplied: 1,
+            maxStacks: 4
+        }
     }
 ];
