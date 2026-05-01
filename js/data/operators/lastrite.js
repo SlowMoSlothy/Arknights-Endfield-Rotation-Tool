@@ -48,19 +48,6 @@ lastrite.skills = [
                 visible: true,
                 iconBase: "assets/buffs/hypothermic_perfusion"
             }
-        ],
-        debuffs: [
-            {
-                id: "cryo_infliction",
-                name: "Cryo Infliction",
-                appliesEffect: "cryo_infliction",
-                persistsForCombo: true,
-                visible: true,
-                stackable: true,
-                stacksApplied: 1,
-                maxStacks: 4,
-                iconBase: "assets/debuffs/cryo_infliction"
-            }
         ]
     },
 
