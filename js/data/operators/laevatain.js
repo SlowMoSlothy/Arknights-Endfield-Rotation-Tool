@@ -12,9 +12,9 @@ const laevatain = {
             type: "Final Strike",
             shortType: "FS",
             elementType: "heat",
-            cooldown: 0,
-            energy: 0,
-            description: "FS",
+            cooldown: 20,
+            energy: 60,
+            description: "Final Strike. Absorbs Heat Infliction and converts absorbed stacks into Melting Flame.",
             debuffs: [
                 {
                     id: "final_strike",
@@ -23,7 +23,17 @@ const laevatain = {
                     persistsForCombo: false,
                     visible: false
                 }
-            ]
+            ],
+            consumeInflictionToBuff: {
+                infliction: "heat_infliction",
+                grantBuff: "melting_flames",
+                buffName: "Melting Flame",
+                ratio: 1,
+                maxStacks: 4,
+                visible: true,
+                stackable: true,
+                iconBase: "assets/ui/buffs/laevatain/melting_flames"
+            }
         },
         {
             id: 102,
@@ -45,7 +55,8 @@ const laevatain = {
                     visible: true,
                     stackable: true,
                     maxStacks: 4,
-                    stacksApplied: 1
+                    stacksApplied: 1,
+                    iconBase: "assets/ui/buffs/laevatain/melting_flames"
                 }
             ],
             debuffs: [
@@ -92,7 +103,7 @@ const laevatain = {
                     stackable: true,
                     maxStacks: 4,
                     stacksApplied: 1,
-                    iconBase: "assets/buffs/laevatain/melting_flames"
+                    iconBase: "assets/ui/buffs/laevatain/melting_flames"
                 }
             ]
         },
