@@ -8,8 +8,8 @@ const enemies = [
             {
                 id: 900001,
                 name: "Basic Attack",
-                icon: "assets/enemies/training_dummy.png",
-                iconSmall: "assets/enemies/skills/basic_attack.png",
+                icon: "assets/enemies/skills/basic_attack.svg",
+                iconSmall: "assets/enemies/skills/basic_attack.svg",
                 type: "Enemy Skill",
                 shortType: "Enemy",
                 cooldown: 0,
@@ -38,8 +38,8 @@ const enemies = [
             {
                 id: 900101,
                 name: "Scorching Hit",
-                icon: "assets/enemies/heat_attacker.png",
-                iconSmall: "assets/enemies/skills/scorching_hit.png",
+                icon: "assets/enemies/skills/basic_attack.svg",
+                iconSmall: "assets/enemies/skills/basic_attack.svg",
                 type: "Enemy Skill",
                 shortType: "Enemy",
                 cooldown: 0,
