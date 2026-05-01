@@ -86,6 +86,7 @@ fluorite.skills = [
             { effect: "cryo_infliction", minStacks: 2 },
             { effect: "nature_infliction", minStacks: 2 }
         ],
+        allowSelfTrigger: true,
         matchingInfliction: {
             candidateEffects: ["cryo_infliction", "nature_infliction"],
             minStacks: 2,
