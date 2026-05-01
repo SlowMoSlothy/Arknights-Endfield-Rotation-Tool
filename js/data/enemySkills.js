@@ -38,8 +38,8 @@ const enemies = [
             {
                 id: 900101,
                 name: "Scorching Hit",
-                icon: "assets/enemies/skills/basic_attack.svg",
-                iconSmall: "assets/enemies/skills/basic_attack.svg",
+                icon: "assets/enemies/skills/heat_attack.svg",
+                iconSmall: "assets/enemies/skills/heat_attack.svg",
                 type: "Enemy Skill",
                 shortType: "Enemy",
                 cooldown: 0,
