@@ -122,6 +122,8 @@ function renderOperatorBuffs() {
                 icon.src = iconPath;
                 icon.alt = displayName;
                 icon.title = displayName;
+                icon.dataset.tooltip = displayName;
+                icon.setAttribute("aria-label", displayName);
 
                 buffContainer.appendChild(icon);
             } else {
