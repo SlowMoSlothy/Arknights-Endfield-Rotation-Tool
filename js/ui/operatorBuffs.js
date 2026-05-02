@@ -108,16 +108,18 @@ function renderOperatorBuffs() {
         const buffs = collectOperatorBuffs(operatorId);
 
         buffs.forEach(buff => {
-            const iconPath = getBuffIcon(buff);
+            const displayName = typeof getBuffDisplayName === "function"
+                ? getBuffDisplayName(buff)
+                : (buff.name || "Buff");
+
+            const iconPath = typeof resolveBuffIcon === "function"
+                ? resolveBuffIcon(buff)
+                : getBuffIcon(buff);
 
             if (iconPath) {
                 const icon = document.createElement("img");
                 icon.className = "operator-buff-icon";
                 icon.src = iconPath;
-                const displayName = typeof getBuffDisplayName === "function"
-                    ? getBuffDisplayName(buff)
-                    : (buff.name || "Buff");
-
                 icon.alt = displayName;
                 icon.title = displayName;
 
@@ -125,7 +127,6 @@ function renderOperatorBuffs() {
             } else {
                 const badge = document.createElement("div");
                 badge.className = "operator-buff-badge";
-                
                 badge.textContent = displayName;
                 badge.title = displayName;
 
