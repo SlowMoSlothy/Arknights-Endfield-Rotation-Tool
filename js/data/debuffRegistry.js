@@ -34,13 +34,6 @@ const DEBUFF_REGISTRY = {
         maxStacks: 0,
         extension: "png"
     },
-    electric_amp: {
-        name: "Electric Amp",
-        iconBase: "assets/ui/buffs/zhuang/electric_amp",
-        stackable: false,
-        maxStacks: 0,
-        extension: "png"
-    },
     solidification: {
         name: "Solidification",
         iconBase: "assets/ui/debuffs/solidification",

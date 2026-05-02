@@ -13,6 +13,13 @@ const BUFF_REGISTRY = {
         maxStacks: 4,
         extension: "png"
     },
+    electric_amp: {
+        name: "Electric Amp",
+        iconBase: "assets/ui/buffs/electric_amp",
+        stackable: false,
+        maxStacks: 0,
+        extension: "svg"
+    },
     atk_up: {
         name: "ATK Up",
         iconBase: "assets/ui/buffs/atk_up",
