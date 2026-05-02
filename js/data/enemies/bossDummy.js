@@ -1,7 +1,7 @@
 const bossDummy = {
     id: "boss_dummy",
     name: "Boss Dummy",
-    icon: "assets/enemies/training_dummy.png",
+    icon: "assets/enemies/training_dummy.svg",
     description: "Boss test enemy.",
     skills: [
         {

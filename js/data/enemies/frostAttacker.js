@@ -1,7 +1,7 @@
 const frostAttacker = {
     id: "frost_attacker",
     name: "Frost Attacker",
-    icon: "assets/enemies/training_dummy.png",
+    icon: "assets/enemies/frost_attacker.svg",
     description: "Enemy with Frost attacks.",
     skills: [
         {
