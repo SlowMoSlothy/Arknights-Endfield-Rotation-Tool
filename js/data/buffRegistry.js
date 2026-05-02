@@ -20,6 +20,13 @@ const BUFF_REGISTRY = {
         maxStacks: 0,
         extension: "svg"
     },
+    auxiliary_crystal: {
+        name: "Auxiliary Crystal",
+        iconBase: "assets/operators/skills/xaihi/bs_small",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
     atk_up: {
         name: "ATK Up",
         iconBase: "assets/ui/buffs/atk_up",
