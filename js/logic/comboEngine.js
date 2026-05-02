@@ -72,7 +72,24 @@ function getMatchingInflictionEffect(skillData, effectMap) {
     };
 }
 
-function applySkillEffectsToComboMap(skillData, effectMap, includeAvailableAfterChain = false) {
+function applySkillEffectsToComboMap(
+    skillData,
+    effectMap,
+    includeAvailableAfterChain = false,
+    includeTransientTriggers = false
+) {
+    const transientComboTriggerEffects = new Set([
+        "final_strike",
+        "combo_skill",
+        "battle_skill",
+        "ultimate",
+        "knock_down",
+        "pull",
+        "stagger",
+        "lift",
+        "operator_attacked"
+    ]);
+
     const allEffects = [
         ...(Array.isArray(skillData?.debuffs) ? skillData.debuffs : []),
         ...(Array.isArray(skillData?.buffs) ? skillData.buffs : [])
@@ -81,17 +98,33 @@ function applySkillEffectsToComboMap(skillData, effectMap, includeAvailableAfter
     allEffects.forEach(effect => {
         if (!effect.appliesEffect) return;
         if (!includeAvailableAfterChain && effect.availableAfterChain === true) return;
-        if (effect.persistsForCombo === false) return;
+
+        const isTransientTrigger =
+            includeTransientTriggers &&
+            transientComboTriggerEffects.has(effect.appliesEffect);
+
+        if (effect.persistsForCombo === false && !isTransientTrigger) return;
 
         const amount = effect.stackable ? (effect.stacksApplied || 1) : 1;
-        addAmountToEffectMap(effectMap, effect.appliesEffect, amount, effect.maxStacks || null);
+
+        addAmountToEffectMap(
+            effectMap,
+            effect.appliesEffect,
+            amount,
+            effect.maxStacks || null
+        );
     });
 
     consumeInflictionToBuffFromEffectMap(skillData, effectMap);
 
     const matchingInfliction = getMatchingInflictionEffect(skillData, effectMap);
     if (matchingInfliction) {
-        addAmountToEffectMap(effectMap, matchingInfliction.effectName, matchingInfliction.amount, matchingInfliction.maxStacks);
+        addAmountToEffectMap(
+            effectMap,
+            matchingInfliction.effectName,
+            matchingInfliction.amount,
+            matchingInfliction.maxStacks
+        );
     }
 }
 
