@@ -5,6 +5,17 @@ function addAmountToEffectMap(effectMap, effectName, amount = 1, maxStacks = nul
     if (maxStacks) effectMap[effectName] = Math.min(effectMap[effectName], maxStacks);
 }
 
+function addTransientSkillTypeTriggers(skillData, effectMap) {
+    if (!skillData?.type) return;
+
+    const type = skillData.type.toLowerCase();
+
+    if (type === "final strike") addAmountToEffectMap(effectMap, "final_strike", 1);
+    if (type === "combo skill") addAmountToEffectMap(effectMap, "combo_skill", 1);
+    if (type === "battle skill") addAmountToEffectMap(effectMap, "battle_skill", 1);
+    if (type === "ultimate") addAmountToEffectMap(effectMap, "ultimate", 1);
+}
+
 function consumeInflictionToBuffFromEffectMap(skillData, effectMap) {
     const config = skillData?.consumeInflictionToBuff;
     if (!config || !config.infliction) return null;
@@ -103,7 +114,10 @@ function collectPersistentEffectsFromRotationUpToIndex(endIndex) {
 function collectEffectsFromSkill(skillData) {
     const effectMap = {};
     if (!skillData) return effectMap;
+
     applySkillEffectsToComboMap(skillData, effectMap, false);
+    addTransientSkillTypeTriggers(skillData, effectMap);
+
     return effectMap;
 }
 
