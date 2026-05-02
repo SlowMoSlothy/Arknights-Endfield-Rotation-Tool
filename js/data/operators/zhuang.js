@@ -36,16 +36,8 @@ const zhuang = {
             energy: 60,
             elementType: "electric",
             shortType: "BS",
-            description: "BS",
-            debuffs: [
-                {
-                    id: "electrification_consumed",
-                    name: "Electrification Consumed",
-                    appliesEffect: "electrification_consumed",
-                    persistsForCombo: false,
-                    visible: true
-                }
-            ],
+            description: "Consumes Electrification and grants Electric Amp.",
+            consumeDebuffs: ["electrification"],
             buffs: [
                 {
                     id: "electric_amp",
