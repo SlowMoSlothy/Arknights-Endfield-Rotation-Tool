@@ -72,6 +72,7 @@ lifeng.skills = [
         elementType: "physical",
         description: "Deals Physical DMG and grants Link status.",
         comboTriggerMode: "any",
+        allowSelfTrigger: true,
         comboTriggers: [
             { effect: "knock_down", minStacks: 1 },
             { effect: "pull", minStacks: 1 }
