@@ -256,6 +256,81 @@ function applySkillDebuffsAndGetActiveState(skillData, activeBuffMetaState, acti
     return getActiveDebuffsFromRotationState(debuffStackState, debuffMetaState);
 }
 
+function escapeEffectTooltipText(value) {
+    return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function ensureGlobalEffectTooltip() {
+    let tooltip = document.getElementById("globalEffectTooltip");
+
+    if (!tooltip) {
+        tooltip = document.createElement("div");
+        tooltip.id = "globalEffectTooltip";
+        tooltip.className = "global-tooltip";
+        document.body.appendChild(tooltip);
+    }
+
+    return tooltip;
+}
+
+function buildEffectTooltipHtml(displayName, type) {
+    const safeName = escapeEffectTooltipText(displayName);
+    const safeType = escapeEffectTooltipText(type === "buff" ? "Buff" : "Debuff");
+
+    return `
+        <div class="tooltip-card tooltip-element-neutral">
+            <div class="tooltip-header">
+                <div class="tooltip-title">${safeName}</div>
+                <div class="tooltip-accent-line"></div>
+            </div>
+            <div class="tooltip-type">${safeType}</div>
+        </div>
+    `;
+}
+
+function positionEffectTooltip(targetEl) {
+    const tooltip = ensureGlobalEffectTooltip();
+    const rect = targetEl.getBoundingClientRect();
+    const margin = 8;
+    const tooltipRect = tooltip.getBoundingClientRect();
+    let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+    let top = rect.top - tooltipRect.height - margin;
+
+    if (left < 8) left = 8;
+    if (left + tooltipRect.width > window.innerWidth - 8) left = window.innerWidth - tooltipRect.width - 8;
+    if (top < 8) top = rect.bottom + margin;
+
+    tooltip.style.left = `${left}px`;
+    tooltip.style.top = `${top}px`;
+}
+
+function showEffectTooltip(targetEl, displayName, type) {
+    const tooltip = ensureGlobalEffectTooltip();
+    tooltip.innerHTML = buildEffectTooltipHtml(displayName, type);
+    tooltip.classList.add("visible");
+    requestAnimationFrame(() => positionEffectTooltip(targetEl));
+}
+
+function hideEffectTooltip() {
+    const tooltip = document.getElementById("globalEffectTooltip");
+    if (!tooltip) return;
+    tooltip.classList.remove("visible");
+}
+
+function attachEffectTooltipEvents(targetEl, displayName, type) {
+    targetEl.addEventListener("mouseenter", () => showEffectTooltip(targetEl, displayName, type));
+    targetEl.addEventListener("mouseleave", hideEffectTooltip);
+    targetEl.addEventListener("mousemove", () => {
+        const tooltip = document.getElementById("globalEffectTooltip");
+        if (tooltip?.classList.contains("visible")) positionEffectTooltip(targetEl);
+    });
+}
+
 function createEffectTray(items, type) {
     if (!items.length) return null;
     const tray = document.createElement("div");
@@ -263,20 +338,29 @@ function createEffectTray(items, type) {
     items.forEach(effect => {
         const item = document.createElement("div");
         item.className = `rotation-${type}-item`;
-        item.title = type === "buff" ? getBuffDisplayName(effect) : getDebuffDisplayName(effect);
+        const displayName = type === "buff" ? getBuffDisplayName(effect) : getDebuffDisplayName(effect);
+        item.title = displayName;
+        item.dataset.tooltip = displayName;
+        item.setAttribute("aria-label", displayName);
         const iconPath = type === "buff" ? resolveBuffIcon(effect) : resolveDebuffIcon(effect);
         if (iconPath) {
             const img = document.createElement("img");
             img.className = `rotation-${type}-icon`;
             img.src = iconPath;
-            img.alt = item.title;
+            img.alt = displayName;
+            img.title = displayName;
+            img.dataset.tooltip = displayName;
+            img.setAttribute("aria-label", displayName);
             item.appendChild(img);
         } else {
             const fallback = document.createElement("span");
             fallback.className = `rotation-${type}-fallback`;
-            fallback.textContent = item.title.slice(0, 2).toUpperCase();
+            fallback.textContent = displayName.slice(0, 2).toUpperCase();
+            fallback.title = displayName;
+            fallback.dataset.tooltip = displayName;
             item.appendChild(fallback);
         }
+        attachEffectTooltipEvents(item, displayName, type);
         tray.appendChild(item);
     });
     return tray;
