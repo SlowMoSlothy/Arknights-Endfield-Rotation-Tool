@@ -30,8 +30,7 @@ ember.skills = [
                 name: "Stagger",
                 appliesEffect: "stagger",
                 persistsForCombo: false,
-                visible: true,
-                iconBase: "assets/debuffs/stagger"
+                visible: true
             }
         ]
     },
@@ -53,8 +52,7 @@ ember.skills = [
                 name: "Knock Down",
                 appliesEffect: "knock_down",
                 persistsForCombo: false,
-                visible: true,
-                iconBase: "assets/debuffs/knock_down"
+                visible: true
             }
         ]
     },
@@ -80,8 +78,7 @@ ember.skills = [
                 name: "Knock Down",
                 appliesEffect: "knock_down",
                 persistsForCombo: false,
-                visible: true,
-                iconBase: "assets/debuffs/knock_down"
+                visible: true
             }
         ],
         buffs: [
@@ -90,8 +87,7 @@ ember.skills = [
                 name: "HP Treatment",
                 appliesEffect: "hp_treatment",
                 persistsForCombo: false,
-                visible: true,
-                iconBase: "assets/buffs/hp_treatment"
+                visible: true
             }
         ]
     },
@@ -113,8 +109,7 @@ ember.skills = [
                 name: "Shield",
                 appliesEffect: "shield",
                 persistsForCombo: true,
-                visible: true,
-                iconBase: "assets/buffs/shield"
+                visible: true
             }
         ]
     }
