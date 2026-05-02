@@ -12,7 +12,16 @@ const electricAttacker = {
             type: "Enemy Skill",
             shortType: "Enemy",
             elementType: "electric",
-            isEnemySkill: true
+            isEnemySkill: true,
+            debuffs: [
+                {
+                    id: "operator_attacked",
+                    name: "Operator Attacked",
+                    appliesEffect: "operator_attacked",
+                    persistsForCombo: true,
+                    visible: false
+                }
+            ]
         }
     ]
 };

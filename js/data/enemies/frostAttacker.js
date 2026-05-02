@@ -12,7 +12,16 @@ const frostAttacker = {
             type: "Enemy Skill",
             shortType: "Enemy",
             elementType: "frost",
-            isEnemySkill: true
+            isEnemySkill: true,
+            debuffs: [
+                {
+                    id: "operator_attacked",
+                    name: "Operator Attacked",
+                    appliesEffect: "operator_attacked",
+                    persistsForCombo: true,
+                    visible: false
+                }
+            ]
         }
     ]
 };

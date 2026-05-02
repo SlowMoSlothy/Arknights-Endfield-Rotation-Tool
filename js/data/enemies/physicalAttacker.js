@@ -12,7 +12,16 @@ const physicalAttacker = {
             type: "Enemy Skill",
             shortType: "Enemy",
             elementType: "physical",
-            isEnemySkill: true
+            isEnemySkill: true,
+            debuffs: [
+                {
+                    id: "operator_attacked",
+                    name: "Operator Attacked",
+                    appliesEffect: "operator_attacked",
+                    persistsForCombo: true,
+                    visible: false
+                }
+            ]
         }
     ]
 };

@@ -12,7 +12,16 @@ const bossDummy = {
             type: "Enemy Skill",
             shortType: "Enemy",
             elementType: "boss",
-            isEnemySkill: true
+            isEnemySkill: true,
+            debuffs: [
+                {
+                    id: "operator_attacked",
+                    name: "Operator Attacked",
+                    appliesEffect: "operator_attacked",
+                    persistsForCombo: true,
+                    visible: false
+                }
+            ]
         }
     ]
 };

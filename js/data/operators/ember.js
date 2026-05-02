@@ -90,7 +90,7 @@ ember.skills = [
                 id: "knock_down",
                 name: "Knock Down",
                 appliesEffect: "knock_down",
-                persistsForCombo: false,
+                persistsForCombo: true,
                 visible: true,
                 iconBase: "assets/debuffs/knock_down"
             }
