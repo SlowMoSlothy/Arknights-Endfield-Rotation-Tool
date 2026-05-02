@@ -5,6 +5,25 @@ window.clearRotation = clearRotation;
 
 const originalApplySkillDebuffsAndGetActiveState = window.applySkillDebuffsAndGetActiveState;
 
+function getVisibleTransientDebuffsForCurrentSkill(skillData) {
+    return (skillData?.debuffs || [])
+        .filter(effect => effect.visible !== false && effect.persistsForCombo === false)
+        .map(effect => {
+            const key = normalizeDebuffKey({
+                id: effect.appliesEffect || effect.id || effect.name
+            });
+
+            return {
+                ...effect,
+                id: key,
+                appliesEffect: key,
+                stackCount: 1,
+                currentStacks: 1,
+                stacks: 1
+            };
+        });
+}
+
 window.applySkillDebuffsAndGetActiveState = function patchedApplySkillDebuffsAndGetActiveState(
     skillData,
     activeBuffMetaState,
@@ -22,7 +41,7 @@ window.applySkillDebuffsAndGetActiveState = function patchedApplySkillDebuffsAnd
         });
     }
 
-    return originalApplySkillDebuffsAndGetActiveState(
+    const activeDebuffs = originalApplySkillDebuffsAndGetActiveState(
         skillData,
         activeBuffMetaState,
         activeBuffStackState,
@@ -31,6 +50,15 @@ window.applySkillDebuffsAndGetActiveState = function patchedApplySkillDebuffsAnd
         buffStackState,
         buffMetaState
     );
+
+    const transientDebuffs = getVisibleTransientDebuffsForCurrentSkill(skillData);
+    const activeKeys = new Set(activeDebuffs.map(effect => normalizeDebuffKey(effect)));
+    const missingTransientDebuffs = transientDebuffs.filter(effect => !activeKeys.has(normalizeDebuffKey(effect)));
+
+    return [
+        ...activeDebuffs,
+        ...missingTransientDebuffs
+    ];
 };
 
 loadOperatorUltimateStates();
