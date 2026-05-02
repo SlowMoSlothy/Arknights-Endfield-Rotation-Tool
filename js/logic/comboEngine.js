@@ -5,6 +5,13 @@ function addAmountToEffectMap(effectMap, effectName, amount = 1, maxStacks = nul
     if (maxStacks) effectMap[effectName] = Math.min(effectMap[effectName], maxStacks);
 }
 
+function removeConsumedDebuffsFromEffectMap(skillData, effectMap) {
+    if (!Array.isArray(skillData?.consumeDebuffs)) return;
+    skillData.consumeDebuffs.forEach(effectName => {
+        delete effectMap[effectName];
+    });
+}
+
 function addTransientSkillTypeTriggers(skillData, effectMap) {
     if (!skillData?.type) return;
 
@@ -115,6 +122,7 @@ function applySkillEffectsToComboMap(
         );
     });
 
+    removeConsumedDebuffsFromEffectMap(skillData, effectMap);
     consumeInflictionToBuffFromEffectMap(skillData, effectMap);
 
     const matchingInfliction = getMatchingInflictionEffect(skillData, effectMap);
@@ -251,6 +259,8 @@ function insertComboChain(startSkillId, startIndex) {
             addAmountToEffectMap(chainEffectMap, effectName, amount);
         });
 
+        removeConsumedDebuffsFromEffectMap(currentSkillData, persistentEffectMap);
+        removeConsumedDebuffsFromEffectMap(currentSkillData, chainEffectMap);
         consumeInflictionToBuffFromComboMaps(currentSkillData, [persistentEffectMap, chainEffectMap]);
 
         const effectMapAfterConsume = { ...persistentEffectMap };
