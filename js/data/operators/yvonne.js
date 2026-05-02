@@ -18,8 +18,7 @@ yvonne.skills = [
         elementType: "cryo",
         description: "Cryo Final Strike. Applies Cryo Infliction.",
         debuffs: [
-            { id: "final_strike", name: "Final Strike", appliesEffect: "final_strike", persistsForCombo: false, visible: false },
-            { id: "cryo_infliction", name: "Cryo Infliction", appliesEffect: "cryo_infliction", persistsForCombo: true, visible: true, stackable: true, stacksApplied: 1, maxStacks: 4 }
+            { id: "final_strike", name: "Final Strike", appliesEffect: "final_strike", persistsForCombo: false, visible: false }
         ]
     },
     {
@@ -32,15 +31,20 @@ yvonne.skills = [
         cooldown: 20,
         energy: 100,
         elementType: "cryo",
-        description: "Consumes Cryo or Nature Infliction to apply Solidification.",
-        consumesEffects: [
-            { effect: "cryo_infliction", amount: "all" },
-            { effect: "nature_infliction", amount: "all" }
-        ],
-        debuffs: [
-            { id: "solidification", name: "Solidification", appliesEffect: "solidification", persistsForCombo: true, visible: true, stackable: false }
-        ]
-    },
+        description: "Consumes Cryo/Nature Infliction to apply Solidification",
+            consumesEffects: [
+                "cryo_infliction",
+                "nature_infliction"
+            ],
+            debuffs: [
+                {
+                    id: "solidification",
+                    name: "Solidification",
+                    appliesEffect: "solidification",
+                    visible: true
+                }
+            ]
+        },
     {
         id: (yvonne.id * 100) + 3,
         name: "Flashfreezer υ37",
@@ -74,8 +78,20 @@ yvonne.skills = [
         elementType: "cryo",
         description: "Enhanced attack state ending in Cryo Final Strike.",
         debuffs: [
-            { id: "final_strike", name: "Final Strike", appliesEffect: "final_strike", persistsForCombo: false, visible: false },
-            { id: "cryo_infliction", name: "Cryo Infliction", appliesEffect: "cryo_infliction", persistsForCombo: true, visible: true, stackable: true, stacksApplied: 1, maxStacks: 4 }
+            { 
+                id: "final_strike", 
+                name: "Final Strike", 
+                appliesEffect: "final_strike", 
+                persistsForCombo: false, 
+                visible: false 
+                
+            },
+            { 
+                id: "cryo_infliction", 
+                name: "Cryo Infliction", 
+                appliesEffect: "cryo_infliction", 
+                persistsForCombo: true, 
+                visible: true, stackable: true, stacksApplied: 1, maxStacks: 4 }
         ]
     }
 ];
