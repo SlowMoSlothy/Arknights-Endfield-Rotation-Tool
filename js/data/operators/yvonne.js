@@ -16,11 +16,26 @@ yvonne.skills = [
         cooldown: 20,
         energy: 60,
         elementType: "cryo",
-        description: "Cryo Final Strike. Applies Cryo Infliction.",
+        description: "Cryo Final Strike. Does not directly apply Cryo Infliction.",
         debuffs: [
-            { id: "final_strike", name: "Final Strike", appliesEffect: "final_strike", persistsForCombo: false, visible: false }
+            {
+                id: "final_strike",
+                name: "Final Strike",
+                appliesEffect: "final_strike",
+                persistsForCombo: false,
+                visible: false
+            },
+            {
+                id: "stagger",
+                name: "Stagger",
+                appliesEffect: "stagger",
+                persistsForCombo: false,
+                visible: true,
+                iconBase: "assets/debuffs/stagger"
+            }
         ]
     },
+
     {
         id: (yvonne.id * 100) + 2,
         name: "Brr-Brr-Bomb β",
@@ -31,20 +46,35 @@ yvonne.skills = [
         cooldown: 20,
         energy: 100,
         elementType: "cryo",
-        description: "Consumes Cryo/Nature Infliction to apply Solidification",
-            consumesEffects: [
-                "cryo_infliction",
-                "nature_infliction"
-            ],
-            debuffs: [
-                {
-                    id: "solidification",
-                    name: "Solidification",
-                    appliesEffect: "solidification",
-                    visible: true
-                }
-            ]
-        },
+        description: "Consumes Cryo Infliction or Nature Infliction to apply Solidification.",
+        consumeDebuffs: [
+            "cryo_infliction",
+            "nature_infliction"
+        ],
+        debuffs: [
+            {
+                id: "solidification",
+                name: "Solidification",
+                appliesEffect: "solidification",
+                persistsForCombo: true,
+                visible: true,
+                stackable: false,
+                iconBase: "assets/debuffs/solidification"
+            }
+        ],
+        buffs: [
+            {
+                id: "yvonne_next_attack_final_strike",
+                name: "Next Attack Final Strike",
+                appliesEffect: "yvonne_next_attack_final_strike",
+                persistsForCombo: true,
+                visible: false,
+                stackable: false,
+                iconBase: "assets/buffs/final_strike"
+            }
+        ]
+    },
+
     {
         id: (yvonne.id * 100) + 3,
         name: "Flashfreezer υ37",
@@ -55,7 +85,7 @@ yvonne.skills = [
         cooldown: 20,
         energy: 0,
         elementType: "cryo",
-        description: "Triggers on Final Strike against Solidified enemy.",
+        description: "Triggers when the controlled operator performs a Final Strike on an enemy with Solidification.",
         comboTriggerMode: "all",
         comboTriggers: [
             { effect: "final_strike", minStacks: 1 },
@@ -63,9 +93,26 @@ yvonne.skills = [
         ],
         allowSelfTrigger: true,
         debuffs: [
-            { id: "solidification", name: "Solidification", appliesEffect: "solidification", persistsForCombo: true, visible: true, stackable: false }
+            {
+                id: "pull",
+                name: "Pull",
+                appliesEffect: "pull",
+                persistsForCombo: false,
+                visible: true,
+                iconBase: "assets/debuffs/pull"
+            },
+            {
+                id: "solidification",
+                name: "Solidification",
+                appliesEffect: "solidification",
+                persistsForCombo: true,
+                visible: true,
+                stackable: false,
+                iconBase: "assets/debuffs/solidification"
+            }
         ]
     },
+
     {
         id: (yvonne.id * 100) + 4,
         name: "Cryoblasting Pistolier",
@@ -76,22 +123,18 @@ yvonne.skills = [
         cooldown: 20,
         energy: 220,
         elementType: "cryo",
-        description: "Enhanced attack state ending in Cryo Final Strike.",
+        description: "Enhanced attack state. Enhanced Final Strike can consume Solidification for an additional Cryo attack.",
         debuffs: [
-            { 
-                id: "final_strike", 
-                name: "Final Strike", 
-                appliesEffect: "final_strike", 
-                persistsForCombo: false, 
-                visible: false 
-                
-            },
-            { 
-                id: "cryo_infliction", 
-                name: "Cryo Infliction", 
-                appliesEffect: "cryo_infliction", 
-                persistsForCombo: true, 
-                visible: true, stackable: true, stacksApplied: 1, maxStacks: 4 }
+            {
+                id: "final_strike",
+                name: "Final Strike",
+                appliesEffect: "final_strike",
+                persistsForCombo: false,
+                visible: false
+            }
+        ],
+        consumeDebuffs: [
+            "solidification"
         ]
     }
 ];
