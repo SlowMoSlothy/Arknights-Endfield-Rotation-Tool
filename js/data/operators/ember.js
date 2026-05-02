@@ -55,17 +55,6 @@ ember.skills = [
                 persistsForCombo: false,
                 visible: true,
                 iconBase: "assets/debuffs/knock_down"
-            },
-            {
-                id: "heat_infliction",
-                name: "Heat Infliction",
-                appliesEffect: "heat_infliction",
-                persistsForCombo: true,
-                visible: true,
-                stackable: true,
-                stacksApplied: 1,
-                maxStacks: 4,
-                iconBase: "assets/debuffs/heat_infliction"
             }
         ]
     },
@@ -90,7 +79,7 @@ ember.skills = [
                 id: "knock_down",
                 name: "Knock Down",
                 appliesEffect: "knock_down",
-                persistsForCombo: true,
+                persistsForCombo: false,
                 visible: true,
                 iconBase: "assets/debuffs/knock_down"
             }
@@ -118,26 +107,14 @@ ember.skills = [
         energy: 100,
         elementType: "heat",
         description: "Deals Heat DMG nearby and grants all teammates a Shield based on Ember's Max HP.",
-        debuffs: [
-            {
-                id: "heat_infliction",
-                name: "Heat Infliction",
-                appliesEffect: "heat_infliction",
-                persistsForCombo: true,
-                visible: true,
-                stackable: true,
-                stacksApplied: 1,
-                maxStacks: 4,
-                iconBase: "assets/debuffs/heat_infliction"
-            }
-        ],
         buffs: [
             {
                 id: "shield",
                 name: "Shield",
                 appliesEffect: "shield",
                 persistsForCombo: true,
-                visible: true
+                visible: true,
+                iconBase: "assets/buffs/shield"
             }
         ]
     }
