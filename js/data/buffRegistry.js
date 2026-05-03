@@ -41,6 +41,13 @@ const BUFF_REGISTRY = {
         maxStacks: 4,
         extension: "png"
     },
+    crush: {
+        name: "Crush",
+        iconBase: "assets/ui/debuffs/crush",
+        stackable: true,
+        maxStacks: 4,
+        extension: "svg"
+    },
     link: {
         name: "Link",
         iconBase: "assets/ui/buffs/link",
