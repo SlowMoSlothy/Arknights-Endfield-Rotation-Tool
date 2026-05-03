@@ -83,8 +83,7 @@ tangtang.skills = [
                 visible: true,
                 stackable: true,
                 stacksApplied: 1,
-                maxStacks: 2,
-                iconBase: "assets/buffs/tangtang/whirlpool"
+                maxStacks: 2
             }
         ],
         debuffs: [
@@ -120,8 +119,7 @@ tangtang.skills = [
                 visible: true,
                 stackable: false,
                 stacksApplied: 1,
-                maxStacks: 4,
-                iconBase: "assets/debuffs/cryo_infliction"
+                maxStacks: 4
             },
             {
                 id: "cryo_burst",

@@ -38,8 +38,7 @@ lastrite.skills = [
                         visible: true,
                         stackable: true,
                         stacksApplied: 1,
-                        maxStacks: 4,
-                        iconBase: "assets/debuffs/cryo_infliction"
+                        maxStacks: 4
                     }
                 ]
             }
@@ -84,12 +83,9 @@ lastrite.skills = [
         comboTriggers: [
             { effect: "cryo_infliction", minStacks: 3 }
         ],
-        consumesEffects: [
-            {
-                effect: "cryo_infliction",
-                amount: "all"
-            }
-        ],
+        consumeDebuffs: [
+    "cryo_infliction"
+],
         debuffs: [
             {
                 id: "cryo_susceptibility",
@@ -97,8 +93,7 @@ lastrite.skills = [
                 appliesEffect: "cryo_susceptibility",
                 persistsForCombo: true,
                 visible: true,
-                stackable: false,
-                iconBase: "assets/debuffs/cryo_susceptibility"
+                stackable: false
             }
         ]
     },
@@ -121,8 +116,7 @@ lastrite.skills = [
                 appliesEffect: "cryo_susceptibility",
                 persistsForCombo: true,
                 visible: true,
-                stackable: false,
-                iconBase: "assets/debuffs/cryo_susceptibility"
+                stackable: false
             }
         ]
     }
