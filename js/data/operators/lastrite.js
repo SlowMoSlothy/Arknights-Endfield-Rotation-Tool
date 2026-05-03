@@ -84,8 +84,8 @@ lastrite.skills = [
             { effect: "cryo_infliction", minStacks: 3 }
         ],
         consumeDebuffs: [
-    "cryo_infliction"
-],
+            "cryo_infliction"
+        ],
         debuffs: [
             {
                 id: "cryo_susceptibility",
