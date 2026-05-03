@@ -34,6 +34,13 @@ const DEBUFF_REGISTRY = {
         maxStacks: 0,
         extension: "png"
     },
+    crush: {
+        name: "Crush",
+        iconBase: "assets/ui/debuffs/crush",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
     solidification: {
         name: "Solidification",
         iconBase: "assets/ui/debuffs/solidification",
