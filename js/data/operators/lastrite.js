@@ -83,6 +83,7 @@ lastrite.skills = [
         comboTriggers: [
             { effect: "cryo_infliction", minStacks: 3 }
         ],
+        allowSelfTrigger: true,
         consumeDebuffs: [
             "cryo_infliction"
         ],
