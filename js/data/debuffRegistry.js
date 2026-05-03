@@ -158,7 +158,7 @@ const DEBUFF_REGISTRY = {
         iconBase: "assets/ui/debuffs/lift",
         stackable: false,
         maxStacks: 0,
-        extension: "png"
+        extension: "svg"
     },
     stagger: {
         name: "Stagger",
