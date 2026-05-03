@@ -45,11 +45,11 @@ function addEffectDefinitionToMap(effect, effectMap) {
     );
 }
 
-function applyConditionalDebuffsToComboMap(skillData, effectMap) {
+function applyConditionalDebuffsToComboMap(skillData, effectMap, contextEffectMap = effectMap) {
     if (!Array.isArray(skillData?.conditionalDebuffs)) return;
 
     skillData.conditionalDebuffs.forEach(rule => {
-        if (!hasRequiredComboBuff(rule, effectMap)) return;
+        if (!hasRequiredComboBuff(rule, contextEffectMap)) return;
         if (!Array.isArray(rule.debuffs)) return;
 
         rule.debuffs.forEach(effect => {
@@ -119,7 +119,8 @@ function applySkillEffectsToComboMap(
     skillData,
     effectMap,
     includeAvailableAfterChain = false,
-    includeTransientTriggers = false
+    includeTransientTriggers = false,
+    contextEffectMap = effectMap
 ) {
     const transientComboTriggerEffects = new Set([
         "final_strike",
@@ -151,7 +152,7 @@ function applySkillEffectsToComboMap(
         addEffectDefinitionToMap(effect, effectMap);
     });
 
-    applyConditionalDebuffsToComboMap(skillData, effectMap);
+    applyConditionalDebuffsToComboMap(skillData, effectMap, contextEffectMap);
     removeConsumedDebuffsFromEffectMap(skillData, effectMap);
     consumeInflictionToBuffFromEffectMap(skillData, effectMap);
 
@@ -176,17 +177,17 @@ function collectPersistentEffectsFromRotationUpToIndex(endIndex) {
         const skillData = getSkillById(entry.id);
         if (!skillData) continue;
 
-        applySkillEffectsToComboMap(skillData, effectMap, true);
+        applySkillEffectsToComboMap(skillData, effectMap, true, false, effectMap);
     }
 
     return effectMap;
 }
 
-function collectEffectsFromSkill(skillData) {
+function collectEffectsFromSkill(skillData, contextEffectMap = {}) {
     const effectMap = {};
     if (!skillData) return effectMap;
 
-    applySkillEffectsToComboMap(skillData, effectMap, false);
+    applySkillEffectsToComboMap(skillData, effectMap, false, false, contextEffectMap);
     addTransientSkillTypeTriggers(skillData, effectMap);
 
     return effectMap;
@@ -202,7 +203,7 @@ function collectEffectsFromRotationUpToIndex(endIndex) {
         const skillData = getSkillById(entry.id);
         if (!skillData) continue;
 
-        applySkillEffectsToComboMap(skillData, effectMap, true);
+        applySkillEffectsToComboMap(skillData, effectMap, true, false, effectMap);
     }
 
     return effectMap;
@@ -283,7 +284,7 @@ function insertComboChain(startSkillId, startIndex) {
             addAmountToEffectMap(effectMapBeforeSkill, effectName, amount);
         });
 
-        const currentEffects = collectEffectsFromSkill(currentSkillData);
+        const currentEffects = collectEffectsFromSkill(currentSkillData, effectMapBeforeSkill);
 
         Object.entries(currentEffects).forEach(([effectName, amount]) => {
             addAmountToEffectMap(chainEffectMap, effectName, amount);
