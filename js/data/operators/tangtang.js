@@ -59,7 +59,7 @@ tangtang.skills = [
         iconSmall: "assets/operators/skills/tangtang/65px-Combo-Tangtang.webp",
         type: "Combo Skill",
         shortType: "CS",
-        cooldown: 0,
+        cooldown: 13,
         energy: 0,
         elementType: "cryo",
         description: "Triggers on Final Strike against an enemy with Cryo Infliction or Cryo Burst. Adds Arts Susceptibility.",

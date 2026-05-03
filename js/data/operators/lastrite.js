@@ -75,7 +75,7 @@ lastrite.skills = [
         iconSmall: "assets/operators/skills/lastrite/cs_small.png",
         type: "Combo Skill",
         shortType: "CS",
-        cooldown: 0,
+        cooldown: 9,
         energy: 0,
         elementType: "cryo",
         description: "Triggers when the enemy has at least 3 Cryo Infliction stacks. Consumes Cryo Infliction and applies Cryo Susceptibility.",
