@@ -65,9 +65,9 @@ const DEBUFF_REGISTRY = {
     arts_susceptibility: {
         name: "Arts Susceptibility",
         iconBase: "assets/ui/debuffs/arts_susceptibility",
-        stackable: true,
+        stackable: false,
         maxStacks: 4,
-        extension: "png"
+        extension: "svg"
     },
     heat_infliction: {
         name: "Heat Infliction",

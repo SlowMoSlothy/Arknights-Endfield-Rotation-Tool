@@ -64,6 +64,7 @@ tangtang.skills = [
         elementType: "cryo",
         description: "Triggers on Final Strike against an enemy with Cryo Infliction or Cryo Burst. Adds Arts Susceptibility.",
         comboTriggerMode: "all",
+        allowSelfTrigger: true,
         comboTriggers: [
             { effect: "final_strike", minStacks: 1 },
             {
@@ -95,8 +96,7 @@ tangtang.skills = [
                 visible: true,
                 stackable: true,
                 stacksApplied: 1,
-                maxStacks: 4,
-                iconBase: "assets/debuffs/arts_susceptibility"
+                maxStacks: 4
             }
         ]
     },
@@ -118,7 +118,7 @@ tangtang.skills = [
                 appliesEffect: "cryo_infliction",
                 persistsForCombo: true,
                 visible: true,
-                stackable: true,
+                stackable: false,
                 stacksApplied: 1,
                 maxStacks: 4,
                 iconBase: "assets/debuffs/cryo_infliction"
