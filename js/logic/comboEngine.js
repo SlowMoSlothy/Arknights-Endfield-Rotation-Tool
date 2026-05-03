@@ -23,6 +23,42 @@ function addTransientSkillTypeTriggers(skillData, effectMap) {
     if (type === "ultimate") addAmountToEffectMap(effectMap, "ultimate", 1);
 }
 
+function normalizeComboEffectKey(value) {
+    return String(value || "").trim().toLowerCase().replace(/\s+/g, "_");
+}
+
+function hasRequiredComboBuff(rule, effectMap) {
+    const requiredList = Array.isArray(rule?.requiresBuff) ? rule.requiresBuff : [rule?.requiresBuff];
+    return requiredList.every(buffName => Boolean(effectMap[normalizeComboEffectKey(buffName)]));
+}
+
+function addEffectDefinitionToMap(effect, effectMap) {
+    if (!effect?.appliesEffect) return;
+
+    const amount = effect.stackable ? (effect.stacksApplied || 1) : 1;
+
+    addAmountToEffectMap(
+        effectMap,
+        effect.appliesEffect,
+        amount,
+        effect.maxStacks || null
+    );
+}
+
+function applyConditionalDebuffsToComboMap(skillData, effectMap) {
+    if (!Array.isArray(skillData?.conditionalDebuffs)) return;
+
+    skillData.conditionalDebuffs.forEach(rule => {
+        if (!hasRequiredComboBuff(rule, effectMap)) return;
+        if (!Array.isArray(rule.debuffs)) return;
+
+        rule.debuffs.forEach(effect => {
+            if (effect.persistsForCombo === false) return;
+            addEffectDefinitionToMap(effect, effectMap);
+        });
+    });
+}
+
 function consumeInflictionToBuffFromEffectMap(skillData, effectMap) {
     const config = skillData?.consumeInflictionToBuff;
     if (!config || !config.infliction) return null;
@@ -112,16 +148,10 @@ function applySkillEffectsToComboMap(
 
         if (effect.persistsForCombo === false && !isTransientTrigger) return;
 
-        const amount = effect.stackable ? (effect.stacksApplied || 1) : 1;
-
-        addAmountToEffectMap(
-            effectMap,
-            effect.appliesEffect,
-            amount,
-            effect.maxStacks || null
-        );
+        addEffectDefinitionToMap(effect, effectMap);
     });
 
+    applyConditionalDebuffsToComboMap(skillData, effectMap);
     removeConsumedDebuffsFromEffectMap(skillData, effectMap);
     consumeInflictionToBuffFromEffectMap(skillData, effectMap);
 
