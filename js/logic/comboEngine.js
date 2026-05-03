@@ -257,6 +257,34 @@ function getComboSkillsFromEffects(effectMap, sourceOperatorId) {
     return result;
 }
 
+function collectComboCooldownStateUpToIndex(endIndex) {
+    const cooldownState = {};
+
+    for (let i = 0; i <= endIndex; i++) {
+        const entry = rotation[i];
+        if (!entry) continue;
+
+        const skillData = getSkillById(entry.id);
+        if (!skillData) continue;
+
+        if ((skillData.type || "").toLowerCase() === "combo skill") {
+            cooldownState[skillData.id] = i;
+        }
+    }
+
+    return cooldownState;
+}
+
+function isComboSkillOnCooldown(comboSkill, comboIndex, cooldownState) {
+    const cooldown = Number(comboSkill.cooldown || 0);
+    if (cooldown <= 0) return false;
+
+    const lastTriggeredAt = cooldownState[comboSkill.id];
+    if (lastTriggeredAt === undefined) return false;
+
+    return (comboIndex - lastTriggeredAt) < cooldown;
+}
+
 function insertComboChain(startSkillId, startIndex) {
     const queue = [{ skillId: startSkillId, insertAfterIndex: startIndex }];
     const alreadyInsertedIds = new Set([startSkillId]);
@@ -266,6 +294,7 @@ function insertComboChain(startSkillId, startIndex) {
 
     const persistentEffectMap = collectPersistentEffectsFromRotationUpToIndex(startIndex - 1);
     const chainEffectMap = {};
+    const comboCooldownState = collectComboCooldownStateUpToIndex(startIndex - 1);
 
     while (queue.length > 0) {
         if (chainCount >= MAX_CHAIN_LENGTH) {
@@ -318,6 +347,7 @@ function insertComboChain(startSkillId, startIndex) {
             if (alreadyInsertedIds.has(comboSkill.id)) return;
 
             const comboIndex = current.insertAfterIndex + insertOffset;
+            if (isComboSkillOnCooldown(comboSkill, comboIndex, comboCooldownState)) return;
 
             rotation.splice(comboIndex, 0, {
                 uid: crypto.randomUUID(),
@@ -326,6 +356,7 @@ function insertComboChain(startSkillId, startIndex) {
             });
 
             alreadyInsertedIds.add(comboSkill.id);
+            comboCooldownState[comboSkill.id] = comboIndex;
 
             queue.push({
                 skillId: comboSkill.id,
