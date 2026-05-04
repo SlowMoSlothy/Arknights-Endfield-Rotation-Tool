@@ -284,6 +284,11 @@ function getComboSkillsFromEffects(effectMap, sourceOperatorId) {
                 if (typeof trigger === "string") return (effectMap[trigger] || 0) >= 1;
                 if (Array.isArray(trigger.anyOf)) return trigger.anyOf.some(option => checkTrigger(option));
                 if (Array.isArray(trigger.allOf)) return trigger.allOf.every(option => checkTrigger(option));
+                if (Array.isArray(trigger.noneOf)) {
+    return trigger.noneOf.every(effectName => {
+        return (effectMap[effectName] || 0) <= 0;
+    });
+}
 
                 const effectName = trigger.effect;
                 const minStacks = trigger.minStacks || 1;
