@@ -37,11 +37,16 @@ function skillConsumesComboEffect(skillData, effectName) {
     return consumeKey === skillTypeKey || consumeKey === shortTypeKey;
 }
 
-function consumeStackedComboEffectsForSkill(skillData, effectMap) {
+function consumeStackedComboEffectsForSkill(skillData, effectMap, outputMap = effectMap) {
+    if (!effectMap) return;
+    if (!outputMap) outputMap = effectMap;
+
     Object.keys(effectMap).forEach(effectName => {
         if (!skillConsumesComboEffect(skillData, effectName)) return;
 
         const registryEntry = BUFF_REGISTRY?.[effectName];
+        if (!registryEntry) return;
+
         const amount = Number(registryEntry.consumeStacks || 1);
 
         effectMap[effectName] -= amount;
@@ -50,7 +55,11 @@ function consumeStackedComboEffectsForSkill(skillData, effectMap) {
             delete effectMap[effectName];
 
             if (registryEntry.onFullyConsumedEffect) {
-                addAmountToEffectMap(effectMap, registryEntry.onFullyConsumedEffect, 1);
+                addAmountToEffectMap(
+                    outputMap,
+                    registryEntry.onFullyConsumedEffect,
+                    1
+                );
             }
         }
     });
@@ -347,8 +356,8 @@ Object.entries(currentEffects).forEach(([effectName, amount]) => {
     addAmountToEffectMap(chainEffectMap, effectName, amount);
 });
 
-consumeStackedComboEffectsForSkill(currentSkillData, chainEffectMap);
-consumeStackedComboEffectsForSkill(currentSkillData, persistentEffectMap);
+consumeStackedComboEffectsForSkill(currentSkillData, chainEffectMap, chainEffectMap);
+consumeStackedComboEffectsForSkill(currentSkillData, persistentEffectMap, chainEffectMap);
 
         removeConsumedDebuffsFromEffectMap(currentSkillData, persistentEffectMap);
         removeConsumedDebuffsFromEffectMap(currentSkillData, chainEffectMap);
