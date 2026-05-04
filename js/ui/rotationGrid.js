@@ -110,9 +110,29 @@ function skillConsumesRotationBuff(skillData, buff) {
 
 function consumeRotationBuffsForSkill(skillData, stackState, metaState) {
     Object.entries(metaState).forEach(([buffId, buff]) => {
-        if (!skillConsumesRotationBuff(skillData, buff)) return;
-        delete stackState[buffId];
-        delete metaState[buffId];
+        const registryEntry = BUFF_REGISTRY?.[buffId];
+        const consumeOnSkillType = buff.consumeOnSkillType || registryEntry?.consumeOnSkillType;
+
+        if (!consumeOnSkillType) return;
+
+        const mergedBuff = {
+            ...registryEntry,
+            ...buff,
+            consumeOnSkillType,
+            consumeStacks: buff.consumeStacks ?? registryEntry?.consumeStacks,
+            onFullyConsumedEffect: buff.onFullyConsumedEffect ?? registryEntry?.onFullyConsumedEffect
+        };
+
+        if (!skillConsumesRotationBuff(skillData, mergedBuff)) return;
+
+        const amount = Number(mergedBuff.consumeStacks || 1);
+
+        stackState[buffId] = Number(stackState[buffId] || 0) - amount;
+
+        if (stackState[buffId] <= 0) {
+            delete stackState[buffId];
+            delete metaState[buffId];
+        }
     });
 }
 
