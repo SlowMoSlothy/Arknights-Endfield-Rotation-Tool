@@ -37,7 +37,24 @@ function skillConsumesComboEffect(skillData, effectName) {
     return consumeKey === skillTypeKey || consumeKey === shortTypeKey;
 }
 
-consumeStackedComboEffectsForSkill
+function consumeStackedComboEffectsForSkill(skillData, effectMap) {
+    Object.keys(effectMap).forEach(effectName => {
+        if (!skillConsumesComboEffect(skillData, effectName)) return;
+
+        const registryEntry = BUFF_REGISTRY?.[effectName];
+        const amount = Number(registryEntry.consumeStacks || 1);
+
+        effectMap[effectName] -= amount;
+
+        if (effectMap[effectName] <= 0) {
+            delete effectMap[effectName];
+
+            if (registryEntry.onFullyConsumedEffect) {
+                addAmountToEffectMap(effectMap, registryEntry.onFullyConsumedEffect, 1);
+            }
+        }
+    });
+}
 function hasRequiredComboBuff(rule, effectMap) {
     const requiredList = Array.isArray(rule?.requiresBuff) ? rule.requiresBuff : [rule?.requiresBuff];
     return requiredList.every(buffName => Boolean(effectMap[normalizeComboEffectKey(buffName)]));
@@ -319,8 +336,6 @@ function insertComboChain(startSkillId, startIndex) {
 
         if (!currentSkillData || !sourceOperator) continue;
 
-consumeStackedComboEffectsForSkill(currentSkillData, chainEffectMap, chainEffectMap);
-consumeStackedComboEffectsForSkill(currentSkillData, persistentEffectMap, chainEffectMap);
         const effectMapBeforeSkill = { ...persistentEffectMap };
         Object.entries(chainEffectMap).forEach(([effectName, amount]) => {
             addAmountToEffectMap(effectMapBeforeSkill, effectName, amount);
