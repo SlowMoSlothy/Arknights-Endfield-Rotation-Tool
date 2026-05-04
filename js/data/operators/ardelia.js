@@ -36,15 +36,47 @@ ardelia.skills = [
         elementType: "nature"
     },
     {
-        id: (ardelia.id * 100) + 3,
-        name: "Eruption Column",
-        icon: ardelia.icon,
-        iconSmall: "assets/operators/skills/ardelia/cs_small.png",
-        type: "Combo Skill",
-        cooldown: 0,
-        energy: 0,
-        elementType: "nature"
-    },
+    id: (ardelia.id * 100) + 3,
+    name: "Eruption Column",
+    icon: ardelia.icon,
+    iconSmall: "assets/operators/skills/ardelia/cs_small.png",
+    type: "Combo Skill",
+    shortType: "CS",
+    cooldown: 18,
+    energy: 0,
+    elementType: "nature",
+    description: "Triggers when the controlled operator performs a Final Strike on an enemy with no Vulnerability or Arts Infliction. Applies temporary Corrosion.",
+    comboTriggerMode: "all",
+    comboTriggers: [
+        { effect: "final_strike", minStacks: 1 },
+        {
+            noneOf: [
+                "vulnerability",
+                "cryo_infliction",
+                "heat_infliction",
+                "electric_infliction",
+                "nature_infliction"
+            ]
+        }
+    ],
+    debuffs: [
+        {
+            id: "corrosion",
+            name: "Corrosion",
+            appliesEffect: "corrosion",
+            persistsForCombo: true,
+            visible: true,
+            stackable: false
+        },
+        {
+            id: "stagger",
+            name: "Stagger",
+            appliesEffect: "stagger",
+            persistsForCombo: false,
+            visible: true
+        }
+    ]
+},
     {
         id: (ardelia.id * 100) + 4,
         name: "Wooly Party",
