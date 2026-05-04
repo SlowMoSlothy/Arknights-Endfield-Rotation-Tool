@@ -364,9 +364,10 @@ consumeStackedComboEffectsForSkill(currentSkillData, persistentEffectMap, chainE
         consumeInflictionToBuffFromComboMaps(currentSkillData, [persistentEffectMap, chainEffectMap]);
 
         const effectMapAfterConsume = { ...persistentEffectMap };
-        Object.entries(chainEffectMap).forEach(([effectName, amount]) => {
-            addAmountToEffectMap(effectMapAfterConsume, effectName, amount);
-        });
+
+Object.entries(chainEffectMap).forEach(([effectName, amount]) => {
+    addAmountToEffectMap(effectMapAfterConsume, effectName, amount);
+});
 
         const matchingInfliction = getMatchingInflictionEffect(currentSkillData, effectMapBeforeSkill);
         if (matchingInfliction) {
