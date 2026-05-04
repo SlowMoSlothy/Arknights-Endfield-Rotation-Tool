@@ -78,7 +78,7 @@ const alesh = {
             type: "Combo Skill",
             shortType: "CS",
             elementType: "physical",
-            cooldown: 20,
+            cooldown: 9,
             energy: 0,
             description: "Triggers when an Arts Reaction or Originium Crystals are consumed. Deals Physical DMG and recovers SP.",
             comboTriggerMode: "all",

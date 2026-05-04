@@ -57,7 +57,7 @@ chen.skills = [
     iconSmall: "assets/operators/skills/chen/cs_small.png",
     type: "Combo Skill",
     shortType: "CS",
-    cooldown: 20,
+    cooldown: 16,
     energy: 0,
     elementType: "physical",
     comboTriggerMode: "all",

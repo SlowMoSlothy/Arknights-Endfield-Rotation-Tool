@@ -70,6 +70,7 @@ dapan.skills = [
         elementType: "physical",
         description: "Triggers at 4 Vulnerable stacks. Consumes Vulnerable and applies Crush.",
         comboTriggerMode: "all",
+        allowSelfTrigger: true,
         comboTriggers: [
             { effect: "vulnerable", minStacks: 4 }
         ],
