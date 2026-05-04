@@ -53,3 +53,6 @@ Mark an operator as complete only after verifying:
 - Re-test completed operators after major engine changes.
 - Add newly released operators to Pending Review.
 - Keep cooldown values updated with latest game patches.
+- Future Engine Enhancement: Catcher retaliation mechanic
+  - If `operator_attacked` and Catcher has `shield`/`protection` active
+  - Then apply `vulnerable` to attacker / target
