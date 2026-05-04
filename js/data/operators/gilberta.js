@@ -58,7 +58,7 @@ gilberta.skills = [
         iconSmall: "assets/operators/skills/gilberta/cs_small.png",
         type: "Combo Skill",
         shortType: "CS",
-        cooldown: 0,
+        cooldown: 20,
         energy: 0,
         elementType: "nature",
         description: "Triggers on Arts Reaction. Applies Lift and Vulnerable.",

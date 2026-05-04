@@ -54,7 +54,7 @@ avywenna.skills = [
         icon: avywenna.icon,
         iconSmall: "assets/operators/skills/avywenna/cs_small.png",
         type: "Combo Skill",
-        cooldown: 0,
+        cooldown: 13,
         energy: 0,
         elementType: "electric",
         comboTriggerMode: "all",
