@@ -341,14 +341,14 @@ function insertComboChain(startSkillId, startIndex) {
             addAmountToEffectMap(effectMapBeforeSkill, effectName, amount);
         });
         
-        consumeStackedComboEffectsForSkill(currentSkillData, chainEffectMap);
-consumeStackedComboEffectsForSkill(currentSkillData, persistentEffectMap);
-
         const currentEffects = collectEffectsFromSkill(currentSkillData, effectMapBeforeSkill);
 
-        Object.entries(currentEffects).forEach(([effectName, amount]) => {
-            addAmountToEffectMap(chainEffectMap, effectName, amount);
-        });
+Object.entries(currentEffects).forEach(([effectName, amount]) => {
+    addAmountToEffectMap(chainEffectMap, effectName, amount);
+});
+
+consumeStackedComboEffectsForSkill(currentSkillData, chainEffectMap);
+consumeStackedComboEffectsForSkill(currentSkillData, persistentEffectMap);
 
         removeConsumedDebuffsFromEffectMap(currentSkillData, persistentEffectMap);
         removeConsumedDebuffsFromEffectMap(currentSkillData, chainEffectMap);
