@@ -215,11 +215,16 @@ function collectPersistentEffectsFromRotationUpToIndex(endIndex) {
         if (!skillData) continue;
 
         applySkillEffectsToComboMap(skillData, effectMap, true, false, effectMap);
+
+        consumeStackedComboEffectsForSkill(
+            skillData,
+            effectMap,
+            effectMap
+        );
     }
 
     return effectMap;
 }
-
 function collectEffectsFromSkill(skillData, contextEffectMap = {}) {
     const effectMap = {};
     if (!skillData) return effectMap;
@@ -232,17 +237,23 @@ function collectEffectsFromSkill(skillData, contextEffectMap = {}) {
 
 function collectEffectsFromRotationUpToIndex(endIndex) {
     const effectMap = {};
-
+    
     for (let i = 0; i <= endIndex; i++) {
         const entry = rotation[i];
         if (!entry) continue;
-
+        
         const skillData = getSkillById(entry.id);
         if (!skillData) continue;
-
+        
         applySkillEffectsToComboMap(skillData, effectMap, true, false, effectMap);
+        
+        consumeStackedComboEffectsForSkill(
+            skillData,
+            effectMap,
+            effectMap
+        );
     }
-
+    
     return effectMap;
 }
 
