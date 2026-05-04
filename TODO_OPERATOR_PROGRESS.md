@@ -22,7 +22,7 @@ Track combo / CS / reaction logic validation for each operator.
 - [ ] Arclight
 - [ ] Avywenna
 - [ ] Catcher
-- [ ] Chen
+- [x] Chen
 - [ ] Dapan
 - [ ] Ember
 - [ ] Estella

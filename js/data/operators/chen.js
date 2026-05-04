@@ -50,34 +50,34 @@ chen.skills = [
     },
 
     {
-        id: (chen.id * 100) + 3,
-        name: "Soar to the Stars",
-        allowSelfTrigger: false,
-        icon: chen.icon,
-        iconSmall: "assets/operators/skills/chen/cs_small.png",
-        type: "Combo Skill",
-        shortType: "CS",
-        cooldown: 0,
-        energy: 0,
-        elementType: "physical",
-        comboTriggerMode: "all",
-        description: "Triggers when enemy becomes Vulnerable.",
-        comboTriggers: [
-            {
-                effect: "vulnerable",
-                minStacks: 1
-            }
-        ],
-        debuffs: [
-            {
-                id: "lift",
-                name: "Lift",
-                appliesEffect: "lift",
-                persistsForCombo: false,
-                visible: true
-            }
-        ]
-    },
+    id: (chen.id * 100) + 3,
+    name: "Soar to the Stars",
+    allowSelfTrigger: false,
+    icon: chen.icon,
+    iconSmall: "assets/operators/skills/chen/cs_small.png",
+    type: "Combo Skill",
+    shortType: "CS",
+    cooldown: 20,
+    energy: 0,
+    elementType: "physical",
+    comboTriggerMode: "all",
+    description: "Triggers when enemy becomes Vulnerable.",
+    comboTriggers: [
+        {
+            effect: "vulnerable",
+            minStacks: 1
+        }
+    ],
+    debuffs: [
+        {
+            id: "lift",
+            name: "Lift",
+            appliesEffect: "lift",
+            persistsForCombo: false,
+            visible: true
+        }
+    ]
+},
 
     {
         id: (chen.id * 100) + 4,
