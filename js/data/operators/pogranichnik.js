@@ -72,7 +72,7 @@ pogranichnik.skills = [
         iconSmall: "assets/operators/skills/pogranichnik/cs_small.png",
         type: "Combo Skill",
         shortType: "CS",
-        cooldown: 16,
+        cooldown: 18,
         energy: 0,
         elementType: "physical",
         description: "Triggers when Breach or Crush consumes Vulnerability stacks. Deals Physical DMG and recovers SP.",

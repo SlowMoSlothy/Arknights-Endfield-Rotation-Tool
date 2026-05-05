@@ -54,7 +54,7 @@ const akekuri = {
             icon: "assets/operators/avatars/Akekuri.png",
             iconSmall: "assets/operators/skills/akekuri/cs_small.png",
             type: "Combo Skill",
-            cooldown: 0,
+            cooldown: 10,
             energy: 100,
             elementType: "physical",
             description: "Triggers when an enemy becomes Staggered or hits a Stagger Node. Recovers SP.",

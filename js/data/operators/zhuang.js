@@ -55,7 +55,7 @@ const zhuang = {
             icon: "assets/operators/avatars/Zhuang.png",
             iconSmall: "assets/operators/skills/zhuang/cs_small.png",
             type: "Combo Skill",
-            cooldown: 0,
+            cooldown: 18,
             energy: 100,
             elementType: "electric",
             shortType: "CS",
