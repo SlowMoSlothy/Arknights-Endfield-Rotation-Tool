@@ -28,6 +28,7 @@ Track combo / CS / reaction logic validation for each operator.
 - [ ] Estella
 - [ ] Gilberta
 - [x] Lifeng
+- [x] Pogranichnik 
 - [ ] Rossi
 - [ ] Snowshine
 - [x] Wulfgard

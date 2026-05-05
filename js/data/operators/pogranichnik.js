@@ -47,11 +47,9 @@ pogranichnik.skills = [
         energy: 100,
         elementType: "physical",
         description: "Deals Physical DMG, applies Breach, and consumes Vulnerability stacks for SP recovery.",
-        consumesEffects: [
-            {
-                effect: "vulnerable"
-            }
-        ],
+        consumeDebuffs: [
+    "vulnerable"
+],
         debuffs: [
             {
                 id: "breach",
