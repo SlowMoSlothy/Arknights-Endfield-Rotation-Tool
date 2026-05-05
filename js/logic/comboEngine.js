@@ -168,7 +168,8 @@ function applySkillEffectsToComboMap(
         "pull",
         "stagger",
         "lift",
-        "operator_attacked"
+        "operator_attacked",
+        "breach"
     ]);
 
     const allEffects = [

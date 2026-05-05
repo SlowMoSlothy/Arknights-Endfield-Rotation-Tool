@@ -49,8 +49,7 @@ pogranichnik.skills = [
         description: "Deals Physical DMG, applies Breach, and consumes Vulnerability stacks for SP recovery.",
         consumesEffects: [
             {
-                effect: "vulnerable",
-                amount: "all"
+                effect: "vulnerable"
             }
         ],
         debuffs: [
@@ -77,7 +76,7 @@ pogranichnik.skills = [
         elementType: "physical",
         description: "Triggers when Breach or Crush consumes Vulnerability stacks. Deals Physical DMG and recovers SP.",
         comboTriggerMode: "any",
-        allowSelfTrigger:true, 
+        allowSelfTrigger: true, 
         comboTriggers: [
             { effect: "breach", minStacks: 1 },
             { effect: "crush", minStacks: 1 }
