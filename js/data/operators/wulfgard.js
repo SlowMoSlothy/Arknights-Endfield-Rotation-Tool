@@ -78,6 +78,7 @@ wulfgard.skills = [
         elementType: "heat",
         description: "Triggers when an Arts Infliction is applied. Applies Heat Infliction.",
         comboTriggerMode: "any",
+        allowSelfTrigger: true, 
         comboTriggers: [
             { effect: "heat_infliction", minStacks: 1 },
             { effect: "cryo_infliction", minStacks: 1 },

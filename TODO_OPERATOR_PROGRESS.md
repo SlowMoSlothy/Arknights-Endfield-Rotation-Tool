@@ -27,12 +27,18 @@ Track combo / CS / reaction logic validation for each operator.
 - [ ] Ember
 - [ ] Estella
 - [ ] Gilberta
+- [x] Lifeng
 - [ ] Rossi
 - [ ] Snowshine
-- [ ] Wulfgard
+- [x] Wulfgard
 
 ---
-
+### Snowshine
+- Data implementation appears correct
+- Requires dedicated enemy/event trigger: `operator_attacked_low_hp`
+- Current engine only supports normal `operator_attacked`
+- Full validation deferred until low HP attack event is implemented
+- 
 ## Validation Checklist
 
 Mark an operator as complete only after verifying:

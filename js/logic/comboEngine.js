@@ -229,7 +229,7 @@ function collectEffectsFromSkill(skillData, contextEffectMap = {}) {
     const effectMap = {};
     if (!skillData) return effectMap;
 
-    applySkillEffectsToComboMap(skillData, effectMap, false, false, contextEffectMap);
+    applySkillEffectsToComboMap(skillData, effectMap, false, true, contextEffectMap);
     addTransientSkillTypeTriggers(skillData, effectMap);
 
     return effectMap;

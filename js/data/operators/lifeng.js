@@ -67,7 +67,7 @@ lifeng.skills = [
         iconSmall: "assets/operators/skills/lifeng/cs_small.png",
         type: "Combo Skill",
         shortType: "CS",
-        cooldown: 16,
+        cooldown: 0,
         energy: 0,
         elementType: "physical",
         description: "Deals Physical DMG and grants Link status.",
