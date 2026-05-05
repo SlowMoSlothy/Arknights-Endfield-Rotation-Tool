@@ -44,7 +44,7 @@ const endministrator = {
             iconSmall: "assets/operators/skills/endmin/cs_small.png",
             type: "Combo Skill",
             shortType: "CS",
-            cooldown: 20,
+            cooldown: 16,
             energy: 60,
             elementType: "physical",
             description: "Triggers when another operator uses a Combo Skill.",

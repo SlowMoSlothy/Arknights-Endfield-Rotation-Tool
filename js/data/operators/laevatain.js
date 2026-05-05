@@ -106,7 +106,7 @@ const laevatain = {
             type: "Combo Skill",
             shortType: "CS",
             elementType: "heat",
-            cooldown: 20,
+            cooldown: 10,
             energy: 60,
             description: "Triggers on Combustion or Corrosion.",
             comboTriggerMode: "all",
