@@ -1,7 +1,7 @@
 .mobile-confirm-fab {
     display: none;
 }
-@media (max-width: 900px) {
+@media (max-width: 600px) {
     .mobile-confirm-fab {
         display: flex;
         position: fixed;
@@ -35,9 +35,8 @@
         transform: scale(0.94);
     }
     body {
-        margin: 0;
-        padding: 10px;
-    }
+    padding: 0 10px 90px;
+}
 
     .builder-shell {
         max-width: 100%;
