@@ -1,4 +1,39 @@
+.mobile-confirm-fab {
+    display: none;
+}
 @media (max-width: 900px) {
+    .mobile-confirm-fab {
+        display: flex;
+        position: fixed;
+        right: 18px;
+        bottom: 24px;
+        z-index: 9999;
+
+        align-items: center;
+        justify-content: center;
+
+        min-width: 64px;
+        height: 64px;
+        padding: 0 20px;
+
+        border: none;
+        border-radius: 999px;
+
+        background: #F8F546;
+        color: #111;
+
+        font-size: 22px;
+        font-weight: 900;
+        box-shadow:
+            0 0 18px rgba(248,245,70,0.45),
+            0 8px 22px rgba(0,0,0,0.45);
+    }
+.selection-confirm-btn {
+        display: none;
+    }
+    .mobile-confirm-fab:active {
+        transform: scale(0.94);
+    }
     body {
         margin: 0;
         padding: 10px;

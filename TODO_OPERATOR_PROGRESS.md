@@ -32,6 +32,7 @@ Track combo / CS / reaction logic validation for each operator.
 - [ ] Rossi
 - [ ] Snowshine
 - [x] Wulfgard
+- [x] Zhuang 
 
 ---
 ### Snowshine
