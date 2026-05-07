@@ -65,7 +65,37 @@
         0 0 16px rgba(248,245,70,0.13),
         inset 0 0 10px rgba(248,245,70,0.035);
 }
+.swap-operator-btn {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
 
+    width: 42px;
+    height: 42px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(10,10,10,0.92);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 8;
+
+    box-shadow:
+        0 0 12px rgba(248,245,70,0.18),
+        0 4px 10px rgba(0,0,0,0.45);
+}
+
+.swap-operator-btn svg {
+    width: 24px;
+    height: 24px;
+
+    fill: #F8F546;
+    stroke: #F8F546;
+}
 .leader-badge {
     position: absolute;
     top: 8px;
