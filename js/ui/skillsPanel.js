@@ -156,7 +156,7 @@ function renderSkills() {
 
         const opRow = document.createElement("div");
         opRow.className = "operator-row";
-        opRow.innerHTML = `<img src="${op.icon}" alt="${op.name}" class="operator-icon"><div>${op.name}</div>`;
+        opRow.innerHTML = `<div class="operator-skill-name">${op.name}</div>`;
         if (index === 0) {
             const leaderBadge = document.createElement("div");
             leaderBadge.className = "leader-badge";
