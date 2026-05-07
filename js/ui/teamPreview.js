@@ -4,35 +4,40 @@ function renderSelectedOperators() {
 
     container.innerHTML = "";
 
-    selectedTeam
-        .filter(id => id !== null)
-        .forEach(id => {
-            const op = operators.find(o => o.id === id);
-            if (!op) return;
+    selectedTeam.forEach((id, index) => {
+        if (id === null) return;
 
-            const item = document.createElement("div");
-            item.className = "team-preview-operator";
-            item.dataset.operatorId = String(op.id);
+        const op = operators.find(o => o.id === id);
+        if (!op) return;
 
-            const header = document.createElement("div");
-            header.className = "team-preview-header";
+        const item = document.createElement("div");
+        item.className = "team-preview-operator";
+        item.dataset.operatorId = String(op.id);
 
-            const img = document.createElement("img");
-            img.src = op.icon;
-            img.alt = op.name;
+        const header = document.createElement("div");
+        header.className = "team-preview-header";
 
-            const name = document.createElement("div");
-            name.textContent = op.name;
+        const img = document.createElement("img");
+        img.src = op.icon;
+        img.alt = op.name;
+        img.title = "Team ändern";
 
-            header.appendChild(img);
-            header.appendChild(name);
+        img.onclick = () => {
+            openTeamSelectionModal(index);
+        };
 
-            const buffContainer = document.createElement("div");
-            buffContainer.className = "operator-buffs";
+        const name = document.createElement("div");
+        name.textContent = op.name;
 
-            item.appendChild(header);
-            item.appendChild(buffContainer);
+        header.appendChild(img);
+        header.appendChild(name);
 
-            container.appendChild(item);
-        });
+        const buffContainer = document.createElement("div");
+        buffContainer.className = "operator-buffs";
+
+        item.appendChild(header);
+        item.appendChild(buffContainer);
+
+        container.appendChild(item);
+    });
 }

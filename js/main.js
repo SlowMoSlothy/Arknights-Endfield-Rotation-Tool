@@ -64,8 +64,12 @@ window.applySkillDebuffsAndGetActiveState = function patchedApplySkillDebuffsAnd
 loadOperatorUltimateStates();
 loadTeam();
 loadRotation();
+
 renderTeamSlots();
 renderOperatorList();
 
 initUiSettings();
 initEnemyPanel();
+
+// Direkt den Rotation Builder anzeigen
+showBuilderScreen();
