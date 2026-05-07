@@ -309,4 +309,25 @@
     backdrop-filter: blur(8px);
     box-sizing: border-box;
 }
+#selectionScreen.team-modal-open .team-slots,
+#selectionScreen.team-modal-open .selection-title-row:first-of-type,
+#selectionScreen.team-modal-open .selection-max-label {
+    display: none !important;
+}
+
+#selectionScreen.team-modal-open .operator-title-row {
+    margin-top: 18px;
+}
+
+#selectionScreen.team-modal-open .selection-confirm-btn,
+#selectionScreen.team-modal-open .mobile-confirm-fab {
+    position: fixed;
+    right: 18px;
+    bottom: calc(18px + env(safe-area-inset-bottom));
+    z-index: 10000;
+}
+
+#selectionScreen.team-modal-open {
+    padding-bottom: 110px;
+}
 }

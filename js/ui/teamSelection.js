@@ -164,7 +164,8 @@ function renderOperatorList() {
                 }
 
                 renderTeamSlots();
-                renderOperatorList();
+renderOperatorList();
+confirmTeam();
             };
         }
 
