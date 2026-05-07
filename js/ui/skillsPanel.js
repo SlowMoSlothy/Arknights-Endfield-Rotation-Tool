@@ -106,6 +106,36 @@ function initMobileSkillTooltipClose() {
     window.addEventListener("resize", hideSkillTooltip);
 }
 
+function createSwapOperatorButton(op, index) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "swap-operator-btn";
+    button.title = "Operator wechseln";
+    button.setAttribute("aria-label", `${op.name} wechseln`);
+    button.innerHTML = `
+        <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+            <path d="M20 18a10 10 0 1 1 0 20a10 10 0 0 1 0-20Z" />
+            <path d="M8 50c2.5-7.5 8-11 12-11s9.5 3.5 12 11H8Z" />
+            <path d="M44 26a9 9 0 1 1 0 18a9 9 0 0 1 0-18Z" />
+            <path d="M33 58c2.4-7 7.6-10 11-10s8.6 3 11 10H33Z" />
+            <path d="M38 10c8 1.5 14 7 16 14" fill="none" stroke-width="5" stroke-linecap="round" />
+            <path d="M54 24l-8-2.5l5.8 8Z" />
+            <path d="M26 54c-8-1.5-14-7-16-14" fill="none" stroke-width="5" stroke-linecap="round" />
+            <path d="M10 40l8 2.5l-5.8-8Z" />
+        </svg>
+    `;
+
+    button.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const teamSlotIndex = selectedTeam.findIndex(id => id === op.id);
+        openTeamSelectionModal(teamSlotIndex >= 0 ? teamSlotIndex : index);
+    };
+
+    return button;
+}
+
 function renderSkills() {
     const list = document.getElementById("skillList");
     if (!list) return;
@@ -119,12 +149,10 @@ function renderSkills() {
         const card = document.createElement("div");
         card.className = "operator-skill-card";
         if (index === 0) card.classList.add("leader");
-        card.onclick = (e) => {
-    if (e.target.closest(".skill-small")) return;
 
-    const teamSlotIndex = selectedTeam.findIndex(id => id === op.id);
-    openTeamSelectionModal(teamSlotIndex >= 0 ? teamSlotIndex : index);
-};
+        const swapBtn = createSwapOperatorButton(op, index);
+        card.appendChild(swapBtn);
+
         const opRow = document.createElement("div");
         opRow.className = "operator-row";
         opRow.innerHTML = `<img src="${op.icon}" alt="${op.name}" class="operator-icon"><div>${op.name}</div>`;
