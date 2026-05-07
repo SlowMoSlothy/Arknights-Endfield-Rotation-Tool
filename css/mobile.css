@@ -115,8 +115,11 @@
         min-width: 150px;
         padding: 8px;
         gap: 8px;
+        cursor: pointer;
     }
-
+.operator-skill-card .skill-small {
+    cursor: grab;
+}
     .operator-icon {
         width: 28px;
         height: 28px;
@@ -329,5 +332,61 @@
 
 #selectionScreen.team-modal-open {
     padding-bottom: 110px;
+}
+#selectionScreen.team-modal-open .selection-hero,
+#selectionScreen.team-modal-open .selection-divider,
+#selectionScreen.team-modal-open .selection-title-row,
+#selectionScreen.team-modal-open .team-slots,
+#selectionScreen.team-modal-open .selection-confirm-btn,
+#selectionScreen.team-modal-open .mobile-confirm-fab {
+    display: none !important;
+}
+
+#selectionScreen.team-modal-open .operator-title-row {
+    margin-top: 0;
+    margin-bottom: 18px;
+}
+
+#selectionScreen.team-modal-open .operator-title-row .selection-section-title {
+    font-size: 28px;
+}
+
+#selectionScreen.team-modal-open {
+    padding: 24px 18px 40px;
+}
+.close-team-modal-btn {
+    display: none;
+}
+
+#selectionScreen.team-modal-open .close-team-modal-btn {
+    display: flex;
+    position: fixed;
+
+    right: 18px;
+    bottom: calc(18px + env(safe-area-inset-bottom));
+
+    z-index: 10001;
+
+    width: 78px;
+    height: 78px;
+
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #F8F546;
+    color: #111;
+
+    font-size: 44px;
+    font-weight: 700;
+    line-height: 1;
+
+    box-shadow:
+        0 0 22px rgba(248,245,70,0.45),
+        0 8px 24px rgba(0,0,0,0.45);
+
+    backdrop-filter: blur(6px);
 }
 }

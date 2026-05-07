@@ -39,6 +39,9 @@
   <div id="globalTooltip" class="global-tooltip"></div>
 
   <div id="selectionScreen">
+    <button id="closeTeamModalBtn" class="close-team-modal-btn" onclick="closeTeamSelectionModal()">
+  ×
+</button>
     <div class="selection-hero">
       <div class="selection-brand">
         <span>TEAM BUILDER FOR</span>
@@ -84,7 +87,6 @@
       <div class="builder-content">
         <aside class="builder-sidebar">
           <h3>Menu</h3>
-          <button onclick="backToSelection()">← Back to Team Selection</button>
           <button onclick="exportImage()">📸 Export Rotation</button>
           <button onclick="clearRotation()">🗑️ Clear Rotation</button>
           <button id="openSettingsBtn" type="button">⚙️ Settings</button>

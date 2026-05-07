@@ -119,6 +119,12 @@ function renderSkills() {
         const card = document.createElement("div");
         card.className = "operator-skill-card";
         if (index === 0) card.classList.add("leader");
+        card.onclick = (e) => {
+    if (e.target.closest(".skill-small")) return;
+
+    const teamSlotIndex = selectedTeam.findIndex(id => id === op.id);
+    openTeamSelectionModal(teamSlotIndex >= 0 ? teamSlotIndex : index);
+};
         const opRow = document.createElement("div");
         opRow.className = "operator-row";
         opRow.innerHTML = `<img src="${op.icon}" alt="${op.name}" class="operator-icon"><div>${op.name}</div>`;
