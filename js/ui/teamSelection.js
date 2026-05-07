@@ -26,7 +26,8 @@ function openTeamSelectionModal(slotIndex = null) {
     }
 
     if (selectionScreen) {
-        selectionScreen.style.display = "flex";
+        selectionScreen.style.display = "block";
+selectionScreen.classList.add("team-modal-open");
     }
 
     if (slotIndex !== null) {

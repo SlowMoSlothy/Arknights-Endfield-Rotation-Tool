@@ -299,14 +299,13 @@
     display: none;
 }
 
-#selectionScreen.team-modal-open,
-#selectionScreen[style*="flex"] {
+#selectionScreen.team-modal-open {
     position: fixed;
     inset: 0;
     z-index: 9998;
     overflow-y: auto;
     padding: 18px;
-    background: rgba(8, 12, 14, 0.92);
+    background: rgba(8, 12, 14, 0.94);
     backdrop-filter: blur(8px);
     box-sizing: border-box;
 }

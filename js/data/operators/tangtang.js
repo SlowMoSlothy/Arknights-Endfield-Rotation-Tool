@@ -47,8 +47,7 @@ tangtang.skills = [
                 visible: true,
                 stackable: true,
                 stacksApplied: 1,
-                maxStacks: 4,
-                iconBase: "assets/debuffs/cryo_infliction"
+                maxStacks: 4
             }
         ]
     },
