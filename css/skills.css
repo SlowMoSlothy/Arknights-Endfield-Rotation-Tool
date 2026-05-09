@@ -182,6 +182,25 @@
     flex-wrap: nowrap;
 
     z-index: 7;
+
+    padding: 4px 8px;
+    border-radius: 999px;
+}
+
+.skill-row::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+
+    background: rgba(0, 0, 0, 0.38);
+
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    z-index: -1;
 }
 
 .skill-small {
