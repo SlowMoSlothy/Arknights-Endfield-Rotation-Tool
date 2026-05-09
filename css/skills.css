@@ -143,8 +143,18 @@
     z-index: 12;
     padding: 4px 8px;
     border-radius: 999px;
-    background: linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.55));
-    backdrop-filter: blur(3px);
+}
+
+.skill-row::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.38);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.08);
+    z-index: -1;
 }
 
 .skill-small {
@@ -179,15 +189,15 @@
     inset: 0;
     background:
         linear-gradient(180deg,
-            rgba(0,0,0,0.15) 0%,
-            rgba(0,0,0,0.25) 35%,
-            rgba(0,0,0,0.70) 100%),
+            rgba(0,0,0,0.10) 0%,
+            rgba(0,0,0,0.18) 35%,
+            rgba(0,0,0,0.58) 100%),
         var(--operator-bg) center/cover no-repeat;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     opacity: 1;
-    filter: saturate(1.12) contrast(1.05);
+    filter: saturate(1.10) contrast(1.03);
     z-index: 0;
     pointer-events: none;
 }
@@ -198,8 +208,8 @@
     left: 0;
     right: 0;
     bottom: 0;
-    height: 48px;
-    background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.65));
+    height: 52px;
+    background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.45));
     z-index: 1;
     pointer-events: none;
 }
@@ -213,28 +223,28 @@
 
     .operator-skill-name {
         left: 30px;
-        right: 50px;
-        top: 12px;
-        font-size: 17px;
+        right: 52px;
+        top: 14px;
+        font-size: 18px;
     }
 
     .skill-row {
-        left: 26px;
-        right: 10px;
-        bottom: 8px;
-        gap: 6px;
-        padding: 3px 6px;
+        left: 28px;
+        right: 12px;
+        bottom: 10px;
+        gap: 9px;
+        padding: 4px 8px;
     }
 
     .skill-small {
-        width: 32px;
-        height: 32px;
-        min-width: 32px;
-        min-height: 32px;
-        padding: 2px;
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        min-height: 36px;
+        padding: 3px;
     }
 
     .skill-small img {
-        transform: scale(0.84);
+        transform: scale(0.88);
     }
 }
