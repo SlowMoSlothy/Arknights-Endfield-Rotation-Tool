@@ -178,7 +178,7 @@
     position: absolute;
     left: 8px;
     right: 8px;
-    bottom: 8px;
+    bottom: 0px;
     height: 34px;
     display: flex;
     justify-content: center;
@@ -255,16 +255,6 @@
 
     .operator-skill-card.leader .operator-skill-name {
         left: 30px;
-    }
-
-    .skill-row {
-        position: absolute;
-        left: 8px;
-        right: 8px;
-        bottom: 8px;
-        height: 32px;
-        padding: 4px 8px;
-        border-radius: 14px;
     }
 
     .operator-skill-card.leader .skill-row {
