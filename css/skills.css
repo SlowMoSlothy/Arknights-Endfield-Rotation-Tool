@@ -193,10 +193,35 @@
     z-index: 2;
 }
 
+.operator-skill-name {
+    position: absolute;
+    left: 14px;
+    bottom: 54px;
+    font-size: 22px;
+    text-shadow: 0 3px 8px #000;
+}
+
+.skill-row {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+}
+
+.leader-badge {
+    font-size: 10px;
+    padding: 3px 12px;
+    width: auto;
+}
+
 .swap-operator-btn {
-    position: relative;
-    z-index: 20;
-    pointer-events: auto;
+    background: rgba(0,0,0,0.78);
+    border: 2px solid #F8F546;
+}
+
+.swap-operator-btn svg {
+    fill: #F8F546;
+    stroke: #F8F546;
 }
     .skill-small {
         width: 34px;
