@@ -67,7 +67,7 @@
 .operator-skill-card::before {
     content: "";
     position: absolute;
-    top: 0;
+    top: 34px;
     left: 20px;
     right: 0;
     height: 90px;
@@ -89,7 +89,7 @@
 
 .swap-operator-btn {
     position: absolute;
-    top: 12px;
+    top: 44px;
     right: 12px;
     width: 34px;
     height: 34px;
@@ -116,7 +116,7 @@
 
 .leader-badge {
     position: absolute;
-    top: 0;
+    top: 34px;
     left: 0;
     height: 90px;
     width: 20px;
@@ -134,64 +134,31 @@
         0 0 10px rgba(248, 245, 70, 0.35);
 }
 
-.operator-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding-top: 18px;
-}
-
-.operator-icon {
-    display: none;
-}
-
-.operator-row span {
-    font-size: 20px;
-    font-weight: 600;
-    color: #f1f1f1;
-}
-
 .operator-skill-name {
     position: absolute;
-    left: 46px;
-    right: 54px;
-    top: 8px;
-    min-height: 28px;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 34px;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0 12px;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 800;
     color: #ffffff;
-    z-index: 12;
+    z-index: 18;
     text-align: center;
-    border-radius: 999px;
     background:
-        linear-gradient(90deg,
-            rgba(0, 0, 0, 0.18),
-            rgba(0, 0, 0, 0.62) 18%,
-            rgba(0, 0, 0, 0.62) 82%,
-            rgba(0, 0, 0, 0.18));
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+        linear-gradient(180deg,
+            rgba(0, 0, 0, 0.88),
+            rgba(0, 0, 0, 0.52));
+    border-bottom: 1px solid rgba(255,255,255,0.06);
     text-shadow:
-        0 2px 6px rgba(0, 0, 0, 0.95),
-        0 0 12px rgba(0, 0, 0, 0.75);
+        0 2px 6px rgba(0, 0, 0, 0.95);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    box-shadow:
-        0 2px 8px rgba(0, 0, 0, 0.25),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05);
-}
-
-.operator-skill-card:not(.leader) .operator-skill-name {
-    left: 28px;
-}
-
-.operator-skill-card.leader .operator-skill-name {
-    left: 46px;
 }
 
 .skill-row {
@@ -253,31 +220,24 @@
     }
 
     .operator-skill-card::before {
+        top: 32px;
         height: 88px;
-        z-index: 0;
-        pointer-events: none;
     }
 
     .leader-badge {
+        top: 32px;
         height: 88px;
         font-size: 10px;
         padding: 3px 12px;
     }
 
+    .swap-operator-btn {
+        top: 40px;
+    }
+
     .operator-skill-name {
-        left: 40px;
-        right: 48px;
-        top: 8px;
-        min-height: 28px;
+        height: 32px;
         font-size: 15px;
-    }
-
-    .operator-skill-card:not(.leader) .operator-skill-name {
-        left: 22px;
-    }
-
-    .operator-skill-card.leader .operator-skill-name {
-        left: 40px;
     }
 
     .operator-skill-card.leader .skill-row {
