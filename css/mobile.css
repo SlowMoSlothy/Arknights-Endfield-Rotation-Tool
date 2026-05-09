@@ -1,6 +1,7 @@
 .mobile-confirm-fab {
     display: none;
 }
+
 @media (max-width: 900px) {
     .mobile-confirm-fab {
         display: flex;
@@ -25,15 +26,18 @@
         font-size: 22px;
         font-weight: 900;
         box-shadow:
-            0 0 18px rgba(248,245,70,0.45),
-            0 8px 22px rgba(0,0,0,0.45);
+            0 0 18px rgba(248, 245, 70, 0.45),
+            0 8px 22px rgba(0, 0, 0, 0.45);
     }
-.selection-confirm-btn {
+
+    .selection-confirm-btn {
         display: none;
     }
+
     .mobile-confirm-fab:active {
         transform: scale(0.94);
     }
+
     body {
         margin: 0;
         padding: 10px;
@@ -117,9 +121,11 @@
         gap: 8px;
         cursor: pointer;
     }
-.operator-skill-card .skill-small {
-    cursor: grab;
-}
+
+    .operator-skill-card .skill-small {
+        cursor: grab;
+    }
+
     .operator-icon {
         width: 28px;
         height: 28px;
@@ -141,10 +147,10 @@
         padding: 10px;
     }
 
-        #rotationDropZone {
-            width: max-content;
-            min-width: 0;
-        }
+    #rotationDropZone {
+        width: max-content;
+        min-width: 0;
+    }
 
     .rotation-slot {
         width: 64px;
@@ -174,13 +180,13 @@
     }
 
     .team-slot .remove-btn {
-    width: 22px;
-    height: 22px;
-    top: -6px;
-    right: -6px;
-    font-size: 13px;
-    line-height: 1;
-}
+        width: 22px;
+        height: 22px;
+        top: -6px;
+        right: -6px;
+        font-size: 13px;
+        line-height: 1;
+    }
 
     .rotation-skill:hover .remove-btn {
         opacity: 1;
@@ -205,48 +211,52 @@
         width: 14px;
         height: 14px;
     }
+
     .team-slots {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 6px;
-    width: 100%;
-    align-items: stretch;
-}
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+        width: 100%;
+        align-items: stretch;
+    }
 
-.team-slot {
-    width: 100%;
-    min-width: 0;
-    aspect-ratio: 1 / 1;
-    padding: 2px;
-    box-sizing: border-box;
-    position: relative;
-    overflow: visible;
-}
+    .team-slot {
+        width: 100%;
+        min-width: 0;
+        aspect-ratio: 1 / 1;
+        padding: 2px;
+        box-sizing: border-box;
+        position: relative;
+        overflow: visible;
+    }
 
-.team-slot img {
-    width: 95%;
-    height: 95%;
-    display: block;
-    border-radius: 10px;
-}
+    .team-slot img {
+        width: 95%;
+        height: 95%;
+        display: block;
+        border-radius: 10px;
+    }
+
     .operator-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 8px;
-}
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+    }
 
     .operator-card img {
         width: 50px;
         height: 50px;
         border-radius: 15px;
     }
-.operator-card {
-    width: 100%;
-    height: 85px;
-    border-radius: 14px;
-    padding: 6px;
-    box-sizing: border-box;
-}
+
+    .operator-card {
+        width: 100%;
+        height: 85px;
+        border-radius: 14px;
+        padding: 6px;
+        box-sizing: border-box;
+    }
+
     .rotation-slot.menu-open {
         border-color: #ffb347;
         box-shadow: 0 0 10px rgba(255, 179, 71, 0.45);
@@ -281,124 +291,117 @@
     .slot-action-btn:disabled {
         opacity: 0.45;
     }
+
     .export-mode .remove-btn {
-    display: none !important;
-}
+        display: none !important;
+    }
 
-.export-mode .rotation-slot:empty {
-    display: none !important;
-}
+    .export-mode .rotation-slot:empty {
+        display: none !important;
+    }
 
-.export-mode .rotation-slot {
-    border: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
-}
+    .export-mode .rotation-slot {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
 
-.export-mode .rotation-arrow.is-unused {
-    display: none !important;
-}
-#selectionScreen {
-    display: none;
-}
+    .export-mode .rotation-arrow.is-unused {
+        display: none !important;
+    }
 
-#selectionScreen.team-modal-open {
-    position: fixed;
-    inset: 0;
-    z-index: 9998;
-    overflow-y: auto;
-    padding: 18px;
-    background: rgba(8, 12, 14, 0.94);
-    backdrop-filter: blur(8px);
-    box-sizing: border-box;
-}
-#selectionScreen.team-modal-open .team-slots,
-#selectionScreen.team-modal-open .selection-title-row:first-of-type,
-#selectionScreen.team-modal-open .selection-max-label {
-    display: none !important;
-}
+    #selectionScreen {
+        display: none;
+    }
 
-#selectionScreen.team-modal-open .operator-title-row {
-    margin-top: 18px;
-}
+    #selectionScreen.team-modal-open {
+        position: fixed;
+        inset: 0;
+        z-index: 9998;
+        overflow-y: auto;
+        padding: 18px;
+        background: rgba(8, 12, 14, 0.94);
+        backdrop-filter: blur(8px);
+        box-sizing: border-box;
+    }
 
-#selectionScreen.team-modal-open .selection-confirm-btn,
-#selectionScreen.team-modal-open .mobile-confirm-fab {
-    position: fixed;
-    right: 18px;
-    bottom: calc(18px + env(safe-area-inset-bottom));
-    z-index: 10000;
-}
+    #selectionScreen.team-modal-open .team-slots,
+    #selectionScreen.team-modal-open .selection-title-row:first-of-type,
+    #selectionScreen.team-modal-open .selection-max-label {
+        display: none !important;
+    }
 
-#selectionScreen.team-modal-open {
-    padding-bottom: 110px;
-}
-#selectionScreen.team-modal-open .selection-hero,
-#selectionScreen.team-modal-open .selection-divider,
-#selectionScreen.team-modal-open .selection-title-row,
-#selectionScreen.team-modal-open .team-slots,
-#selectionScreen.team-modal-open .selection-confirm-btn,
-#selectionScreen.team-modal-open .mobile-confirm-fab {
-    display: none !important;
-}
+    #selectionScreen.team-modal-open .operator-title-row {
+        margin-top: 18px;
+    }
 
-#selectionScreen.team-modal-open .operator-title-row {
-    margin-top: 0;
-    margin-bottom: 18px;
-}
+    #selectionScreen.team-modal-open .selection-confirm-btn,
+    #selectionScreen.team-modal-open .mobile-confirm-fab {
+        position: fixed;
+        right: 18px;
+        bottom: calc(18px + env(safe-area-inset-bottom));
+        z-index: 10000;
+    }
 
-#selectionScreen.team-modal-open .operator-title-row .selection-section-title {
-    font-size: 28px;
-}
+    #selectionScreen.team-modal-open {
+        padding-bottom: 110px;
+    }
 
-#selectionScreen.team-modal-open {
-    padding: 24px 18px 40px;
-}
-.close-team-modal-btn {
-    display: none;
-}
+    #selectionScreen.team-modal-open .selection-hero,
+    #selectionScreen.team-modal-open .selection-divider,
+    #selectionScreen.team-modal-open .selection-title-row,
+    #selectionScreen.team-modal-open .team-slots,
+    #selectionScreen.team-modal-open .selection-confirm-btn,
+    #selectionScreen.team-modal-open .mobile-confirm-fab {
+        display: none !important;
+    }
 
-#selectionScreen.team-modal-open .close-team-modal-btn {
-    display: flex;
-    position: fixed;
+    #selectionScreen.team-modal-open .operator-title-row {
+        margin-top: 0;
+        margin-bottom: 18px;
+    }
 
-    right: 18px;
-    bottom: calc(18px + env(safe-area-inset-bottom));
+    #selectionScreen.team-modal-open .operator-title-row .selection-section-title {
+        font-size: 28px;
+    }
 
-    z-index: 10001;
+    #selectionScreen.team-modal-open {
+        padding: 24px 18px 40px;
+    }
 
-    width: 78px;
-    height: 78px;
+    .close-team-modal-btn {
+        display: none;
+    }
 
-    align-items: center;
-    justify-content: center;
+    #selectionScreen.team-modal-open .close-team-modal-btn {
+        display: flex;
+        position: fixed;
 
-    border: none;
-    border-radius: 50%;
+        right: 18px;
+        bottom: calc(18px + env(safe-area-inset-bottom));
 
-    background: #F8F546;
-    color: #111;
+        z-index: 10001;
 
-    font-size: 44px;
-    font-weight: 700;
-    line-height: 1;
+        width: 78px;
+        height: 78px;
 
-    box-shadow:
-        0 0 22px rgba(248,245,70,0.45),
-        0 8px 24px rgba(0,0,0,0.45);
+        align-items: center;
+        justify-content: center;
 
-    backdrop-filter: blur(6px);
-}
-}
-.swap-operator-btn {
-    width: 38px;
-    height: 38px;
+        border: none;
+        border-radius: 50%;
 
-    right: 8px;
-    bottom: 8px;
-}
+        background: #F8F546;
+        color: #111;
 
-.swap-operator-btn svg {
-    width: 20px;
-    height: 20px;
+        font-size: 44px;
+        font-weight: 700;
+        line-height: 1;
+
+        box-shadow:
+            0 0 22px rgba(248, 245, 70, 0.45),
+            0 8px 24px rgba(0, 0, 0, 0.45);
+
+        backdrop-filter: blur(6px);
+    }
 }
