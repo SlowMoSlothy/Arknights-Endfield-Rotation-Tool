@@ -70,24 +70,17 @@
     position: absolute;
     top: 12px;
     right: 12px;
-
     width: 34px;
     height: 34px;
     min-width: 34px;
-
     z-index: 20;
-
     border: 2px solid #F8F546;
     border-radius: 50%;
-
     background: rgba(0, 0, 0, 0.82);
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     padding: 0;
-
     box-shadow:
         0 0 14px rgba(248, 245, 70, 0.35),
         0 4px 10px rgba(0, 0, 0, 0.45);
@@ -96,74 +89,42 @@
 .swap-operator-btn svg {
     width: 18px;
     height: 18px;
-
     fill: #F8F546;
     stroke: #F8F546;
 }
 
 .leader-badge {
     position: absolute;
-
     top: 0;
     left: 0;
     bottom: 0;
-
     width: 20px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     background: #F8F546;
     color: #000000;
-
     font-size: 10px;
     font-weight: 900;
-
     writing-mode: vertical-rl;
     transform: rotate(180deg);
-
     z-index: 15;
-
     box-shadow:
         0 0 10px rgba(248, 245, 70, 0.35);
 }
 
-.operator-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding-top: 18px;
-}
-
-.operator-icon {
-    display: none;
-}
-
-.operator-row span {
-    font-size: 20px;
-    font-weight: 600;
-    color: #f1f1f1;
-}
-
 .operator-skill-name {
     position: absolute;
-
     left: 30px;
     right: 52px;
     top: 14px;
-
     font-size: 18px;
     font-weight: 800;
-
     color: #ffffff;
-
     z-index: 12;
-
     text-shadow:
         0 2px 6px rgba(0, 0, 0, 0.95),
         0 0 12px rgba(0, 0, 0, 0.75);
-
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -174,14 +135,16 @@
     left: 28px;
     right: 12px;
     bottom: 10px;
-
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 9px;
     flex-wrap: nowrap;
-
-    z-index: 7;
+    z-index: 12;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.55));
+    backdrop-filter: blur(3px);
 }
 
 .skill-small {
@@ -214,59 +177,60 @@
     content: "";
     position: absolute;
     inset: 0;
-
     background:
-        linear-gradient(90deg, rgba(10, 11, 13, 0.35), rgba(10, 11, 13, 0.78)),
+        linear-gradient(180deg,
+            rgba(0,0,0,0.15) 0%,
+            rgba(0,0,0,0.25) 35%,
+            rgba(0,0,0,0.70) 100%),
         var(--operator-bg) center/cover no-repeat;
-
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-
     opacity: 1;
-    filter: saturate(1.15) contrast(1.05);
-
+    filter: saturate(1.12) contrast(1.05);
     z-index: 0;
     pointer-events: none;
 }
 
+.operator-skill-card::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 48px;
+    background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.65));
+    z-index: 1;
+    pointer-events: none;
+}
+
+.operator-skill-card > * {
+    position: relative;
+    z-index: 2;
+}
+
 @media (max-width: 900px) {
 
-    .operator-skill-card::before {
-        z-index: 0;
-        pointer-events: none;
-    }
-
-    .operator-skill-card>* {
-        position: relative;
-        z-index: 2;
-    }
-
     .operator-skill-name {
-        position: absolute;
-        left: 14px;
-        bottom: 54px;
-        font-size: 22px;
-        text-shadow: 0 3px 8px #000;
+        left: 30px;
+        right: 50px;
+        top: 12px;
+        font-size: 17px;
     }
 
     .skill-row {
-        position: absolute;
-        left: 12px;
-        right: 12px;
-        bottom: 12px;
+        left: 26px;
+        right: 10px;
+        bottom: 8px;
+        gap: 6px;
+        padding: 3px 6px;
     }
 
-    .leader-badge {
-        font-size: 10px;
-        padding: 3px 12px;
-        width: auto;
-    }
     .skill-small {
-        width: 34px;
-        height: 34px;
-        min-width: 34px;
-        min-height: 34px;
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
         padding: 2px;
     }
 
