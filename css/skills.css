@@ -173,7 +173,7 @@
     position: absolute;
     left: 28px;
     right: 12px;
-    bottom: 10px;
+    bottom: 0px;
 
     display: flex;
     justify-content: center;
