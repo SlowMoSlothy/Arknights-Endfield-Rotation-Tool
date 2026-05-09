@@ -68,12 +68,12 @@
 
 .swap-operator-btn {
     position: absolute;
+    top: 12px;
+    right: 12px;
 
-    top: 10px;
-    right: 10px;
-
-    width: 38px;
-    height: 38px;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
 
     z-index: 20;
 
@@ -85,6 +85,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
+    padding: 0;
 
     box-shadow:
         0 0 14px rgba(248, 245, 70, 0.35),
@@ -132,10 +134,11 @@
 .operator-skill-name {
     position: absolute;
     left: 14px;
-    bottom: 52px;
+    right: 58px;
+    bottom: 58px;
 
-    font-size: 24px;
-    font-weight: 700;
+    font-size: 22px;
+    font-weight: 800;
     color: #ffffff;
 
     z-index: 12;
@@ -145,14 +148,23 @@
         0 0 12px rgba(0, 0, 0, 0.75);
 
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .skill-row {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 9px;
     flex-wrap: nowrap;
+
+    z-index: 7;
 }
 
 .skill-small {
