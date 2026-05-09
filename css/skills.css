@@ -70,24 +70,17 @@
     position: absolute;
     top: 12px;
     right: 12px;
-
     width: 34px;
     height: 34px;
     min-width: 34px;
-
     z-index: 20;
-
     border: 2px solid #F8F546;
     border-radius: 50%;
-
     background: rgba(0, 0, 0, 0.82);
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     padding: 0;
-
     box-shadow:
         0 0 14px rgba(248, 245, 70, 0.35),
         0 4px 10px rgba(0, 0, 0, 0.45);
@@ -96,35 +89,26 @@
 .swap-operator-btn svg {
     width: 18px;
     height: 18px;
-
     fill: #F8F546;
     stroke: #F8F546;
 }
 
 .leader-badge {
     position: absolute;
-
     top: 0;
     left: 0;
     bottom: 0;
-
     width: 20px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     background: #F8F546;
     color: #000000;
-
     font-size: 10px;
     font-weight: 900;
-
     writing-mode: vertical-rl;
     transform: rotate(180deg);
-
     z-index: 15;
-
     box-shadow:
         0 0 10px rgba(248, 245, 70, 0.35);
 }
@@ -148,22 +132,16 @@
 
 .operator-skill-name {
     position: absolute;
-
     left: 30px;
     right: 52px;
     top: 14px;
-
     font-size: 18px;
     font-weight: 800;
-
     color: #ffffff;
-
     z-index: 12;
-
     text-shadow:
         0 2px 6px rgba(0, 0, 0, 0.95),
         0 0 12px rgba(0, 0, 0, 0.75);
-
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -171,40 +149,31 @@
 
 .skill-row {
     position: absolute;
-    left: 20px;
-    right: 0;
-    bottom: 0;
-
-    height: 38px;
-
+    left: 28px;
+    right: 12px;
+    bottom: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 9px;
     flex-wrap: nowrap;
-
     z-index: 12;
-
     padding: 4px 8px;
-    border-radius: 0 0 16px 0;
-
-    background: rgba(0, 0, 0, 0.46);
-    backdrop-filter: blur(7px);
-    -webkit-backdrop-filter: blur(7px);
-
-    border-top: 1px solid rgba(248, 245, 70, 0.32);
-    box-shadow:
-        0 -8px 18px rgba(0, 0, 0, 0.20),
-        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    border-radius: 999px;
 }
 
 .skill-row::before {
     content: "";
     position: absolute;
     inset: 0;
-    border-radius: 0 0 16px 0;
-    background:
-        linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.18));
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.38);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow:
+        0 3px 10px rgba(0, 0, 0, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
     pointer-events: none;
     z-index: -1;
 }
@@ -239,21 +208,14 @@
     content: "";
     position: absolute;
     inset: 0;
-
     background:
-        linear-gradient(180deg,
-            rgba(10, 11, 13, 0.08) 0%,
-            rgba(10, 11, 13, 0.20) 52%,
-            rgba(10, 11, 13, 0.62) 100%),
+        linear-gradient(90deg, rgba(10, 11, 13, 0.35), rgba(10, 11, 13, 0.78)),
         var(--operator-bg) center/cover no-repeat;
-
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-
     opacity: 1;
     filter: saturate(1.15) contrast(1.05);
-
     z-index: 0;
     pointer-events: none;
 }
@@ -286,10 +248,10 @@
     .skill-row {
         position: absolute;
         left: 12px;
-        right: 0;
-        bottom: 0;
-        height: 38px;
-        border-radius: 0 0 16px 0;
+        right: 12px;
+        bottom: 12px;
+        padding: 4px 8px;
+        border-radius: 999px;
     }
 
     .leader-badge {
