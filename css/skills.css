@@ -171,9 +171,11 @@
 
 .skill-row {
     position: absolute;
-    left: 28px;
-    right: 12px;
-    bottom: 0px;
+    left: 20px;
+    right: 0;
+    bottom: 0;
+
+    height: 38px;
 
     display: flex;
     justify-content: center;
@@ -181,25 +183,29 @@
     gap: 9px;
     flex-wrap: nowrap;
 
-    z-index: 7;
+    z-index: 12;
 
     padding: 4px 8px;
-    border-radius: 999px;
+    border-radius: 0 0 16px 0;
+
+    background: rgba(0, 0, 0, 0.46);
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+
+    border-top: 1px solid rgba(248, 245, 70, 0.32);
+    box-shadow:
+        0 -8px 18px rgba(0, 0, 0, 0.20),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .skill-row::before {
     content: "";
     position: absolute;
     inset: 0;
-    border-radius: 999px;
-
-    background: rgba(0, 0, 0, 0.38);
-
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-
-    border: 1px solid rgba(255,255,255,0.08);
-
+    border-radius: 0 0 16px 0;
+    background:
+        linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.18));
+    pointer-events: none;
     z-index: -1;
 }
 
@@ -235,7 +241,10 @@
     inset: 0;
 
     background:
-        linear-gradient(90deg, rgba(10, 11, 13, 0.35), rgba(10, 11, 13, 0.78)),
+        linear-gradient(180deg,
+            rgba(10, 11, 13, 0.08) 0%,
+            rgba(10, 11, 13, 0.20) 52%,
+            rgba(10, 11, 13, 0.62) 100%),
         var(--operator-bg) center/cover no-repeat;
 
     background-size: cover;
@@ -247,6 +256,11 @@
 
     z-index: 0;
     pointer-events: none;
+}
+
+.operator-skill-card > * {
+    position: relative;
+    z-index: 2;
 }
 
 @media (max-width: 900px) {
@@ -272,8 +286,10 @@
     .skill-row {
         position: absolute;
         left: 12px;
-        right: 12px;
-        bottom: 12px;
+        right: 0;
+        bottom: 0;
+        height: 38px;
+        border-radius: 0 0 16px 0;
     }
 
     .leader-badge {
