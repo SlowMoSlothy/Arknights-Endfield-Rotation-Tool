@@ -149,9 +149,9 @@ function renderSkills() {
         const card = document.createElement("div");
         card.className = "operator-skill-card";
         card.style.setProperty(
-    "--operator-bg",
-    `url("/${op.background || op.icon}")`
-);
+            "--operator-bg",
+            `url("${op.background || op.icon}")`
+        );
         if (index === 0) card.classList.add("leader");
 
         const swapBtn = createSwapOperatorButton(op, index);

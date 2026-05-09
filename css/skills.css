@@ -167,9 +167,9 @@
     position: absolute;
     inset: 0;
 
-    background-image:
+    background:
         linear-gradient(90deg, rgba(10,11,13,0.35), rgba(10,11,13,0.78)),
-        var(--operator-bg);
+        var(--operator-bg) center/cover no-repeat;
 
     background-size: cover;
     background-position: center;
