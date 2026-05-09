@@ -71,9 +71,7 @@
     left: 20px;
     right: 0;
     height: 90px;
-    background:
-        linear-gradient(90deg, rgba(10, 11, 13, 0.35), rgba(10, 11, 13, 0.78)),
-        var(--operator-bg) center/cover no-repeat;
+    background: var(--operator-bg) center/cover no-repeat;
     opacity: 1;
     filter: saturate(1.15) contrast(1.05);
     z-index: 0;
