@@ -173,7 +173,7 @@
     position: absolute;
     left: 28px;
     right: 12px;
-    bottom: 10px;
+    bottom: 0;
 
     display: flex;
     justify-content: center;
@@ -181,7 +181,30 @@
     gap: 9px;
     flex-wrap: nowrap;
 
-    z-index: 7;
+    z-index: 14;
+
+    padding: 0;
+    border-radius: 999px;
+    transform: translateY(50%);
+}
+
+.skill-row::before {
+    content: "";
+    position: absolute;
+    inset: -4px -8px;
+    border-radius: 999px;
+
+    background: rgba(0, 0, 0, 0.46);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.32),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+    pointer-events: none;
+    z-index: -1;
 }
 
 .skill-small {
@@ -230,6 +253,11 @@
     pointer-events: none;
 }
 
+.operator-skill-card > * {
+    position: relative;
+    z-index: 2;
+}
+
 @media (max-width: 900px) {
 
     .operator-skill-card::before {
@@ -254,7 +282,10 @@
         position: absolute;
         left: 12px;
         right: 12px;
-        bottom: 12px;
+        bottom: 0;
+        padding: 0;
+        border-radius: 999px;
+        transform: translateY(50%);
     }
 
     .leader-badge {
