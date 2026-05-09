@@ -148,10 +148,10 @@ function renderSkills() {
     activeOperators.forEach((op, index) => {
         const card = document.createElement("div");
         card.className = "operator-skill-card";
-        card.style.setProperty(
-            "--operator-bg",
-            `url("${op.background || op.icon}")`
-        );
+        const bgPath = op.background || op.icon;
+        const bgUrl = new URL(bgPath, document.baseURI).href;
+
+        card.style.setProperty("--operator-bg", `url("${bgUrl}")`);
         if (index === 0) card.classList.add("leader");
 
         const swapBtn = createSwapOperatorButton(op, index);
