@@ -1,10 +1,15 @@
 function getExportWatermarkUrl() {
+    const configuredUrl = typeof builderWatermarkUrl === "string" ? builderWatermarkUrl.trim() : "";
+    if (configuredUrl) {
+        return configuredUrl.split("#")[0];
+    }
+
     const currentUrl = window.location.href;
     if (currentUrl.startsWith("http://") || currentUrl.startsWith("https://")) {
         return currentUrl.split("#")[0];
     }
 
-    return typeof builderWatermarkUrl === "undefined" ? "" : builderWatermarkUrl;
+    return "";
 }
 
 function addExportWatermark(clonedDoc, clonedRotation, url) {
