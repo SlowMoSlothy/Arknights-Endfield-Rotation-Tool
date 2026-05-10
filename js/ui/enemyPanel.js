@@ -7,6 +7,14 @@ function getEffectIcon(effect) {
     return `${effect.iconBase}.png`;
 }
 
+function getEnemyRank(enemy) {
+    return enemy.enemyRank || enemy.rank || "normal";
+}
+
+function getEnemyType(enemy) {
+    return enemy.enemyType || enemy.elementType || "neutral";
+}
+
 function collectEnemyEffects() {
     const effectMap = new Map();
 
@@ -17,8 +25,7 @@ function collectEnemyEffects() {
         if (!skillData || !skillData.debuffs || !Array.isArray(skillData.debuffs)) return;
 
         skillData.debuffs.forEach(debuff => {
-            if(debuff.visible === false) return;
-            // Nur eindeutige IDs verwenden
+            if (debuff.visible === false) return;
             if (!debuff.id) return;
 
             const effectId = debuff.id;
@@ -30,11 +37,8 @@ function collectEnemyEffects() {
                 });
             } else {
                 const existing = effectMap.get(effectId);
-
-                // Nur wirklich stackbare Effekte erhöhen
                 if (existing.stackable) {
                     existing.stacks += debuff.stacksApplied || 1;
-
                     if (existing.maxStacks) {
                         existing.stacks = Math.min(existing.stacks, existing.maxStacks);
                     }
@@ -60,7 +64,126 @@ function renderEnemyEffects() {
         icon.src = getEffectIcon(effect);
         icon.alt = effect.name || "Effect";
         icon.title = effect.name || "Effect";
-
         container.appendChild(icon);
     });
+}
+
+function renderEnemySkillBar() {
+    if (!isEnemyPanelEnabled()) return;
+
+    const container = document.getElementById("enemySkillBar");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    const enemy = getSelectedEnemy();
+    if (!enemy) return;
+
+    const header = document.createElement("div");
+    header.className = `enemy-card enemy-rank-${getEnemyRank(enemy)} enemy-type-${getEnemyType(enemy)}`;
+    header.innerHTML = `
+        <img class="enemy-card-icon" src="${enemy.icon}" alt="${enemy.name}">
+        <div class="enemy-card-info">
+            <div class="enemy-card-name">${enemy.name}</div>
+            <div class="enemy-card-meta">${getEnemyRank(enemy).toUpperCase()} · ${getEnemyType(enemy).toUpperCase()}</div>
+        </div>
+    `;
+    container.appendChild(header);
+
+    const skillRow = document.createElement("div");
+    skillRow.className = "enemy-skill-row";
+
+    enemy.skills.forEach(skill => {
+        const div = document.createElement("div");
+        div.className = `skill skill-small enemy-skill enemy-skill-rank-${getEnemyRank(enemy)} enemy-skill-type-${getEnemyType(enemy)}`;
+        div.dataset.id = String(skill.id);
+        div.dataset.largeIcon = skill.icon;
+
+        div.appendChild(createSkillIcon(skill, {
+            size: "small",
+            useSmallIcon: true
+        }));
+
+        skillRow.appendChild(div);
+
+        if (typeof attachSkillTooltipEvents === "function") {
+            attachSkillTooltipEvents(div, skill);
+        }
+    });
+
+    container.appendChild(skillRow);
+
+    if (typeof initEnemySkillDragDrop === "function") {
+        initEnemySkillDragDrop();
+    }
+}
+
+function renderEnemyModal() {
+    const list = document.getElementById("enemyModalList");
+    if (!list) return;
+
+    list.innerHTML = "";
+
+    enemies.forEach(enemy => {
+        const btn = document.createElement("button");
+        btn.className = `settings-option-btn enemy-select-btn enemy-rank-${getEnemyRank(enemy)} enemy-type-${getEnemyType(enemy)}`;
+        btn.type = "button";
+        btn.innerHTML = `
+            <img class="enemy-select-icon" src="${enemy.icon}" alt="${enemy.name}">
+            <div class="enemy-select-text">
+                <div class="settings-option-title">${enemy.name}</div>
+                <div class="enemy-select-meta">${getEnemyRank(enemy).toUpperCase()} · ${getEnemyType(enemy).toUpperCase()}</div>
+                <div style="font-size:12px;opacity:.8;">${enemy.description || ""}</div>
+            </div>
+        `;
+
+        btn.addEventListener("click", () => {
+            setSelectedEnemy(enemy.id);
+            closeEnemyModal();
+            renderEnemySkillBar();
+        });
+
+        list.appendChild(btn);
+    });
+}
+
+function openEnemyModal() {
+    renderEnemyModal();
+    document.getElementById("enemyModal")?.classList.add("open");
+}
+
+function closeEnemyModal() {
+    document.getElementById("enemyModal")?.classList.remove("open");
+}
+
+function isEnemyPanelEnabled() {
+    return typeof showEnemyPanel === "undefined" ? true : showEnemyPanel;
+}
+
+function applyEnemyPanelVisibility() {
+    const panel = document.getElementById("enemyPanel");
+    const isEnabled = isEnemyPanelEnabled();
+
+    if (panel) {
+        panel.hidden = !isEnabled;
+    }
+
+    if (!isEnabled) {
+        closeEnemyModal();
+
+        if (enemySkillSourceSortable) {
+            enemySkillSourceSortable.destroy();
+            enemySkillSourceSortable = null;
+        }
+    }
+
+    return isEnabled;
+}
+
+function initEnemyPanel() {
+    if (!applyEnemyPanelVisibility()) return;
+
+    document.getElementById("selectEnemyBtn")?.addEventListener("click", openEnemyModal);
+    document.getElementById("closeEnemyModalBtn")?.addEventListener("click", closeEnemyModal);
+    renderEnemySkillBar();
 }

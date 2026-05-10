@@ -13,6 +13,13 @@ const DEBUFF_REGISTRY = {
         maxStacks: 0,
         extension: "png"
     },
+    electrification_consumed: {
+        name: "Electrification consumed",
+        iconBase: "assets/ui/debuffs/electrification_consumed",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
     combustion: {
         name: "Combustion",
         iconBase: "assets/ui/debuffs/combustion",
@@ -23,6 +30,13 @@ const DEBUFF_REGISTRY = {
     corrosion: {
         name: "Corrosion",
         iconBase: "assets/ui/debuffs/corrosion",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+    crush: {
+        name: "Crush",
+        iconBase: "assets/ui/debuffs/crush",
         stackable: false,
         maxStacks: 0,
         extension: "png"
@@ -51,9 +65,9 @@ const DEBUFF_REGISTRY = {
     arts_susceptibility: {
         name: "Arts Susceptibility",
         iconBase: "assets/ui/debuffs/arts_susceptibility",
-        stackable: true,
+        stackable: false,
         maxStacks: 4,
-        extension: "png"
+        extension: "svg"
     },
     heat_infliction: {
         name: "Heat Infliction",
@@ -151,14 +165,14 @@ const DEBUFF_REGISTRY = {
         iconBase: "assets/ui/debuffs/lift",
         stackable: false,
         maxStacks: 0,
-        extension: "png"
+        extension: "svg"
     },
     stagger: {
         name: "Stagger",
         iconBase: "assets/ui/debuffs/stagger",
         stackable: false,
         maxStacks: 0,
-        extension: "png"
+        extension: "svg"
     },
     knock_down: {
         name: "Knock Down",
@@ -212,13 +226,6 @@ const DEBUFF_REGISTRY = {
     heat_susceptibility: {
         name: "Heat Susceptibility",
         iconBase: "assets/ui/debuffs/heat_susceptibility",
-        stackable: false,
-        maxStacks: 0,
-        extension: "png"
-    },
-    electric_amp: {
-        name: "Electric Amp",
-        iconBase: "assets/ui/debuffs/electric_amp",
         stackable: false,
         maxStacks: 0,
         extension: "png"

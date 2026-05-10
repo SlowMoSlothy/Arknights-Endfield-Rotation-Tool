@@ -49,16 +49,15 @@ xaihi.skills = [
         description: "Summons Auxiliary Crystal. Provides HP Treatment after Final Strike and grants Arts Amp if HP is full.",
         buffs: [
             {
-                id: "auxiliary_crystal",
-                name: "Auxiliary Crystal",
-                appliesEffect: "auxiliary_crystal",
-                persistsForCombo: true,
-                visible: true,
-                stackable: true,
-                stacksApplied: 2,
-                maxStacks: 2,
-                iconBase: "assets/buffs/auxiliary_crystal"
-            },
+    id: "auxiliary_crystal",
+    name: "Auxiliary Crystal",
+    appliesEffect: "auxiliary_crystal",
+    persistsForCombo: true,
+    visible: true,
+    stackable: true,
+    stacksApplied: 2,
+    maxStacks: 2
+},
             {
                 id: "arts_amp",
                 name: "Arts Amp",
@@ -82,6 +81,7 @@ xaihi.skills = [
         elementType: "cryo",
         description: "Triggers when Auxiliary Crystal uses up its HP treatments. Applies Cryo Infliction.",
         comboTriggerMode: "all",
+        allowSelfTrigger: true,
         comboTriggers: [
             { effect: "auxiliary_crystal_used_up", minStacks: 1 }
         ],

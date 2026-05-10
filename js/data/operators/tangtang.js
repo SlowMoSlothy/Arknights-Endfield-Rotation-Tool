@@ -47,8 +47,7 @@ tangtang.skills = [
                 visible: true,
                 stackable: true,
                 stacksApplied: 1,
-                maxStacks: 4,
-                iconBase: "assets/debuffs/cryo_infliction"
+                maxStacks: 4
             }
         ]
     },
@@ -59,11 +58,12 @@ tangtang.skills = [
         iconSmall: "assets/operators/skills/tangtang/65px-Combo-Tangtang.webp",
         type: "Combo Skill",
         shortType: "CS",
-        cooldown: 0,
+        cooldown: 13,
         energy: 0,
         elementType: "cryo",
         description: "Triggers on Final Strike against an enemy with Cryo Infliction or Cryo Burst. Adds Arts Susceptibility.",
         comboTriggerMode: "all",
+        allowSelfTrigger: true,
         comboTriggers: [
             { effect: "final_strike", minStacks: 1 },
             {
@@ -82,8 +82,7 @@ tangtang.skills = [
                 visible: true,
                 stackable: true,
                 stacksApplied: 1,
-                maxStacks: 2,
-                iconBase: "assets/buffs/tangtang/whirlpool"
+                maxStacks: 2
             }
         ],
         debuffs: [
@@ -95,8 +94,7 @@ tangtang.skills = [
                 visible: true,
                 stackable: true,
                 stacksApplied: 1,
-                maxStacks: 4,
-                iconBase: "assets/debuffs/arts_susceptibility"
+                maxStacks: 4
             }
         ]
     },
@@ -118,10 +116,9 @@ tangtang.skills = [
                 appliesEffect: "cryo_infliction",
                 persistsForCombo: true,
                 visible: true,
-                stackable: true,
+                stackable: false,
                 stacksApplied: 1,
-                maxStacks: 4,
-                iconBase: "assets/debuffs/cryo_infliction"
+                maxStacks: 4
             },
             {
                 id: "cryo_burst",

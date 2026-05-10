@@ -39,6 +39,9 @@
   <div id="globalTooltip" class="global-tooltip"></div>
 
   <div id="selectionScreen">
+    <button id="closeTeamModalBtn" class="close-team-modal-btn" onclick="closeTeamSelectionModal()">
+  ×
+</button>
     <div class="selection-hero">
       <div class="selection-brand">
         <span>TEAM BUILDER FOR</span>
@@ -49,6 +52,9 @@
         <span class="confirm-check">✓</span>
         <span>Confirm team</span>
       </button>
+      <button class="mobile-confirm-fab" onclick="confirmTeam()">
+  ✓
+</button>
     </div>
 
     <div class="selection-divider"></div>
@@ -81,10 +87,21 @@
       <div class="builder-content">
         <aside class="builder-sidebar">
           <h3>Menu</h3>
-          <button onclick="backToSelection()">← Back to Team Selection</button>
-          <button onclick="exportImage()">📸 Export Rotation</button>
-          <button onclick="clearRotation()">🗑️ Clear Rotation</button>
-          <button id="openSettingsBtn" type="button">⚙️ Settings</button>
+          <button class="sidebar-command sidebar-command-primary" onclick="exportImage()">
+            <span class="sidebar-command-icon">▣</span>
+            <span class="sidebar-command-label">Export Rotation</span>
+            <span class="sidebar-command-signal"></span>
+          </button>
+          <button class="sidebar-command" onclick="clearRotation()">
+            <span class="sidebar-command-icon">⌫</span>
+            <span class="sidebar-command-label">Clear Rotation</span>
+            <span class="sidebar-command-signal"></span>
+          </button>
+          <button id="openSettingsBtn" class="sidebar-command" type="button">
+            <span class="sidebar-command-icon">⚙</span>
+            <span class="sidebar-command-label">Settings</span>
+            <span class="sidebar-command-signal"></span>
+          </button>
         </aside>
 
         <main class="builder-main">
@@ -97,6 +114,11 @@
             <div id="rotation" class="rotation-panel">
               <div id="rotationDropZone"></div>
             </div>
+          </section>
+          <section id="enemyPanel" class="builder-panel">
+            <h3>Enemy</h3>
+            <button id="selectEnemyBtn" type="button">Select Enemy</button>
+            <div id="enemySkillBar" class="skills-panel"></div>
           </section>
         </main>
       </div>
@@ -122,6 +144,16 @@
     </div>
   </div>
 
+  <div id="enemyModal" class="settings-modal">
+    <div class="settings-dialog">
+      <div class="settings-header">
+        <h2 class="settings-title">Select Enemy</h2>
+        <button id="closeEnemyModalBtn" class="settings-close" type="button">×</button>
+      </div>
+      <div id="enemyModalList" class="settings-section"></div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="js/utils/tooltipFormatter.js"></script>
@@ -129,6 +161,13 @@
   <script src="js/data/buffRegistry.js"></script>
   <script src="js/data/effectGroups.js"></script>
   <script src="js/data/reactionRules.js"></script>
+  <script src="js/data/enemies/trainingDummy.js"></script>
+<script src="js/data/enemies/heatAttacker.js"></script>
+<script src="js/data/enemies/frostAttacker.js"></script>
+<script src="js/data/enemies/electricAttacker.js"></script>
+<script src="js/data/enemies/physicalAttacker.js"></script>
+<script src="js/data/enemies/bossDummy.js"></script>
+  <script src="js/data/enemySkills.js"></script>
   <script src="js/data/operators/alesh.js"></script>
   <script src="js/data/operators/antal.js"></script>
   <script src="js/data/operators/akekuri.js"></script>

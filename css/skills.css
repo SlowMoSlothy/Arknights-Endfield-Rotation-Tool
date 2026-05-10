@@ -3,16 +3,16 @@
 ========================= */
 .skills-panel {
     background:
-        linear-gradient(180deg, rgba(22,24,26,0.96), rgba(16,18,20,0.98));
-    border: 1px solid rgba(255,255,255,0.10);
+        linear-gradient(180deg, rgba(22, 24, 26, 0.96), rgba(16, 18, 20, 0.98));
+    border: 1px solid rgba(255, 255, 255, 0.10);
     border-radius: 18px;
     padding: 14px;
     position: relative;
     overflow-x: auto;
     overflow-y: hidden;
     box-shadow:
-        inset 0 0 0 1px rgba(255,255,255,0.025),
-        0 10px 28px rgba(0,0,0,0.28);
+        inset 0 0 0 1px rgba(255, 255, 255, 0.025),
+        0 10px 28px rgba(0, 0, 0, 0.28);
 }
 
 .skills-panel::before {
@@ -21,8 +21,8 @@
     inset: 0;
     background:
         repeating-linear-gradient(-45deg,
-            rgba(255,255,255,0.012) 0px,
-            rgba(255,255,255,0.012) 2px,
+            rgba(255, 255, 255, 0.012) 0px,
+            rgba(255, 255, 255, 0.012) 2px,
             transparent 2px,
             transparent 8px);
     pointer-events: none;
@@ -34,84 +34,183 @@
     z-index: 1;
     display: flex;
     gap: 14px;
-    align-items: stretch;
+    align-items: flex-start;
     flex-wrap: nowrap;
     width: max-content;
 }
-
+.operator-skill-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 222px;
+}
 .operator-skill-card {
     position: relative;
-    display: grid;
-    grid-template-rows: auto 1fr;
-    gap: 10px;
-    min-width: 230px;
-    min-height: 118px;
+    display: block;
+    min-width: 222px;
+    min-height: 111px;
     background:
-        radial-gradient(circle at 20% 20%, rgba(248,245,70,0.05), transparent 42%),
-        linear-gradient(180deg, rgba(19,20,22,0.97), rgba(12,13,15,0.99));
-    border: 1px solid rgba(255,255,255,0.08);
+        radial-gradient(circle at 20% 20%, rgba(248, 245, 70, 0.05), transparent 42%),
+        linear-gradient(180deg, rgba(19, 20, 22, 0.97), rgba(12, 13, 15, 0.99));
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 16px;
-    padding: 12px;
+    padding: 0;
     overflow: hidden;
     box-shadow:
-        inset 0 0 0 1px rgba(255,255,255,0.025),
-        0 8px 18px rgba(0,0,0,0.24);
+        inset 0 0 0 1px rgba(255, 255, 255, 0.025),
+        0 8px 18px rgba(0, 0, 0, 0.24);
     transition: 0.18s ease;
 }
 
 .operator-skill-card.leader {
     border-color: #F8F546;
     box-shadow:
-        0 0 16px rgba(248,245,70,0.13),
-        inset 0 0 10px rgba(248,245,70,0.035);
+        0 0 16px rgba(248, 245, 70, 0.13),
+        inset 0 0 10px rgba(248, 245, 70, 0.035);
+}
+
+.operator-skill-card::before {
+    content: "";
+    position: absolute;
+    top: 34px;
+    left: 20px;
+    right: 0;
+    height: 92px;
+    background: var(--operator-bg) center 58%/cover no-repeat;
+    opacity: 1;
+    filter: saturate(1.15) contrast(1.05);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.operator-skill-card:not(.leader)::before {
+    left: 0;
+}
+
+.operator-skill-card > * {
+    position: relative;
+    z-index: 2;
+}
+
+.swap-operator-btn {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    z-index: 20;
+    transform: translateY(-50%);
+    border: 2px solid #F8F546;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.82);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    box-shadow:
+        0 0 14px rgba(248, 245, 70, 0.35),
+        0 4px 10px rgba(0, 0, 0, 0.45);
+}
+
+.swap-operator-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: #F8F546;
+    stroke: #F8F546;
+}
+
+.swap-operator-btn:hover {
+    transform: translateY(-50%);
+    background: linear-gradient(180deg, #F8F546, #d9d53b);
+    box-shadow:
+        0 0 18px rgba(248, 245, 70, 0.48),
+        0 4px 10px rgba(0, 0, 0, 0.45);
+}
+
+.swap-operator-btn:hover svg {
+    fill: #000000;
+    stroke: #000000;
 }
 
 .leader-badge {
     position: absolute;
-    top: 8px;
-    left: 10px;
-    background: #F8F546;
-    color: #111;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 3px 10px;
-    border-radius: 999px;
-    z-index: 5;
-}
-
-.operator-row {
+    top: 0px;
+    left: 0;
+    height: 111px;
+    width: 20px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding-top: 18px;
+    justify-content: center;
+    background: #F8F546;
+    color: #000000;
+    font-size: 18px;
+    font-weight: 900;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    z-index: 15;
+    box-shadow:
+        0 0 10px rgba(248, 245, 70, 0.35);
 }
 
-.operator-icon {
-    width: 30px;
-    height: 30px;
-    border-radius: 8px;
-    object-fit: cover;
-}
-
-.operator-row span {
-    font-size: 20px;
-    font-weight: 600;
-    color: #f1f1f1;
+.operator-skill-name {
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px 0 12px;
+    padding-right: 42px;
+    font-size: 17px;
+    font-weight: 800;
+    color: #ffffff;
+    z-index: 18;
+    text-align: center;
+    background:
+        linear-gradient(180deg,
+            rgba(0, 0, 0, 0.88),
+            rgba(0, 0, 0, 0.52));
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    text-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.95);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .skill-row {
+    width: 200px;
+    height: 46px;
+
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 9px;
-    flex-wrap: nowrap;
+
+    padding: 4px 10px;
+
+    border-radius: 14px;
+
+    background: rgba(0, 0, 0, 0.72);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.32),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .skill-small {
-    width: 42px;
-    height: 42px;
-    min-width: 42px;
-    min-height: 42px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
     border-radius: 50%;
     overflow: hidden;
     display: flex;
@@ -119,7 +218,7 @@
     justify-content: center;
     cursor: grab;
     position: relative;
-    border: 2px solid rgba(255,255,255,0.18);
+    border: 2px solid rgba(255, 255, 255, 0.18);
     background: #111;
     box-sizing: border-box;
     padding: 3px;
@@ -135,8 +234,37 @@
 
 @media (max-width: 900px) {
     .operator-skill-card {
-        min-width: 210px;
-        min-height: 106px;
+        min-height: 160px;
+    }
+
+    .operator-skill-card::before {
+        top: 32px;
+        height: 90px;
+    }
+
+    .leader-badge {
+        top: 32px;
+        height: 90px;
+        font-size: 10px;
+        padding: 3px 12px;
+    }
+
+    .swap-operator-btn {
+        top: 40px;
+    }
+
+    .operator-skill-name {
+        height: 32px;
+        font-size: 15px;
+    }
+
+    .operator-skill-card.leader .skill-row {
+        left: 28px;
+    }
+
+    .skill-row {
+        height: 40px;
+        bottom: 8px;
     }
 
     .skill-small {

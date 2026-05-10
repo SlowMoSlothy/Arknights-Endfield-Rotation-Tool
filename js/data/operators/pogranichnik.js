@@ -47,12 +47,9 @@ pogranichnik.skills = [
         energy: 100,
         elementType: "physical",
         description: "Deals Physical DMG, applies Breach, and consumes Vulnerability stacks for SP recovery.",
-        consumesEffects: [
-            {
-                effect: "vulnerable",
-                amount: "all"
-            }
-        ],
+        consumeDebuffs: [
+    "vulnerable"
+],
         debuffs: [
             {
                 id: "breach",
@@ -72,11 +69,12 @@ pogranichnik.skills = [
         iconSmall: "assets/operators/skills/pogranichnik/cs_small.png",
         type: "Combo Skill",
         shortType: "CS",
-        cooldown: 16,
+        cooldown: 18,
         energy: 0,
         elementType: "physical",
         description: "Triggers when Breach or Crush consumes Vulnerability stacks. Deals Physical DMG and recovers SP.",
         comboTriggerMode: "any",
+        allowSelfTrigger: true, 
         comboTriggers: [
             { effect: "breach", minStacks: 1 },
             { effect: "crush", minStacks: 1 }

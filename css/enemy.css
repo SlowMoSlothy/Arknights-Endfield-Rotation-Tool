@@ -1,5 +1,7 @@
 .enemy-panel {
     display: flex;
+    flex-direction: column;
+    gap: 12px;
     justify-content: center;
     align-items: center;
     min-height: 140px;
@@ -9,11 +11,64 @@
     padding: 12px;
 }
 
-.enemy-panel img {
-    max-width: 120px;
-    max-height: 120px;
-    object-fit: contain;
+.enemy-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px;
+    border-radius: 12px;
+    background: #0f0f0f;
+    border: 2px solid #555;
 }
+
+.enemy-card-icon,
+.enemy-select-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.enemy-card-name {
+    font-weight: 700;
+    color: white;
+}
+
+.enemy-card-meta,
+.enemy-select-meta {
+    font-size: 12px;
+    opacity: .75;
+}
+
+.enemy-skill-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.enemy-select-btn {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    text-align: left;
+}
+
+.enemy-select-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.enemy-rank-normal { border-color: #777; }
+.enemy-rank-elite { border-color: #7a5cff; box-shadow: 0 0 10px rgba(122,92,255,.35); }
+.enemy-rank-boss { border-color: #ff3c3c; box-shadow: 0 0 14px rgba(255,60,60,.45); }
+
+.enemy-type-heat { background: linear-gradient(135deg,#24100a,#0f0f0f); }
+.enemy-type-frost { background: linear-gradient(135deg,#0a1f2c,#0f0f0f); }
+.enemy-type-electric { background: linear-gradient(135deg,#1b1230,#0f0f0f); }
+.enemy-type-physical { background: linear-gradient(135deg,#252525,#0f0f0f); }
+.enemy-type-boss { background: linear-gradient(135deg,#2c0b0b,#0f0f0f); }
 
 .enemy-effects-panel {
     display: flex;

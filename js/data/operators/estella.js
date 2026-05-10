@@ -61,7 +61,7 @@ estella.skills = [
         iconSmall: "assets/operators/skills/estella/cs_small.png",
         type: "Combo Skill",
         shortType: "CS",
-        cooldown: 0,
+        cooldown: 18,
         energy: 0,
         elementType: "physical",
         description: "Triggers on Solidification. Applies Lift and Physical Susceptibility.",

@@ -27,7 +27,6 @@ dapan.skills = [
             }
         ]
     },
-
     {
         id: (dapan.id * 100) + 2,
         name: "FLIP DA WOK!",
@@ -38,15 +37,14 @@ dapan.skills = [
         cooldown: 20,
         energy: 100,
         elementType: "physical",
-        description: "Deals Physical DMG and applies Lift.",
+        description: "Deals Physical DMG and applies Lift plus 1 Vulnerable stack.",
         debuffs: [
             {
                 id: "lift",
                 name: "Lift",
                 appliesEffect: "lift",
                 persistsForCombo: false,
-                visible: true,
-                iconBase: "assets/debuffs/lift"
+                visible: true
             },
             {
                 id: "vulnerable",
@@ -56,12 +54,10 @@ dapan.skills = [
                 visible: true,
                 stackable: true,
                 stacksApplied: 1,
-                maxStacks: 4,
-                iconBase: "assets/debuffs/vulnerable"
+                maxStacks: 4
             }
         ]
     },
-
     {
         id: (dapan.id * 100) + 3,
         name: "MORE SPICE!",
@@ -72,10 +68,14 @@ dapan.skills = [
         cooldown: 20,
         energy: 0,
         elementType: "physical",
-        description: "Triggers when enemy reaches 4 Vulnerability stacks. Deals Physical DMG and applies Crush.",
+        description: "Triggers at 4 Vulnerable stacks. Consumes Vulnerable and applies Crush.",
         comboTriggerMode: "all",
+        allowSelfTrigger: true,
         comboTriggers: [
             { effect: "vulnerable", minStacks: 4 }
+        ],
+        consumeDebuffs: [
+            "vulnerable"
         ],
         debuffs: [
             {
@@ -83,15 +83,13 @@ dapan.skills = [
                 name: "Crush",
                 appliesEffect: "crush",
                 persistsForCombo: false,
-                visible: true,
-                iconBase: "assets/debuffs/crush"
+                visible: true
             }
         ]
     },
-
     {
         id: (dapan.id * 100) + 4,
-        name: "CHOP 'N DUNK!",
+        name: "CHOP N DUNK!",
         icon: dapan.icon,
         iconSmall: "assets/operators/skills/dapan/ult_small.png",
         type: "Ultimate",
@@ -99,15 +97,21 @@ dapan.skills = [
         cooldown: 15,
         energy: 90,
         elementType: "physical",
-        description: "Applies Lift and 4 Vulnerability stacks.",
+        description: "Applies Lift, Knock Down, and 4 Vulnerable stacks.",
         debuffs: [
             {
                 id: "lift",
                 name: "Lift",
                 appliesEffect: "lift",
                 persistsForCombo: false,
-                visible: true,
-                iconBase: "assets/debuffs/lift"
+                visible: true
+            },
+            {
+                id: "knock_down",
+                name: "Knock Down",
+                appliesEffect: "knock_down",
+                persistsForCombo: false,
+                visible: true
             },
             {
                 id: "vulnerable",
@@ -117,8 +121,7 @@ dapan.skills = [
                 visible: true,
                 stackable: true,
                 stacksApplied: 4,
-                maxStacks: 4,
-                iconBase: "assets/debuffs/vulnerable"
+                maxStacks: 4
             }
         ]
     }

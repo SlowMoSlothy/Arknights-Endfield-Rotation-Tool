@@ -38,8 +38,7 @@ lastrite.skills = [
                         visible: true,
                         stackable: true,
                         stacksApplied: 1,
-                        maxStacks: 4,
-                        iconBase: "assets/debuffs/cryo_infliction"
+                        maxStacks: 4
                     }
                 ]
             }
@@ -76,7 +75,7 @@ lastrite.skills = [
         iconSmall: "assets/operators/skills/lastrite/cs_small.png",
         type: "Combo Skill",
         shortType: "CS",
-        cooldown: 0,
+        cooldown: 9,
         energy: 0,
         elementType: "cryo",
         description: "Triggers when the enemy has at least 3 Cryo Infliction stacks. Consumes Cryo Infliction and applies Cryo Susceptibility.",
@@ -84,11 +83,9 @@ lastrite.skills = [
         comboTriggers: [
             { effect: "cryo_infliction", minStacks: 3 }
         ],
-        consumesEffects: [
-            {
-                effect: "cryo_infliction",
-                amount: "all"
-            }
+        allowSelfTrigger: true,
+        consumeDebuffs: [
+            "cryo_infliction"
         ],
         debuffs: [
             {
@@ -97,8 +94,7 @@ lastrite.skills = [
                 appliesEffect: "cryo_susceptibility",
                 persistsForCombo: true,
                 visible: true,
-                stackable: false,
-                iconBase: "assets/debuffs/cryo_susceptibility"
+                stackable: false
             }
         ]
     },
@@ -121,8 +117,7 @@ lastrite.skills = [
                 appliesEffect: "cryo_susceptibility",
                 persistsForCombo: true,
                 visible: true,
-                stackable: false,
-                iconBase: "assets/debuffs/cryo_susceptibility"
+                stackable: false
             }
         ]
     }

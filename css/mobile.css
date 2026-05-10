@@ -1,12 +1,54 @@
+.mobile-confirm-fab {
+    display: none;
+}
+
 @media (max-width: 900px) {
+    .mobile-confirm-fab {
+        display: flex;
+        position: fixed;
+        right: 18px;
+        bottom: 24px;
+        z-index: 9999;
+
+        align-items: center;
+        justify-content: center;
+
+        min-width: 64px;
+        height: 64px;
+        padding: 0 20px;
+
+        border: none;
+        border-radius: 999px;
+
+        background: #F8F546;
+        color: #111;
+
+        font-size: 22px;
+        font-weight: 900;
+        box-shadow:
+            0 0 18px rgba(248, 245, 70, 0.45),
+            0 8px 22px rgba(0, 0, 0, 0.45);
+    }
+
+    .selection-confirm-btn {
+        display: none;
+    }
+
+    .mobile-confirm-fab:active {
+        transform: scale(0.94);
+    }
+
     body {
         margin: 0;
         padding: 10px;
+        overflow-x: hidden;
     }
 
     .builder-shell {
         max-width: 100%;
         margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
 
     .builder-top {
@@ -38,14 +80,25 @@
     .builder-content {
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 14px;
+        min-width: 0;
     }
 
     .builder-sidebar {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 8px;
         padding: 10px;
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    .builder-panel {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        padding: 12px;
     }
 
     .builder-sidebar h3 {
@@ -56,30 +109,122 @@
     .builder-sidebar button {
         width: 100%;
         text-align: center;
-        padding: 10px 8px;
-        font-size: 14px;
+        padding: 6px 5px;
+        font-size: 11px;
+    }
+
+    .sidebar-command {
+        min-height: 44px;
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 4px;
+        border-left-width: 1px;
+        padding: 6px 5px;
+    }
+
+    .sidebar-command:hover {
+        transform: translateY(-1px);
+    }
+
+    .sidebar-command-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+    }
+
+    .sidebar-command-label {
+        max-width: 100%;
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 1.1;
+        white-space: normal;
+        overflow: hidden;
+        text-overflow: clip;
+    }
+
+    .sidebar-command-signal {
+        display: none;
     }
 
     .builder-main {
         gap: 16px;
+        width: 100%;
+        min-width: 0;
     }
 
     .skills-panel {
         overflow-x: auto;
         padding: 10px;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .skills-panel::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 30px;
+        background: linear-gradient(90deg, transparent, rgba(16, 18, 20, 0.92));
+        pointer-events: none;
+        z-index: 3;
     }
 
     .operators-skills-grid {
         flex-wrap: nowrap;
         align-items: stretch;
-        gap: 12px;
+        gap: 10px;
         width: max-content;
     }
 
+    .operator-skill-wrapper {
+        width: 168px;
+        gap: 6px;
+    }
+
     .operator-skill-card {
-        min-width: 150px;
-        padding: 8px;
-        gap: 8px;
+        min-width: 168px;
+        min-height: 104px;
+        border-radius: 14px;
+        padding: 0;
+        cursor: pointer;
+    }
+
+    .operator-skill-card::before {
+        top: 30px;
+        height: 78px;
+    }
+
+    .leader-badge {
+        top: 0;
+        width: 20px;
+        height: 104px;
+        padding: 0;
+        font-size: 11px;
+    }
+
+    .operator-skill-name {
+        height: 30px;
+        font-size: 13px;
+        padding-right: 36px;
+    }
+
+    .swap-operator-btn {
+        top: 15px;
+        right: 7px;
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+    }
+
+    .swap-operator-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .operator-skill-card .skill-small {
+        cursor: grab;
     }
 
     .operator-icon {
@@ -88,7 +233,19 @@
     }
 
     .skill-row {
-        gap: 6px;
+        width: 148px;
+        height: 38px;
+        gap: 4px;
+        padding: 4px 8px;
+        border-radius: 12px;
+    }
+
+    .skill-small {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
+        padding: 2px;
     }
 
     .skill-small.selected {
@@ -100,23 +257,24 @@
         width: 100%;
         overflow-x: auto;
         overflow-y: visible;
-        padding: 10px;
+        padding: 8px 8px 24px;
     }
 
-        #rotationDropZone {
-            width: max-content;
-            min-width: 0;
-        }
+    #rotationDropZone {
+        width: max-content;
+        min-width: 0;
+        padding: 28px 0 34px;
+    }
 
     .rotation-slot {
-        width: 64px;
-        height: 64px;
+        width: 58px;
+        height: 58px;
         overflow: visible;
     }
 
     .rotation-skill {
-        width: 64px;
-        height: 64px;
+        width: 58px;
+        height: 58px;
     }
 
     .rotation-arrow {
@@ -136,13 +294,13 @@
     }
 
     .team-slot .remove-btn {
-    width: 22px;
-    height: 22px;
-    top: -6px;
-    right: -6px;
-    font-size: 13px;
-    line-height: 1;
-}
+        width: 22px;
+        height: 22px;
+        top: -6px;
+        right: -6px;
+        font-size: 13px;
+        line-height: 1;
+    }
 
     .rotation-skill:hover .remove-btn {
         opacity: 1;
@@ -167,48 +325,52 @@
         width: 14px;
         height: 14px;
     }
+
     .team-slots {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 6px;
-    width: 100%;
-    align-items: stretch;
-}
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+        width: 100%;
+        align-items: stretch;
+    }
 
-.team-slot {
-    width: 100%;
-    min-width: 0;
-    aspect-ratio: 1 / 1;
-    padding: 2px;
-    box-sizing: border-box;
-    position: relative;
-    overflow: visible;
-}
+    .team-slot {
+        width: 100%;
+        min-width: 0;
+        aspect-ratio: 1 / 1;
+        padding: 2px;
+        box-sizing: border-box;
+        position: relative;
+        overflow: visible;
+    }
 
-.team-slot img {
-    width: 95%;
-    height: 95%;
-    display: block;
-    border-radius: 10px;
-}
+    .team-slot img {
+        width: 95%;
+        height: 95%;
+        display: block;
+        border-radius: 10px;
+    }
+
     .operator-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 8px;
-}
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+    }
 
     .operator-card img {
         width: 50px;
         height: 50px;
         border-radius: 15px;
     }
-.operator-card {
-    width: 100%;
-    height: 85px;
-    border-radius: 14px;
-    padding: 6px;
-    box-sizing: border-box;
-}
+
+    .operator-card {
+        width: 100%;
+        height: 85px;
+        border-radius: 14px;
+        padding: 6px;
+        box-sizing: border-box;
+    }
+
     .rotation-slot.menu-open {
         border-color: #ffb347;
         box-shadow: 0 0 10px rgba(255, 179, 71, 0.45);
@@ -243,21 +405,128 @@
     .slot-action-btn:disabled {
         opacity: 0.45;
     }
+
     .export-mode .remove-btn {
-    display: none !important;
-}
+        display: none !important;
+    }
 
-.export-mode .rotation-slot:empty {
-    display: none !important;
-}
+    .export-mode .rotation-slot:empty {
+        display: none !important;
+    }
 
-.export-mode .rotation-slot {
-    border: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
-}
+    .export-mode .rotation-slot {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
 
-.export-mode .rotation-arrow.is-unused {
-    display: none !important;
-}
+    .export-mode .rotation-arrow.is-unused {
+        display: none !important;
+    }
+
+    #selectionScreen {
+        display: none;
+    }
+
+    #selectionScreen.team-modal-open {
+        position: fixed;
+        inset: 0;
+        z-index: 9998;
+        overflow-y: auto;
+        padding: 18px;
+        background: rgba(8, 12, 14, 0.94);
+        backdrop-filter: blur(8px);
+        box-sizing: border-box;
+    }
+
+    #selectionScreen.team-modal-open .team-slots,
+    #selectionScreen.team-modal-open .selection-title-row:first-of-type,
+    #selectionScreen.team-modal-open .selection-max-label {
+        display: none !important;
+    }
+
+    #selectionScreen.team-modal-open .operator-title-row {
+        margin-top: 18px;
+    }
+
+    #selectionScreen.team-modal-open .selection-confirm-btn,
+    #selectionScreen.team-modal-open .mobile-confirm-fab {
+        position: fixed;
+        right: 18px;
+        bottom: calc(18px + env(safe-area-inset-bottom));
+        z-index: 10000;
+    }
+
+    #selectionScreen.team-modal-open {
+        padding-bottom: 110px;
+    }
+
+    #selectionScreen.team-modal-open .selection-hero,
+    #selectionScreen.team-modal-open .selection-divider,
+    #selectionScreen.team-modal-open .selection-title-row,
+    #selectionScreen.team-modal-open .team-slots,
+    #selectionScreen.team-modal-open .selection-confirm-btn,
+    #selectionScreen.team-modal-open .mobile-confirm-fab {
+        display: none !important;
+    }
+
+    #selectionScreen.team-modal-open .operator-title-row {
+        margin-top: 0;
+        margin-bottom: 18px;
+    }
+
+    #selectionScreen.team-modal-open .operator-title-row .selection-section-title {
+        font-size: 28px;
+    }
+
+    #selectionScreen.team-modal-open {
+        padding: 24px 18px 40px;
+    }
+
+    #selectionScreen.team-modal-open .operator-title-row,
+    #selectionScreen.team-modal-open .operator-grid {
+        width: 100%;
+    }
+
+    #selectionScreen.team-modal-open .operator-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .close-team-modal-btn {
+        display: none;
+    }
+
+    #selectionScreen.team-modal-open .close-team-modal-btn {
+        display: flex;
+        position: fixed;
+
+        top: auto;
+        right: 18px;
+        bottom: calc(18px + env(safe-area-inset-bottom));
+
+        z-index: 10001;
+
+        width: 78px;
+        height: 78px;
+
+        align-items: center;
+        justify-content: center;
+
+        border: none;
+        border-radius: 50%;
+
+        background: #F8F546;
+        color: #111;
+
+        font-size: 44px;
+        font-weight: 700;
+        line-height: 1;
+
+        box-shadow:
+            0 0 22px rgba(248, 245, 70, 0.45),
+            0 8px 24px rgba(0, 0, 0, 0.45);
+
+        backdrop-filter: blur(6px);
+    }
 }

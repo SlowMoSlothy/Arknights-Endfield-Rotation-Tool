@@ -9,7 +9,7 @@ const zhuang = {
             id: 901,
             name: "Jolting Arts",
             icon: "assets/operators/avatars/Zhuang.png",
-            iconSmall: "assets/operators/skills/zhuang/fs_small.png",
+            iconSmall: "assets/ui/skills/batk/art_unit.svg",
             type: "Final Strike",
             cooldown: 20,
             energy: 60,
@@ -30,22 +30,14 @@ const zhuang = {
             id: 902,
             name: "Mantra of Sundering",
             icon: "assets/operators/avatars/Zhuang.png",
-            iconSmall: "assets/operators/skills/zhuang/bs_small.png",
+            iconSmall: "assets/operators/skills/zhuang/bs_small.svg",
             type: "Battle Skill",
             cooldown: 20,
             energy: 60,
             elementType: "electric",
             shortType: "BS",
-            description: "BS",
-            debuffs: [
-                {
-                    id: "electrification_consumed",
-                    name: "Electrification Consumed",
-                    appliesEffect: "electrification_consumed",
-                    persistsForCombo: false,
-                    visible: false
-                }
-            ],
+            description: "Consumes Electrification and grants Electric Amp.",
+            consumeDebuffs: ["electrification"],
             buffs: [
                 {
                     id: "electric_amp",
@@ -53,9 +45,7 @@ const zhuang = {
                     appliesEffect: "electric_amp",
                     persistsForCombo: true,
                     visible: true,
-                    stackable: true,
-                    stacksApplied: 1,
-                    maxStacks: 99
+                    stackable: false
                 }
             ]
         },
@@ -65,7 +55,7 @@ const zhuang = {
             icon: "assets/operators/avatars/Zhuang.png",
             iconSmall: "assets/operators/skills/zhuang/cs_small.png",
             type: "Combo Skill",
-            cooldown: 0,
+            cooldown: 18,
             energy: 100,
             elementType: "electric",
             shortType: "CS",

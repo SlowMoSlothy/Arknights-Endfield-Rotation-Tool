@@ -1,6 +1,57 @@
+function showBuilderScreen() {
+    const selectionScreen = document.getElementById("selectionScreen");
+    const builderScreen = document.getElementById("builderScreen");
+
+    if (selectionScreen) {
+        selectionScreen.style.display = "none";
+    }
+
+    if (builderScreen) {
+        builderScreen.style.display = "block";
+    }
+
+    renderSelectedOperators();
+    renderSkills();
+    renderRotation();
+    initSkillDragDrop();
+    initTapInput();
+}
+
+function openTeamSelectionModal(slotIndex = null) {
+    const selectionScreen = document.getElementById("selectionScreen");
+    const builderScreen = document.getElementById("builderScreen");
+
+    if (builderScreen) {
+        builderScreen.style.display = "block";
+    }
+
+    if (selectionScreen) {
+        selectionScreen.style.display = "block";
+        selectionScreen.classList.add("team-modal-open");
+    }
+
+    if (slotIndex !== null) {
+        activeSlotIndex = slotIndex;
+    } else if (activeSlotIndex === null) {
+        const firstEmptySlot = selectedTeam.findIndex(x => x === null);
+        activeSlotIndex = firstEmptySlot >= 0 ? firstEmptySlot : 0;
+    }
+
+    renderTeamSlots();
+    renderOperatorList();
+    highlightActiveSlot();
+}
+
+function closeTeamSelectionModal() {
+    const selectionScreen = document.getElementById("selectionScreen");
+
+    if (selectionScreen) {
+        selectionScreen.classList.remove("team-modal-open");
+        selectionScreen.style.display = "none";
+    }
+}
 function backToSelection() {
-    document.getElementById("selectionScreen").style.display = "block";
-    document.getElementById("builderScreen").style.display = "none";
+    openTeamSelectionModal();
 }
 
 function confirmTeam() {
@@ -13,14 +64,8 @@ function confirmTeam() {
 
     saveTeam();
 
-    document.getElementById("selectionScreen").style.display = "none";
-    document.getElementById("builderScreen").style.display = "block";
-
-    renderSelectedOperators();
-    renderSkills();
-    renderRotation();
-    initSkillDragDrop();
-    initTapInput();
+    closeTeamSelectionModal();
+showBuilderScreen();
 }
 function renderTeamSlots() {
     const container = document.getElementById("teamSlots");
@@ -120,7 +165,8 @@ function renderOperatorList() {
                 }
 
                 renderTeamSlots();
-                renderOperatorList();
+renderOperatorList();
+confirmTeam();
             };
         }
 

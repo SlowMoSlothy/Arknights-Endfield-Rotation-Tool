@@ -10,6 +10,7 @@ const endministrator = {
             icon: "assets/operators/avatars/Endmin.png",
             iconSmall: "assets/operators/skills/endmin/fs_small.png",
             type: "Final Strike",
+            shortType: "FS",
             cooldown: 0,
             energy: 0,
             description: "FS",
@@ -30,23 +31,24 @@ const endministrator = {
             icon: "assets/operators/avatars/Endmin.png",
             iconSmall: "assets/operators/skills/endmin/bs_small.png",
             type: "Battle Skill",
+            shortType: "BS",
             cooldown: 20,
             energy: 60,
             elementType: "physical",
-            description: "BS",
-        }
-        ,
+            description: "BS"
+        },
         {
             id: 303,
             name: "Sealing Sequence",
             icon: "assets/operators/avatars/Endmin.png",
             iconSmall: "assets/operators/skills/endmin/cs_small.png",
-            type: "Combo Skil",
-            cooldown: 20,
+            type: "Combo Skill",
+            shortType: "CS",
+            cooldown: 16,
             energy: 60,
             elementType: "physical",
-            description: "CS",
-            comboTriggers: ["combo_skill"],
+            description: "Triggers when another operator uses a Combo Skill.",
+            comboTriggers: ["combo_skill"]
         },
         {
             id: 304,
@@ -55,9 +57,10 @@ const endministrator = {
             iconSmall: "assets/operators/skills/endmin/ult_small.png",
             elementType: "physical",
             type: "Ultimate",
+            shortType: "Ult",
             cooldown: 20,
             energy: 60,
             description: "Ultimate"
         }
     ]
-}
+};

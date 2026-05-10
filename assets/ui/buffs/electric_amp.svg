@@ -1,0 +1,83 @@
+<svg id="Gruppe_1" data-name="Gruppe 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" viewBox="0 0 512 512">
+  <metadata><?xpacket begin="﻿" id="W5M0MpCehiHzreSzNTczkc9d"?>
+<x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="Adobe XMP Core 9.1-c002 79.b7c64cc, 2024/07/16-07:59:40        ">
+   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+      <rdf:Description rdf:about=""
+            xmlns:dc="http://purl.org/dc/elements/1.1/"
+            xmlns:xmp="http://ns.adobe.com/xap/1.0/">
+         <dc:creator>
+            <rdf:Seq>
+               <rdf:li>SlowMoSloth</rdf:li>
+            </rdf:Seq>
+         </dc:creator>
+         <xmp:CreatorTool>Adobe Photoshop 26.0 (Windows)</xmp:CreatorTool>
+      </rdf:Description>
+   </rdf:RDF>
+</x:xmpmeta>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                           
+<?xpacket end="w"?></metadata>
+<defs>
+    <style>
+      .cls-1, .cls-2, .cls-3 {
+        fill: #fff;
+        fill-rule: evenodd;
+      }
+
+      .cls-1 {
+        filter: url(#filter);
+      }
+
+      .cls-2 {
+        filter: url(#filter-2);
+      }
+
+      .cls-3 {
+        stroke: #fff;
+        stroke-linecap: round;
+        stroke-width: 1px;
+        filter: url(#filter-3);
+      }
+    </style>
+    <filter id="filter" x="10.063" y="97.781" width="438.781" height="349.031" filterUnits="userSpaceOnUse">
+      <feFlood result="flood" flood-color="#fff"/>
+      <feComposite result="composite" operator="in" in2="SourceGraphic"/>
+      <feBlend result="blend" in2="SourceGraphic"/>
+    </filter>
+    <filter id="filter-2" x="374.562" y="149.656" width="84.282" height="83.625" filterUnits="userSpaceOnUse">
+      <feFlood result="flood" flood-color="#fff"/>
+      <feComposite result="composite" operator="in" in2="SourceGraphic"/>
+      <feBlend result="blend" in2="SourceGraphic"/>
+    </filter>
+    <filter id="filter-3" x="324.688" y="42.344" width="179.343" height="191.625" filterUnits="userSpaceOnUse">
+      <feFlood result="flood" flood-color="#fff"/>
+      <feComposite result="composite" operator="in" in2="SourceGraphic"/>
+      <feBlend result="blend" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+  <path id="Form_1" data-name="Form 1" class="cls-1" d="M100.886,444.626l170.69-166.313,2.188,168.5L448.83,271.748l-91.909,1.094,3.282-75.5-63.461,54.708,3.282-105.04L184.043,262.994,182.949,97.776,10.071,273.936h91.91Z"/>
+  <path id="Rechteck_1" data-name="Rechteck 1" class="cls-2" d="M415.561,149.653L458.83,190.76l-41.013,42.514-43.268-41.107Z"/>
+  <g style="fill: #fff; filter: url(#filter-3)">
+    <path id="Rechteck_1_Kopie" data-name="Rechteck 1 Kopie" class="cls-3" d="M415.561,149.653L458.83,190.76l-41.013,42.514-43.268-41.107Zm0.444-106.585-1.1,1.11-89.718,90.8v56.9s89.721-82.062,89.721-84.251,86.439,84.251,86.439,84.251l2.188-55.8" style="stroke: inherit; filter: none; fill: inherit"/>
+  </g>
+  <use xlink:href="#Rechteck_1_Kopie" style="stroke: #fff; filter: none; fill: none"/>
+</svg>

@@ -37,6 +37,92 @@
     text-transform: uppercase;
 }
 
+.close-team-modal-btn {
+    display: none;
+}
+
+#selectionScreen.team-modal-open {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    display: block;
+    overflow-y: auto;
+    padding: 56px 24px;
+    box-sizing: border-box;
+    background: rgba(8, 12, 14, 0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+#selectionScreen.team-modal-open .selection-hero,
+#selectionScreen.team-modal-open .selection-divider,
+#selectionScreen.team-modal-open .selection-title-row:first-of-type,
+#selectionScreen.team-modal-open .team-slots,
+#selectionScreen.team-modal-open .selection-confirm-btn,
+#selectionScreen.team-modal-open .mobile-confirm-fab {
+    display: none !important;
+}
+
+#selectionScreen.team-modal-open .operator-title-row,
+#selectionScreen.team-modal-open .operator-grid {
+    width: min(760px, calc(100vw - 48px));
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#selectionScreen.team-modal-open .operator-title-row {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: 18px 22px 12px;
+    box-sizing: border-box;
+    border: 1px solid rgba(160,170,169,0.24);
+    border-bottom: none;
+    border-radius: 16px 16px 0 0;
+    background: linear-gradient(180deg, rgba(49,55,57,0.96), rgba(28,31,33,0.98));
+    box-shadow: 0 14px 34px rgba(0,0,0,0.42);
+}
+
+#selectionScreen.team-modal-open .operator-title-row .selection-section-title {
+    font-size: 30px;
+}
+
+#selectionScreen.team-modal-open .operator-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 14px;
+    margin-bottom: 0;
+    padding: 6px 22px 24px;
+    box-sizing: border-box;
+    border: 1px solid rgba(160,170,169,0.24);
+    border-top: none;
+    border-radius: 0 0 16px 16px;
+    background: linear-gradient(180deg, rgba(28,31,33,0.98), rgba(16,18,20,0.99));
+    box-shadow: 0 20px 38px rgba(0,0,0,0.42);
+}
+
+#selectionScreen.team-modal-open .close-team-modal-btn {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: #F8F546;
+    color: #111;
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1;
+    box-shadow:
+        0 0 18px rgba(248,245,70,0.36),
+        0 8px 22px rgba(0,0,0,0.45);
+}
+
 .selection-divider {
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(248,245,70,0.35), transparent);

@@ -3,7 +3,7 @@ const alesh = {
     name: "Alesh",
     icon: "assets/operators/avatars/Alesh.png",
     canEnterUltimateState: false,
-    elementType: "cryo",
+    elementType: "physical",
     skills: [
         {
             id: 1001,
@@ -15,7 +15,7 @@ const alesh = {
             cooldown: 20,
             energy: 60,
             elementType: "physical",
-            description: "FS",
+            description: "Physical Final Strike.",
             debuffs: [
                 {
                     id: "final_strike",
@@ -23,9 +23,18 @@ const alesh = {
                     appliesEffect: "final_strike",
                     persistsForCombo: false,
                     visible: false
+                },
+                {
+                    id: "stagger",
+                    name: "Stagger",
+                    appliesEffect: "stagger",
+                    persistsForCombo: false,
+                    visible: true,
+                    iconBase: "assets/debuffs/stagger"
                 }
             ]
         },
+
         {
             id: 1002,
             name: "Unconventional Lure",
@@ -35,8 +44,12 @@ const alesh = {
             shortType: "BS",
             cooldown: 20,
             energy: 60,
-            elementType: "physical",
-            description: "Consumes Originium Crystals.",
+            elementType: "cryo",
+            description: "Consumes Cryo Infliction or Originium Crystals to apply Solidification.",
+            consumeDebuffs: [
+                "cryo_infliction",
+                "originium_crystal"
+            ],
             debuffs: [
                 {
                     id: "originium_crystal_consumed",
@@ -44,9 +57,19 @@ const alesh = {
                     appliesEffect: "originium_crystal_consumed",
                     persistsForCombo: false,
                     visible: false
+                },
+                {
+                    id: "solidification",
+                    name: "Solidification",
+                    appliesEffect: "solidification",
+                    persistsForCombo: true,
+                    visible: true,
+                    stackable: false,
+                    iconBase: "assets/debuffs/solidification"
                 }
             ]
         },
+
         {
             id: 1003,
             name: "Auger Angling",
@@ -55,7 +78,7 @@ const alesh = {
             type: "Combo Skill",
             shortType: "CS",
             elementType: "physical",
-            cooldown: 20,
+            cooldown: 9,
             energy: 0,
             description: "Triggers when an Arts Reaction or Originium Crystals are consumed. Deals Physical DMG and recovers SP.",
             comboTriggerMode: "all",
@@ -67,6 +90,7 @@ const alesh = {
                     ]
                 }
             ],
+            allowSelfTrigger: true,
             buffs: [
                 {
                     id: "sp_recovery",
@@ -77,6 +101,7 @@ const alesh = {
                 }
             ]
         },
+
         {
             id: 1004,
             name: "One Monster Catch!",
@@ -87,7 +112,7 @@ const alesh = {
             cooldown: 20,
             energy: 60,
             elementType: "cryo",
-            description: "Ultimate"
+            description: "Cryo Ultimate. Deals Cryo DMG."
         }
     ]
 };
