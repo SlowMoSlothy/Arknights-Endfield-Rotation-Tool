@@ -159,7 +159,7 @@ function renderSkills() {
         if (index === 0) card.classList.add("leader");
 
         const swapBtn = createSwapOperatorButton(op, index);
-        card.appendChild(swapBtn);
+        
 
         const opRow = document.createElement("div");
         opRow.className = "operator-row";
@@ -182,6 +182,7 @@ function renderSkills() {
             skillRow.appendChild(div);
             attachSkillTooltipEvents(div, skillData);
         });
+        opRow.appendChild(swapBtn);
         card.appendChild(opRow);
         operatorWrapper.appendChild(card);
         operatorWrapper.appendChild(skillRow);
