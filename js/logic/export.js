@@ -29,9 +29,31 @@ function addExportWatermark(clonedDoc, clonedRotation, url) {
     clonedRotation.appendChild(watermark);
 }
 
+function isLocalFileExportBlocked() {
+    return window.location.protocol === "file:";
+}
+
+function showExportSecurityMessage() {
+    alert(
+        "Der Export kann nicht direkt aus einer lokalen file:// Seite erstellt werden.\n\n" +
+        "Bitte starte den Builder ueber einen lokalen Webserver oder die GitHub-Pages-Adresse. " +
+        "Dann kann der Browser die Bilder sicher in das Export-Bild einbetten."
+    );
+}
+
+function isCanvasSecurityError(error) {
+    return error?.name === "SecurityError" ||
+        String(error?.message || "").toLowerCase().includes("tainted");
+}
+
 function exportImage() {
     const element = document.getElementById("rotation");
     if (!element) return;
+
+    if (isLocalFileExportBlocked()) {
+        showExportSecurityMessage();
+        return;
+    }
 
     const watermarkUrl = getExportWatermarkUrl();
 
@@ -97,6 +119,9 @@ function exportImage() {
         element.classList.remove("export-mode");
     }).catch(error => {
         console.error("Export failed:", error);
+        if (isCanvasSecurityError(error)) {
+            showExportSecurityMessage();
+        }
         element.classList.remove("export-mode");
     });
 }
