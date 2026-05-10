@@ -92,6 +92,21 @@
             <span class="sidebar-command-label">Export Rotation</span>
             <span class="sidebar-command-signal"></span>
           </button>
+          <button class="sidebar-command" onclick="copyBuildShareCode()">
+            <span class="sidebar-command-icon">SC</span>
+            <span class="sidebar-command-label">Copy Setup</span>
+            <span class="sidebar-command-signal"></span>
+          </button>
+          <button class="sidebar-command" onclick="copyBuildShareLink()">
+            <span class="sidebar-command-icon">LK</span>
+            <span class="sidebar-command-label">Copy Link</span>
+            <span class="sidebar-command-signal"></span>
+          </button>
+          <button class="sidebar-command" onclick="loadBuildShareCode()">
+            <span class="sidebar-command-icon">IN</span>
+            <span class="sidebar-command-label">Load Setup</span>
+            <span class="sidebar-command-signal"></span>
+          </button>
           <button class="sidebar-command" onclick="clearRotation()">
             <span class="sidebar-command-icon">⌫</span>
             <span class="sidebar-command-label">Clear Rotation</span>
@@ -203,6 +218,7 @@
   <script src="js/state/appState.js"></script>
   <script src="js/logic/operatorStateEngine.js"></script>
   <script src="js/logic/storage.js"></script>
+  <script src="js/logic/shareCode.js"></script>
   <script src="js/logic/export.js"></script>
   <script src="js/logic/snakeLayout.js"></script>
   <script src="js/logic/reactionEngine.js"></script>
