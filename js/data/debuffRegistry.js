@@ -172,7 +172,7 @@ const DEBUFF_REGISTRY = {
         iconBase: "assets/ui/debuffs/stagger",
         stackable: false,
         maxStacks: 0,
-        extension: "png"
+        extension: "svg"
     },
     knock_down: {
         name: "Knock Down",
