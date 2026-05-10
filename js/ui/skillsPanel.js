@@ -136,19 +136,36 @@ function createSwapOperatorButton(op, index) {
     return button;
 }
 
+function createAddOperatorCard(index) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "operator-skill-add-card";
+    button.setAttribute("aria-label", `Operator fuer Slot ${index + 1} auswaehlen`);
+    button.innerHTML = `<span class="operator-skill-add-plus">+</span>`;
+    button.addEventListener("click", () => openTeamSelectionModal(index));
+    return button;
+}
+
 function renderSkills() {
     const list = document.getElementById("skillList");
     if (!list) return;
     list.innerHTML = "";
     hideSkillTooltip();
     initMobileSkillTooltipClose();
-    const activeOperators = selectedTeam.filter(id => id !== null).map(id => operators.find(op => op.id === id)).filter(Boolean);
     const wrapper = document.createElement("div");
     wrapper.className = "operators-skills-grid";
-    activeOperators.forEach((op, index) => {
+    selectedTeam.forEach((opId, index) => {
+        const op = opId !== null ? operators.find(operator => operator.id === opId) : null;
         const operatorWrapper = document.createElement("div");
         operatorWrapper.className = "operator-skill-wrapper";
         if (index === 0) operatorWrapper.classList.add("leader");
+
+        if (!op) {
+            operatorWrapper.classList.add("empty");
+            operatorWrapper.appendChild(createAddOperatorCard(index));
+            wrapper.appendChild(operatorWrapper);
+            return;
+        }
 
         const card = document.createElement("div");
         card.className = "operator-skill-card";

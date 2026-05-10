@@ -63,14 +63,29 @@
         padding-bottom: 6px;
     }
 
-    .team-preview-operator {
+    .team-preview-slot {
         flex: 0 0 auto;
-        min-width: 120px;
+        width: 82px;
+        min-height: 64px;
+        padding: 6px;
     }
 
     .team-preview-operator img {
-        width: 40px;
-        height: 40px;
+        width: 34px;
+        height: 34px;
+    }
+
+    .team-preview-header {
+        flex-direction: column;
+        gap: 4px;
+        font-size: 11px;
+        line-height: 1;
+    }
+
+    .team-preview-plus {
+        width: 30px;
+        height: 30px;
+        font-size: 24px;
     }
 
     .builder-divider {
@@ -198,6 +213,18 @@
         border-radius: 14px;
         padding: 0;
         cursor: pointer;
+    }
+
+    .operator-skill-add-card {
+        min-width: 168px;
+        min-height: 104px;
+        border-radius: 14px;
+    }
+
+    .operator-skill-add-plus {
+        width: 34px;
+        height: 34px;
+        font-size: 28px;
     }
 
     .operator-skill-card::before {

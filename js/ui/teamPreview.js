@@ -5,13 +5,30 @@ function renderSelectedOperators() {
     container.innerHTML = "";
 
     selectedTeam.forEach((id, index) => {
-        if (id === null) return;
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "team-preview-slot";
+        item.setAttribute("aria-label", id === null
+            ? `Operator fuer Slot ${index + 1} auswaehlen`
+            : `Operator in Slot ${index + 1} aendern`);
+        item.addEventListener("click", () => openTeamSelectionModal(index));
+
+        if (id === null) {
+            item.classList.add("empty");
+            item.innerHTML = `<span class="team-preview-plus">+</span>`;
+            container.appendChild(item);
+            return;
+        }
 
         const op = operators.find(o => o.id === id);
-        if (!op) return;
+        if (!op) {
+            item.classList.add("empty");
+            item.innerHTML = `<span class="team-preview-plus">+</span>`;
+            container.appendChild(item);
+            return;
+        }
 
-        const item = document.createElement("div");
-        item.className = "team-preview-operator";
+        item.classList.add("team-preview-operator");
         item.dataset.operatorId = String(op.id);
 
         const header = document.createElement("div");
@@ -20,11 +37,7 @@ function renderSelectedOperators() {
         const img = document.createElement("img");
         img.src = op.icon;
         img.alt = op.name;
-        img.title = "Team ändern";
-
-        img.onclick = () => {
-            openTeamSelectionModal(index);
-        };
+        img.title = "Team aendern";
 
         const name = document.createElement("div");
         name.textContent = op.name;
