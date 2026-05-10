@@ -1,161 +1,144 @@
-# 🎮 Arknights Endfield Rotation Tool
+# Arknights Endfield Rotation Tool
 
-<p align="center">
-  <img src="assets/banner.png" alt="Endfield Rotation Tool Banner" width="100%" />
-</p>
+Interactive web tool for building, visualizing, exporting, and sharing Arknights: Endfield team rotations.
 
-<p align="center">
-  <a href="#"><img src="https://img.shields.io/badge/status-active-success" alt="Status"></a>
-  <a href="#"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License"></a>
-  <a href="#"><img src="https://img.shields.io/badge/version-1.0-orange" alt="Version"></a>
-  <a href="#"><img src="https://img.shields.io/badge/platform-web-lightgrey" alt="Platform"></a>
-</p>
+![Endfield Rotation Tool Banner](assets/banner.png)
 
-<p align="center">
-  An interactive web tool to build, visualize, and share team-based skill rotations.
-</p>
+## Live Demo
 
----
+[Open the builder](https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/)
 
-## 🚀 Live Demo
+## Features
 
-👉 **Try it here:** [https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/](https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/)
+- Build a team with up to 4 operators.
+- Empty team slots show a `+` button so new users can start immediately.
+- Drag and drop skills into a snake-style rotation layout.
+- Tap-friendly mobile controls for adding, moving, and removing skills.
+- Skill tooltips with cooldown, energy, type, effects, buffs, and debuffs.
+- Operator buff and enemy debuff indicators on the rotation.
+- Compact share codes for team + rotation setups.
+- Share links with the setup embedded in the URL hash.
+- Export rotation images with a builder-address watermark.
+- LocalStorage auto-save for team, rotation, UI settings, and operator states.
+- Optional Enemy panel controlled from `js/state/appState.js`.
 
----
+## Sharing Builds
 
-## 🖼️ Preview
+Use the sidebar buttons:
 
-<p align="center">
-  <img src="assets/preview.gif" width="80%" />
-</p>
+- `Copy Setup` copies a short setup code.
+- `Copy Link` copies a URL that loads the team and rotation automatically.
+- `Load Setup` accepts either a setup code or a full share link.
 
----
+Share links use this format:
 
-## ✨ Features
-
-### 🎯 Core
-
-* 🧩 Drag & Drop skill system
-* 🔁 Snake-style rotation layout (→ ↓ ←)
-* 👥 Team selection (up to 4 operators)
-* 🎯 Skill icons with detailed tooltips
-
-### 🎮 UX / UI
-
-* ✨ Hover effects & glow animations
-* ❌ Remove skills via hover button
-* 🧠 Clean, game-inspired interface
-
-### 📦 Utility
-
-* 📸 Export rotation as an image
-* 💾 Auto-save using LocalStorage
-
----
-
-## 🧠 How It Works
-
-1. Select up to **4 operators** for your team
-2. Drag skills into the rotation area
-3. Arrange them in your desired order
-4. Visualize your rotation with directional flow
-5. Export your build as an image
-
----
-
-## 📁 Project Structure
-
-```
-/endfield-tool
-│── index.html
-│
-├── css/
-│   └── style.css
-│
-├── js/
-│   ├── data/
-│   │   └── operators.js
-│   │
-│   └── ui/
-│       └── main.js
-│
-└── assets/
-    ├── icons/
-    ├── preview.gif
-    └── banner.png
+```text
+https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/#setup=AERT2:...
 ```
 
----
+Current share codes use the compact `AERT2:` format. Older `AERT1:` codes can still be imported.
 
-## ⚙️ Installation
+## Exporting Images
+
+Use `Export Rotation` to download the current rotation as a PNG.
+
+Important: browsers block image export from direct `file://` pages when local images are drawn into a canvas. For local testing, start a small web server instead:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/Arknights-Endfield-Rotation-Tool.git
-cd Arknights-Endfield-Rotation-Tool
+python -m http.server 4173
 ```
 
 Then open:
 
+```text
+http://localhost:4173/index.html
 ```
+
+## Configuration
+
+Feature flags and app-level values live in:
+
+```text
+js/state/appState.js
+```
+
+Useful options:
+
+```js
+let showEnemyPanel = false;
+let builderWatermarkUrl = "https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/";
+```
+
+Set `showEnemyPanel` to `true` to show the Enemy section again.
+
+## Project Structure
+
+```text
 index.html
+css/
+  base.css
+  layout.css
+  team.css
+  skills.css
+  rotation.css
+  dragdrop.css
+  mobile.css
+  tooltip.css
+  skill-elements.css
+js/
+  data/
+  logic/
+    comboEngine.js
+    dragDrop.js
+    export.js
+    shareCode.js
+    storage.js
+  state/
+    appState.js
+  ui/
+assets/
 ```
 
-> 💡 Using a local server is recommended.
+## Tech Stack
 
----
+- HTML
+- CSS
+- Vanilla JavaScript
+- SortableJS
+- html2canvas
 
-## 🔮 Roadmap
+## Development
 
-* ⏱️ Cooldown & energy system
-* 📊 DPS / rotation analysis
-* 🎮 Operator synergy system
-* 🧠 Smart rotation suggestions
-* 📋 Shareable rotation links
+Clone the repository:
 
----
+```bash
+git clone https://github.com/SlowMoSlothy/Arknights-Endfield-Rotation-Tool.git
+cd Arknights-Endfield-Rotation-Tool
+```
 
-## 🛠️ Tech Stack
+Run locally:
 
-* HTML5
-* CSS3
-* JavaScript (Vanilla)
-* SortableJS
-* html2canvas
+```bash
+python -m http.server 4173
+```
 
----
+Open:
 
-## 🤝 Contributing
+```text
+http://localhost:4173/index.html
+```
 
-Contributions are welcome!
+## Roadmap
 
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Open a Pull Request
+- More operators and enemy presets.
+- Better rotation analysis and validation.
+- More share/import options.
+- Additional UI settings.
 
----
+## Credits
 
-## 📄 License
+Fan-made tool. Not affiliated with Gryphline or Hypergryph.
+
+## License
 
 This project is licensed under the MIT License.
-
----
-
-## ⭐ Support
-
-If you like this project:
-
-👉 Leave a ⭐ on GitHub
-👉 Share it with others
-
----
-
-## ❤️ Credits
-
-Inspired by team rotation mechanics in modern action RPGs.
-
----
-
-<p align="center">
-  Made with ❤️ by the community
-</p>
