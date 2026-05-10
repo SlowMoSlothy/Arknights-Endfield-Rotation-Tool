@@ -14,15 +14,17 @@ function addExportWatermark(clonedDoc, clonedRotation, url) {
     watermark.className = "export-watermark";
     watermark.textContent = `Builder: ${url}`;
     watermark.style.marginTop = "12px";
+    watermark.style.paddingLeft = "6px";
     watermark.style.paddingTop = "8px";
     watermark.style.borderTop = "1px solid rgba(160,170,169,0.24)";
     watermark.style.color = "rgba(248,245,70,0.76)";
-    watermark.style.fontSize = "12px";
+    watermark.style.fontSize = "11px";
     watermark.style.fontWeight = "700";
     watermark.style.letterSpacing = "0.02em";
-    watermark.style.textAlign = "right";
-    watermark.style.lineHeight = "1.25";
+    watermark.style.textAlign = "left";
+    watermark.style.lineHeight = "1.4";
     watermark.style.whiteSpace = "normal";
+    watermark.style.wordBreak = "break-word";
     watermark.style.overflowWrap = "anywhere";
     watermark.style.textShadow = "none";
 
