@@ -62,8 +62,7 @@ function exportImage() {
     const originalOverflow = element.style.overflow;
 
     const exportWidth = Math.ceil(Math.max(element.scrollWidth, element.offsetWidth));
-    const exportHeight = Math.ceil(Math.max(element.scrollHeight, element.offsetHeight));
-
+    const exportHeight = Math.ceil(Math.max(element.scrollHeight, element.offsetHeight)) + (watermarkUrl ? 80 : 0);
     element.classList.add("export-mode");
     element.style.width = `${exportWidth}px`;
     element.style.maxWidth = "none";
