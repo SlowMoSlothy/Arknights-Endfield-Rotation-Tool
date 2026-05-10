@@ -180,6 +180,20 @@
     z-index: 1;
 }
 
+.site-footer {
+    max-width: 1600px;
+    margin: 22px auto 18px;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    border-top: 1px solid rgba(160,170,169,0.18);
+    color: rgba(160,170,169,0.74);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
 @media (max-width: 900px) {
     .builder-shell {
         max-width: 100%;
