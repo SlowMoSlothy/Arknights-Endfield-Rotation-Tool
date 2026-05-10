@@ -43,7 +43,7 @@
     position: relative;
     display: block;
     min-width: 222px;
-    min-height: 132px;
+    min-height: 166px;
     background:
         radial-gradient(circle at 20% 20%, rgba(248, 245, 70, 0.05), transparent 42%),
         linear-gradient(180deg, rgba(19, 20, 22, 0.97), rgba(12, 13, 15, 0.99));
@@ -70,7 +70,7 @@
     top: 34px;
     left: 20px;
     right: 0;
-    height: 90px;
+    height: 92px;
     background: var(--operator-bg) center/cover no-repeat;
     opacity: 1;
     filter: saturate(1.15) contrast(1.05);
@@ -118,7 +118,7 @@
     position: absolute;
     top: 34px;
     left: 0;
-    height: 90px;
+    height: 92px;
     width: 20px;
     display: flex;
     align-items: center;
@@ -165,19 +165,19 @@
     position: absolute;
     left: 8px;
     right: 8px;
-    bottom: 0px;
-    height: 34px;
+    bottom: 8px;
+    height: 42px;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 9px;
     flex-wrap: nowrap;
     z-index: 14;
-    padding: 4px 8px;
+    padding: 4px 10px;
     border-radius: 14px;
-    background: rgba(0, 0, 0, 0.46);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow:
         0 4px 12px rgba(0, 0, 0, 0.32),
@@ -216,17 +216,17 @@
 
 @media (max-width: 900px) {
     .operator-skill-card {
-        min-height: 128px;
+        min-height: 160px;
     }
 
     .operator-skill-card::before {
         top: 32px;
-        height: 88px;
+        height: 90px;
     }
 
     .leader-badge {
         top: 32px;
-        height: 88px;
+        height: 90px;
         font-size: 10px;
         padding: 3px 12px;
     }
@@ -242,6 +242,11 @@
 
     .operator-skill-card.leader .skill-row {
         left: 28px;
+    }
+
+    .skill-row {
+        height: 40px;
+        bottom: 8px;
     }
 
     .skill-small {
