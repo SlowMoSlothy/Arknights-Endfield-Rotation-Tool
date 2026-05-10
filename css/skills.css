@@ -34,16 +34,21 @@
     z-index: 1;
     display: flex;
     gap: 14px;
-    align-items: stretch;
+    align-items: flex-start;
     flex-wrap: nowrap;
     width: max-content;
 }
-
+.operator-skill-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 222px;
+}
 .operator-skill-card {
     position: relative;
     display: block;
     min-width: 222px;
-    min-height: 166px;
+    min-height: 111px;
     background:
         radial-gradient(circle at 20% 20%, rgba(248, 245, 70, 0.05), transparent 42%),
         linear-gradient(180deg, rgba(19, 20, 22, 0.97), rgba(12, 13, 15, 0.99));
@@ -162,30 +167,28 @@
 }
 
 .skill-row {
-    position: absolute;
-    left: 8px;
-    right: 8px;
-    bottom: 8px;
-    height: 42px;
+    width: 200px;
+    height: 46px;
+
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 9px;
-    flex-wrap: nowrap;
-    z-index: 14;
+
     padding: 4px 10px;
+
     border-radius: 14px;
+
     background: rgba(0, 0, 0, 0.72);
+
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+
     border: 1px solid rgba(255, 255, 255, 0.08);
+
     box-shadow:
         0 4px 12px rgba(0, 0, 0, 0.32),
         inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-.operator-skill-card.leader .skill-row {
-    left: 28px;
 }
 
 .skill-small {
