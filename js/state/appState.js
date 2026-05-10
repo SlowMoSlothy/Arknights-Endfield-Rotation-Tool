@@ -9,3 +9,4 @@ let isDraggingSkill = false;
 let operatorUltimateStates = {};
 
 let showEnemyPanel = false;
+let builderWatermarkUrl = "https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/";

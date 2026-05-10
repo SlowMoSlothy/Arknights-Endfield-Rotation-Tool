@@ -1,4 +1,7 @@
 window.exportImage = exportImage;
+window.copyBuildShareCode = copyBuildShareCode;
+window.copyBuildShareLink = copyBuildShareLink;
+window.loadBuildShareCode = loadBuildShareCode;
 window.confirmTeam = confirmTeam;
 window.backToSelection = backToSelection;
 window.clearRotation = clearRotation;
@@ -64,6 +67,7 @@ window.applySkillDebuffsAndGetActiveState = function patchedApplySkillDebuffsAnd
 loadOperatorUltimateStates();
 loadTeam();
 loadRotation();
+loadBuildShareCodeFromUrl();
 
 renderTeamSlots();
 renderOperatorList();
