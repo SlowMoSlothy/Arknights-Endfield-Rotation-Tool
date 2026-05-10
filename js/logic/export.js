@@ -57,18 +57,37 @@ function exportImage() {
 
     const watermarkUrl = getExportWatermarkUrl();
 
+    const originalWidth = element.style.width;
+    const originalMaxWidth = element.style.maxWidth;
+    const originalOverflow = element.style.overflow;
+
+    const exportWidth = Math.ceil(Math.max(element.scrollWidth, element.offsetWidth));
+    const exportHeight = Math.ceil(Math.max(element.scrollHeight, element.offsetHeight));
+
     element.classList.add("export-mode");
+    element.style.width = `${exportWidth}px`;
+    element.style.maxWidth = "none";
+    element.style.overflow = "visible";
 
     html2canvas(element, {
         backgroundColor: "#121212",
         scale: 2,
         useCORS: true,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: exportWidth,
+        windowHeight: exportHeight,
+        width: exportWidth,
+        height: exportHeight,
 
         onclone: (clonedDoc) => {
             const clonedRotation = clonedDoc.getElementById("rotation");
             if (!clonedRotation) return;
 
             clonedRotation.classList.add("export-mode");
+            clonedRotation.style.width = `${exportWidth}px`;
+            clonedRotation.style.maxWidth = "none";
+            clonedRotation.style.overflow = "visible";
 
             const nodes = [
                 clonedRotation,
@@ -115,13 +134,15 @@ function exportImage() {
         link.download = "rotation.png";
         link.href = canvas.toDataURL("image/png");
         link.click();
-
-        element.classList.remove("export-mode");
     }).catch(error => {
         console.error("Export failed:", error);
         if (isCanvasSecurityError(error)) {
             showExportSecurityMessage();
         }
+    }).finally(() => {
+        element.style.width = originalWidth;
+        element.style.maxWidth = originalMaxWidth;
+        element.style.overflow = originalOverflow;
         element.classList.remove("export-mode");
     });
 }
