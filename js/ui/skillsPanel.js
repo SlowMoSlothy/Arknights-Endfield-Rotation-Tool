@@ -146,6 +146,10 @@ function renderSkills() {
     const wrapper = document.createElement("div");
     wrapper.className = "operators-skills-grid";
     activeOperators.forEach((op, index) => {
+        const operatorWrapper = document.createElement("div");
+        operatorWrapper.className = "operator-skill-wrapper";
+        if (index === 0) operatorWrapper.classList.add("leader");
+
         const card = document.createElement("div");
         card.className = "operator-skill-card";
         const bgPath = op.background || op.icon;
@@ -179,8 +183,9 @@ function renderSkills() {
             attachSkillTooltipEvents(div, skillData);
         });
         card.appendChild(opRow);
-        card.appendChild(skillRow);
-        wrapper.appendChild(card);
+        operatorWrapper.appendChild(card);
+        operatorWrapper.appendChild(skillRow);
+        wrapper.appendChild(operatorWrapper);
     });
     list.appendChild(wrapper);
 }
