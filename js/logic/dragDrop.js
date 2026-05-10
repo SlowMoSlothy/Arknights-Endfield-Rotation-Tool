@@ -1,6 +1,10 @@
 function cleanupDragArtifacts() {
-    document.querySelectorAll(".drag-ghost, .sortable-fallback, .sortable-ghost, .sortable-chosen, .sortable-drag").forEach(el => {
+    document.querySelectorAll(".drag-ghost, .sortable-fallback, .neutral-drag-preview").forEach(el => {
         el.remove();
+    });
+
+    document.querySelectorAll(".sortable-ghost, .sortable-chosen, .sortable-drag").forEach(el => {
+        el.classList.remove("sortable-ghost", "sortable-chosen", "sortable-drag", "neutral-drag-preview");
     });
 
     document.querySelectorAll(".rotation-slot").forEach(slot => {
@@ -21,6 +25,44 @@ function endDrag() {
     requestAnimationFrame(() => {
         cleanupDragArtifacts();
     });
+
+    setTimeout(cleanupDragArtifacts, 80);
+}
+
+function hydrateDragPreview(previewEl, sourceEl) {
+    if (!previewEl) return;
+
+    previewEl.classList.add("neutral-drag-preview");
+
+    const skillId = parseInt(sourceEl?.dataset?.id || previewEl.dataset.id, 10);
+    const skillData = Number.isNaN(skillId) ? null : getSkillById(skillId);
+    if (!skillData || previewEl.querySelector(".ef-skill-icon")) return;
+
+    previewEl.innerHTML = "";
+    previewEl.dataset.id = String(skillId);
+    if (sourceEl?.dataset?.uid) previewEl.dataset.uid = sourceEl.dataset.uid;
+    previewEl.appendChild(createSkillIcon(skillData, { size: "small", useSmallIcon: true }));
+}
+
+function scheduleDragPreviewHydration(sourceEl, attempts = 8) {
+    const hydrate = (remaining) => {
+        const ghost = document.querySelector(".drag-ghost, .sortable-fallback");
+        if (ghost) {
+            hydrateDragPreview(ghost, sourceEl);
+            return;
+        }
+
+        if (remaining > 0) {
+            requestAnimationFrame(() => hydrate(remaining - 1));
+        }
+    };
+
+    requestAnimationFrame(() => hydrate(attempts));
+}
+
+function handleDragStart(evt) {
+    beginDrag();
+    scheduleDragPreviewHydration(evt.item);
 }
 
 function createSourceSortable(target) {
@@ -40,13 +82,7 @@ function createSourceSortable(target) {
         delayOnTouchOnly: true,
         touchStartThreshold: 4,
         fallbackTolerance: 8,
-        onStart: () => {
-            beginDrag();
-            setTimeout(() => {
-                const ghost = document.querySelector(".drag-ghost, .sortable-fallback");
-                if (ghost) ghost.classList.add("neutral-drag-preview");
-            }, 0);
-        },
+        onStart: handleDragStart,
         onEnd: endDrag,
         onUnchoose: cleanupDragArtifacts
     });
@@ -100,13 +136,7 @@ function initRotationDragDrop() {
             delayOnTouchOnly: true,
             touchStartThreshold: 4,
             fallbackTolerance: 8,
-            onStart: () => {
-                beginDrag();
-                setTimeout(() => {
-                    const ghost = document.querySelector(".drag-ghost, .sortable-fallback");
-                    if (ghost) ghost.classList.add("neutral-drag-preview");
-                }, 0);
-            },
+            onStart: handleDragStart,
             onFilter: (evt) => {
                 const removeBtn = evt.target.closest(".remove-btn");
                 if (!removeBtn) return;

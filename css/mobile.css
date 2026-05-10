@@ -41,11 +41,14 @@
     body {
         margin: 0;
         padding: 10px;
+        overflow-x: hidden;
     }
 
     .builder-shell {
         max-width: 100%;
         margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
 
     .builder-top {
@@ -78,13 +81,23 @@
         display: flex;
         flex-direction: column;
         gap: 16px;
+        min-width: 0;
     }
 
     .builder-sidebar {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 8px;
         padding: 10px;
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    .builder-panel {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
     }
 
     .builder-sidebar h3 {
@@ -95,31 +108,105 @@
     .builder-sidebar button {
         width: 100%;
         text-align: center;
-        padding: 10px 8px;
-        font-size: 14px;
+        padding: 8px 6px;
+        font-size: 12px;
+    }
+
+    .sidebar-command {
+        min-height: 50px;
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 5px;
+        border-left-width: 1px;
+        padding: 7px 5px;
+    }
+
+    .sidebar-command:hover {
+        transform: translateY(-1px);
+    }
+
+    .sidebar-command-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+    }
+
+    .sidebar-command-label {
+        max-width: 100%;
+        font-size: 10px;
+        line-height: 1.05;
+        white-space: normal;
+        overflow: hidden;
+        text-overflow: clip;
+    }
+
+    .sidebar-command-signal {
+        display: none;
     }
 
     .builder-main {
         gap: 16px;
+        width: 100%;
+        min-width: 0;
     }
 
     .skills-panel {
         overflow-x: auto;
         padding: 10px;
+        max-width: 100%;
+        box-sizing: border-box;
     }
 
     .operators-skills-grid {
         flex-wrap: nowrap;
         align-items: stretch;
-        gap: 12px;
+        gap: 10px;
         width: max-content;
     }
 
+    .operator-skill-wrapper {
+        width: 168px;
+        gap: 6px;
+    }
+
     .operator-skill-card {
-        min-width: 150px;
-        padding: 8px;
-        gap: 8px;
+        min-width: 168px;
+        min-height: 104px;
+        border-radius: 14px;
+        padding: 0;
         cursor: pointer;
+    }
+
+    .operator-skill-card::before {
+        top: 30px;
+        height: 78px;
+    }
+
+    .leader-badge {
+        top: 0;
+        width: 20px;
+        height: 104px;
+        padding: 0;
+        font-size: 11px;
+    }
+
+    .operator-skill-name {
+        height: 30px;
+        font-size: 13px;
+        padding-right: 36px;
+    }
+
+    .swap-operator-btn {
+        top: 15px;
+        right: 7px;
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+    }
+
+    .swap-operator-btn svg {
+        width: 16px;
+        height: 16px;
     }
 
     .operator-skill-card .skill-small {
@@ -132,7 +219,19 @@
     }
 
     .skill-row {
-        gap: 6px;
+        width: 148px;
+        height: 38px;
+        gap: 4px;
+        padding: 4px 8px;
+        border-radius: 12px;
+    }
+
+    .skill-small {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
+        padding: 2px;
     }
 
     .skill-small.selected {
@@ -369,6 +468,16 @@
         padding: 24px 18px 40px;
     }
 
+    #selectionScreen.team-modal-open .operator-title-row,
+    #selectionScreen.team-modal-open .operator-grid {
+        width: 100%;
+    }
+
+    #selectionScreen.team-modal-open .operator-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+    }
+
     .close-team-modal-btn {
         display: none;
     }
@@ -377,6 +486,7 @@
         display: flex;
         position: fixed;
 
+        top: auto;
         right: 18px;
         bottom: calc(18px + env(safe-area-inset-bottom));
 

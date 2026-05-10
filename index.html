@@ -87,9 +87,21 @@
       <div class="builder-content">
         <aside class="builder-sidebar">
           <h3>Menu</h3>
-          <button onclick="exportImage()">📸 Export Rotation</button>
-          <button onclick="clearRotation()">🗑️ Clear Rotation</button>
-          <button id="openSettingsBtn" type="button">⚙️ Settings</button>
+          <button class="sidebar-command sidebar-command-primary" onclick="exportImage()">
+            <span class="sidebar-command-icon">▣</span>
+            <span class="sidebar-command-label">Export Rotation</span>
+            <span class="sidebar-command-signal"></span>
+          </button>
+          <button class="sidebar-command" onclick="clearRotation()">
+            <span class="sidebar-command-icon">⌫</span>
+            <span class="sidebar-command-label">Clear Rotation</span>
+            <span class="sidebar-command-signal"></span>
+          </button>
+          <button id="openSettingsBtn" class="sidebar-command" type="button">
+            <span class="sidebar-command-icon">⚙</span>
+            <span class="sidebar-command-label">Settings</span>
+            <span class="sidebar-command-signal"></span>
+          </button>
         </aside>
 
         <main class="builder-main">
@@ -103,7 +115,7 @@
               <div id="rotationDropZone"></div>
             </div>
           </section>
-          <section class="builder-panel">
+          <section id="enemyPanel" class="builder-panel">
             <h3>Enemy</h3>
             <button id="selectEnemyBtn" type="button">Select Enemy</button>
             <div id="enemySkillBar" class="skills-panel"></div>

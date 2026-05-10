@@ -7,3 +7,5 @@ let slotSortables = [];
 let isDraggingSkill = false;
 
 let operatorUltimateStates = {};
+
+let showEnemyPanel = false;

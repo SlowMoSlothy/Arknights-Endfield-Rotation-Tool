@@ -69,6 +69,8 @@ function renderEnemyEffects() {
 }
 
 function renderEnemySkillBar() {
+    if (!isEnemyPanelEnabled()) return;
+
     const container = document.getElementById("enemySkillBar");
     if (!container) return;
 
@@ -154,7 +156,33 @@ function closeEnemyModal() {
     document.getElementById("enemyModal")?.classList.remove("open");
 }
 
+function isEnemyPanelEnabled() {
+    return typeof showEnemyPanel === "undefined" ? true : showEnemyPanel;
+}
+
+function applyEnemyPanelVisibility() {
+    const panel = document.getElementById("enemyPanel");
+    const isEnabled = isEnemyPanelEnabled();
+
+    if (panel) {
+        panel.hidden = !isEnabled;
+    }
+
+    if (!isEnabled) {
+        closeEnemyModal();
+
+        if (enemySkillSourceSortable) {
+            enemySkillSourceSortable.destroy();
+            enemySkillSourceSortable = null;
+        }
+    }
+
+    return isEnabled;
+}
+
 function initEnemyPanel() {
+    if (!applyEnemyPanelVisibility()) return;
+
     document.getElementById("selectEnemyBtn")?.addEventListener("click", openEnemyModal);
     document.getElementById("closeEnemyModalBtn")?.addEventListener("click", closeEnemyModal);
     renderEnemySkillBar();

@@ -27,7 +27,7 @@ function openTeamSelectionModal(slotIndex = null) {
 
     if (selectionScreen) {
         selectionScreen.style.display = "block";
-selectionScreen.classList.add("team-modal-open");
+        selectionScreen.classList.add("team-modal-open");
     }
 
     if (slotIndex !== null) {
@@ -46,6 +46,7 @@ function closeTeamSelectionModal() {
     const selectionScreen = document.getElementById("selectionScreen");
 
     if (selectionScreen) {
+        selectionScreen.classList.remove("team-modal-open");
         selectionScreen.style.display = "none";
     }
 }
