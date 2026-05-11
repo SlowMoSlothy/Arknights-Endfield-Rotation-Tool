@@ -3,6 +3,27 @@
     margin: 0 auto;
 }
 
+.app-brand {
+    max-width: 1600px;
+    margin: 0 auto 10px;
+    padding: 4px 18px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.app-logo {
+    display: block;
+    width: min(280px, 28vw);
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    filter:
+        drop-shadow(0 0 18px rgba(248,245,70,0.10))
+        drop-shadow(0 12px 24px rgba(0,0,0,0.28));
+}
+
 .builder-top {
     display: flex;
     flex-direction: column;
@@ -195,6 +216,15 @@
 }
 
 @media (max-width: 900px) {
+    .app-brand {
+        margin: 0 auto 14px;
+        padding: 2px 6px 0;
+    }
+
+    .app-logo {
+        width: min(360px, 96vw);
+    }
+
     .builder-shell {
         max-width: 100%;
         padding: 0 10px;
