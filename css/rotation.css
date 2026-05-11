@@ -24,10 +24,12 @@
 
 #rotationDropZone {
     display: grid;
+    grid-auto-columns: max-content;
     grid-auto-rows: auto;
     column-gap: 0;
     row-gap: var(--rotation-gap);
     align-items: center;
+    justify-content: start;
     overflow: visible;
     padding: 22px 0 28px;
 }

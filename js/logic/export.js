@@ -70,6 +70,7 @@ function exportImage() {
 
     const exportWidth = Math.ceil(Math.max(element.scrollWidth, element.offsetWidth));
     const exportHeight = Math.ceil(Math.max(element.scrollHeight, element.offsetHeight)) + (watermarkUrl ? 80 : 0);
+    const exportViewportWidth = document.documentElement.clientWidth || window.innerWidth || exportWidth;
     element.classList.add("export-mode");
     element.style.width = `${exportWidth}px`;
     element.style.maxWidth = "none";
@@ -81,7 +82,7 @@ function exportImage() {
         useCORS: true,
         scrollX: 0,
         scrollY: 0,
-        windowWidth: exportWidth,
+        windowWidth: exportViewportWidth,
         windowHeight: exportHeight,
         width: exportWidth,
         height: exportHeight,
