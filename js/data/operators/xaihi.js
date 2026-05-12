@@ -1,6 +1,8 @@
 const xaihi = {
     id: 25,
     name: "Xaihi",
+    star: 5,
+    operatorClass: "Supporter",
     icon: "assets/operators/avatars/Xaihi.png",
     elementType: "cryo"
 };

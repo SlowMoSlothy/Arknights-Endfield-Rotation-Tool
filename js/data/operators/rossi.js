@@ -1,6 +1,8 @@
 const rossi = {
     id: 5,
     name: "Rossi",
+    star: 6,
+    operatorClass: "Guard",
     icon: "assets/operators/avatars/Rossi.png",
     elementType: "physical",
     skills: [

@@ -1,6 +1,8 @@
 const gilberta = {
     id: 11,
     name: "Gilberta",
+    star: 6,
+    operatorClass: "Supporter",
     icon: "assets/operators/avatars/Gilberta.png",
     elementType: "nature"
 };

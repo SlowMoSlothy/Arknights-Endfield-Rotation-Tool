@@ -1,6 +1,8 @@
 const chen = {
     id: 14,
     name: "Chen Qianyu",
+    star: 5,
+    operatorClass: "Guard",
     icon: "assets/operators/avatars/Chen.png",
     elementType: "physical"
 };

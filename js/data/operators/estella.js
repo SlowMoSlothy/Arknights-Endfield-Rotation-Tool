@@ -1,6 +1,8 @@
 const estella = {
     id: 18,
     name: "Estella",
+    star: 4,
+    operatorClass: "Guard",
     icon: "assets/operators/avatars/Estella.png",
     elementType: "cryo"
 };

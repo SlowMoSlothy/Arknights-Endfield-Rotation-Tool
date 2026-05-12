@@ -161,6 +161,10 @@
     display: none !important;
 }
 
+.export-mode .rotation-arrow::before {
+    display: none !important;
+}
+
 .export-mode .rotation-panel,
 .export-mode {
     background: #000 !important;

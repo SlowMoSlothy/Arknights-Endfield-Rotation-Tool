@@ -1,6 +1,8 @@
 const lifeng = {
     id: 21,
     name: "Lifeng",
+    star: 6,
+    operatorClass: "Guard",
     icon: "assets/operators/avatars/Lifeng.png",
     elementType: "physical"
 };

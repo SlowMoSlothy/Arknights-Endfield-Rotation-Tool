@@ -1,6 +1,8 @@
 const avywenna = {
     id: 7,
     name: "Avywenna",
+    star: 5,
+    operatorClass: "Striker",
     icon: "assets/operators/avatars/Avywenna.png",
     elementType: "electric"
 };

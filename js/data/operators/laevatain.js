@@ -1,6 +1,8 @@
 const laevatain = {
     id: 1,
     name: "Laevatain",
+    star: 6,
+    operatorClass: "Striker",
     icon: "assets/operators/avatars/Laevatain.png",
     elementType: "heat",
     skills: [

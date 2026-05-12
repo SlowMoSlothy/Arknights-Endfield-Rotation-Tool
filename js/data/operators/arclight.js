@@ -4,6 +4,8 @@ const opId = 6;
 const arclight = {
     id: opId,
     name: "Arclight",
+    star: 5,
+    operatorClass: "Vanguard",
     icon: opImg,
     elementType: "electric",
     skills: [

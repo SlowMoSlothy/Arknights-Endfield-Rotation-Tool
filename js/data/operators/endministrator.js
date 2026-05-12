@@ -1,6 +1,8 @@
 const endministrator = {
     id: 3,
     name: "Endministrator",
+    star: 6,
+    operatorClass: "Guard",
     icon: "assets/operators/avatars/Endmin.png",
     elementType: "physical",
     skills: [

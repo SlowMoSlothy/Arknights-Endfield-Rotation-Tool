@@ -1,6 +1,8 @@
 const pogranichnik = {
     id: 22,
     name: "Pogranichnik",
+    star: 6,
+    operatorClass: "Vanguard",
     icon: "assets/operators/avatars/Pogranichnik.png",
     elementType: "physical"
 };

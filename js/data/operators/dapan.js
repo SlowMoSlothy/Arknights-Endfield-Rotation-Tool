@@ -1,6 +1,8 @@
 const dapan = {
     id: 16,
     name: "Da Pan",
+    star: 5,
+    operatorClass: "Striker",
     icon: "assets/operators/avatars/Dapan.png",
     elementType: "physical"
 };

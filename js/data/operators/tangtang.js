@@ -1,6 +1,8 @@
 const tangtang = {
     id: 15,
     name: "Tangtang",
+    star: 6,
+    operatorClass: "Caster",
     icon: "assets/operators/avatars/Tangtang.png",
     elementType: "cryo"
 };

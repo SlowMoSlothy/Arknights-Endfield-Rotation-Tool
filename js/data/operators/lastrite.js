@@ -1,6 +1,8 @@
 const lastrite = {
     id: 20,
     name: "Last Rite",
+    star: 6,
+    operatorClass: "Striker",
     icon: "assets/operators/avatars/Last_Rite.png",
     elementType: "cryo"
 };

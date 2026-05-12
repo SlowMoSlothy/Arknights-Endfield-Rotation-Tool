@@ -1,6 +1,8 @@
 const wulfgard = {
     id: 24,
     name: "Wulfgard",
+    star: 5,
+    operatorClass: "Caster",
     icon: "assets/operators/avatars/Wulfgard.png",
     elementType: "heat"
 };

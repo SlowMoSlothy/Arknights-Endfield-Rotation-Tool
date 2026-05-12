@@ -1,6 +1,8 @@
 const catcher = {
     id: 13,
     name: "Catcher",
+    star: 4,
+    operatorClass: "Defender",
     icon: "assets/operators/avatars/Catcher.png",
     elementType: "physical"
 };

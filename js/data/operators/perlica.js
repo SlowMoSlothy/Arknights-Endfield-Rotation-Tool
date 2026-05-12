@@ -1,6 +1,8 @@
 const perlica = {
     id: 4,
     name: "Perlica",
+    star: 5,
+    operatorClass: "Caster",
     icon: "assets/operators/avatars/Perlica.png",
     elementType: "electric",
     skills: [

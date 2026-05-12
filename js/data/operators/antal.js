@@ -1,6 +1,8 @@
 const antal = {
     id: 8,
     name: "Antal",
+    star: 4,
+    operatorClass: "Supporter",
     icon: "assets/operators/avatars/Antal.png",
     elementType: "electric",
     skills: [

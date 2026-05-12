@@ -1,6 +1,8 @@
 const yvonne = {
     id: 26,
     name: "Yvonne",
+    star: 6,
+    operatorClass: "Caster",
     icon: "assets/operators/avatars/Yvonne.png",
     elementType: "cryo"
 };

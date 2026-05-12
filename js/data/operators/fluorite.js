@@ -1,6 +1,8 @@
 const fluorite = {
     id: 19,
     name: "Fluorite",
+    star: 4,
+    operatorClass: "Caster",
     icon: "assets/operators/avatars/Fluorite.png",
     elementType: "nature"
 };

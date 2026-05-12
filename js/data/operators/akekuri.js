@@ -1,6 +1,8 @@
 const akekuri = {
     id: 2,
     name: "Akekuri",
+    star: 4,
+    operatorClass: "Vanguard",
     icon: "assets/operators/avatars/Akekuri.png",
     elementType: "heat",
     skills: [

@@ -1,6 +1,8 @@
 const snowshine = {
     id: 23,
     name: "Snowshine",
+    star: 5,
+    operatorClass: "Defender",
     icon: "assets/operators/avatars/Snowshine.png",
     elementType: "cryo"
 };

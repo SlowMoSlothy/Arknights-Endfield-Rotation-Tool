@@ -1,6 +1,8 @@
 const zhuang = {
     id: 9,
     name: "Zhuang",
+    star: 6,
+    operatorClass: "Striker",
     icon: "assets/operators/avatars/Zhuang.png",
     canEnterUltimateState: true,
     elementType: "electric",

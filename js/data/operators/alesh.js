@@ -1,6 +1,8 @@
 const alesh = {
     id: 10,
     name: "Alesh",
+    star: 5,
+    operatorClass: "Vanguard",
     icon: "assets/operators/avatars/Alesh.png",
     canEnterUltimateState: false,
     elementType: "physical",

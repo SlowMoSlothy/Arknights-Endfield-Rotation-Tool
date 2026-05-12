@@ -1,6 +1,8 @@
 const ardelia = {
     id: 12,
     name: "Ardelia",
+    star: 6,
+    operatorClass: "Supporter",
     icon: "assets/operators/avatars/Ardelia.png",
     elementType: "nature"
 };

@@ -1,6 +1,8 @@
 const ember = {
     id: 17,
     name: "Ember",
+    star: 6,
+    operatorClass: "Defender",
     icon: "assets/operators/avatars/Ember.png",
     elementType: "heat"
 };
