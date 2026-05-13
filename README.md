@@ -66,10 +66,43 @@ Useful options:
 
 ```js
 let showEnemyPanel = false;
+let useSupabaseOperators = true;
 let builderWatermarkUrl = "https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/";
 ```
 
 Set `showEnemyPanel` to `true` to show the Enemy section again.
+Set `useSupabaseOperators` to `false` to force the local operator files instead of Supabase.
+
+## Supabase Database
+
+Supabase setup files live in:
+
+```text
+supabase/
+  schema.sql
+  seed_operators_basic.sql
+tools/
+  exportOperatorsForSupabase.js
+```
+
+Run `supabase/schema.sql` first in the Supabase SQL Editor. It creates:
+
+- `operators` for the operator base data, including `star` and `operator_class`.
+- `operator_skills` for all skills linked to their operator.
+- public read policies for both tables.
+
+For a quick import of only the operator rows, run `supabase/seed_operators_basic.sql`.
+
+For the full import with operators, skills, and preserved raw JSON data, generate the SQL from the current local data:
+
+```bash
+node tools/exportOperatorsForSupabase.js --stdout > supabase/seed_operators.sql
+```
+
+Then paste/run `supabase/seed_operators.sql` in the Supabase SQL Editor after the schema.
+
+The frontend must only use the Supabase publishable/anon key. Never put a Supabase `service_role` key into browser code.
+When `useSupabaseOperators` is enabled, the app loads `operators` and `operator_skills` from Supabase on startup and falls back to the local JS files if loading fails.
 
 ## Project Structure
 

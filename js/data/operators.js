@@ -1,4 +1,4 @@
-const operators = [
+let operators = [
     ardelia,
     antal,
     alesh,
