@@ -64,16 +64,24 @@ window.applySkillDebuffsAndGetActiveState = function patchedApplySkillDebuffsAnd
     ];
 };
 
-loadOperatorUltimateStates();
-loadTeam();
-loadRotation();
-loadBuildShareCodeFromUrl();
+async function initApp() {
+    if (typeof hydrateOperatorsFromSupabase === "function") {
+        await hydrateOperatorsFromSupabase();
+    }
 
-renderTeamSlots();
-renderOperatorList();
+    loadOperatorUltimateStates();
+    loadTeam();
+    loadRotation();
+    loadBuildShareCodeFromUrl();
 
-initUiSettings();
-initEnemyPanel();
+    renderTeamSlots();
+    renderOperatorList();
 
-// Direkt den Rotation Builder anzeigen
-showBuilderScreen();
+    initUiSettings();
+    initEnemyPanel();
+
+    // Direkt den Rotation Builder anzeigen
+    showBuilderScreen();
+}
+
+initApp();

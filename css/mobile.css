@@ -393,7 +393,7 @@
         gap: 8px;
     }
 
-    .operator-card img {
+    .operator-card > img {
         width: 50px;
         height: 50px;
         border-radius: 15px;
@@ -401,9 +401,9 @@
 
     .operator-card {
         width: 100%;
-        height: 85px;
+        height: 96px;
         border-radius: 14px;
-        padding: 6px;
+        padding: 24px 5px 7px;
         box-sizing: border-box;
     }
 
@@ -516,35 +516,127 @@
     }
 
     #selectionScreen.team-modal-open {
-        padding: 24px 18px 40px;
+        overflow-x: hidden;
+        padding: 24px 12px 112px;
     }
 
     #selectionScreen.team-modal-open .operator-title-row,
+    #selectionScreen.team-modal-open .operator-filter-panel,
     #selectionScreen.team-modal-open .operator-grid {
         width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    #selectionScreen.team-modal-open .operator-title-row {
+        padding: 16px 14px 10px;
+    }
+
+    #selectionScreen.team-modal-open .operator-filter-panel {
+        overflow: hidden;
+        padding: 0 14px 12px;
+    }
+
+    #selectionScreen.team-modal-open .operator-filter-top {
+        gap: 8px;
+    }
+
+    #selectionScreen.team-modal-open .operator-search-wrap {
+        min-width: 0;
+    }
+
+    #selectionScreen.team-modal-open .operator-search-input {
+        min-width: 0;
+    }
+
+    #selectionScreen.team-modal-open .operator-filter-reset {
+        flex: 0 0 auto;
+        padding: 0 9px;
+        font-size: 11px;
+    }
+
+    #selectionScreen.team-modal-open .operator-filter-buttons {
+        flex-wrap: wrap;
+        overflow-x: visible;
+        gap: 5px;
+        padding-bottom: 0;
+    }
+
+    #selectionScreen.team-modal-open .operator-filter-btn {
+        min-height: 25px;
+        padding: 0 8px;
+        font-size: 10px;
+    }
+
+    #selectionScreen.team-modal-open .operator-filter-icon {
+        width: 13px;
+        height: 13px;
     }
 
     #selectionScreen.team-modal-open .operator-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 8px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        overflow: visible;
+        padding: 10px 14px 26px;
+    }
+
+    #selectionScreen.team-modal-open .operator-card {
+        min-width: 0;
+        height: 110px;
+        padding: 25px 4px 8px;
+    }
+
+    #selectionScreen.team-modal-open .operator-card-meta {
+        left: 5px;
+        right: 5px;
+        gap: 2px;
+    }
+
+    #selectionScreen.team-modal-open .operator-card-star {
+        min-width: 22px;
+        height: 16px;
+        padding: 0 4px;
+        font-size: 9px;
+    }
+
+    #selectionScreen.team-modal-open .operator-card-meta-icon {
+        width: 15px;
+        height: 15px;
+    }
+
+    #selectionScreen.team-modal-open .operator-card > img {
+        width: 52px;
+        height: 52px;
+        border-radius: 10px;
+    }
+
+    #selectionScreen.team-modal-open .operator-name {
+        max-width: 100%;
+        font-size: 11px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .close-team-modal-btn {
         display: none;
     }
 
-    #selectionScreen.team-modal-open .close-team-modal-btn {
+    #selectionScreen.team-modal-open .close-team-modal-btn,
+    body.team-selection-modal-open .close-team-modal-btn {
         display: flex;
         position: fixed;
 
         top: auto;
-        right: 18px;
-        bottom: calc(18px + env(safe-area-inset-bottom));
+        right: 16px;
+        bottom: calc(16px + env(safe-area-inset-bottom));
 
         z-index: 10001;
 
-        width: 78px;
-        height: 78px;
+        width: 62px;
+        height: 62px;
+        min-width: 62px;
 
         align-items: center;
         justify-content: center;
@@ -555,13 +647,13 @@
         background: #F8F546;
         color: #111;
 
-        font-size: 44px;
+        font-size: 34px;
         font-weight: 700;
         line-height: 1;
 
         box-shadow:
-            0 0 22px rgba(248, 245, 70, 0.45),
-            0 8px 24px rgba(0, 0, 0, 0.45);
+            0 0 18px rgba(248, 245, 70, 0.42),
+            0 7px 20px rgba(0, 0, 0, 0.45);
 
         backdrop-filter: blur(6px);
     }
