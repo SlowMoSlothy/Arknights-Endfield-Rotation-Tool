@@ -507,7 +507,7 @@ function openCommunityRotationsModal() {
 
     modal.classList.add("open");
     updateCommunitySubmitAvailability();
-    fetchCommunityRotations();
+    fetchCommunityRotations(true);
 }
 
 function closeCommunityRotationsModal() {
