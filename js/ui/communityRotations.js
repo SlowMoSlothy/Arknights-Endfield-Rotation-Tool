@@ -3,6 +3,7 @@ const communityRotationState = {
     search: "",
     loaded: false,
     loading: false,
+    submitting: false,
     error: ""
 };
 
@@ -13,7 +14,7 @@ function normalizeCommunityList(value) {
 }
 
 function getCommunityOperatorById(operatorId) {
-    if (!Array.isArray(operators)) return null;
+    if (typeof operators === "undefined" || !Array.isArray(operators)) return null;
     return operators.find(operator => operator.id === Number(operatorId)) || null;
 }
 
@@ -130,6 +131,209 @@ function setCommunityStatus(text, className = "") {
 
     status.className = `community-status${className ? ` ${className}` : ""}`;
     status.textContent = text;
+}
+
+function setCommunitySubmitStatus(text, className = "") {
+    const status = document.getElementById("communitySubmitStatus");
+    if (!status) return;
+
+    status.className = `community-submit-status${className ? ` ${className}` : ""}`;
+    status.textContent = text;
+}
+
+function getCurrentCommunityTeamIds() {
+    if (!Array.isArray(selectedTeam)) return [];
+
+    return selectedTeam
+        .map(operatorId => Number(operatorId))
+        .filter(operatorId => Number.isFinite(operatorId) && getCommunityOperatorById(operatorId));
+}
+
+function getCurrentCommunityTeamOperators() {
+    return getCurrentCommunityTeamIds()
+        .map(operatorId => getCommunityOperatorById(operatorId))
+        .filter(Boolean);
+}
+
+function getCurrentCommunityRotationEntries() {
+    if (!Array.isArray(rotation)) return [];
+
+    return rotation
+        .filter(Boolean)
+        .map(entry => ({
+            id: Number(entry.id),
+            autoInserted: entry.autoInserted === true
+        }))
+        .filter(entry => Number.isFinite(entry.id) && typeof getSkillById === "function" && getSkillById(entry.id));
+}
+
+function getCurrentCommunityRotationSkills() {
+    return getCurrentCommunityRotationEntries()
+        .map(entry => getSkillById(entry.id))
+        .filter(Boolean);
+}
+
+function getCurrentCommunityElements() {
+    return uniqueCommunityLabels([
+        ...getCurrentCommunityTeamOperators().map(operator => operator.elementType),
+        ...getCurrentCommunityRotationSkills().map(skill => skill.elementType)
+    ]).map(value => String(value).toLowerCase());
+}
+
+function getCurrentCommunityClasses() {
+    return uniqueCommunityLabels(getCurrentCommunityTeamOperators().map(operator => operator.operatorClass))
+        .map(value => String(value).toLowerCase());
+}
+
+function updateCommunitySubmitAvailability() {
+    const submitToggle = document.getElementById("openCommunitySubmitFormBtn");
+    if (!submitToggle) return;
+
+    const canSubmit = typeof hasCreatedRotation === "function" ? hasCreatedRotation() : getCurrentCommunityRotationEntries().length > 0;
+    submitToggle.disabled = !canSubmit;
+    submitToggle.textContent = canSubmit ? "Submit Current" : "No Rotation";
+}
+
+function setCommunitySubmitFormOpen(isOpen) {
+    const form = document.getElementById("communitySubmitForm");
+    if (!form) return;
+
+    form.hidden = !isOpen;
+    if (isOpen) {
+        updateCommunitySubmitAvailability();
+        setCommunitySubmitStatus("");
+        const titleInput = document.getElementById("communitySubmitTitle");
+        if (titleInput) titleInput.focus();
+    }
+}
+
+function validateCommunitySubmission(values) {
+    const title = values.title.trim();
+    const description = values.description.trim();
+    const author = values.author.trim();
+    const teamIds = getCurrentCommunityTeamIds();
+    const rotationEntries = getCurrentCommunityRotationEntries();
+
+    if (!title || title.length < 3 || title.length > 80) {
+        return "Please enter a title between 3 and 80 characters.";
+    }
+
+    if (author.length > 40) {
+        return "Author can be up to 40 characters.";
+    }
+
+    if (description.length > 600) {
+        return "Description can be up to 600 characters.";
+    }
+
+    if (!teamIds.length) {
+        return "Please choose at least one operator before submitting.";
+    }
+
+    if (!rotationEntries.length) {
+        return "Please create a rotation before submitting.";
+    }
+
+    return "";
+}
+
+function buildCommunitySubmission(values) {
+    const teamIds = getCurrentCommunityTeamIds();
+    const rotationEntries = getCurrentCommunityRotationEntries();
+    const rotationSkillIds = rotationEntries.map(entry => entry.id);
+    const teamOperators = getCurrentCommunityTeamOperators();
+    const rotationSkills = getCurrentCommunityRotationSkills();
+
+    return {
+        game: "arknights_endfield",
+        title: values.title.trim(),
+        description: values.description.trim(),
+        author_name: values.author.trim(),
+        share_code: createBuildShareCode(),
+        setup_version: 2,
+        team_operator_ids: teamIds,
+        rotation_skill_ids: rotationSkillIds,
+        element_types: getCurrentCommunityElements(),
+        operator_classes: getCurrentCommunityClasses(),
+        payload: {
+            version: 1,
+            submittedAt: new Date().toISOString(),
+            team: teamOperators.map(operator => ({
+                id: operator.id,
+                name: operator.name,
+                elementType: operator.elementType,
+                operatorClass: operator.operatorClass
+            })),
+            rotation: rotationEntries.map((entry, index) => {
+                const skill = rotationSkills[index];
+                return {
+                    id: entry.id,
+                    name: skill?.name || "",
+                    type: skill?.type || "",
+                    shortType: skill?.shortType || "",
+                    elementType: skill?.elementType || "",
+                    autoInserted: entry.autoInserted
+                };
+            })
+        },
+        likes_count: 0,
+        view_count: 0,
+        is_public: true,
+        is_approved: false,
+        is_hidden: false
+    };
+}
+
+async function submitCommunityRotation(event) {
+    event.preventDefault();
+
+    if (communityRotationState.submitting) return;
+
+    const values = {
+        title: document.getElementById("communitySubmitTitle")?.value || "",
+        author: document.getElementById("communitySubmitAuthor")?.value || "",
+        description: document.getElementById("communitySubmitDescription")?.value || ""
+    };
+
+    const validationError = validateCommunitySubmission(values);
+    if (validationError) {
+        setCommunitySubmitStatus(validationError, "is-error");
+        return;
+    }
+
+    if (typeof supabaseClient === "undefined" || !supabaseClient) {
+        setCommunitySubmitStatus("Supabase is not available right now.", "is-error");
+        return;
+    }
+
+    communityRotationState.submitting = true;
+    const submitButton = document.getElementById("communitySubmitButton");
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = "Submitting";
+    }
+    setCommunitySubmitStatus("Submitting rotation for review...");
+
+    try {
+        const { error } = await supabaseClient
+            .from("community_rotations")
+            .insert(buildCommunitySubmission(values));
+
+        if (error) throw error;
+
+        const form = document.getElementById("communitySubmitForm");
+        if (form) form.reset();
+        setCommunitySubmitStatus("Submitted for review. It will appear after approval.", "is-success");
+    } catch (error) {
+        console.error("Community rotation submission failed:", error);
+        setCommunitySubmitStatus("This rotation could not be submitted.", "is-error");
+    } finally {
+        communityRotationState.submitting = false;
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = "Submit for review";
+        }
+    }
 }
 
 function renderCommunityRotations() {
@@ -302,6 +506,7 @@ function openCommunityRotationsModal() {
     if (!modal) return;
 
     modal.classList.add("open");
+    updateCommunitySubmitAvailability();
     fetchCommunityRotations();
 }
 
@@ -309,6 +514,7 @@ function closeCommunityRotationsModal() {
     const modal = document.getElementById("communityModal");
     if (!modal) return;
 
+    setCommunitySubmitFormOpen(false);
     modal.classList.remove("open");
 }
 
@@ -319,12 +525,18 @@ function initCommunityRotations() {
     const openButton = document.getElementById("openCommunityRotationsBtn");
     const closeButton = document.getElementById("closeCommunityModalBtn");
     const refreshButton = document.getElementById("refreshCommunityRotationsBtn");
+    const submitToggle = document.getElementById("openCommunitySubmitFormBtn");
+    const submitForm = document.getElementById("communitySubmitForm");
+    const cancelSubmitButton = document.getElementById("cancelCommunitySubmitBtn");
     const searchInput = document.getElementById("communitySearchInput");
     const modal = document.getElementById("communityModal");
 
     if (openButton) openButton.addEventListener("click", openCommunityRotationsModal);
     if (closeButton) closeButton.addEventListener("click", closeCommunityRotationsModal);
     if (refreshButton) refreshButton.addEventListener("click", () => fetchCommunityRotations(true));
+    if (submitToggle) submitToggle.addEventListener("click", () => setCommunitySubmitFormOpen(true));
+    if (submitForm) submitForm.addEventListener("submit", submitCommunityRotation);
+    if (cancelSubmitButton) cancelSubmitButton.addEventListener("click", () => setCommunitySubmitFormOpen(false));
     if (searchInput) {
         searchInput.addEventListener("input", event => {
             communityRotationState.search = event.target.value;

@@ -224,8 +224,33 @@
           <span>Search</span>
           <input id="communitySearchInput" class="community-search-input" type="search" placeholder="Rotation, author, operator">
         </label>
-        <button id="refreshCommunityRotationsBtn" class="community-refresh-btn" type="button">Refresh</button>
+        <div class="community-toolbar-actions">
+          <button id="refreshCommunityRotationsBtn" class="community-refresh-btn" type="button">Refresh</button>
+          <button id="openCommunitySubmitFormBtn" class="community-submit-toggle" type="button">Submit Current</button>
+        </div>
       </div>
+
+      <form id="communitySubmitForm" class="community-submit-form" hidden>
+        <div class="community-form-grid">
+          <label class="community-field">
+            <span>Title</span>
+            <input id="communitySubmitTitle" type="text" minlength="3" maxlength="80" required placeholder="Electric burst opener">
+          </label>
+          <label class="community-field">
+            <span>Author</span>
+            <input id="communitySubmitAuthor" type="text" maxlength="40" placeholder="Optional">
+          </label>
+        </div>
+        <label class="community-field">
+          <span>Description</span>
+          <textarea id="communitySubmitDescription" maxlength="600" rows="3" placeholder="Short notes for this rotation"></textarea>
+        </label>
+        <div id="communitySubmitStatus" class="community-submit-status"></div>
+        <div class="community-submit-actions">
+          <button id="cancelCommunitySubmitBtn" class="community-secondary-btn" type="button">Cancel</button>
+          <button id="communitySubmitButton" class="community-submit-btn" type="submit">Submit for review</button>
+        </div>
+      </form>
 
       <div id="communityRotationStatus" class="community-status"></div>
       <div id="communityRotationList" class="community-rotation-list"></div>
