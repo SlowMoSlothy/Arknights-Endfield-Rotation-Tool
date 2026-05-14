@@ -3,6 +3,13 @@
     --rotation-gap: 12px;
     --rotation-arrow-width: 24px;
     --rotation-arrow-size: 18px;
+    --rotation-row-gap: var(--rotation-gap);
+    --rotation-effect-size: 18px;
+    --rotation-effect-gap: 4px;
+    --rotation-effect-row-gap: 2px;
+    --rotation-effect-tray-width: var(--rotation-slot-size);
+    --rotation-buff-offset: -22px;
+    --rotation-debuff-offset: -30px;
 }
 
 .rotation-panel {
@@ -206,7 +213,7 @@
     grid-auto-columns: max-content;
     grid-auto-rows: auto;
     column-gap: 0;
-    row-gap: var(--rotation-gap);
+    row-gap: var(--rotation-row-gap);
     align-items: center;
     justify-content: start;
     overflow: visible;
@@ -450,24 +457,34 @@
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
+    width: var(--rotation-effect-tray-width);
+    gap: var(--rotation-effect-gap);
+    row-gap: var(--rotation-effect-row-gap);
     z-index: 9;
     pointer-events: none;
 }
 
 .rotation-buff-tray {
-    top: -22px;
+    top: var(--rotation-buff-offset);
 }
 
 .rotation-debuff-tray {
-    bottom: -30px;
+    bottom: var(--rotation-debuff-offset);
+}
+
+.rotation-debuff-tray.is-multi-row {
+    bottom: calc(var(--rotation-debuff-offset) - var(--rotation-effect-size) - var(--rotation-effect-row-gap) - 2px);
 }
 
 .rotation-buff-item,
 .rotation-debuff-item {
-    width: 18px;
-    height: 18px;
-    border-radius: 6px;
+    width: var(--rotation-effect-size);
+    height: var(--rotation-effect-size);
+    box-sizing: border-box;
+    border-radius: min(6px, calc(var(--rotation-effect-size) * 0.34));
     background: rgba(10,12,14,0.94);
     box-shadow: 0 0 8px rgba(0,0,0,0.35);
     display: flex;
@@ -495,7 +512,7 @@
 
 .rotation-buff-fallback,
 .rotation-debuff-fallback {
-    font-size: 9px;
+    font-size: calc(var(--rotation-effect-size) * 0.5);
     font-weight: 700;
     color: #f8f546;
     pointer-events: none;

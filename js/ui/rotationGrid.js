@@ -245,6 +245,32 @@ function consumeAllDebuffStacks(effectName, stackState, metaState) {
     delete metaState[key];
 }
 
+const ROTATION_ELEMENTAL_INFLICTION_EFFECTS = [
+    "electric_infliction",
+    "heat_infliction",
+    "cryo_infliction",
+    "nature_infliction"
+];
+
+const ROTATION_LATEST_ELEMENT_REACTIONS = {
+    cryo_infliction: "solidification",
+    heat_infliction: "combustion",
+    nature_infliction: "corrosion"
+};
+
+const ROTATION_ARTS_REACTION_EFFECTS = [
+    "arts_reaction",
+    "combustion",
+    "corrosion",
+    "solidification"
+];
+
+const ROTATION_LATEST_REACTION_OWN_EFFECTS = {
+    cryo_infliction: "solidification",
+    heat_infliction: "combustion",
+    nature_infliction: "corrosion"
+};
+
 function resolveRotationArtsReactionsWithFullConsume(stackState, metaState) {
     if (!Array.isArray(ARTS_REACTIONS)) return;
     let didResolve = true;
@@ -252,7 +278,7 @@ function resolveRotationArtsReactionsWithFullConsume(stackState, metaState) {
     while (didResolve && safetyCounter < 20) {
         didResolve = false;
         safetyCounter++;
-        if (resolveLatestNatureCorrosionForRotation(stackState, metaState)) {
+        if (resolveLatestElementalReactionForRotation(stackState, metaState)) {
             didResolve = true;
             continue;
         }
@@ -262,6 +288,7 @@ function resolveRotationArtsReactionsWithFullConsume(stackState, metaState) {
             })] || 0) > 0);
             if (!canResolve) continue;
             reaction.requires.forEach(effectName => consumeAllDebuffStacks(effectName, stackState, metaState));
+            ROTATION_ARTS_REACTION_EFFECTS.forEach(effectName => consumeAllDebuffStacks(effectName, stackState, metaState));
             [reaction.appliesEffect, reaction.reactionEffect].forEach(effectName => {
                 if (!effectName) return;
                 addDebuffToRotationState({
@@ -279,21 +306,29 @@ function resolveRotationArtsReactionsWithFullConsume(stackState, metaState) {
     }
 }
 
-function resolveLatestNatureCorrosionForRotation(stackState, metaState) {
-    const natureKey = "nature_infliction";
-    if ((stackState[natureKey] || 0) <= 0) return false;
+function resolveLatestElementalReactionForRotation(stackState, metaState) {
+    const latestInfliction = Object.keys(ROTATION_LATEST_ELEMENT_REACTIONS)
+        .filter(key => (stackState[key] || 0) > 0)
+        .sort((left, right) => Number(metaState[right]?.lastAppliedOrder || 0) - Number(metaState[left]?.lastAppliedOrder || 0))[0];
 
-    const natureOrder = Number(metaState[natureKey]?.lastAppliedOrder || 0);
-    const previousInflictionKeys = [
-        "electric_infliction",
-        "heat_infliction",
-        "cryo_infliction"
-    ].filter(key => (stackState[key] || 0) > 0 && Number(metaState[key]?.lastAppliedOrder || 0) < natureOrder);
+    if (!latestInfliction) return false;
+
+    const latestOrder = Number(metaState[latestInfliction]?.lastAppliedOrder || 0);
+    const previousInflictionKeys = ROTATION_ELEMENTAL_INFLICTION_EFFECTS
+        .concat(ROTATION_ARTS_REACTION_EFFECTS.filter(key => key !== "arts_reaction"))
+        .filter(key => {
+        return key !== latestInfliction
+            && key !== ROTATION_LATEST_REACTION_OWN_EFFECTS[latestInfliction]
+            && (stackState[key] || 0) > 0
+            && Number(metaState[key]?.lastAppliedOrder || 0) < latestOrder;
+    });
 
     if (previousInflictionKeys.length === 0) return false;
 
-    previousInflictionKeys.concat(natureKey).forEach(effectName => consumeAllDebuffStacks(effectName, stackState, metaState));
-    ["arts_reaction", "corrosion"].forEach(effectName => {
+    ROTATION_ELEMENTAL_INFLICTION_EFFECTS
+        .concat(ROTATION_ARTS_REACTION_EFFECTS)
+        .forEach(effectName => consumeAllDebuffStacks(effectName, stackState, metaState));
+    ["arts_reaction", ROTATION_LATEST_ELEMENT_REACTIONS[latestInfliction]].forEach(effectName => {
         addDebuffToRotationState({
             id: effectName,
             name: DEBUFF_REGISTRY?.[effectName]?.name || effectName,
@@ -413,6 +448,7 @@ function createEffectTray(items, type) {
     if (!items.length) return null;
     const tray = document.createElement("div");
     tray.className = `rotation-${type}-tray`;
+    if (items.length > 5) tray.classList.add("is-multi-row");
     items.forEach(effect => {
         const item = document.createElement("div");
         item.className = `rotation-${type}-item`;

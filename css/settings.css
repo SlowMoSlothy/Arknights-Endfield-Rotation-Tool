@@ -132,37 +132,58 @@
     text-align: center;
 }
 
-:root.rotation-size-small {
-    --rotation-slot-size: 56px;
-    --rotation-gap: 10px;
-    --rotation-arrow-size: 16px;
-    --rotation-arrow-width: 20px;
-}
-
 :root.rotation-size-medium {
     --rotation-slot-size: 72px;
     --rotation-gap: 14px;
+    --rotation-row-gap: 36px;
     --rotation-arrow-size: 18px;
     --rotation-arrow-width: 24px;
+    --rotation-effect-size: 15px;
+    --rotation-effect-gap: 2px;
+    --rotation-effect-row-gap: 2px;
+    --rotation-effect-tray-width: 84px;
+    --rotation-buff-offset: -17px;
+    --rotation-debuff-offset: -26px;
 }
 
 :root.rotation-size-large {
     --rotation-slot-size: 88px;
     --rotation-gap: 18px;
+    --rotation-row-gap: 34px;
     --rotation-arrow-size: 22px;
     --rotation-arrow-width: 30px;
+    --rotation-effect-size: 15px;
+    --rotation-effect-gap: 3px;
+    --rotation-effect-row-gap: 2px;
+    --rotation-effect-tray-width: 88px;
+    --rotation-buff-offset: -19px;
+    --rotation-debuff-offset: -30px;
 }
 
 :root.rotation-size-xl {
     --rotation-slot-size: 104px;
     --rotation-gap: 22px;
+    --rotation-row-gap: 38px;
     --rotation-arrow-size: 26px;
     --rotation-arrow-width: 36px;
+    --rotation-effect-size: 16px;
+    --rotation-effect-gap: 3px;
+    --rotation-effect-row-gap: 2px;
+    --rotation-effect-tray-width: 104px;
+    --rotation-buff-offset: -20px;
+    --rotation-debuff-offset: -31px;
 }
 
 :root.rotation-size-xxl {
     --rotation-slot-size: 120px;
     --rotation-gap: 26px;
+    --rotation-row-gap: 42px;
     --rotation-arrow-size: 30px;
     --rotation-arrow-width: 42px;
+    --rotation-effect-size: 18px;
+    --rotation-effect-gap: 3px;
+    --rotation-effect-row-gap: 2px;
+    --rotation-effect-tray-width: 120px;
+    --rotation-buff-offset: -22px;
+    --rotation-debuff-offset: -32px;
 }

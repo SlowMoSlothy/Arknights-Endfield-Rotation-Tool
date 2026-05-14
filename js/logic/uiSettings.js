@@ -1,5 +1,4 @@
 const UI_SIZE_OPTIONS = {
-    small: "small",
     medium: "medium",
     large: "large",
     xl: "xl",
@@ -33,13 +32,17 @@ function saveUiSettings() {
 
 function applyUiSettings() {
     const root = document.documentElement;
+    root.classList.remove("rotation-size-small");
 
     // 🔥 automatisch alle size Klassen entfernen
     Object.values(UI_SIZE_OPTIONS).forEach(size => {
         root.classList.remove(`rotation-size-${size}`);
     });
 
-    const size = uiSettings.rotationSkillSize || UI_SIZE_OPTIONS.medium;
+    const size = Object.values(UI_SIZE_OPTIONS).includes(uiSettings.rotationSkillSize)
+        ? uiSettings.rotationSkillSize
+        : UI_SIZE_OPTIONS.medium;
+    uiSettings.rotationSkillSize = size;
     root.classList.add(`rotation-size-${size}`);
 
     updateSettingsUi();

@@ -21,24 +21,51 @@ const ELEMENTAL_INFLICTION_EFFECTS = [
     "nature_infliction"
 ];
 
-function resolveLatestNatureCorrosion(reactionMap, latestEffectNames = []) {
+const LATEST_ELEMENT_REACTIONS = {
+    cryo_infliction: "solidification",
+    heat_infliction: "combustion",
+    nature_infliction: "corrosion"
+};
+
+const ARTS_REACTION_EFFECTS = [
+    "arts_reaction",
+    "combustion",
+    "corrosion",
+    "solidification"
+];
+
+const LATEST_REACTION_OWN_EFFECTS = {
+    cryo_infliction: "solidification",
+    heat_infliction: "combustion",
+    nature_infliction: "corrosion"
+};
+
+function resolveLatestElementalReaction(reactionMap, latestEffectNames = []) {
     const latestEffects = Array.isArray(latestEffectNames) ? latestEffectNames : [latestEffectNames];
-    if (!latestEffects.includes("nature_infliction") || (reactionMap.nature_infliction || 0) < 1) {
+    const latestInfliction = Object.keys(LATEST_ELEMENT_REACTIONS).find(effectName => {
+        return latestEffects.includes(effectName) && (reactionMap[effectName] || 0) >= 1;
+    });
+
+    if (!latestInfliction) {
         return false;
     }
 
-    const previousInflictions = ELEMENTAL_INFLICTION_EFFECTS.filter(effectName => {
-        return effectName !== "nature_infliction" && (reactionMap[effectName] || 0) >= 1;
-    });
+    const previousInflictions = ELEMENTAL_INFLICTION_EFFECTS
+        .concat(ARTS_REACTION_EFFECTS.filter(effectName => effectName !== "arts_reaction"))
+        .filter(effectName => {
+            return effectName !== latestInfliction
+                && effectName !== LATEST_REACTION_OWN_EFFECTS[latestInfliction]
+                && (reactionMap[effectName] || 0) >= 1;
+        });
 
     if (previousInflictions.length === 0) return false;
 
-    ELEMENTAL_INFLICTION_EFFECTS.forEach(effectName => {
+    ELEMENTAL_INFLICTION_EFFECTS.concat(ARTS_REACTION_EFFECTS).forEach(effectName => {
         delete reactionMap[effectName];
     });
 
     addEffectToMap(reactionMap, "arts_reaction", 1);
-    addEffectToMap(reactionMap, "corrosion", 1);
+    addEffectToMap(reactionMap, LATEST_ELEMENT_REACTIONS[latestInfliction], 1);
 
     return true;
 }
@@ -53,6 +80,9 @@ function resolveSingleArtsReaction(reactionMap, reaction) {
     reaction.requires.forEach(effectName => {
         consumeEffectFromMap(reactionMap, effectName, 1);
     });
+    ARTS_REACTION_EFFECTS.forEach(effectName => {
+        delete reactionMap[effectName];
+    });
 
     addEffectToMap(reactionMap, reaction.appliesEffect, 1);
     addEffectToMap(reactionMap, reaction.reactionEffect, 1);
@@ -64,7 +94,7 @@ function resolveArtsReactions(effectMap, latestEffectNames = []) {
     const reactionMap = { ...effectMap };
     const reactionRules = Array.isArray(ARTS_REACTIONS) ? ARTS_REACTIONS : [];
 
-    resolveLatestNatureCorrosion(reactionMap, latestEffectNames);
+    resolveLatestElementalReaction(reactionMap, latestEffectNames);
 
     let reactionResolved = true;
     let safetyCounter = 0;
