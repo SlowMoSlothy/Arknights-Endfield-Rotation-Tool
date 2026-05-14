@@ -230,6 +230,30 @@
         </div>
       </div>
 
+      <div class="community-filter-panel" aria-label="Community rotation filters">
+        <div class="community-filter-group">
+          <span class="community-filter-label">Element</span>
+          <div id="communityElementFilters" class="community-filter-options"></div>
+        </div>
+        <div class="community-filter-group">
+          <span class="community-filter-label">Class</span>
+          <div id="communityClassFilters" class="community-filter-options"></div>
+        </div>
+        <div class="community-filter-group community-sort-group">
+          <label class="community-sort-wrap">
+            <span class="community-filter-label">Sort</span>
+            <select id="communitySortSelect" class="community-sort-select">
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="views">Most viewed</option>
+              <option value="likes">Most liked</option>
+              <option value="skills">Most skills</option>
+            </select>
+          </label>
+          <button id="clearCommunityFiltersBtn" class="community-clear-filters-btn" type="button">Reset</button>
+        </div>
+      </div>
+
       <form id="communitySubmitForm" class="community-submit-form" hidden>
         <div class="community-form-grid">
           <label class="community-field">

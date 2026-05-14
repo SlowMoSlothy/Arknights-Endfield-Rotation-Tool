@@ -19,7 +19,7 @@ Interactive web tool for building, visualizing, exporting, and sharing Arknights
 - Compact share codes for team + rotation setups.
 - Share links with the setup embedded in the URL hash.
 - Export rotation images with a builder-address watermark.
-- Browse approved Community rotations and submit your current setup for review.
+- Browse, filter, and sort approved Community rotations, then submit your current setup for review.
 - LocalStorage auto-save for team, rotation, UI settings, and operator states.
 - Optional Enemy panel controlled from `js/state/appState.js`.
 

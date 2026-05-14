@@ -1,6 +1,9 @@
 const communityRotationState = {
     rotations: [],
     search: "",
+    elementFilter: "all",
+    classFilter: "all",
+    sort: "newest",
     loaded: false,
     loading: false,
     submitting: false,
@@ -45,6 +48,10 @@ function formatCommunityLabel(value) {
         .replace(/\b\w/g, letter => letter.toUpperCase());
 }
 
+function normalizeCommunityFilterValue(value) {
+    return String(value || "").trim().toLowerCase();
+}
+
 function getCommunityElements(row) {
     const directElements = uniqueCommunityLabels(normalizeCommunityList(row.element_types));
     if (directElements.length) return directElements;
@@ -57,6 +64,24 @@ function getCommunityClasses(row) {
     if (directClasses.length) return directClasses;
 
     return uniqueCommunityLabels(getCommunityTeamOperators(row).map(operator => operator.operatorClass));
+}
+
+function getAvailableCommunityValues(accessor) {
+    const values = communityRotationState.rotations.flatMap(row => accessor(row));
+    const seen = new Set();
+
+    return values
+        .map(value => ({
+            value: normalizeCommunityFilterValue(value),
+            label: formatCommunityLabel(value)
+        }))
+        .filter(item => item.value)
+        .filter(item => {
+            if (seen.has(item.value)) return false;
+            seen.add(item.value);
+            return true;
+        })
+        .sort((a, b) => a.label.localeCompare(b.label));
 }
 
 function formatCommunityDate(value) {
@@ -120,9 +145,147 @@ function getCommunitySearchText(row) {
 
 function getFilteredCommunityRotations() {
     const query = communityRotationState.search.trim().toLowerCase();
-    if (!query) return communityRotationState.rotations;
+    const elementFilter = normalizeCommunityFilterValue(communityRotationState.elementFilter);
+    const classFilter = normalizeCommunityFilterValue(communityRotationState.classFilter);
 
-    return communityRotationState.rotations.filter(row => getCommunitySearchText(row).includes(query));
+    const filteredRotations = communityRotationState.rotations.filter(row => {
+        const matchesSearch = !query || getCommunitySearchText(row).includes(query);
+        const matchesElement = elementFilter === "all" || getCommunityElements(row)
+            .map(normalizeCommunityFilterValue)
+            .includes(elementFilter);
+        const matchesClass = classFilter === "all" || getCommunityClasses(row)
+            .map(normalizeCommunityFilterValue)
+            .includes(classFilter);
+
+        return matchesSearch && matchesElement && matchesClass;
+    });
+
+    return sortCommunityRotations(filteredRotations);
+}
+
+function getCommunityCreatedTime(row) {
+    const timestamp = new Date(row.created_at || 0).getTime();
+    return Number.isFinite(timestamp) ? timestamp : 0;
+}
+
+function getCommunitySkillCount(row) {
+    return normalizeCommunityList(row.rotation_skill_ids).length;
+}
+
+function sortCommunityRotations(rotations) {
+    const sortedRotations = [...rotations];
+
+    sortedRotations.sort((a, b) => {
+        switch (communityRotationState.sort) {
+            case "oldest":
+                return getCommunityCreatedTime(a) - getCommunityCreatedTime(b);
+            case "views":
+                return (Number(b.view_count) || 0) - (Number(a.view_count) || 0)
+                    || getCommunityCreatedTime(b) - getCommunityCreatedTime(a);
+            case "likes":
+                return (Number(b.likes_count) || 0) - (Number(a.likes_count) || 0)
+                    || getCommunityCreatedTime(b) - getCommunityCreatedTime(a);
+            case "skills":
+                return getCommunitySkillCount(b) - getCommunitySkillCount(a)
+                    || getCommunityCreatedTime(b) - getCommunityCreatedTime(a);
+            case "newest":
+            default:
+                return getCommunityCreatedTime(b) - getCommunityCreatedTime(a);
+        }
+    });
+
+    return sortedRotations;
+}
+
+function hasActiveCommunityFilters() {
+    return Boolean(communityRotationState.search.trim())
+        || communityRotationState.elementFilter !== "all"
+        || communityRotationState.classFilter !== "all";
+}
+
+function getCommunityFilterIconPath(filterKey, value) {
+    if (value === "all") return "";
+    if (typeof getFilterIconPath === "function") return getFilterIconPath(filterKey, value);
+
+    if (filterKey === "operatorClass") {
+        return `assets/ui/classes/${normalizeCommunityFilterValue(value)}.webp`;
+    }
+
+    if (filterKey === "element") {
+        return `assets/ui/elements/${normalizeCommunityFilterValue(value)}.webp`;
+    }
+
+    return "";
+}
+
+function createCommunityFilterButton(filterKey, label, value, isActive, onClick) {
+    const button = document.createElement("button");
+    button.className = `community-filter-chip${isActive ? " is-active" : ""}`;
+    button.type = "button";
+    button.setAttribute("aria-pressed", String(isActive));
+
+    const iconPath = getCommunityFilterIconPath(filterKey, value);
+    if (iconPath) {
+        const icon = document.createElement("img");
+        icon.className = "community-filter-icon";
+        icon.src = iconPath;
+        icon.alt = "";
+        icon.setAttribute("aria-hidden", "true");
+        button.classList.add("has-icon");
+        button.appendChild(icon);
+    }
+
+    const text = document.createElement("span");
+    text.textContent = label;
+    button.appendChild(text);
+
+    button.addEventListener("click", onClick);
+    return button;
+}
+
+function renderCommunityFilterGroup(containerId, filterKey, values, activeValue, onSelect) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    container.replaceChildren();
+    container.appendChild(createCommunityFilterButton(filterKey, "All", "all", activeValue === "all", () => onSelect("all")));
+
+    values.forEach(item => {
+        container.appendChild(createCommunityFilterButton(
+            filterKey,
+            item.label,
+            item.value,
+            activeValue === item.value,
+            () => onSelect(item.value)
+        ));
+    });
+}
+
+function renderCommunityFilters() {
+    renderCommunityFilterGroup(
+        "communityElementFilters",
+        "element",
+        getAvailableCommunityValues(getCommunityElements),
+        communityRotationState.elementFilter,
+        value => {
+            communityRotationState.elementFilter = value;
+            renderCommunityRotations();
+        }
+    );
+
+    renderCommunityFilterGroup(
+        "communityClassFilters",
+        "operatorClass",
+        getAvailableCommunityValues(getCommunityClasses),
+        communityRotationState.classFilter,
+        value => {
+            communityRotationState.classFilter = value;
+            renderCommunityRotations();
+        }
+    );
+
+    const sortSelect = document.getElementById("communitySortSelect");
+    if (sortSelect) sortSelect.value = communityRotationState.sort;
 }
 
 function setCommunityStatus(text, className = "") {
@@ -341,6 +504,8 @@ function renderCommunityRotations() {
     const refreshButton = document.getElementById("refreshCommunityRotationsBtn");
     if (!list) return;
 
+    renderCommunityFilters();
+
     if (refreshButton) {
         refreshButton.disabled = communityRotationState.loading;
         refreshButton.textContent = communityRotationState.loading ? "Loading" : "Refresh";
@@ -365,14 +530,18 @@ function renderCommunityRotations() {
 
     const filteredRotations = getFilteredCommunityRotations();
     if (!filteredRotations.length) {
-        const message = communityRotationState.search
-            ? "No community rotations match this search."
+        const message = hasActiveCommunityFilters()
+            ? "No community rotations match these filters."
             : "No approved community rotations yet.";
         setCommunityStatus(message, "is-empty");
         return;
     }
 
-    setCommunityStatus(`${filteredRotations.length} rotation${filteredRotations.length === 1 ? "" : "s"} found.`);
+    const totalCount = communityRotationState.rotations.length;
+    const statusText = filteredRotations.length === totalCount
+        ? `${filteredRotations.length} rotation${filteredRotations.length === 1 ? "" : "s"} found.`
+        : `${filteredRotations.length} of ${totalCount} rotations shown.`;
+    setCommunityStatus(statusText);
     filteredRotations.forEach(row => {
         list.appendChild(createCommunityRotationCard(row));
     });
@@ -518,6 +687,18 @@ function closeCommunityRotationsModal() {
     modal.classList.remove("open");
 }
 
+function resetCommunityFilters() {
+    communityRotationState.search = "";
+    communityRotationState.elementFilter = "all";
+    communityRotationState.classFilter = "all";
+    communityRotationState.sort = "newest";
+
+    const searchInput = document.getElementById("communitySearchInput");
+    if (searchInput) searchInput.value = "";
+
+    renderCommunityRotations();
+}
+
 function initCommunityRotations() {
     if (communityRotationsInitialized) return;
     communityRotationsInitialized = true;
@@ -529,6 +710,8 @@ function initCommunityRotations() {
     const submitForm = document.getElementById("communitySubmitForm");
     const cancelSubmitButton = document.getElementById("cancelCommunitySubmitBtn");
     const searchInput = document.getElementById("communitySearchInput");
+    const sortSelect = document.getElementById("communitySortSelect");
+    const clearFiltersButton = document.getElementById("clearCommunityFiltersBtn");
     const modal = document.getElementById("communityModal");
 
     if (openButton) openButton.addEventListener("click", openCommunityRotationsModal);
@@ -543,6 +726,13 @@ function initCommunityRotations() {
             renderCommunityRotations();
         });
     }
+    if (sortSelect) {
+        sortSelect.addEventListener("change", event => {
+            communityRotationState.sort = event.target.value;
+            renderCommunityRotations();
+        });
+    }
+    if (clearFiltersButton) clearFiltersButton.addEventListener("click", resetCommunityFilters);
 
     if (modal) {
         modal.addEventListener("click", event => {
