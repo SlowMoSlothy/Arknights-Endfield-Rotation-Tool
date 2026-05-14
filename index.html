@@ -212,6 +212,26 @@
     </div>
   </div>
 
+  <div id="communityModal" class="settings-modal community-modal">
+    <div class="settings-dialog community-dialog">
+      <div class="settings-header">
+        <h2 class="settings-title">Community Rotations</h2>
+        <button id="closeCommunityModalBtn" class="settings-close" type="button">&times;</button>
+      </div>
+
+      <div class="community-toolbar">
+        <label class="community-search-wrap">
+          <span>Search</span>
+          <input id="communitySearchInput" class="community-search-input" type="search" placeholder="Rotation, author, operator">
+        </label>
+        <button id="refreshCommunityRotationsBtn" class="community-refresh-btn" type="button">Refresh</button>
+      </div>
+
+      <div id="communityRotationStatus" class="community-status"></div>
+      <div id="communityRotationList" class="community-rotation-list"></div>
+    </div>
+  </div>
+
   <div id="enemyModal" class="settings-modal">
     <div class="settings-dialog">
       <div class="settings-header">
@@ -289,6 +309,7 @@
   <script src="js/ui/operatorBuffs.js"></script>
   <script src="js/ui/rotationGrid.js"></script>
   <script src="js/ui/teamSelection.js"></script>
+  <script src="js/ui/communityRotations.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
