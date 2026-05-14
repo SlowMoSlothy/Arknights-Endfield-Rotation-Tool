@@ -19,6 +19,7 @@ Interactive web tool for building, visualizing, exporting, and sharing Arknights
 - Compact share codes for team + rotation setups.
 - Share links with the setup embedded in the URL hash.
 - Export rotation images with a builder-address watermark.
+- Browse approved Community rotations and submit your current setup for review.
 - LocalStorage auto-save for team, rotation, UI settings, and operator states.
 - Optional Enemy panel controlled from `js/state/appState.js`.
 
@@ -80,6 +81,8 @@ Supabase setup files live in:
 ```text
 supabase/
   schema.sql
+  community_rotations.sql
+  community_rotations_review.sql
   seed_operators_basic.sql
 tools/
   exportOperatorsForSupabase.js
@@ -103,6 +106,28 @@ Then paste/run `supabase/seed_operators.sql` in the Supabase SQL Editor after th
 
 The frontend must only use the Supabase publishable/anon key. Never put a Supabase `service_role` key into browser code.
 When `useSupabaseOperators` is enabled, the app loads `operators` and `operator_skills` from Supabase on startup and falls back to the local JS files if loading fails.
+
+### Community Rotations
+
+To enable the Community modal, run this file in the Supabase SQL Editor:
+
+```text
+supabase/community_rotations.sql
+```
+
+It creates `community_rotations` and the public access rules:
+
+- visitors can submit rotations for review.
+- visitors can only read rotations that are public, approved, and not hidden.
+- pending submissions stay hidden until you approve them in Supabase.
+
+To review submissions, open:
+
+```text
+supabase/community_rotations_review.sql
+```
+
+Run the first query to list pending rotations. Then copy one of the commented blocks, replace the example UUID with the real `id`, and run it to approve, hide, or edit the submission.
 
 ## Project Structure
 
