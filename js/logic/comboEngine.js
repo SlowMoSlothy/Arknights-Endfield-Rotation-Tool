@@ -394,7 +394,7 @@ Object.entries(chainEffectMap).forEach(([effectName, amount]) => {
 
         const resolvedEffectMap =
             typeof resolveArtsReactions === "function"
-                ? resolveArtsReactions(effectMapAfterConsume)
+                ? resolveArtsReactions(effectMapAfterConsume, Object.keys(currentEffects))
                 : effectMapAfterConsume;
 
         const comboSkills = getComboSkillsFromEffects(resolvedEffectMap, sourceOperator.id);

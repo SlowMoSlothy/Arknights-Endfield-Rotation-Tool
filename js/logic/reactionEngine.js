@@ -14,6 +14,35 @@ function consumeEffectFromMap(effectMap, effectName, amount = 1) {
     }
 }
 
+const ELEMENTAL_INFLICTION_EFFECTS = [
+    "electric_infliction",
+    "heat_infliction",
+    "cryo_infliction",
+    "nature_infliction"
+];
+
+function resolveLatestNatureCorrosion(reactionMap, latestEffectNames = []) {
+    const latestEffects = Array.isArray(latestEffectNames) ? latestEffectNames : [latestEffectNames];
+    if (!latestEffects.includes("nature_infliction") || (reactionMap.nature_infliction || 0) < 1) {
+        return false;
+    }
+
+    const previousInflictions = ELEMENTAL_INFLICTION_EFFECTS.filter(effectName => {
+        return effectName !== "nature_infliction" && (reactionMap[effectName] || 0) >= 1;
+    });
+
+    if (previousInflictions.length === 0) return false;
+
+    ELEMENTAL_INFLICTION_EFFECTS.forEach(effectName => {
+        delete reactionMap[effectName];
+    });
+
+    addEffectToMap(reactionMap, "arts_reaction", 1);
+    addEffectToMap(reactionMap, "corrosion", 1);
+
+    return true;
+}
+
 function resolveSingleArtsReaction(reactionMap, reaction) {
     const hasAllRequiredEffects = reaction.requires.every(effectName => {
         return (reactionMap[effectName] || 0) >= 1;
@@ -31,9 +60,11 @@ function resolveSingleArtsReaction(reactionMap, reaction) {
     return true;
 }
 
-function resolveArtsReactions(effectMap) {
+function resolveArtsReactions(effectMap, latestEffectNames = []) {
     const reactionMap = { ...effectMap };
     const reactionRules = Array.isArray(ARTS_REACTIONS) ? ARTS_REACTIONS : [];
+
+    resolveLatestNatureCorrosion(reactionMap, latestEffectNames);
 
     let reactionResolved = true;
     let safetyCounter = 0;

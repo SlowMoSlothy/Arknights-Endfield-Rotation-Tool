@@ -27,6 +27,19 @@ function getRotationBuffKey(effect) {
     });
 }
 
+function getNextRotationEffectOrder(stackState) {
+    if (!Object.prototype.hasOwnProperty.call(stackState, "__effectOrder")) {
+        Object.defineProperty(stackState, "__effectOrder", {
+            value: 0,
+            writable: true,
+            enumerable: false
+        });
+    }
+
+    stackState.__effectOrder += 1;
+    return stackState.__effectOrder;
+}
+
 function clearOtherExclusiveInflictions(activeKey, stackState, metaState) {
     if (!EXCLUSIVE_INFLICTIONS.has(activeKey)) return;
     EXCLUSIVE_INFLICTIONS.forEach(key => {
@@ -40,7 +53,6 @@ function clearOtherExclusiveInflictions(activeKey, stackState, metaState) {
 function addDebuffToRotationState(effect, stackState, metaState) {
     const key = getRotationDebuffKey(effect);
     if (!key) return;
-    clearOtherExclusiveInflictions(key, stackState, metaState);
     const registryEntry = DEBUFF_REGISTRY?.[key];
     const isStackable = effect?.stackable === true || registryEntry?.stackable === true;
     const maxStacks = Number(effect?.maxStacks || registryEntry?.maxStacks || 4);
@@ -51,7 +63,8 @@ function addDebuffToRotationState(effect, stackState, metaState) {
         id: key,
         appliesEffect: key,
         stackable: isStackable,
-        maxStacks
+        maxStacks,
+        lastAppliedOrder: getNextRotationEffectOrder(stackState)
     };
 }
 
@@ -239,15 +252,60 @@ function resolveRotationArtsReactionsWithFullConsume(stackState, metaState) {
     while (didResolve && safetyCounter < 20) {
         didResolve = false;
         safetyCounter++;
+        if (resolveLatestNatureCorrosionForRotation(stackState, metaState)) {
+            didResolve = true;
+            continue;
+        }
         for (const reaction of ARTS_REACTIONS) {
             const canResolve = reaction.requires.every(effectName => (stackState[normalizeDebuffKey({
                 id: effectName
             })] || 0) > 0);
             if (!canResolve) continue;
             reaction.requires.forEach(effectName => consumeAllDebuffStacks(effectName, stackState, metaState));
+            [reaction.appliesEffect, reaction.reactionEffect].forEach(effectName => {
+                if (!effectName) return;
+                addDebuffToRotationState({
+                    id: effectName,
+                    name: DEBUFF_REGISTRY?.[effectName]?.name || reaction.name || effectName,
+                    appliesEffect: effectName,
+                    persistsForCombo: reaction.persistsForCombo,
+                    visible: true,
+                    stackable: DEBUFF_REGISTRY?.[effectName]?.stackable === true,
+                    maxStacks: DEBUFF_REGISTRY?.[effectName]?.maxStacks || 1
+                }, stackState, metaState);
+            });
             didResolve = true;
         }
     }
+}
+
+function resolveLatestNatureCorrosionForRotation(stackState, metaState) {
+    const natureKey = "nature_infliction";
+    if ((stackState[natureKey] || 0) <= 0) return false;
+
+    const natureOrder = Number(metaState[natureKey]?.lastAppliedOrder || 0);
+    const previousInflictionKeys = [
+        "electric_infliction",
+        "heat_infliction",
+        "cryo_infliction"
+    ].filter(key => (stackState[key] || 0) > 0 && Number(metaState[key]?.lastAppliedOrder || 0) < natureOrder);
+
+    if (previousInflictionKeys.length === 0) return false;
+
+    previousInflictionKeys.concat(natureKey).forEach(effectName => consumeAllDebuffStacks(effectName, stackState, metaState));
+    ["arts_reaction", "corrosion"].forEach(effectName => {
+        addDebuffToRotationState({
+            id: effectName,
+            name: DEBUFF_REGISTRY?.[effectName]?.name || effectName,
+            appliesEffect: effectName,
+            persistsForCombo: false,
+            visible: true,
+            stackable: DEBUFF_REGISTRY?.[effectName]?.stackable === true,
+            maxStacks: DEBUFF_REGISTRY?.[effectName]?.maxStacks || 1
+        }, stackState, metaState);
+    });
+
+    return true;
 }
 
 function getActiveDebuffsFromRotationState(stackState, metaState) {
