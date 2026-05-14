@@ -119,6 +119,7 @@ It creates `community_rotations` and the public access rules:
 
 - visitors can submit rotations for review.
 - visitors can only read rotations that are public, approved, and not hidden.
+- visitors can increment the view counter through a restricted database function.
 - pending submissions stay hidden until you approve them in Supabase.
 
 To review submissions, open:

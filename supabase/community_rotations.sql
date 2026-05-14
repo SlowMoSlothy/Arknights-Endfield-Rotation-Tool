@@ -84,3 +84,30 @@ create policy "Public submit community rotations for review"
         and coalesce(array_length(team_operator_ids, 1), 0) between 1 and 4
         and coalesce(array_length(rotation_skill_ids, 1), 0) >= 1
     );
+
+create or replace function public.increment_community_rotation_view(target_rotation_id uuid)
+returns integer
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+    next_view_count integer;
+begin
+    update public.community_rotations
+    set
+        view_count = view_count + 1,
+        updated_at = now()
+    where id = target_rotation_id
+        and game = 'arknights_endfield'
+        and is_public = true
+        and is_approved = true
+        and is_hidden = false
+    returning view_count into next_view_count;
+
+    return coalesce(next_view_count, 0);
+end;
+$$;
+
+revoke all on function public.increment_community_rotation_view(uuid) from public;
+grant execute on function public.increment_community_rotation_view(uuid) to anon, authenticated;

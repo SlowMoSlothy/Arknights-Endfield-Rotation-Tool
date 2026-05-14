@@ -648,6 +648,26 @@ async function fetchCommunityRotations(force = false) {
     }
 }
 
+async function incrementCommunityRotationView(row) {
+    if (!row?.id || typeof supabaseClient === "undefined" || !supabaseClient) return;
+
+    try {
+        const { data, error } = await supabaseClient
+            .rpc("increment_community_rotation_view", {
+                target_rotation_id: row.id
+            });
+
+        if (error) throw error;
+
+        const nextViewCount = Number(data);
+        row.view_count = Number.isFinite(nextViewCount)
+            ? nextViewCount
+            : (Number(row.view_count) || 0) + 1;
+    } catch (error) {
+        console.warn("Community rotation view count could not be updated:", error);
+    }
+}
+
 function loadCommunityRotation(rotationId) {
     const row = communityRotationState.rotations.find(item => item.id === rotationId);
     if (!row || !row.share_code) {
@@ -662,6 +682,7 @@ function loadCommunityRotation(rotationId) {
 
     try {
         applyBuildShareCode(row.share_code);
+        incrementCommunityRotationView(row);
         closeCommunityRotationsModal();
         alert("Community rotation loaded.");
     } catch (error) {

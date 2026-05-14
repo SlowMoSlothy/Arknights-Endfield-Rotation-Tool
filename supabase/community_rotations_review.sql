@@ -71,3 +71,6 @@ where game = 'arknights_endfield'
     and is_approved = true
     and is_hidden = false
 order by created_at desc;
+
+-- 7. Test the public view counter function.
+-- select public.increment_community_rotation_view('00000000-0000-0000-0000-000000000000');
