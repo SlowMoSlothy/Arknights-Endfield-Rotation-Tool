@@ -41,6 +41,21 @@ function saveRotation() {
     renderRotation();
 }
 
+function hasCreatedRotation() {
+    return Array.isArray(rotation) && rotation.some(entry => entry !== null);
+}
+
+function updateRotationActionStates() {
+    const exportButton = document.getElementById("exportRotationBtn");
+    const copyShareCodeButton = document.getElementById("copyShareCodeBtn");
+    const copyShareLinkButton = document.getElementById("copyShareLinkBtn");
+    const hasRotation = hasCreatedRotation();
+
+    if (exportButton) exportButton.disabled = !hasRotation;
+    if (copyShareCodeButton) copyShareCodeButton.disabled = !hasRotation;
+    if (copyShareLinkButton) copyShareLinkButton.disabled = !hasRotation;
+}
+
 function loadRotation() {
     const saved = localStorage.getItem("rotation");
 
@@ -75,4 +90,25 @@ function clearRotation() {
     rotation = [null];
     localStorage.removeItem("rotation");
     renderRotation();
+}
+
+async function createNewRotation() {
+    if (!hasCreatedRotation()) {
+        clearRotation();
+        return;
+    }
+
+    const shouldCreate = confirm("Create a new rotation? The current rotation will be cleared.");
+    if (!shouldCreate) return;
+
+    const shouldExport = confirm("Do you want to export the current rotation as a PNG image first?");
+    if (shouldExport && typeof exportImage === "function") {
+        const exported = await exportImage();
+        if (!exported) {
+            const continueWithoutExport = confirm("The rotation could not be exported. Create a new rotation anyway?");
+            if (!continueWithoutExport) return;
+        }
+    }
+
+    clearRotation();
 }

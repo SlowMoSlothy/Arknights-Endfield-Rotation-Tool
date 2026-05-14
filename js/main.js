@@ -5,8 +5,29 @@ window.loadBuildShareCode = loadBuildShareCode;
 window.confirmTeam = confirmTeam;
 window.backToSelection = backToSelection;
 window.clearRotation = clearRotation;
+window.createNewRotation = createNewRotation;
 
 const originalApplySkillDebuffsAndGetActiveState = window.applySkillDebuffsAndGetActiveState;
+
+function setAppLoading(isLoading) {
+    const loadingScreen = document.getElementById("appLoadingScreen");
+    document.body.classList.toggle("app-loading", isLoading);
+
+    if (!loadingScreen) return;
+
+    if (isLoading) {
+        loadingScreen.hidden = false;
+        loadingScreen.classList.remove("is-hidden");
+        loadingScreen.setAttribute("aria-busy", "true");
+        return;
+    }
+
+    loadingScreen.classList.add("is-hidden");
+    loadingScreen.setAttribute("aria-busy", "false");
+    window.setTimeout(() => {
+        loadingScreen.hidden = true;
+    }, 260);
+}
 
 function getVisibleTransientDebuffsForCurrentSkill(skillData) {
     return (skillData?.debuffs || [])
@@ -65,23 +86,31 @@ window.applySkillDebuffsAndGetActiveState = function patchedApplySkillDebuffsAnd
 };
 
 async function initApp() {
-    if (typeof hydrateOperatorsFromSupabase === "function") {
-        await hydrateOperatorsFromSupabase();
+    setAppLoading(true);
+
+    try {
+        if (typeof hydrateOperatorsFromSupabase === "function") {
+            await hydrateOperatorsFromSupabase();
+        }
+
+        loadOperatorUltimateStates();
+        loadTeam();
+        loadRotation();
+        loadBuildShareCodeFromUrl();
+
+        renderTeamSlots();
+        renderOperatorList();
+
+        initUiSettings();
+        initEnemyPanel();
+
+        // Direkt den Rotation Builder anzeigen
+        showBuilderScreen();
+    } catch (error) {
+        console.error("App initialization failed:", error);
+    } finally {
+        setAppLoading(false);
     }
-
-    loadOperatorUltimateStates();
-    loadTeam();
-    loadRotation();
-    loadBuildShareCodeFromUrl();
-
-    renderTeamSlots();
-    renderOperatorList();
-
-    initUiSettings();
-    initEnemyPanel();
-
-    // Direkt den Rotation Builder anzeigen
-    showBuilderScreen();
 }
 
 initApp();

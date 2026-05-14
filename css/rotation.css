@@ -22,6 +22,185 @@
         0 10px 26px rgba(0,0,0,0.28);
 }
 
+.rotation-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    margin: 0 0 12px;
+}
+
+.rotation-action-tooltip-host {
+    display: inline-flex;
+    line-height: 0;
+    position: relative;
+}
+
+.rotation-action-tooltip-host:has(.rotation-action-btn:disabled) {
+    cursor: not-allowed;
+}
+
+.rotation-action-tooltip-host::before,
+.rotation-action-tooltip-host::after {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.14s ease, transform 0.14s ease;
+    z-index: 50;
+}
+
+.rotation-action-tooltip-host::before {
+    content: "";
+    top: calc(100% + 4px);
+    left: 50%;
+    transform: translate(-50%, 4px);
+    border: 6px solid transparent;
+    border-bottom-color: rgba(30,34,36,0.98);
+}
+
+.rotation-action-tooltip-host::after {
+    content: attr(data-action-tooltip);
+    top: calc(100% + 15px);
+    left: 50%;
+    transform: translate(-50%, 4px);
+    width: max-content;
+    max-width: min(210px, calc(100vw - 32px));
+    padding: 9px 11px;
+    border: 1px solid rgba(160,170,169,0.22);
+    border-radius: 10px;
+    background:
+        radial-gradient(circle at 50% 0%, rgba(248,245,70,0.12), transparent 58%),
+        linear-gradient(180deg, rgba(30,34,36,0.98), rgba(10,12,14,0.99));
+    color: rgba(244,245,242,0.92);
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.035),
+        0 10px 24px rgba(0,0,0,0.42);
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.25;
+    text-align: center;
+    white-space: normal;
+}
+
+.rotation-action-tooltip-host:nth-child(-n+2)::after {
+    left: 0;
+    transform: translate(0, 4px);
+    text-align: left;
+}
+
+.rotation-action-tooltip-host:nth-child(-n+2)::before {
+    left: 17px;
+}
+
+.rotation-action-tooltip-host:nth-last-child(-n+2)::after {
+    right: 0;
+    left: auto;
+    transform: translate(0, 4px);
+    text-align: right;
+}
+
+.rotation-action-tooltip-host:nth-last-child(-n+2)::before {
+    right: 17px;
+    left: auto;
+    transform: translate(50%, 4px);
+}
+
+.rotation-action-tooltip-host:hover,
+.rotation-action-tooltip-host:focus-within {
+    z-index: 20;
+}
+
+.rotation-action-tooltip-host:hover::before,
+.rotation-action-tooltip-host:hover::after,
+.rotation-action-tooltip-host:focus-within::before,
+.rotation-action-tooltip-host:focus-within::after {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+.rotation-action-tooltip-host:nth-child(-n+2):hover::after,
+.rotation-action-tooltip-host:nth-child(-n+2):focus-within::after,
+.rotation-action-tooltip-host:nth-last-child(-n+2):hover::after,
+.rotation-action-tooltip-host:nth-last-child(-n+2):focus-within::after {
+    transform: translate(0, 0);
+}
+
+.rotation-action-tooltip-host:nth-last-child(-n+2):hover::before,
+.rotation-action-tooltip-host:nth-last-child(-n+2):focus-within::before {
+    transform: translate(50%, 0);
+}
+
+.rotation-action-btn {
+    width: 34px;
+    height: 30px;
+    min-width: 34px;
+    min-height: 30px;
+    padding: 0;
+    border: 1px solid rgba(160,170,169,0.22);
+    border-radius: 999px;
+    background:
+        linear-gradient(180deg, rgba(49,55,57,0.68), rgba(16,18,20,0.96));
+    color: rgba(244,245,242,0.82);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.rotation-action-icon {
+    width: 16px;
+    height: 16px;
+    display: block;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.rotation-action-icon-dot {
+    fill: currentColor;
+    stroke: none;
+}
+
+.rotation-action-btn:hover {
+    border-color: rgba(248,245,70,0.42);
+    color: #fff;
+}
+
+.rotation-action-btn:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+    pointer-events: none;
+    color: rgba(160,170,169,0.5);
+    border-color: rgba(160,170,169,0.16);
+    background:
+        linear-gradient(180deg, rgba(49,55,57,0.38), rgba(16,18,20,0.74));
+    box-shadow: none;
+}
+
+.rotation-action-btn:disabled:hover {
+    border-color: rgba(160,170,169,0.16);
+    color: rgba(160,170,169,0.5);
+}
+
+.rotation-action-primary {
+    border-color: rgba(248,245,70,0.92);
+    background:
+        radial-gradient(circle at 50% 0%, rgba(248,245,70,0.24), transparent 60%),
+        linear-gradient(180deg, rgba(64,68,43,0.95), rgba(18,20,13,0.98));
+    color: #F8F546;
+    box-shadow: 0 0 12px rgba(248,245,70,0.16);
+}
+
+.rotation-action-danger:hover {
+    border-color: rgba(255,91,69,0.52);
+    color: #ffb7ae;
+}
+
 #rotationDropZone {
     display: grid;
     grid-auto-columns: max-content;
@@ -37,16 +216,20 @@
 .rotation-slot {
     width: var(--rotation-slot-size);
     height: var(--rotation-slot-size);
-    border: 1px dashed rgba(160,170,169,0.28);
+    border: 1px dashed rgba(160,170,169,0.34);
     border-radius: 12px;
     position: relative;
     overflow: visible;
     background:
-        radial-gradient(circle at 50% 45%, rgba(255,255,255,0.05), transparent 48%),
-        linear-gradient(180deg, rgba(49,55,57,0.28), rgba(12,14,16,0.76));
+        radial-gradient(circle at 50% 42%, rgba(255,255,255,0.08), transparent 48%),
+        radial-gradient(circle at 50% 18%, rgba(248,245,70,0.08), transparent 52%),
+        linear-gradient(180deg, rgba(49,55,57,0.42), rgba(12,14,16,0.82));
     box-shadow:
-        inset 0 0 0 1px rgba(255,255,255,0.025),
-        0 0 10px rgba(0,0,0,0.22);
+        inset 0 0 0 1px rgba(255,255,255,0.035),
+        inset 0 1px 0 rgba(255,255,255,0.06),
+        0 0 12px rgba(0,0,0,0.26);
+    backdrop-filter: blur(8px) saturate(1.08);
+    -webkit-backdrop-filter: blur(8px) saturate(1.08);
     transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
 }
 
@@ -55,7 +238,9 @@
     position: absolute;
     inset: 7px;
     border-radius: 9px;
-    border: 1px solid rgba(255,255,255,0.045);
+    border: 1px solid rgba(255,255,255,0.07);
+    background:
+        linear-gradient(135deg, rgba(255,255,255,0.10), transparent 36%);
     pointer-events: none;
 }
 
@@ -63,8 +248,9 @@
     transform: translateY(-1px);
     border-color: rgba(248,245,70,0.46);
     box-shadow:
-        0 0 14px rgba(248,245,70,0.13),
-        inset 0 0 0 1px rgba(255,255,255,0.04);
+        0 0 14px rgba(248,245,70,0.14),
+        inset 0 0 0 1px rgba(255,255,255,0.055),
+        inset 0 1px 0 rgba(255,255,255,0.08);
 }
 
 .rotation-slot:empty::after {
@@ -83,6 +269,9 @@
 .rotation-skill {
     --rotation-element-color: #d0d4d8;
     --rotation-element-glow: rgba(208,212,216,0.34);
+    --rotation-element-bg-soft: rgba(208,212,216,0.12);
+    --rotation-element-overlay-soft: rgba(208,212,216,0.14);
+    --rotation-element-border: rgba(208,212,216,0.74);
     position: absolute;
     inset: 0;
     width: 100%;
@@ -92,27 +281,42 @@
 .rotation-skill.ef-element-heat {
     --rotation-element-color: #ff5a4a;
     --rotation-element-glow: rgba(255,90,74,0.42);
+    --rotation-element-bg-soft: rgba(255,90,74,0.12);
+    --rotation-element-overlay-soft: rgba(255,90,74,0.14);
+    --rotation-element-border: rgba(255,90,74,0.74);
 }
 
 .rotation-skill.ef-element-electric {
     --rotation-element-color: #f8f546;
     --rotation-element-glow: rgba(248,245,70,0.36);
+    --rotation-element-bg-soft: rgba(248,245,70,0.12);
+    --rotation-element-overlay-soft: rgba(248,245,70,0.14);
+    --rotation-element-border: rgba(248,245,70,0.74);
 }
 
 .rotation-skill.ef-element-cryo {
     --rotation-element-color: #56d8ff;
     --rotation-element-glow: rgba(86,216,255,0.38);
+    --rotation-element-bg-soft: rgba(86,216,255,0.12);
+    --rotation-element-overlay-soft: rgba(86,216,255,0.14);
+    --rotation-element-border: rgba(86,216,255,0.74);
 }
 
 .rotation-skill.ef-element-nature {
     --rotation-element-color: #53ff8c;
     --rotation-element-glow: rgba(83,255,140,0.36);
+    --rotation-element-bg-soft: rgba(83,255,140,0.12);
+    --rotation-element-overlay-soft: rgba(83,255,140,0.14);
+    --rotation-element-border: rgba(83,255,140,0.74);
 }
 
 .rotation-skill.ef-element-physical,
 .rotation-skill.ef-element-neutral {
     --rotation-element-color: #d0d4d8;
     --rotation-element-glow: rgba(208,212,216,0.26);
+    --rotation-element-bg-soft: rgba(208,212,216,0.10);
+    --rotation-element-overlay-soft: rgba(208,212,216,0.12);
+    --rotation-element-border: rgba(208,212,216,0.70);
 }
 
 .rotation-arrow {
@@ -142,12 +346,31 @@
     height: 100%;
     border-radius: 12px;
     overflow: visible;
-    background: #111;
-    border: 1px solid color-mix(in srgb, var(--rotation-element-color) 78%, transparent);
+    background:
+        radial-gradient(circle at 50% 0%, var(--rotation-element-bg-soft), transparent 48%),
+        linear-gradient(180deg, rgba(49,55,57,0.48), rgba(9,10,12,0.96));
+    border: 1px solid var(--rotation-element-border);
     box-shadow:
         0 0 0 1px rgba(0,0,0,0.66),
-        0 0 10px var(--rotation-element-glow),
-        inset 0 0 12px rgba(0,0,0,0.35);
+        0 0 11px var(--rotation-element-glow),
+        inset 0 0 0 1px rgba(255,255,255,0.035),
+        inset 0 1px 0 rgba(255,255,255,0.10),
+        inset 0 0 12px rgba(0,0,0,0.32);
+    backdrop-filter: blur(6px) saturate(1.08);
+    -webkit-backdrop-filter: blur(6px) saturate(1.08);
+}
+
+.rotation-skill-composite::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    z-index: 6;
+    pointer-events: none;
+    background:
+        linear-gradient(135deg, rgba(255,255,255,0.16), transparent 34%),
+        radial-gradient(circle at 74% 82%, var(--rotation-element-overlay-soft), transparent 36%);
+    opacity: 0.48;
 }
 
 .rotation-skill-composite::after {
@@ -172,6 +395,8 @@
     object-fit: cover;
     display: block;
     border-radius: 12px;
+    position: relative;
+    z-index: 1;
 }
 
 .rotation-skill-type-badge {
@@ -294,6 +519,24 @@
         width: 100%;
     }
 
+    .rotation-actions {
+        gap: 5px;
+        margin-bottom: 10px;
+    }
+
+    .rotation-action-btn {
+        width: 32px;
+        height: 28px;
+        min-width: 32px;
+        min-height: 28px;
+        font-size: 10px;
+    }
+
+    .rotation-action-icon {
+        width: 15px;
+        height: 15px;
+    }
+
     #rotationDropZone {
         width: max-content;
         min-width: 100%;
@@ -304,6 +547,31 @@
     .rotation-slot {
         width: 80px;
         height: 80px;
+        background:
+            radial-gradient(circle at 50% 44%, rgba(255,255,255,0.07), transparent 46%),
+            linear-gradient(180deg, rgba(38,43,45,0.70), rgba(8,10,12,0.96));
+        border-color: rgba(160,170,169,0.36);
+        box-shadow:
+            inset 0 0 0 1px rgba(255,255,255,0.035),
+            0 0 12px rgba(0,0,0,0.32);
+        backdrop-filter: blur(3px) saturate(1.02);
+        -webkit-backdrop-filter: blur(3px) saturate(1.02);
+    }
+
+    .rotation-slot::before {
+        background:
+            linear-gradient(135deg, rgba(255,255,255,0.08), transparent 34%);
+    }
+
+    .rotation-skill-composite {
+        background:
+            linear-gradient(180deg, rgba(35,40,42,0.70), rgba(7,8,10,0.98));
+        backdrop-filter: blur(2px) saturate(1.02);
+        -webkit-backdrop-filter: blur(2px) saturate(1.02);
+    }
+
+    .rotation-skill-composite::before {
+        opacity: 0.30;
     }
 
     .rotation-arrow {

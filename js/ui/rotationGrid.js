@@ -477,4 +477,5 @@ function renderRotation() {
     initTapInput();
     renderEnemyEffects();
     renderOperatorBuffs();
+    updateRotationActionStates();
 }

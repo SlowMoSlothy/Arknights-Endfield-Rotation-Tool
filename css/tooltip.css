@@ -22,12 +22,19 @@
 
 .tooltip-card {
     position: relative;
-    background: linear-gradient(180deg, #0f1114 0%, #090b0e 100%);
-    border: 1px solid rgba(255,255,255,0.08);
+    background:
+        radial-gradient(circle at 50% 0%, rgba(248,245,70,0.10), transparent 54%),
+        linear-gradient(180deg, rgba(49,55,57,0.78), rgba(10,12,14,0.97));
+    border: 1px solid rgba(160,170,169,0.22);
     border-radius: 12px;
     padding: 18px 14px 14px;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.45);
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.04),
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        0 12px 30px rgba(0,0,0,0.45);
     overflow: hidden;
+    backdrop-filter: blur(14px) saturate(1.15);
+    -webkit-backdrop-filter: blur(14px) saturate(1.15);
 }
 
 .tooltip-card::before {
@@ -35,8 +42,10 @@
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(circle at top center, rgba(255,255,255,0.035), transparent 58%),
-        repeating-linear-gradient(-45deg, rgba(255,255,255,0.012) 0 2px, transparent 2px 8px);
+        linear-gradient(135deg, rgba(255,255,255,0.14), transparent 32%),
+        radial-gradient(circle at top center, rgba(255,255,255,0.06), transparent 58%),
+        repeating-linear-gradient(-45deg, rgba(255,255,255,0.014) 0 2px, transparent 2px 8px);
+    opacity: 0.8;
     pointer-events: none;
 }
 

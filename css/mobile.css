@@ -222,9 +222,11 @@
     }
 
     .operator-skill-add-plus {
-        width: 34px;
-        height: 34px;
-        font-size: 28px;
+        width: 32px;
+        height: 28px;
+        min-width: 32px;
+        min-height: 28px;
+        font-size: 22px;
     }
 
     .operator-skill-card::before {
@@ -249,14 +251,15 @@
     .swap-operator-btn {
         top: 15px;
         right: 7px;
-        width: 24px;
-        height: 24px;
-        min-width: 24px;
+        width: 32px;
+        height: 28px;
+        min-width: 32px;
+        min-height: 28px;
     }
 
     .swap-operator-btn svg {
-        width: 16px;
-        height: 16px;
+        width: 15px;
+        height: 15px;
     }
 
     .operator-skill-card .skill-small {
@@ -285,8 +288,11 @@
     }
 
     .skill-small.selected {
-        outline: 2px solid #4da6ff;
-        box-shadow: 0 0 8px rgba(77, 166, 255, 0.8);
+        outline: none;
+        border-color: rgba(248,245,70,0.92);
+        box-shadow:
+            0 0 12px rgba(248,245,70,0.24),
+            inset 0 0 0 1px rgba(248,245,70,0.14);
     }
 
     .rotation-panel {
