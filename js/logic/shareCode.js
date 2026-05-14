@@ -135,6 +135,10 @@ function createBuildShareLink() {
 }
 
 async function copyBuildShareCode() {
+    if (typeof hasCreatedRotation === "function" && !hasCreatedRotation()) {
+        return false;
+    }
+
     const code = createBuildShareCode();
 
     try {
@@ -144,9 +148,15 @@ async function copyBuildShareCode() {
         console.warn("Clipboard copy failed, falling back to prompt:", error);
         prompt("Share-Code kopieren:", code);
     }
+
+    return true;
 }
 
 async function copyBuildShareLink() {
+    if (typeof hasCreatedRotation === "function" && !hasCreatedRotation()) {
+        return false;
+    }
+
     const link = createBuildShareLink();
 
     try {
@@ -156,6 +166,8 @@ async function copyBuildShareLink() {
         console.warn("Clipboard copy failed, falling back to prompt:", error);
         prompt("Share-Link kopieren:", link);
     }
+
+    return true;
 }
 
 function extractBuildShareCode(input) {
@@ -343,7 +355,7 @@ function applyBuildShareCode(code) {
 }
 
 function loadBuildShareCode() {
-    const code = prompt("Share-Code einfuegen:");
+    const code = prompt("Paste share code or share link:");
     if (!code) return;
 
     try {

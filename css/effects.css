@@ -151,6 +151,10 @@
     display: none !important;
 }
 
+.export-mode .rotation-actions {
+    display: none !important;
+}
+
 .export-mode .rotation-slot {
     border: none !important;
     background: transparent !important;

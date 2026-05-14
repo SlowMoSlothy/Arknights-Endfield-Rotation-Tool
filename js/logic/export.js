@@ -227,11 +227,15 @@ function isCanvasSecurityError(error) {
 
 function exportImage() {
     const element = document.getElementById("rotation");
-    if (!element) return;
+    if (!element) return Promise.resolve(false);
+
+    if (typeof hasCreatedRotation === "function" && !hasCreatedRotation()) {
+        return Promise.resolve(false);
+    }
 
     if (isLocalFileExportBlocked()) {
         showExportSecurityMessage();
-        return;
+        return Promise.resolve(false);
     }
 
     const watermarkUrl = getExportWatermarkUrl();
@@ -244,10 +248,11 @@ function exportImage() {
     const originalOverflow = element.style.overflow;
     let originalTeamStrip = null;
 
+    element.classList.add("export-mode");
+
     const exportWidth = Math.ceil(Math.max(element.scrollWidth, element.offsetWidth, exportTeamWidth));
     const exportHeight = Math.ceil(Math.max(element.scrollHeight, element.offsetHeight)) + exportTeamHeight + (watermarkUrl ? 80 : 0);
     const exportViewportWidth = document.documentElement.clientWidth || window.innerWidth || exportWidth;
-    element.classList.add("export-mode");
     element.style.width = `${exportWidth}px`;
     element.style.maxWidth = "none";
     element.style.overflow = "visible";
@@ -257,7 +262,7 @@ function exportImage() {
         originalTeamStrip.style.visibility = "hidden";
     }
 
-    preloadExportTeamImages(exportTeamOperators).then(() => html2canvas(element, {
+    return preloadExportTeamImages(exportTeamOperators).then(() => html2canvas(element, {
         backgroundColor: "#121212",
         scale: 2,
         useCORS: true,
@@ -328,11 +333,13 @@ function exportImage() {
         link.download = "rotation.png";
         link.href = canvas.toDataURL("image/png");
         link.click();
+        return true;
     }).catch(error => {
         console.error("Export failed:", error);
         if (isCanvasSecurityError(error)) {
             showExportSecurityMessage();
         }
+        return false;
     }).finally(() => {
         element.style.width = originalWidth;
         element.style.maxWidth = originalMaxWidth;

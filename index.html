@@ -34,11 +34,28 @@
     <link rel="stylesheet" href="css/mobile.css">
 </head>
 
-<body>
+<body class="app-loading">
   <link rel="stylesheet" href="css/settings.css?v=3">
   <div id="globalTooltip" class="global-tooltip"></div>
 
-  <div id="selectionScreen">
+  <div id="appLoadingScreen" class="app-loading-screen" role="status" aria-live="polite" aria-busy="true">
+    <div class="app-loading-card">
+      <img
+        class="app-loading-logo"
+        src="assets/header.png"
+        alt="Arknights Endfield Rotation Builder"
+      >
+      <div class="app-loading-orbit" aria-hidden="true">
+        <span></span>
+      </div>
+      <div class="app-loading-copy">
+        <strong>Loading database</strong>
+        <span>Preparing operators and rotation data</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="selectionScreen" style="display:none;">
     <button id="closeTeamModalBtn" class="close-team-modal-btn" onclick="closeTeamSelectionModal()">
   ×
 </button>
@@ -95,31 +112,6 @@
       <div class="builder-content">
         <aside class="builder-sidebar">
           <h3>Menu</h3>
-          <button class="sidebar-command sidebar-command-primary" onclick="exportImage()">
-            <span class="sidebar-command-icon">▣</span>
-            <span class="sidebar-command-label">Export Rotation</span>
-            <span class="sidebar-command-signal"></span>
-          </button>
-          <button class="sidebar-command" onclick="copyBuildShareCode()">
-            <span class="sidebar-command-icon">SC</span>
-            <span class="sidebar-command-label">Copy Setup</span>
-            <span class="sidebar-command-signal"></span>
-          </button>
-          <button class="sidebar-command" onclick="copyBuildShareLink()">
-            <span class="sidebar-command-icon">LK</span>
-            <span class="sidebar-command-label">Copy Link</span>
-            <span class="sidebar-command-signal"></span>
-          </button>
-          <button class="sidebar-command" onclick="loadBuildShareCode()">
-            <span class="sidebar-command-icon">IN</span>
-            <span class="sidebar-command-label">Load Setup</span>
-            <span class="sidebar-command-signal"></span>
-          </button>
-          <button class="sidebar-command" onclick="clearRotation()">
-            <span class="sidebar-command-icon">⌫</span>
-            <span class="sidebar-command-label">Clear Rotation</span>
-            <span class="sidebar-command-signal"></span>
-          </button>
           <button id="openSettingsBtn" class="sidebar-command" type="button">
             <span class="sidebar-command-icon">⚙</span>
             <span class="sidebar-command-label">Settings</span>
@@ -135,6 +127,54 @@
           <section class="builder-panel">
             <h3>Rotation</h3>
             <div id="rotation" class="rotation-panel">
+              <div class="rotation-actions" aria-label="Rotation actions">
+                <span class="rotation-action-tooltip-host" data-action-tooltip="Export rotation as PNG image">
+                  <button id="exportRotationBtn" class="rotation-action-btn rotation-action-primary" type="button" onclick="exportImage()" aria-label="Export rotation as PNG image" disabled>
+                    <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <rect x="4" y="5" width="16" height="14" rx="2"></rect>
+                      <circle cx="9" cy="10" r="1.5"></circle>
+                      <path d="M6.5 17l4.2-4.2 2.8 2.8 1.7-1.7 2.3 3.1"></path>
+                    </svg>
+                  </button>
+                </span>
+                <span class="rotation-action-tooltip-host" data-action-tooltip="Copy share code">
+                  <button id="copyShareCodeBtn" class="rotation-action-btn" type="button" onclick="copyBuildShareCode()" aria-label="Copy share code" disabled>
+                    <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <rect x="8" y="8" width="11" height="11" rx="2"></rect>
+                      <path d="M5 15V7a2 2 0 0 1 2-2h8"></path>
+                    </svg>
+                  </button>
+                </span>
+                <span class="rotation-action-tooltip-host" data-action-tooltip="Copy share link">
+                  <button id="copyShareLinkBtn" class="rotation-action-btn" type="button" onclick="copyBuildShareLink()" aria-label="Copy share link" disabled>
+                    <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <circle class="rotation-action-icon-dot" cx="18" cy="5" r="2.5"></circle>
+                      <circle class="rotation-action-icon-dot" cx="6" cy="12" r="2.5"></circle>
+                      <circle class="rotation-action-icon-dot" cx="18" cy="19" r="2.5"></circle>
+                      <path d="M8.3 10.8l7.4-4.4"></path>
+                      <path d="M8.3 13.2l7.4 4.4"></path>
+                    </svg>
+                  </button>
+                </span>
+                <span class="rotation-action-tooltip-host" data-action-tooltip="Import share code or share link">
+                  <button class="rotation-action-btn" type="button" onclick="loadBuildShareCode()" aria-label="Import share code or share link">
+                    <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M3.5 8.5h6l2 2h9v7a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"></path>
+                      <path d="M3.5 8.5V6a2 2 0 0 1 2-2h4l2 2h4"></path>
+                      <path d="M12 13v5"></path>
+                      <path d="M9.8 15.8 12 18l2.2-2.2"></path>
+                    </svg>
+                  </button>
+                </span>
+                <span class="rotation-action-tooltip-host" data-action-tooltip="Create new rotation">
+                  <button class="rotation-action-btn rotation-action-danger" type="button" onclick="createNewRotation()" aria-label="Create new rotation">
+                    <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M12 5v14"></path>
+                      <path d="M5 12h14"></path>
+                    </svg>
+                  </button>
+                </span>
+              </div>
               <div id="rotationDropZone"></div>
             </div>
           </section>
