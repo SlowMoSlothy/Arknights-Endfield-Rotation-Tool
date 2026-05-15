@@ -4,6 +4,7 @@ const communityRotationState = {
     elementFilter: "all",
     classFilter: "all",
     sort: "newest",
+    detailRotationId: "",
     likedRotationIds: new Set(),
     likingRotationIds: new Set(),
     loaded: false,
@@ -63,6 +64,14 @@ function getCommunityOperatorById(operatorId) {
 function getCommunityTeamOperators(row) {
     return normalizeCommunityList(row.team_operator_ids)
         .map(operatorId => getCommunityOperatorById(operatorId))
+        .filter(Boolean);
+}
+
+function getCommunityRotationSkills(row) {
+    if (typeof getSkillById !== "function") return [];
+
+    return normalizeCommunityList(row.rotation_skill_ids)
+        .map(skillId => getSkillById(Number(skillId)))
         .filter(Boolean);
 }
 
@@ -143,6 +152,41 @@ function createCommunityTextElement(tagName, className, text) {
     return element;
 }
 
+function createCommunityStateCard({ type = "", title, message, actionLabel = "", action = null, loading = false }) {
+    const card = document.createElement("div");
+    card.className = `community-state-card${type ? ` is-${type}` : ""}`;
+
+    if (loading) {
+        const loader = document.createElement("span");
+        loader.className = "community-state-loader";
+        loader.setAttribute("aria-hidden", "true");
+        card.appendChild(loader);
+    }
+
+    const content = document.createElement("div");
+    content.className = "community-state-content";
+    content.append(
+        createCommunityTextElement("h3", "community-state-title", title),
+        createCommunityTextElement("p", "community-state-message", message)
+    );
+
+    if (actionLabel && typeof action === "function") {
+        const button = document.createElement("button");
+        button.className = "community-state-action";
+        button.type = "button";
+        button.textContent = actionLabel;
+        button.addEventListener("click", action);
+        content.appendChild(button);
+    }
+
+    card.appendChild(content);
+    return card;
+}
+
+function renderCommunityListState(list, options) {
+    list.replaceChildren(createCommunityStateCard(options));
+}
+
 function createCommunityOperatorPlaceholder() {
     const placeholder = document.createElement("span");
     placeholder.className = "community-operator-placeholder";
@@ -167,6 +211,68 @@ function createCommunityOperatorAvatar(operator) {
     return image;
 }
 
+function createCommunitySkillPlaceholder() {
+    const placeholder = document.createElement("span");
+    placeholder.className = "community-skill-placeholder";
+    placeholder.textContent = "?";
+    return placeholder;
+}
+
+function createCommunitySkillPreviewItem(skill, isExpanded = false) {
+    const item = document.createElement("span");
+    item.className = `community-preview-skill${isExpanded ? " is-expanded" : ""}`;
+
+    let icon;
+    if (skill && typeof createSkillIcon === "function") {
+        icon = createSkillIcon(skill, {
+            size: "small",
+            useSmallIcon: true,
+            extraClasses: ["community-preview-skill-icon"]
+        });
+    } else {
+        icon = createCommunitySkillPlaceholder();
+    }
+
+    item.appendChild(icon);
+
+    if (isExpanded && skill) {
+        const label = document.createElement("span");
+        label.className = "community-preview-skill-label";
+        label.textContent = typeof getShortSkillType === "function"
+            ? getShortSkillType(skill.type || skill.shortType)
+            : (skill.shortType || "");
+        item.appendChild(label);
+    }
+
+    return item;
+}
+
+function createCommunityRotationPreview(row, options = {}) {
+    const { limit = 6, isExpanded = false } = options;
+    const skills = getCommunityRotationSkills(row);
+    const previewSkills = isExpanded ? skills : skills.slice(0, limit);
+    const preview = document.createElement("div");
+    preview.className = `community-rotation-preview${isExpanded ? " is-expanded" : ""}`;
+
+    if (!previewSkills.length) {
+        preview.appendChild(createCommunityTextElement("span", "community-preview-empty", "No rotation preview"));
+        return preview;
+    }
+
+    previewSkills.forEach((skill, index) => {
+        if (index > 0) {
+            preview.appendChild(createCommunityTextElement("span", "community-preview-arrow", "->"));
+        }
+        preview.appendChild(createCommunitySkillPreviewItem(skill, isExpanded));
+    });
+
+    if (!isExpanded && skills.length > previewSkills.length) {
+        preview.appendChild(createCommunityTextElement("span", "community-preview-more", `+${skills.length - previewSkills.length}`));
+    }
+
+    return preview;
+}
+
 function createCommunityLikeButton(row) {
     const rotationId = String(row?.id || "");
     const liked = hasLikedCommunityRotation(rotationId);
@@ -182,6 +288,30 @@ function createCommunityLikeButton(row) {
     button.addEventListener("click", () => likeCommunityRotation(row));
 
     return button;
+}
+
+function createCommunityLoadButton(row, label = "Load") {
+    const loadButton = document.createElement("button");
+    loadButton.className = "community-load-btn";
+    loadButton.type = "button";
+    loadButton.textContent = label;
+    loadButton.addEventListener("click", event => {
+        event.stopPropagation();
+        loadCommunityRotation(row.id);
+    });
+    return loadButton;
+}
+
+function createCommunityDetailButton(row) {
+    const detailButton = document.createElement("button");
+    detailButton.className = "community-detail-btn";
+    detailButton.type = "button";
+    detailButton.textContent = "Details";
+    detailButton.addEventListener("click", event => {
+        event.stopPropagation();
+        openCommunityDetail(row.id);
+    });
+    return detailButton;
 }
 
 function getCommunitySearchText(row) {
@@ -342,6 +472,96 @@ function renderCommunityFilters() {
 
     const sortSelect = document.getElementById("communitySortSelect");
     if (sortSelect) sortSelect.value = communityRotationState.sort;
+}
+
+function getActiveCommunityDetailRow() {
+    if (!communityRotationState.detailRotationId) return null;
+    return communityRotationState.rotations.find(row => String(row.id) === String(communityRotationState.detailRotationId)) || null;
+}
+
+function openCommunityDetail(rotationId) {
+    communityRotationState.detailRotationId = String(rotationId || "");
+    renderCommunityDetailPanel();
+}
+
+function closeCommunityDetail() {
+    communityRotationState.detailRotationId = "";
+    renderCommunityDetailPanel();
+}
+
+function renderCommunityDetailPanel() {
+    const panel = document.getElementById("communityDetailPanel");
+    if (!panel) return;
+
+    const row = getActiveCommunityDetailRow();
+    panel.replaceChildren();
+
+    if (!row) {
+        communityRotationState.detailRotationId = "";
+        panel.hidden = true;
+        return;
+    }
+
+    panel.hidden = false;
+
+    const header = document.createElement("div");
+    header.className = "community-detail-header";
+
+    const titleWrap = document.createElement("div");
+    titleWrap.append(
+        createCommunityTextElement("h3", "community-detail-title", row.title || "Untitled rotation"),
+        createCommunityTextElement(
+            "div",
+            "community-detail-meta",
+            [
+                row.author_name ? `by ${row.author_name}` : "by Anonymous",
+                formatCommunityDate(row.created_at),
+                `${Number(row.view_count) || 0} views`,
+                `${Number(row.likes_count) || 0} likes`
+            ].filter(Boolean).join(" - ")
+        )
+    );
+
+    const closeButton = document.createElement("button");
+    closeButton.className = "community-detail-close";
+    closeButton.type = "button";
+    closeButton.textContent = "Close";
+    closeButton.addEventListener("click", closeCommunityDetail);
+
+    header.append(titleWrap, closeButton);
+
+    const body = document.createElement("div");
+    body.className = "community-detail-body";
+
+    const team = document.createElement("div");
+    team.className = "community-detail-team";
+    getCommunityTeamOperators(row).slice(0, 4).forEach(operator => {
+        const item = document.createElement("div");
+        item.className = "community-detail-operator";
+        item.append(
+            createCommunityOperatorAvatar(operator),
+            createCommunityTextElement("span", "", operator.name || "Operator")
+        );
+        team.appendChild(item);
+    });
+    if (!team.children.length) team.appendChild(createCommunityOperatorPlaceholder());
+
+    const rotationWrap = document.createElement("div");
+    rotationWrap.className = "community-detail-rotation";
+    rotationWrap.appendChild(createCommunityRotationPreview(row, { isExpanded: true }));
+
+    const description = createCommunityTextElement(
+        "p",
+        "community-detail-description",
+        row.description || "No description added."
+    );
+
+    const actions = document.createElement("div");
+    actions.className = "community-detail-actions";
+    actions.append(createCommunityLoadButton(row, "Load Rotation"), createCommunityLikeButton(row));
+
+    body.append(team, rotationWrap, description, actions);
+    panel.append(header, body);
 }
 
 function setCommunityStatus(text, className = "") {
@@ -561,6 +781,7 @@ function renderCommunityRotations() {
     if (!list) return;
 
     renderCommunityFilters();
+    renderCommunityDetailPanel();
 
     if (refreshButton) {
         refreshButton.disabled = communityRotationState.loading;
@@ -570,12 +791,25 @@ function renderCommunityRotations() {
     list.innerHTML = "";
 
     if (communityRotationState.loading) {
-        setCommunityStatus("Loading community rotations...");
+        setCommunityStatus("");
+        renderCommunityListState(list, {
+            type: "loading",
+            title: "Loading community rotations",
+            message: "Fetching approved builds from the database.",
+            loading: true
+        });
         return;
     }
 
     if (communityRotationState.error) {
-        setCommunityStatus(communityRotationState.error, "is-error");
+        setCommunityStatus("");
+        renderCommunityListState(list, {
+            type: "error",
+            title: "Community could not be loaded",
+            message: communityRotationState.error,
+            actionLabel: "Try again",
+            action: () => fetchCommunityRotations(true)
+        });
         return;
     }
 
@@ -586,10 +820,24 @@ function renderCommunityRotations() {
 
     const filteredRotations = getFilteredCommunityRotations();
     if (!filteredRotations.length) {
-        const message = hasActiveCommunityFilters()
-            ? "No community rotations match these filters."
-            : "No approved community rotations yet.";
-        setCommunityStatus(message, "is-empty");
+        setCommunityStatus("");
+        if (hasActiveCommunityFilters()) {
+            renderCommunityListState(list, {
+                type: "empty",
+                title: "No matching rotations",
+                message: "Try another search, element, or class filter.",
+                actionLabel: "Reset filters",
+                action: resetCommunityFilters
+            });
+        } else {
+            renderCommunityListState(list, {
+                type: "empty",
+                title: "No community rotations yet",
+                message: "Approved community rotations will appear here after review.",
+                actionLabel: "Refresh",
+                action: () => fetchCommunityRotations(true)
+            });
+        }
         return;
     }
 
@@ -606,6 +854,18 @@ function renderCommunityRotations() {
 function createCommunityRotationCard(row) {
     const card = document.createElement("article");
     card.className = "community-card";
+    card.tabIndex = 0;
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", `Open details for ${row.title || "community rotation"}`);
+    card.addEventListener("click", event => {
+        if (event.target.closest("button")) return;
+        openCommunityDetail(row.id);
+    });
+    card.addEventListener("keydown", event => {
+        if (event.target !== card || (event.key !== "Enter" && event.key !== " ")) return;
+        event.preventDefault();
+        openCommunityDetail(row.id);
+    });
 
     const header = document.createElement("div");
     header.className = "community-card-header";
@@ -618,13 +878,7 @@ function createCommunityRotationCard(row) {
     if (date) metaParts.push(date);
     titleWrap.append(title, createCommunityTextElement("div", "community-card-meta", metaParts.join(" - ")));
 
-    const loadButton = document.createElement("button");
-    loadButton.className = "community-load-btn";
-    loadButton.type = "button";
-    loadButton.textContent = "Load";
-    loadButton.addEventListener("click", () => loadCommunityRotation(row.id));
-
-    header.append(titleWrap, loadButton);
+    header.append(titleWrap, createCommunityLoadButton(row));
 
     const team = document.createElement("div");
     team.className = "community-team";
@@ -634,6 +888,8 @@ function createCommunityRotationCard(row) {
     } else {
         team.appendChild(createCommunityOperatorPlaceholder());
     }
+
+    const rotationPreview = createCommunityRotationPreview(row);
 
     const description = createCommunityTextElement(
         "p",
@@ -655,9 +911,12 @@ function createCommunityRotationCard(row) {
         `${Number(row.view_count) || 0} views`
     ].join(" - ");
     footer.appendChild(createCommunityTextElement("span", "community-stat", statText));
-    footer.appendChild(createCommunityLikeButton(row));
+    const actions = document.createElement("div");
+    actions.className = "community-card-actions";
+    actions.append(createCommunityDetailButton(row), createCommunityLikeButton(row));
+    footer.appendChild(actions);
 
-    card.append(header, team, description, chipRow, footer);
+    card.append(header, team, rotationPreview, description, chipRow, footer);
     return card;
 }
 
@@ -795,6 +1054,8 @@ function closeCommunityRotationsModal() {
     if (!modal) return;
 
     setCommunitySubmitFormOpen(false);
+    communityRotationState.detailRotationId = "";
+    renderCommunityDetailPanel();
     modal.classList.remove("open");
 }
 

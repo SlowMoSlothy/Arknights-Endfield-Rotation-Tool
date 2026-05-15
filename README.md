@@ -19,7 +19,7 @@ Interactive web tool for building, visualizing, exporting, and sharing Arknights
 - Compact share codes for team + rotation setups.
 - Share links with the setup embedded in the URL hash.
 - Export rotation images with a builder-address watermark.
-- Browse, filter, and sort approved Community rotations, then submit your current setup for review.
+- Browse, filter, sort, preview, and like approved Community rotations, then submit your current setup for review.
 - LocalStorage auto-save for team, rotation, UI settings, and operator states.
 - Optional Enemy panel controlled from `js/state/appState.js`.
 
@@ -83,6 +83,7 @@ supabase/
   schema.sql
   community_rotations.sql
   community_rotations_review.sql
+  admin_panel.sql
   seed_operators_basic.sql
 tools/
   exportOperatorsForSupabase.js
@@ -130,6 +131,24 @@ supabase/community_rotations_review.sql
 
 Run the first query to list pending rotations. Then copy one of the commented blocks, replace the example UUID with the real `id`, and run it to approve, hide, or edit the submission.
 
+### Admin Review Panel
+
+The in-app Admin panel uses Supabase Auth. To enable it, run:
+
+```text
+supabase/admin_panel.sql
+```
+
+Then create your admin user in Supabase Authentication and add that user's id:
+
+```sql
+insert into public.app_admins (user_id)
+values ('YOUR_AUTH_USER_ID')
+on conflict (user_id) do nothing;
+```
+
+After that, open the Admin panel in the app and sign in with that Supabase Auth account. The panel includes `Pending`, `Approved`, and `Rejected` tabs, a detail view, preview loading, restore actions, and optional internal reject notes. The frontend still uses only the publishable/anon key.
+
 ## Project Structure
 
 ```text
@@ -156,6 +175,7 @@ js/
     appState.js
   ui/
 assets/
+supabase/
 ```
 
 ## Tech Stack

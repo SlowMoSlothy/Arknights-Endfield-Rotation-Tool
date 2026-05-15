@@ -117,6 +117,11 @@
             <span class="sidebar-command-label">Community</span>
             <span class="sidebar-command-signal"></span>
           </button>
+          <button id="openAdminPanelBtn" class="sidebar-command" type="button">
+            <span class="sidebar-command-icon">AD</span>
+            <span class="sidebar-command-label">Admin</span>
+            <span class="sidebar-command-signal"></span>
+          </button>
           <button id="openSettingsBtn" class="sidebar-command" type="button">
             <span class="sidebar-command-icon">⚙</span>
             <span class="sidebar-command-label">Settings</span>
@@ -276,8 +281,54 @@
         </div>
       </form>
 
+      <div id="communityDetailPanel" class="community-detail-panel" hidden></div>
       <div id="communityRotationStatus" class="community-status"></div>
       <div id="communityRotationList" class="community-rotation-list"></div>
+    </div>
+  </div>
+
+  <div id="adminModal" class="settings-modal admin-modal">
+    <div class="settings-dialog admin-dialog">
+      <div class="settings-header">
+        <h2 class="settings-title">Admin Review</h2>
+        <button id="closeAdminPanelBtn" class="settings-close" type="button">&times;</button>
+      </div>
+
+      <section id="adminLoginPanel" class="admin-login-panel">
+        <p class="admin-intro">Sign in with your Supabase admin account to review submitted rotations.</p>
+        <form id="adminLoginForm" class="admin-login-form">
+          <label class="admin-field">
+            <span>Email</span>
+            <input id="adminEmailInput" type="email" autocomplete="email" required placeholder="admin@example.com">
+          </label>
+          <label class="admin-field">
+            <span>Password</span>
+            <input id="adminPasswordInput" type="password" autocomplete="current-password" required placeholder="Password">
+          </label>
+          <div id="adminLoginStatus" class="admin-status"></div>
+          <div class="admin-login-actions">
+            <button id="adminLoginSignOutBtn" class="admin-secondary-btn" type="button" hidden>Sign out</button>
+            <button id="adminLoginButton" class="admin-primary-btn" type="submit">Sign in</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="adminReviewPanel" class="admin-review-panel" hidden>
+        <div class="admin-session-bar">
+          <div class="admin-session-copy">
+            <span>Signed in as</span>
+            <strong id="adminUserEmail">Admin</strong>
+          </div>
+          <div class="admin-session-actions">
+            <button id="adminRefreshBtn" class="admin-secondary-btn" type="button">Refresh</button>
+            <button id="adminSignOutBtn" class="admin-secondary-btn" type="button">Sign out</button>
+          </div>
+        </div>
+        <div id="adminReviewTabs" class="admin-review-tabs" role="tablist" aria-label="Review status"></div>
+        <div id="adminReviewStatus" class="admin-status"></div>
+        <div id="adminDetailPanel" class="admin-detail-panel" hidden></div>
+        <div id="adminReviewList" class="admin-review-list"></div>
+      </section>
     </div>
   </div>
 
@@ -293,7 +344,7 @@
 
   <footer class="site-footer">
     <span>&copy; 2026 Arknights Endfield Rotation Builder</span>
-    <span>App Version 2.1.0</span>
+    <span>App Version 2.4.0</span>
     <span>Fan-made tool, not affiliated with Gryphline or Hypergryph.</span>
   </footer>
 
@@ -360,6 +411,7 @@
   <script src="js/ui/rotationGrid.js"></script>
   <script src="js/ui/teamSelection.js"></script>
   <script src="js/ui/communityRotations.js"></script>
+  <script src="js/ui/adminPanel.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
