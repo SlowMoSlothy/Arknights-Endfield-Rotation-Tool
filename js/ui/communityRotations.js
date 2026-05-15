@@ -4,16 +4,55 @@ const communityRotationState = {
     elementFilter: "all",
     classFilter: "all",
     sort: "newest",
+    likedRotationIds: new Set(),
+    likingRotationIds: new Set(),
     loaded: false,
     loading: false,
     submitting: false,
     error: ""
 };
 
+const COMMUNITY_LIKES_STORAGE_KEY = "aertLikedCommunityRotations";
+
 let communityRotationsInitialized = false;
 
 function normalizeCommunityList(value) {
     return Array.isArray(value) ? value.filter(item => item !== null && item !== undefined) : [];
+}
+
+function readCommunityLikedRotationIds() {
+    if (typeof localStorage === "undefined") return new Set();
+
+    try {
+        const rawValue = localStorage.getItem(COMMUNITY_LIKES_STORAGE_KEY);
+        const parsedValue = JSON.parse(rawValue || "[]");
+        return new Set(Array.isArray(parsedValue) ? parsedValue.map(String).filter(Boolean) : []);
+    } catch (error) {
+        console.warn("Community likes could not be read:", error);
+        return new Set();
+    }
+}
+
+function saveCommunityLikedRotationIds() {
+    if (typeof localStorage === "undefined") return;
+
+    try {
+        localStorage.setItem(
+            COMMUNITY_LIKES_STORAGE_KEY,
+            JSON.stringify([...communityRotationState.likedRotationIds].slice(-500))
+        );
+    } catch (error) {
+        console.warn("Community likes could not be saved:", error);
+    }
+}
+
+function hasLikedCommunityRotation(rotationId) {
+    return communityRotationState.likedRotationIds.has(String(rotationId || ""));
+}
+
+function rememberLikedCommunityRotation(rotationId) {
+    communityRotationState.likedRotationIds.add(String(rotationId || ""));
+    saveCommunityLikedRotationIds();
 }
 
 function getCommunityOperatorById(operatorId) {
@@ -126,6 +165,23 @@ function createCommunityOperatorAvatar(operator) {
     }, { once: true });
 
     return image;
+}
+
+function createCommunityLikeButton(row) {
+    const rotationId = String(row?.id || "");
+    const liked = hasLikedCommunityRotation(rotationId);
+    const liking = communityRotationState.likingRotationIds.has(rotationId);
+    const likeCount = Number(row?.likes_count) || 0;
+    const button = document.createElement("button");
+
+    button.className = `community-like-btn${liked ? " is-liked" : ""}`;
+    button.type = "button";
+    button.disabled = liked || liking || !rotationId;
+    button.setAttribute("aria-pressed", String(liked));
+    button.textContent = `${liking ? "Liking" : liked ? "Liked" : "Like"} ${likeCount}`;
+    button.addEventListener("click", () => likeCommunityRotation(row));
+
+    return button;
 }
 
 function getCommunitySearchText(row) {
@@ -596,10 +652,10 @@ function createCommunityRotationCard(row) {
     const skillCount = normalizeCommunityList(row.rotation_skill_ids).length;
     const statText = [
         `${skillCount} skill${skillCount === 1 ? "" : "s"}`,
-        `${Number(row.view_count) || 0} views`,
-        `${Number(row.likes_count) || 0} likes`
+        `${Number(row.view_count) || 0} views`
     ].join(" - ");
     footer.appendChild(createCommunityTextElement("span", "community-stat", statText));
+    footer.appendChild(createCommunityLikeButton(row));
 
     card.append(header, team, description, chipRow, footer);
     return card;
@@ -668,6 +724,40 @@ async function incrementCommunityRotationView(row) {
     }
 }
 
+async function likeCommunityRotation(row) {
+    const rotationId = String(row?.id || "");
+    if (!rotationId || hasLikedCommunityRotation(rotationId) || communityRotationState.likingRotationIds.has(rotationId)) return;
+
+    if (typeof supabaseClient === "undefined" || !supabaseClient) {
+        alert("Supabase is not available right now.");
+        return;
+    }
+
+    communityRotationState.likingRotationIds.add(rotationId);
+    renderCommunityRotations();
+
+    try {
+        const { data, error } = await supabaseClient
+            .rpc("increment_community_rotation_like", {
+                target_rotation_id: rotationId
+            });
+
+        if (error) throw error;
+
+        const nextLikesCount = Number(data);
+        row.likes_count = Number.isFinite(nextLikesCount)
+            ? nextLikesCount
+            : (Number(row.likes_count) || 0) + 1;
+        rememberLikedCommunityRotation(rotationId);
+    } catch (error) {
+        console.warn("Community rotation like count could not be updated:", error);
+        alert("This rotation could not be liked right now.");
+    } finally {
+        communityRotationState.likingRotationIds.delete(rotationId);
+        renderCommunityRotations();
+    }
+}
+
 function loadCommunityRotation(rotationId) {
     const row = communityRotationState.rotations.find(item => item.id === rotationId);
     if (!row || !row.share_code) {
@@ -723,6 +813,7 @@ function resetCommunityFilters() {
 function initCommunityRotations() {
     if (communityRotationsInitialized) return;
     communityRotationsInitialized = true;
+    communityRotationState.likedRotationIds = readCommunityLikedRotationIds();
 
     const openButton = document.getElementById("openCommunityRotationsBtn");
     const closeButton = document.getElementById("closeCommunityModalBtn");

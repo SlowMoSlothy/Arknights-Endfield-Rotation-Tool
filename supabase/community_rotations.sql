@@ -111,3 +111,30 @@ $$;
 
 revoke all on function public.increment_community_rotation_view(uuid) from public;
 grant execute on function public.increment_community_rotation_view(uuid) to anon, authenticated;
+
+create or replace function public.increment_community_rotation_like(target_rotation_id uuid)
+returns integer
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+    next_likes_count integer;
+begin
+    update public.community_rotations
+    set
+        likes_count = likes_count + 1,
+        updated_at = now()
+    where id = target_rotation_id
+        and game = 'arknights_endfield'
+        and is_public = true
+        and is_approved = true
+        and is_hidden = false
+    returning likes_count into next_likes_count;
+
+    return coalesce(next_likes_count, 0);
+end;
+$$;
+
+revoke all on function public.increment_community_rotation_like(uuid) from public;
+grant execute on function public.increment_community_rotation_like(uuid) to anon, authenticated;

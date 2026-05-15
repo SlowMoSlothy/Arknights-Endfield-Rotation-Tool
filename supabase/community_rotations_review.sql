@@ -74,3 +74,6 @@ order by created_at desc;
 
 -- 7. Test the public view counter function.
 -- select public.increment_community_rotation_view('00000000-0000-0000-0000-000000000000');
+
+-- 8. Test the public like counter function.
+-- select public.increment_community_rotation_like('00000000-0000-0000-0000-000000000000');
