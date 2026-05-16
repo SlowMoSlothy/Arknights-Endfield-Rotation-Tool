@@ -19,6 +19,8 @@ Interactive web tool for building, visualizing, exporting, and sharing Arknights
 - Compact share codes for team + rotation setups.
 - Share links with the setup embedded in the URL hash.
 - Export rotation images with a builder-address watermark.
+- Account-based private saves through `My Rotations`.
+- Browse, filter, sort, inspect, preview, link, and like approved Community rotations, then submit your current setup for review.
 - LocalStorage auto-save for team, rotation, UI settings, and operator states.
 - Optional Enemy panel controlled from `js/state/appState.js`.
 
@@ -26,14 +28,23 @@ Interactive web tool for building, visualizing, exporting, and sharing Arknights
 
 Use the sidebar buttons:
 
+- Top-right `Sign In` and `Create Account` buttons open the account flow.
+- `My Rotations` lets signed-in users save private rotations, load them later, delete them, or submit them for Community review.
 - `Copy Setup` copies a short setup code.
 - `Copy Link` copies a URL that loads the team and rotation automatically.
 - `Load Setup` accepts either a setup code or a full share link.
+- Community rotation cards and detail views can copy a direct link to an approved rotation.
 
 Share links use this format:
 
 ```text
 https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/#setup=AERT2:...
+```
+
+Approved Community rotations can also be opened directly:
+
+```text
+https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/#community=ROTATION_ID
 ```
 
 Current share codes use the compact `AERT2:` format. Older `AERT1:` codes can still be imported.
@@ -80,6 +91,10 @@ Supabase setup files live in:
 ```text
 supabase/
   schema.sql
+  community_rotations.sql
+  community_rotations_review.sql
+  user_rotations.sql
+  admin_panel.sql
   seed_operators_basic.sql
 tools/
   exportOperatorsForSupabase.js
@@ -103,6 +118,62 @@ Then paste/run `supabase/seed_operators.sql` in the Supabase SQL Editor after th
 
 The frontend must only use the Supabase publishable/anon key. Never put a Supabase `service_role` key into browser code.
 When `useSupabaseOperators` is enabled, the app loads `operators` and `operator_skills` from Supabase on startup and falls back to the local JS files if loading fails.
+
+### Community Rotations
+
+To enable the Community modal, run this file in the Supabase SQL Editor:
+
+```text
+supabase/community_rotations.sql
+```
+
+It creates `community_rotations` and the public access rules:
+
+- visitors can submit rotations for review.
+- visitors can only read rotations that are public, approved, and not hidden.
+- visitors can increment view and like counters through restricted database functions.
+- pending submissions stay hidden until you approve them in Supabase.
+
+### User Accounts And Private Rotations
+
+To enable account-based saves, run this file in the Supabase SQL Editor after the Community setup:
+
+```text
+supabase/user_rotations.sql
+```
+
+It creates `user_rotations` with row-level security:
+
+- signed-in users can save private rotations.
+- users can only read, update, and delete their own saved rotations.
+- saved rotations can be submitted to Community review later.
+- Community submissions still require Admin approval before becoming public.
+
+To review submissions, open:
+
+```text
+supabase/community_rotations_review.sql
+```
+
+Run the first query to list pending rotations. Then copy one of the commented blocks, replace the example UUID with the real `id`, and run it to approve, hide, or edit the submission.
+
+### Admin Review Panel
+
+The in-app Admin panel uses Supabase Auth. To enable it, run:
+
+```text
+supabase/admin_panel.sql
+```
+
+Then create your admin user in Supabase Authentication and add that user's id:
+
+```sql
+insert into public.app_admins (user_id)
+values ('YOUR_AUTH_USER_ID')
+on conflict (user_id) do nothing;
+```
+
+After that, open the Admin panel in the app and sign in with that Supabase Auth account. The panel includes `Pending`, `Approved`, and `Rejected` tabs, a detail view, preview loading, restore actions, and optional internal reject notes. The frontend still uses only the publishable/anon key.
 
 ## Project Structure
 
@@ -130,6 +201,7 @@ js/
     appState.js
   ui/
 assets/
+supabase/
 ```
 
 ## Tech Stack

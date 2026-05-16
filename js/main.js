@@ -103,6 +103,9 @@ async function initApp() {
 
         initUiSettings();
         initEnemyPanel();
+        if (typeof initCommunityRotations === "function") initCommunityRotations();
+        if (typeof initMyRotations === "function") initMyRotations();
+        if (typeof initAdminPanel === "function") initAdminPanel();
 
         // Direkt den Rotation Builder anzeigen
         showBuilderScreen();

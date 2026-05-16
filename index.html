@@ -99,6 +99,12 @@
         src="assets/header.png"
         alt="Arknights Endfield Rotation Builder"
       >
+      <div class="account-bar" aria-label="Account actions">
+        <span id="accountUserLabel" class="account-user-label" hidden></span>
+        <button id="accountSignInBtn" class="account-action-btn" type="button">Sign In</button>
+        <button id="accountCreateBtn" class="account-action-btn account-action-primary" type="button">Create Account</button>
+        <button id="accountSignOutBtn" class="account-action-btn" type="button" hidden>Sign Out</button>
+      </div>
     </header>
 
     <div class="builder-shell">
@@ -112,6 +118,21 @@
       <div class="builder-content">
         <aside class="builder-sidebar">
           <h3>Menu</h3>
+          <button id="openMyRotationsBtn" class="sidebar-command" type="button">
+            <span class="sidebar-command-icon">MY</span>
+            <span class="sidebar-command-label">My Rotations</span>
+            <span class="sidebar-command-signal"></span>
+          </button>
+          <button id="openCommunityRotationsBtn" class="sidebar-command" type="button">
+            <span class="sidebar-command-icon">CM</span>
+            <span class="sidebar-command-label">Community</span>
+            <span class="sidebar-command-signal"></span>
+          </button>
+          <button id="openAdminPanelBtn" class="sidebar-command" type="button" hidden>
+            <span class="sidebar-command-icon">AD</span>
+            <span class="sidebar-command-label">Admin</span>
+            <span class="sidebar-command-signal"></span>
+          </button>
           <button id="openSettingsBtn" class="sidebar-command" type="button">
             <span class="sidebar-command-icon">⚙</span>
             <span class="sidebar-command-label">Settings</span>
@@ -206,6 +227,179 @@
     </div>
   </div>
 
+  <div id="myRotationsModal" class="settings-modal my-rotations-modal">
+    <div class="settings-dialog my-rotations-dialog">
+      <div class="settings-header">
+        <h2 id="myRotationsTitle" class="settings-title">My Rotations</h2>
+        <button id="closeMyRotationsModalBtn" class="settings-close" type="button">&times;</button>
+      </div>
+
+      <section id="myRotationsAuthPanel" class="my-rotations-auth-panel">
+        <p id="myRotationsIntro" class="my-rotations-intro">Create an account or sign in to save private rotations and submit them for Community review later.</p>
+        <form id="myRotationsAuthForm" class="my-rotations-form">
+          <label class="my-rotations-field">
+            <span>Email</span>
+            <input id="myRotationsEmailInput" type="email" autocomplete="email" required placeholder="you@example.com">
+          </label>
+          <label class="my-rotations-field">
+            <span>Password</span>
+            <input id="myRotationsPasswordInput" type="password" autocomplete="current-password" minlength="6" required placeholder="Password">
+          </label>
+          <div id="myRotationsAuthStatus" class="my-rotations-status"></div>
+          <div class="my-rotations-actions">
+            <button id="myRotationsRegisterButton" class="my-secondary-btn" type="button">Create Account</button>
+            <button id="myRotationsSignInButton" class="my-primary-btn" type="submit">Sign In</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="myRotationsContentPanel" class="my-rotations-content-panel" hidden>
+        <div class="my-rotations-session-bar">
+          <div class="my-rotations-session-copy">
+            <span>Signed in as</span>
+            <strong id="myRotationsUserEmail">Account</strong>
+          </div>
+          <div class="my-rotations-session-actions">
+            <button id="myRotationsRefreshButton" class="my-secondary-btn" type="button">Refresh</button>
+            <button id="myRotationsSignOutButton" class="my-secondary-btn" type="button">Sign Out</button>
+          </div>
+        </div>
+
+        <form id="myRotationSaveForm" class="my-rotation-save-form">
+          <label class="my-rotations-field">
+            <span>Title</span>
+            <input id="myRotationTitleInput" type="text" minlength="3" maxlength="80" required placeholder="Electric opener">
+          </label>
+          <label class="my-rotations-field">
+            <span>Description</span>
+            <textarea id="myRotationDescriptionInput" maxlength="600" rows="3" placeholder="Private notes for this rotation"></textarea>
+          </label>
+          <div class="my-rotations-actions">
+            <button id="myRotationSaveButton" class="my-primary-btn" type="submit" disabled>Save Current Rotation</button>
+          </div>
+        </form>
+
+        <div id="myRotationsListStatus" class="my-rotations-status"></div>
+        <div id="myRotationsList" class="my-rotations-list"></div>
+      </section>
+    </div>
+  </div>
+
+  <div id="communityModal" class="settings-modal community-modal">
+    <div class="settings-dialog community-dialog">
+      <div class="settings-header">
+        <h2 class="settings-title">Community Rotations</h2>
+        <button id="closeCommunityModalBtn" class="settings-close" type="button">&times;</button>
+      </div>
+
+      <div class="community-toolbar">
+        <label class="community-search-wrap">
+          <span>Search</span>
+          <input id="communitySearchInput" class="community-search-input" type="search" placeholder="Rotation, author, operator">
+        </label>
+        <div class="community-toolbar-actions">
+          <button id="refreshCommunityRotationsBtn" class="community-refresh-btn" type="button">Refresh</button>
+          <button id="openCommunitySubmitFormBtn" class="community-submit-toggle" type="button">Submit Current</button>
+        </div>
+      </div>
+
+      <div class="community-filter-panel" aria-label="Community rotation filters">
+        <div class="community-filter-group">
+          <span class="community-filter-label">Element</span>
+          <div id="communityElementFilters" class="community-filter-options"></div>
+        </div>
+        <div class="community-filter-group">
+          <span class="community-filter-label">Class</span>
+          <div id="communityClassFilters" class="community-filter-options"></div>
+        </div>
+        <div class="community-filter-group community-sort-group">
+          <label class="community-sort-wrap">
+            <span class="community-filter-label">Sort</span>
+            <select id="communitySortSelect" class="community-sort-select">
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="views">Most viewed</option>
+              <option value="likes">Most liked</option>
+              <option value="skills">Most skills</option>
+            </select>
+          </label>
+          <button id="clearCommunityFiltersBtn" class="community-clear-filters-btn" type="button">Reset</button>
+        </div>
+      </div>
+
+      <form id="communitySubmitForm" class="community-submit-form" hidden>
+        <div class="community-form-grid">
+          <label class="community-field">
+            <span>Title</span>
+            <input id="communitySubmitTitle" type="text" minlength="3" maxlength="80" required placeholder="Electric burst opener">
+          </label>
+          <label class="community-field">
+            <span>Author</span>
+            <input id="communitySubmitAuthor" type="text" maxlength="40" placeholder="Optional">
+          </label>
+        </div>
+        <label class="community-field">
+          <span>Description</span>
+          <textarea id="communitySubmitDescription" maxlength="600" rows="3" placeholder="Short notes for this rotation"></textarea>
+        </label>
+        <div id="communitySubmitStatus" class="community-submit-status"></div>
+        <div class="community-submit-actions">
+          <button id="cancelCommunitySubmitBtn" class="community-secondary-btn" type="button">Cancel</button>
+          <button id="communitySubmitButton" class="community-submit-btn" type="submit">Submit for review</button>
+        </div>
+      </form>
+
+      <div id="communityDetailPanel" class="community-detail-panel" hidden></div>
+      <div id="communityRotationStatus" class="community-status"></div>
+      <div id="communityRotationList" class="community-rotation-list"></div>
+    </div>
+  </div>
+
+  <div id="adminModal" class="settings-modal admin-modal">
+    <div class="settings-dialog admin-dialog">
+      <div class="settings-header">
+        <h2 class="settings-title">Admin Review</h2>
+        <button id="closeAdminPanelBtn" class="settings-close" type="button">&times;</button>
+      </div>
+
+      <section id="adminLoginPanel" class="admin-login-panel">
+        <p class="admin-intro">Sign in with your Supabase admin account to review submitted rotations.</p>
+        <form id="adminLoginForm" class="admin-login-form">
+          <label class="admin-field">
+            <span>Email</span>
+            <input id="adminEmailInput" type="email" autocomplete="email" required placeholder="admin@example.com">
+          </label>
+          <label class="admin-field">
+            <span>Password</span>
+            <input id="adminPasswordInput" type="password" autocomplete="current-password" required placeholder="Password">
+          </label>
+          <div id="adminLoginStatus" class="admin-status"></div>
+          <div class="admin-login-actions">
+            <button id="adminLoginSignOutBtn" class="admin-secondary-btn" type="button" hidden>Sign out</button>
+            <button id="adminLoginButton" class="admin-primary-btn" type="submit">Sign in</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="adminReviewPanel" class="admin-review-panel" hidden>
+        <div class="admin-session-bar">
+          <div class="admin-session-copy">
+            <span>Signed in as</span>
+            <strong id="adminUserEmail">Admin</strong>
+          </div>
+          <div class="admin-session-actions">
+            <button id="adminRefreshBtn" class="admin-secondary-btn" type="button">Refresh</button>
+            <button id="adminSignOutBtn" class="admin-secondary-btn" type="button">Sign out</button>
+          </div>
+        </div>
+        <div id="adminReviewTabs" class="admin-review-tabs" role="tablist" aria-label="Review status"></div>
+        <div id="adminReviewStatus" class="admin-status"></div>
+        <div id="adminDetailPanel" class="admin-detail-panel" hidden></div>
+        <div id="adminReviewList" class="admin-review-list"></div>
+      </section>
+    </div>
+  </div>
+
   <div id="enemyModal" class="settings-modal">
     <div class="settings-dialog">
       <div class="settings-header">
@@ -218,6 +412,7 @@
 
   <footer class="site-footer">
     <span>&copy; 2026 Arknights Endfield Rotation Builder</span>
+    <span>App Version 2.6.2</span>
     <span>Fan-made tool, not affiliated with Gryphline or Hypergryph.</span>
   </footer>
 
@@ -283,6 +478,9 @@
   <script src="js/ui/operatorBuffs.js"></script>
   <script src="js/ui/rotationGrid.js"></script>
   <script src="js/ui/teamSelection.js"></script>
+  <script src="js/ui/communityRotations.js"></script>
+  <script src="js/ui/myRotations.js"></script>
+  <script src="js/ui/adminPanel.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
