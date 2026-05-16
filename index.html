@@ -99,6 +99,12 @@
         src="assets/header.png"
         alt="Arknights Endfield Rotation Builder"
       >
+      <div class="account-bar" aria-label="Account actions">
+        <span id="accountUserLabel" class="account-user-label" hidden></span>
+        <button id="accountSignInBtn" class="account-action-btn" type="button">Sign In</button>
+        <button id="accountCreateBtn" class="account-action-btn account-action-primary" type="button">Create Account</button>
+        <button id="accountSignOutBtn" class="account-action-btn" type="button" hidden>Sign Out</button>
+      </div>
     </header>
 
     <div class="builder-shell">
@@ -112,12 +118,17 @@
       <div class="builder-content">
         <aside class="builder-sidebar">
           <h3>Menu</h3>
+          <button id="openMyRotationsBtn" class="sidebar-command" type="button">
+            <span class="sidebar-command-icon">MY</span>
+            <span class="sidebar-command-label">My Rotations</span>
+            <span class="sidebar-command-signal"></span>
+          </button>
           <button id="openCommunityRotationsBtn" class="sidebar-command" type="button">
             <span class="sidebar-command-icon">CM</span>
             <span class="sidebar-command-label">Community</span>
             <span class="sidebar-command-signal"></span>
           </button>
-          <button id="openAdminPanelBtn" class="sidebar-command" type="button">
+          <button id="openAdminPanelBtn" class="sidebar-command" type="button" hidden>
             <span class="sidebar-command-icon">AD</span>
             <span class="sidebar-command-label">Admin</span>
             <span class="sidebar-command-signal"></span>
@@ -214,6 +225,64 @@
           <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="xxl"><div class="settings-option-title">XXL</div><div class="settings-preview"><div class="settings-preview-box" style="width: 92px; height: 92px;"></div></div><div class="settings-size-label">120px</div></button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div id="myRotationsModal" class="settings-modal my-rotations-modal">
+    <div class="settings-dialog my-rotations-dialog">
+      <div class="settings-header">
+        <h2 id="myRotationsTitle" class="settings-title">My Rotations</h2>
+        <button id="closeMyRotationsModalBtn" class="settings-close" type="button">&times;</button>
+      </div>
+
+      <section id="myRotationsAuthPanel" class="my-rotations-auth-panel">
+        <p id="myRotationsIntro" class="my-rotations-intro">Create an account or sign in to save private rotations and submit them for Community review later.</p>
+        <form id="myRotationsAuthForm" class="my-rotations-form">
+          <label class="my-rotations-field">
+            <span>Email</span>
+            <input id="myRotationsEmailInput" type="email" autocomplete="email" required placeholder="you@example.com">
+          </label>
+          <label class="my-rotations-field">
+            <span>Password</span>
+            <input id="myRotationsPasswordInput" type="password" autocomplete="current-password" minlength="6" required placeholder="Password">
+          </label>
+          <div id="myRotationsAuthStatus" class="my-rotations-status"></div>
+          <div class="my-rotations-actions">
+            <button id="myRotationsRegisterButton" class="my-secondary-btn" type="button">Create Account</button>
+            <button id="myRotationsSignInButton" class="my-primary-btn" type="submit">Sign In</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="myRotationsContentPanel" class="my-rotations-content-panel" hidden>
+        <div class="my-rotations-session-bar">
+          <div class="my-rotations-session-copy">
+            <span>Signed in as</span>
+            <strong id="myRotationsUserEmail">Account</strong>
+          </div>
+          <div class="my-rotations-session-actions">
+            <button id="myRotationsRefreshButton" class="my-secondary-btn" type="button">Refresh</button>
+            <button id="myRotationsSignOutButton" class="my-secondary-btn" type="button">Sign Out</button>
+          </div>
+        </div>
+
+        <form id="myRotationSaveForm" class="my-rotation-save-form">
+          <label class="my-rotations-field">
+            <span>Title</span>
+            <input id="myRotationTitleInput" type="text" minlength="3" maxlength="80" required placeholder="Electric opener">
+          </label>
+          <label class="my-rotations-field">
+            <span>Description</span>
+            <textarea id="myRotationDescriptionInput" maxlength="600" rows="3" placeholder="Private notes for this rotation"></textarea>
+          </label>
+          <div class="my-rotations-actions">
+            <button id="myRotationSaveButton" class="my-primary-btn" type="submit" disabled>Save Current Rotation</button>
+          </div>
+        </form>
+
+        <div id="myRotationsListStatus" class="my-rotations-status"></div>
+        <div id="myRotationsList" class="my-rotations-list"></div>
+      </section>
     </div>
   </div>
 
@@ -344,7 +413,7 @@
 
   <footer class="site-footer">
     <span>&copy; 2026 Arknights Endfield Rotation Builder</span>
-    <span>App Version 2.4.0</span>
+    <span>App Version 2.6.2</span>
     <span>Fan-made tool, not affiliated with Gryphline or Hypergryph.</span>
   </footer>
 
@@ -411,6 +480,7 @@
   <script src="js/ui/rotationGrid.js"></script>
   <script src="js/ui/teamSelection.js"></script>
   <script src="js/ui/communityRotations.js"></script>
+  <script src="js/ui/myRotations.js"></script>
   <script src="js/ui/adminPanel.js"></script>
   <script src="js/main.js"></script>
 </body>

@@ -595,6 +595,18 @@ function renderAdminPanel() {
     renderAdminReviewTabs();
     renderAdminDetailPanel();
     renderAdminReviewList();
+    updateAdminEntryVisibility();
+}
+
+function updateAdminEntryVisibility() {
+    const openButton = document.getElementById("openAdminPanelBtn");
+    const modal = document.getElementById("adminModal");
+    const canShowAdmin = Boolean(adminPanelState.session && adminPanelState.isAdmin);
+
+    if (openButton) openButton.hidden = !canShowAdmin;
+    if (!canShowAdmin && modal?.classList.contains("open")) {
+        modal.classList.remove("open");
+    }
 }
 
 async function refreshAdminSession({ loadPending = true } = {}) {
@@ -796,6 +808,7 @@ async function signOutAdmin() {
     setAdminAuthStatus("");
     setAdminReviewStatus("");
     renderAdminPanel();
+    updateAdminEntryVisibility();
 }
 
 function loadAdminRotationPreview(row) {
@@ -977,6 +990,28 @@ function initAdminPanel() {
             closeAdminPanel();
         }
     });
+
+    const client = getAdminSupabaseClient();
+    if (client?.auth?.onAuthStateChange) {
+        client.auth.onAuthStateChange((_event, session) => {
+            adminPanelState.session = session || null;
+            adminPanelState.isAdmin = false;
+            adminPanelState.rotations = [];
+            adminPanelState.loaded = false;
+            adminPanelState.detailRotationId = "";
+            setAdminAuthStatus("");
+            setAdminReviewStatus("");
+
+            if (session) {
+                refreshAdminSession({ loadPending: false });
+                return;
+            }
+
+            renderAdminPanel();
+        });
+    }
+
+    refreshAdminSession({ loadPending: false });
 }
 
 window.initAdminPanel = initAdminPanel;

@@ -19,7 +19,8 @@ Interactive web tool for building, visualizing, exporting, and sharing Arknights
 - Compact share codes for team + rotation setups.
 - Share links with the setup embedded in the URL hash.
 - Export rotation images with a builder-address watermark.
-- Browse, filter, sort, preview, and like approved Community rotations, then submit your current setup for review.
+- Account-based private saves through `My Rotations`.
+- Browse, filter, sort, inspect, preview, link, and like approved Community rotations, then submit your current setup for review.
 - LocalStorage auto-save for team, rotation, UI settings, and operator states.
 - Optional Enemy panel controlled from `js/state/appState.js`.
 
@@ -27,14 +28,23 @@ Interactive web tool for building, visualizing, exporting, and sharing Arknights
 
 Use the sidebar buttons:
 
+- Top-right `Sign In` and `Create Account` buttons open the account flow.
+- `My Rotations` lets signed-in users save private rotations, load them later, delete them, or submit them for Community review.
 - `Copy Setup` copies a short setup code.
 - `Copy Link` copies a URL that loads the team and rotation automatically.
 - `Load Setup` accepts either a setup code or a full share link.
+- Community rotation cards and detail views can copy a direct link to an approved rotation.
 
 Share links use this format:
 
 ```text
 https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/#setup=AERT2:...
+```
+
+Approved Community rotations can also be opened directly:
+
+```text
+https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/#community=ROTATION_ID
 ```
 
 Current share codes use the compact `AERT2:` format. Older `AERT1:` codes can still be imported.
@@ -83,6 +93,7 @@ supabase/
   schema.sql
   community_rotations.sql
   community_rotations_review.sql
+  user_rotations.sql
   admin_panel.sql
   seed_operators_basic.sql
 tools/
@@ -122,6 +133,21 @@ It creates `community_rotations` and the public access rules:
 - visitors can only read rotations that are public, approved, and not hidden.
 - visitors can increment view and like counters through restricted database functions.
 - pending submissions stay hidden until you approve them in Supabase.
+
+### User Accounts And Private Rotations
+
+To enable account-based saves, run this file in the Supabase SQL Editor after the Community setup:
+
+```text
+supabase/user_rotations.sql
+```
+
+It creates `user_rotations` with row-level security:
+
+- signed-in users can save private rotations.
+- users can only read, update, and delete their own saved rotations.
+- saved rotations can be submitted to Community review later.
+- Community submissions still require Admin approval before becoming public.
 
 To review submissions, open:
 

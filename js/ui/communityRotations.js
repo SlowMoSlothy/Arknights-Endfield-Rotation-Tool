@@ -5,8 +5,10 @@ const communityRotationState = {
     classFilter: "all",
     sort: "newest",
     detailRotationId: "",
+    deepLinkRotationId: "",
     likedRotationIds: new Set(),
     likingRotationIds: new Set(),
+    viewedRotationIds: new Set(),
     loaded: false,
     loading: false,
     submitting: false,
@@ -14,6 +16,7 @@ const communityRotationState = {
 };
 
 const COMMUNITY_LIKES_STORAGE_KEY = "aertLikedCommunityRotations";
+const COMMUNITY_ROTATION_HASH_KEY = "community";
 
 let communityRotationsInitialized = false;
 
@@ -54,6 +57,52 @@ function hasLikedCommunityRotation(rotationId) {
 function rememberLikedCommunityRotation(rotationId) {
     communityRotationState.likedRotationIds.add(String(rotationId || ""));
     saveCommunityLikedRotationIds();
+}
+
+function getCommunityShareBaseUrl() {
+    if (typeof getBuildShareBaseUrl === "function") {
+        return getBuildShareBaseUrl();
+    }
+
+    if (window.location.protocol === "http:" || window.location.protocol === "https:") {
+        return `${window.location.origin}${window.location.pathname}`;
+    }
+
+    return window.location.href.split("#")[0];
+}
+
+function getCommunityRotationIdFromUrl() {
+    const searchParams = new URLSearchParams(window.location.search);
+    const queryRotationId = searchParams.get(COMMUNITY_ROTATION_HASH_KEY);
+    if (queryRotationId) return queryRotationId;
+
+    const hash = window.location.hash.replace(/^#/, "");
+    if (!hash) return "";
+
+    return new URLSearchParams(hash).get(COMMUNITY_ROTATION_HASH_KEY) || "";
+}
+
+function createCommunityRotationLink(row) {
+    const rotationId = String(row?.id || "");
+    if (!rotationId) return "";
+
+    return `${getCommunityShareBaseUrl()}#${COMMUNITY_ROTATION_HASH_KEY}=${encodeURIComponent(rotationId)}`;
+}
+
+async function copyCommunityRotationLink(row) {
+    const link = createCommunityRotationLink(row);
+    if (!link) return false;
+
+    try {
+        if (!navigator.clipboard?.writeText) throw new Error("Clipboard API is unavailable.");
+        await navigator.clipboard.writeText(link);
+        alert("Community rotation link copied.");
+    } catch (error) {
+        console.warn("Clipboard copy failed, falling back to prompt:", error);
+        prompt("Copy community rotation link:", link);
+    }
+
+    return true;
 }
 
 function getCommunityOperatorById(operatorId) {
@@ -211,6 +260,56 @@ function createCommunityOperatorAvatar(operator) {
     return image;
 }
 
+function createCommunityOperatorDetail(operator, index) {
+    const item = document.createElement("div");
+    item.className = "community-detail-operator";
+
+    item.appendChild(createCommunityOperatorAvatar(operator));
+
+    const copy = document.createElement("div");
+    copy.className = "community-detail-operator-copy";
+    copy.appendChild(createCommunityTextElement("strong", "", operator?.name || "Operator"));
+
+    const meta = [
+        operator?.star ? `${operator.star} star` : "",
+        operator?.operatorClass ? formatCommunityLabel(operator.operatorClass) : "",
+        operator?.elementType ? formatCommunityLabel(operator.elementType) : ""
+    ].filter(Boolean).join(" - ");
+
+    copy.appendChild(createCommunityTextElement("span", "", meta || `Slot ${index + 1}`));
+    item.appendChild(copy);
+    return item;
+}
+
+function createCommunityDetailMetaBlock(label, value) {
+    const item = document.createElement("div");
+    item.className = "community-detail-meta-item";
+    item.append(
+        createCommunityTextElement("span", "", label),
+        createCommunityTextElement("strong", "", value || "-")
+    );
+    return item;
+}
+
+function createCommunityDetailSection(title, child) {
+    const section = document.createElement("section");
+    section.className = "community-detail-section";
+    section.appendChild(createCommunityTextElement("h4", "community-detail-section-title", title));
+    section.appendChild(child);
+    return section;
+}
+
+function createCommunityDetailChipRow(row) {
+    const chipRow = document.createElement("div");
+    chipRow.className = "community-detail-chip-row";
+
+    [...getCommunityElements(row), ...getCommunityClasses(row)].slice(0, 10).forEach(label => {
+        chipRow.appendChild(createCommunityTextElement("span", "community-chip", formatCommunityLabel(label)));
+    });
+
+    return chipRow;
+}
+
 function createCommunitySkillPlaceholder() {
     const placeholder = document.createElement("span");
     placeholder.className = "community-skill-placeholder";
@@ -300,6 +399,18 @@ function createCommunityLoadButton(row, label = "Load") {
         loadCommunityRotation(row.id);
     });
     return loadButton;
+}
+
+function createCommunityCopyLinkButton(row, label = "Copy Link") {
+    const linkButton = document.createElement("button");
+    linkButton.className = "community-copy-link-btn";
+    linkButton.type = "button";
+    linkButton.textContent = label;
+    linkButton.addEventListener("click", event => {
+        event.stopPropagation();
+        copyCommunityRotationLink(row);
+    });
+    return linkButton;
 }
 
 function createCommunityDetailButton(row) {
@@ -482,6 +593,9 @@ function getActiveCommunityDetailRow() {
 function openCommunityDetail(rotationId) {
     communityRotationState.detailRotationId = String(rotationId || "");
     renderCommunityDetailPanel();
+
+    const row = getActiveCommunityDetailRow();
+    if (row) markCommunityRotationViewed(row);
 }
 
 function closeCommunityDetail() {
@@ -498,11 +612,17 @@ function renderCommunityDetailPanel() {
 
     if (!row) {
         communityRotationState.detailRotationId = "";
+        delete panel.dataset.communityRotationId;
         panel.hidden = true;
         return;
     }
 
     panel.hidden = false;
+    panel.dataset.communityRotationId = String(row.id || "");
+    const teamOperators = getCommunityTeamOperators(row);
+    const skillCount = getCommunitySkillCount(row);
+    const author = row.author_name ? row.author_name : "Anonymous";
+    const submittedDate = formatCommunityDate(row.created_at);
 
     const header = document.createElement("div");
     header.className = "community-detail-header";
@@ -514,10 +634,9 @@ function renderCommunityDetailPanel() {
             "div",
             "community-detail-meta",
             [
-                row.author_name ? `by ${row.author_name}` : "by Anonymous",
-                formatCommunityDate(row.created_at),
-                `${Number(row.view_count) || 0} views`,
-                `${Number(row.likes_count) || 0} likes`
+                `by ${author}`,
+                submittedDate,
+                `${skillCount} skill${skillCount === 1 ? "" : "s"}`
             ].filter(Boolean).join(" - ")
         )
     );
@@ -530,19 +649,10 @@ function renderCommunityDetailPanel() {
 
     header.append(titleWrap, closeButton);
 
-    const body = document.createElement("div");
-    body.className = "community-detail-body";
-
     const team = document.createElement("div");
     team.className = "community-detail-team";
-    getCommunityTeamOperators(row).slice(0, 4).forEach(operator => {
-        const item = document.createElement("div");
-        item.className = "community-detail-operator";
-        item.append(
-            createCommunityOperatorAvatar(operator),
-            createCommunityTextElement("span", "", operator.name || "Operator")
-        );
-        team.appendChild(item);
+    teamOperators.slice(0, 4).forEach((operator, index) => {
+        team.appendChild(createCommunityOperatorDetail(operator, index));
     });
     if (!team.children.length) team.appendChild(createCommunityOperatorPlaceholder());
 
@@ -556,12 +666,32 @@ function renderCommunityDetailPanel() {
         row.description || "No description added."
     );
 
+    const stats = document.createElement("div");
+    stats.className = "community-detail-meta-grid";
+    stats.append(
+        createCommunityDetailMetaBlock("Author", author),
+        createCommunityDetailMetaBlock("Submitted", submittedDate),
+        createCommunityDetailMetaBlock("Views", String(Number(row.view_count) || 0)),
+        createCommunityDetailMetaBlock("Likes", String(Number(row.likes_count) || 0))
+    );
+
     const actions = document.createElement("div");
     actions.className = "community-detail-actions";
-    actions.append(createCommunityLoadButton(row, "Load Rotation"), createCommunityLikeButton(row));
+    actions.append(
+        createCommunityLoadButton(row, "Load Rotation"),
+        createCommunityCopyLinkButton(row),
+        createCommunityLikeButton(row)
+    );
 
-    body.append(team, rotationWrap, description, actions);
-    panel.append(header, body);
+    panel.append(
+        header,
+        createCommunityDetailSection("Team", team),
+        createCommunityDetailSection("Rotation", rotationWrap),
+        createCommunityDetailSection("Notes", description),
+        stats,
+        createCommunityDetailChipRow(row),
+        actions
+    );
 }
 
 function setCommunityStatus(text, className = "") {
@@ -854,6 +984,7 @@ function renderCommunityRotations() {
 function createCommunityRotationCard(row) {
     const card = document.createElement("article");
     card.className = "community-card";
+    card.dataset.communityRotationId = String(row.id || "");
     card.tabIndex = 0;
     card.setAttribute("role", "button");
     card.setAttribute("aria-label", `Open details for ${row.title || "community rotation"}`);
@@ -913,17 +1044,43 @@ function createCommunityRotationCard(row) {
     footer.appendChild(createCommunityTextElement("span", "community-stat", statText));
     const actions = document.createElement("div");
     actions.className = "community-card-actions";
-    actions.append(createCommunityDetailButton(row), createCommunityLikeButton(row));
+    actions.append(createCommunityDetailButton(row), createCommunityCopyLinkButton(row, "Link"), createCommunityLikeButton(row));
     footer.appendChild(actions);
 
     card.append(header, team, rotationPreview, description, chipRow, footer);
     return card;
 }
 
+function resolvePendingCommunityRotationDeepLink() {
+    const rotationId = String(communityRotationState.deepLinkRotationId || "");
+    if (!rotationId || communityRotationState.loading || !communityRotationState.loaded) return false;
+
+    communityRotationState.deepLinkRotationId = "";
+    const row = communityRotationState.rotations.find(item => String(item.id) === rotationId);
+    if (!row) {
+        setCommunityStatus("This community rotation could not be found or is not approved yet.", "is-error");
+        return false;
+    }
+
+    openCommunityDetail(row.id);
+    setCommunityStatus("Community rotation opened from link.");
+    return true;
+}
+
+function handleCommunityRotationDeepLink() {
+    const rotationId = getCommunityRotationIdFromUrl();
+    if (!rotationId) return false;
+
+    communityRotationState.deepLinkRotationId = String(rotationId);
+    openCommunityRotationsModal({ forceRefresh: !communityRotationState.loaded });
+    return true;
+}
+
 async function fetchCommunityRotations(force = false) {
     if (communityRotationState.loading) return;
     if (communityRotationState.loaded && !force) {
         renderCommunityRotations();
+        resolvePendingCommunityRotationDeepLink();
         return;
     }
 
@@ -960,11 +1117,14 @@ async function fetchCommunityRotations(force = false) {
     } finally {
         communityRotationState.loading = false;
         renderCommunityRotations();
+        resolvePendingCommunityRotationDeepLink();
     }
 }
 
 async function incrementCommunityRotationView(row) {
-    if (!row?.id || typeof supabaseClient === "undefined" || !supabaseClient) return;
+    if (!row?.id || typeof supabaseClient === "undefined" || !supabaseClient) {
+        return Number(row?.view_count) || 0;
+    }
 
     try {
         const { data, error } = await supabaseClient
@@ -978,9 +1138,24 @@ async function incrementCommunityRotationView(row) {
         row.view_count = Number.isFinite(nextViewCount)
             ? nextViewCount
             : (Number(row.view_count) || 0) + 1;
+        return row.view_count;
     } catch (error) {
         console.warn("Community rotation view count could not be updated:", error);
+        return Number(row.view_count) || 0;
     }
+}
+
+async function markCommunityRotationViewed(row) {
+    const rotationId = String(row?.id || "");
+    if (!rotationId || communityRotationState.viewedRotationIds.has(rotationId)) return;
+
+    communityRotationState.viewedRotationIds.add(rotationId);
+    await incrementCommunityRotationView(row);
+
+    if (communityRotationState.detailRotationId === rotationId) {
+        renderCommunityDetailPanel();
+    }
+    renderCommunityRotations();
 }
 
 async function likeCommunityRotation(row) {
@@ -1031,7 +1206,7 @@ function loadCommunityRotation(rotationId) {
 
     try {
         applyBuildShareCode(row.share_code);
-        incrementCommunityRotationView(row);
+        markCommunityRotationViewed(row);
         closeCommunityRotationsModal();
         alert("Community rotation loaded.");
     } catch (error) {
@@ -1040,13 +1215,17 @@ function loadCommunityRotation(rotationId) {
     }
 }
 
-function openCommunityRotationsModal() {
+function openCommunityRotationsModal(options = {}) {
     const modal = document.getElementById("communityModal");
     if (!modal) return;
 
+    const forceRefresh = Object.prototype.hasOwnProperty.call(options || {}, "forceRefresh")
+        ? Boolean(options.forceRefresh)
+        : true;
+
     modal.classList.add("open");
     updateCommunitySubmitAvailability();
-    fetchCommunityRotations(true);
+    fetchCommunityRotations(forceRefresh);
 }
 
 function closeCommunityRotationsModal() {
@@ -1087,7 +1266,7 @@ function initCommunityRotations() {
     const clearFiltersButton = document.getElementById("clearCommunityFiltersBtn");
     const modal = document.getElementById("communityModal");
 
-    if (openButton) openButton.addEventListener("click", openCommunityRotationsModal);
+    if (openButton) openButton.addEventListener("click", () => openCommunityRotationsModal());
     if (closeButton) closeButton.addEventListener("click", closeCommunityRotationsModal);
     if (refreshButton) refreshButton.addEventListener("click", () => fetchCommunityRotations(true));
     if (submitToggle) submitToggle.addEventListener("click", () => setCommunitySubmitFormOpen(true));
@@ -1119,6 +1298,11 @@ function initCommunityRotations() {
             closeCommunityRotationsModal();
         }
     });
+
+    window.addEventListener("hashchange", handleCommunityRotationDeepLink);
+    if (getCommunityRotationIdFromUrl()) {
+        window.setTimeout(handleCommunityRotationDeepLink, 0);
+    }
 }
 
 window.initCommunityRotations = initCommunityRotations;
