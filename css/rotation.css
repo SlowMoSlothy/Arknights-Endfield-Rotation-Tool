@@ -388,10 +388,13 @@
 }
 
 .rotation-arrow {
+    --rotation-arrow-glow: rgba(248,245,70,0.30);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(248,245,70,0.74);
+    justify-self: center;
+    align-self: center;
+    color: rgba(248,245,70,0.82);
     user-select: none;
     pointer-events: none;
     position: relative;
@@ -399,9 +402,72 @@
     min-height: 24px;
     width: var(--rotation-arrow-width);
     min-width: var(--rotation-arrow-width);
-    font-size: var(--rotation-arrow-size);
     line-height: 1;
-    text-shadow: 0 0 8px rgba(248,245,70,0.28);
+    filter: drop-shadow(0 0 5px var(--rotation-arrow-glow));
+}
+
+.rotation-arrow-line,
+.rotation-arrow-head {
+    display: block;
+    flex: 0 0 auto;
+}
+
+.rotation-arrow-line {
+    width: calc(var(--rotation-arrow-width) - 4px);
+    height: 2px;
+    border-radius: 999px;
+    background:
+        linear-gradient(90deg, rgba(248,245,70,0.08), currentColor 38%, #fff9a0 100%);
+    box-shadow:
+        0 0 7px var(--rotation-arrow-glow),
+        inset 0 0 0 1px rgba(255,255,255,0.12);
+}
+
+.rotation-arrow-head {
+    width: 8px;
+    height: 8px;
+    margin-left: -5px;
+    border-top: 2px solid currentColor;
+    border-right: 2px solid currentColor;
+    transform: rotate(45deg);
+    box-shadow: 1px -1px 0 rgba(255,255,255,0.16);
+}
+
+.rotation-arrow.is-left {
+    flex-direction: row-reverse;
+}
+
+.rotation-arrow.is-left .rotation-arrow-line {
+    background:
+        linear-gradient(270deg, rgba(248,245,70,0.08), currentColor 38%, #fff9a0 100%);
+}
+
+.rotation-arrow.is-left .rotation-arrow-head {
+    margin-right: -5px;
+    margin-left: 0;
+    transform: rotate(-135deg);
+}
+
+.rotation-arrow.is-down {
+    flex-direction: column;
+    min-height: 32px;
+}
+
+.rotation-arrow.is-vertical {
+    margin: 0;
+}
+
+.rotation-arrow.is-down .rotation-arrow-line {
+    width: 2px;
+    height: 24px;
+    background:
+        linear-gradient(180deg, rgba(248,245,70,0.08), currentColor 42%, #fff9a0 100%);
+}
+
+.rotation-arrow.is-down .rotation-arrow-head {
+    margin-top: -5px;
+    margin-left: 0;
+    transform: rotate(135deg);
 }
 
 .rotation-arrow.is-unused {

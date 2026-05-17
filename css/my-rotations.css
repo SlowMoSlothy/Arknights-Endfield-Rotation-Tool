@@ -174,7 +174,8 @@
 
 .my-primary-btn,
 .my-secondary-btn,
-.my-action-btn {
+.my-action-btn,
+.my-link-btn {
     min-height: 34px;
     border: 1px solid rgba(160,170,169,0.30);
     border-radius: 999px;
@@ -197,6 +198,13 @@
     background: linear-gradient(180deg, #F8F546, #d6d336);
 }
 
+.my-link-btn {
+    color: #F8F546;
+    border-color: rgba(248,245,70,0.26);
+    background:
+        linear-gradient(180deg, rgba(248,245,70,0.08), rgba(18,20,22,0.88));
+}
+
 .my-action-btn.is-danger {
     border-color: rgba(255,125,115,0.42);
     color: #ffb1ab;
@@ -204,7 +212,8 @@
 
 .my-primary-btn:hover,
 .my-secondary-btn:hover,
-.my-action-btn:hover {
+.my-action-btn:hover,
+.my-link-btn:hover {
     border-color: rgba(248,245,70,0.7);
     color: #F8F546;
     box-shadow:
@@ -219,7 +228,8 @@
 
 .my-primary-btn:disabled,
 .my-secondary-btn:disabled,
-.my-action-btn:disabled {
+.my-action-btn:disabled,
+.my-link-btn:disabled {
     cursor: not-allowed;
     opacity: 0.62;
 }

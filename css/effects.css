@@ -165,6 +165,10 @@
     display: none !important;
 }
 
+.export-mode #rotationDropZone {
+    padding-bottom: 76px !important;
+}
+
 .export-mode .rotation-arrow::before {
     display: none !important;
 }

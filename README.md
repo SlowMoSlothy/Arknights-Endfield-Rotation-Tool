@@ -19,7 +19,7 @@ Interactive web tool for building, visualizing, exporting, and sharing Arknights
 - Compact share codes for team + rotation setups.
 - Share links with the setup embedded in the URL hash.
 - Export rotation images with a builder-address watermark.
-- Account-based private saves, usernames, and avatar profiles through `My Rotations`.
+- Account-based private saves, password reset, usernames, and avatar profiles through `My Rotations`.
 - Browse, filter, sort, inspect, preview, link, and like approved Community rotations with visible author usernames and avatars, then submit your current setup for review when signed in.
 - LocalStorage auto-save for team, rotation, UI settings, and operator states.
 - Optional Enemy panel controlled from `js/state/appState.js`.
@@ -29,7 +29,7 @@ Interactive web tool for building, visualizing, exporting, and sharing Arknights
 Use the sidebar buttons:
 
 - Top-right `Sign In` and `Create Account` buttons open the account flow.
-- `Profile` lets signed-in users edit their username and avatar.
+- `Profile` lets signed-in users edit their username, update or remove their avatar, and keep their public Community identity current.
 - `My Rotations` lets signed-in users inspect saved rotations, edit title/description, overwrite a save with the current rotation, delete it, or submit it for Community review.
 - `Copy Setup` copies a short setup code.
 - `Copy Link` copies a URL that loads the team and rotation automatically.
@@ -148,7 +148,8 @@ It creates `user_profiles`, the public `avatars` storage bucket, and `user_rotat
 
 - new accounts store a public username during registration.
 - public usernames and avatars can be shown on approved Community rotations.
-- signed-in users can update their own username and avatar.
+- signed-in users can update their own username and avatar, or remove the avatar again.
+- password reset runs through Supabase Auth email recovery.
 - signed-in users can save private rotations.
 - users can only read, update, and delete their own saved rotations.
 - saved rotations can be submitted to Community review later.
