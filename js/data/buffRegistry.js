@@ -20,6 +20,21 @@ const BUFF_REGISTRY = {
         maxStacks: 0,
         extension: "svg"
     },
+    arts_amp: {
+        name: "Arts Amp",
+        iconBase: "assets/ui/buffs/arts_amp",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+
+    cryo_amp: {
+        name: "Cryo Amp",
+        iconBase: "assets/ui/buffs/cryo_amp",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
     auxiliary_crystal: {
     name: "Auxiliary Crystal",
     iconBase: "assets/operators/skills/xaihi/bs_small",

@@ -754,23 +754,55 @@ function getCurrentCommunityClasses() {
         .map(value => String(value).toLowerCase());
 }
 
+function isCommunityAccountSignedIn() {
+    return typeof isMyAccountSignedIn === "function" && isMyAccountSignedIn();
+}
+
+function getCommunityAccountProfile() {
+    return typeof getMyAccountProfile === "function" ? getMyAccountProfile() : null;
+}
+
+function getCommunityAccountUserId() {
+    return typeof getMyAccountUserId === "function" ? getMyAccountUserId() : "";
+}
+
+function getCommunitySubmitAuthorName() {
+    const profile = getCommunityAccountProfile();
+    const username = String(profile?.username || "").trim();
+    return username || "Account";
+}
+
 function updateCommunitySubmitAvailability() {
     const submitToggle = document.getElementById("openCommunitySubmitFormBtn");
     if (!submitToggle) return;
 
-    const canSubmit = typeof hasCreatedRotation === "function" ? hasCreatedRotation() : getCurrentCommunityRotationEntries().length > 0;
-    submitToggle.disabled = !canSubmit;
-    submitToggle.textContent = canSubmit ? "Submit Current" : "No Rotation";
+    const isSignedIn = isCommunityAccountSignedIn();
+    const hasRotation = typeof hasCreatedRotation === "function" ? hasCreatedRotation() : getCurrentCommunityRotationEntries().length > 0;
+
+    submitToggle.disabled = !isSignedIn || !hasRotation;
+    submitToggle.textContent = !isSignedIn ? "Sign in required" : hasRotation ? "Submit Current" : "No Rotation";
 }
 
 function setCommunitySubmitFormOpen(isOpen) {
     const form = document.getElementById("communitySubmitForm");
     if (!form) return;
 
+    if (isOpen && !isCommunityAccountSignedIn()) {
+        form.hidden = true;
+        updateCommunitySubmitAvailability();
+        setCommunitySubmitStatus("Sign in before submitting a rotation.", "is-error");
+        return;
+    }
+
     form.hidden = !isOpen;
     if (isOpen) {
         updateCommunitySubmitAvailability();
         setCommunitySubmitStatus("");
+        const authorInput = document.getElementById("communitySubmitAuthor");
+        if (authorInput) {
+            authorInput.value = getCommunitySubmitAuthorName();
+            authorInput.disabled = true;
+        }
         const titleInput = document.getElementById("communitySubmitTitle");
         if (titleInput) titleInput.focus();
     }
@@ -779,16 +811,15 @@ function setCommunitySubmitFormOpen(isOpen) {
 function validateCommunitySubmission(values) {
     const title = values.title.trim();
     const description = values.description.trim();
-    const author = values.author.trim();
     const teamIds = getCurrentCommunityTeamIds();
     const rotationEntries = getCurrentCommunityRotationEntries();
 
-    if (!title || title.length < 3 || title.length > 80) {
-        return "Please enter a title between 3 and 80 characters.";
+    if (!isCommunityAccountSignedIn()) {
+        return "Sign in before submitting a rotation.";
     }
 
-    if (author.length > 40) {
-        return "Author can be up to 40 characters.";
+    if (!title || title.length < 3 || title.length > 80) {
+        return "Please enter a title between 3 and 80 characters.";
     }
 
     if (description.length > 600) {
@@ -817,7 +848,8 @@ function buildCommunitySubmission(values) {
         game: "arknights_endfield",
         title: values.title.trim(),
         description: values.description.trim(),
-        author_name: values.author.trim(),
+        author_name: getCommunitySubmitAuthorName().slice(0, 40),
+        submitted_by: getCommunityAccountUserId() || null,
         share_code: createBuildShareCode(),
         setup_version: 2,
         team_operator_ids: teamIds,
@@ -864,15 +896,34 @@ async function submitCommunityRotation(event) {
         description: document.getElementById("communitySubmitDescription")?.value || ""
     };
 
-    const validationError = validateCommunitySubmission(values);
+    try {
+        await submitCurrentRotationToCommunity(values);
+
+        const form = document.getElementById("communitySubmitForm");
+        if (form) form.reset();
+    } catch (_error) {
+        // The shared submit helper already renders the user-facing message.
+    }
+}
+
+async function submitCurrentRotationToCommunity(values) {
+    if (communityRotationState.submitting) return false;
+
+    const normalizedValues = {
+        title: String(values?.title || "").trim(),
+        author: String(values?.author || "").trim(),
+        description: String(values?.description || "").trim()
+    };
+
+    const validationError = validateCommunitySubmission(normalizedValues);
     if (validationError) {
         setCommunitySubmitStatus(validationError, "is-error");
-        return;
+        throw new Error(validationError);
     }
 
     if (typeof supabaseClient === "undefined" || !supabaseClient) {
         setCommunitySubmitStatus("Supabase is not available right now.", "is-error");
-        return;
+        throw new Error("Supabase is not available right now.");
     }
 
     communityRotationState.submitting = true;
@@ -886,16 +937,16 @@ async function submitCommunityRotation(event) {
     try {
         const { error } = await supabaseClient
             .from("community_rotations")
-            .insert(buildCommunitySubmission(values));
+            .insert(buildCommunitySubmission(normalizedValues));
 
         if (error) throw error;
 
-        const form = document.getElementById("communitySubmitForm");
-        if (form) form.reset();
         setCommunitySubmitStatus("Submitted for review. It will appear after approval.", "is-success");
+        return true;
     } catch (error) {
         console.error("Community rotation submission failed:", error);
         setCommunitySubmitStatus("This rotation could not be submitted.", "is-error");
+        throw error;
     } finally {
         communityRotationState.submitting = false;
         if (submitButton) {
@@ -1305,4 +1356,7 @@ function initCommunityRotations() {
     }
 }
 
+window.openCommunityRotationsModal = openCommunityRotationsModal;
+window.setCommunitySubmitFormOpen = setCommunitySubmitFormOpen;
+window.submitCurrentRotationToCommunity = submitCurrentRotationToCommunity;
 window.initCommunityRotations = initCommunityRotations;

@@ -65,8 +65,7 @@ xaihi.skills = [
                 name: "Arts Amp",
                 appliesEffect: "arts_amp",
                 persistsForCombo: true,
-                visible: true,
-                iconBase: "assets/buffs/arts_amp"
+                visible: true
             }
         ]
     },

@@ -296,6 +296,15 @@
         0 0 16px rgba(248,245,70,0.12);
 }
 
+.community-field input:disabled,
+.community-field input[readonly] {
+    color: rgba(242,242,242,0.72);
+    border-color: rgba(160,170,169,0.18);
+    background:
+        linear-gradient(180deg, rgba(160,170,169,0.10), rgba(7,9,10,0.68));
+    cursor: not-allowed;
+}
+
 .community-submit-status {
     min-height: 18px;
     color: rgba(242,242,242,0.74);

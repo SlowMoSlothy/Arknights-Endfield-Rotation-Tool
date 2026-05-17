@@ -1,4 +1,6 @@
-.settings-dialog.my-rotations-dialog {
+.settings-dialog.my-rotations-dialog,
+.settings-dialog.my-profile-dialog,
+.settings-dialog.rotation-quick-save-dialog {
     width: min(980px, calc(100vw - 32px));
     max-height: min(780px, calc(100vh - 32px));
     display: flex;
@@ -11,6 +13,14 @@
     box-shadow:
         0 22px 54px rgba(0,0,0,0.58),
         inset 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+.settings-dialog.my-profile-dialog {
+    width: min(620px, calc(100vw - 32px));
+}
+
+.settings-dialog.rotation-quick-save-dialog {
+    width: min(620px, calc(100vw - 32px));
 }
 
 .my-rotations-auth-panel,
@@ -35,6 +45,7 @@
 
 .my-rotations-form,
 .my-rotation-save-form,
+.my-account-panel,
 .my-rotations-session-bar,
 .my-state-card {
     border: 1px solid rgba(160,170,169,0.18);
@@ -47,10 +58,64 @@
 }
 
 .my-rotations-form,
-.my-rotation-save-form {
+.my-rotation-save-form,
+.my-profile-form,
+.rotation-quick-save-form {
     display: grid;
     gap: 12px;
     padding: 14px;
+}
+
+.rotation-quick-save-form {
+    margin-top: 12px;
+    border: 1px solid rgba(160,170,169,0.18);
+    border-radius: 14px;
+    background:
+        linear-gradient(180deg, rgba(160,170,169,0.10), rgba(7,9,10,0.44));
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.025),
+        0 8px 20px rgba(0,0,0,0.18);
+}
+
+.my-account-panel {
+    display: grid;
+    gap: 12px;
+    padding: 14px;
+}
+
+.my-account-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.my-account-header h3 {
+    margin: 0;
+    color: #F8F546;
+    font-size: 14px;
+    line-height: 1.1;
+}
+
+.my-account-header p {
+    margin: 5px 0 0;
+    color: rgba(242,242,242,0.68);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.my-profile-avatar {
+    width: 64px;
+    height: 64px;
+    flex: 0 0 auto;
+    border: 1px solid rgba(160,170,169,0.34);
+    border-radius: 16px;
+    object-fit: cover;
+    background: rgba(7,9,10,0.64);
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.035),
+        0 8px 22px rgba(0,0,0,0.24);
 }
 
 .my-rotations-field {
@@ -61,6 +126,10 @@
     font-weight: 900;
     letter-spacing: 0.14em;
     text-transform: uppercase;
+}
+
+.my-rotations-field[hidden] {
+    display: none !important;
 }
 
 .my-rotations-field input,
@@ -224,6 +293,27 @@
     box-shadow:
         inset 0 0 0 1px rgba(255,255,255,0.025),
         0 12px 28px rgba(0,0,0,0.24);
+    cursor: pointer;
+}
+
+.my-rotation-card:hover,
+.my-rotation-card:focus-visible,
+.my-rotation-card.is-selected {
+    border-color: rgba(248,245,70,0.58);
+    box-shadow:
+        inset 0 0 0 1px rgba(248,245,70,0.08),
+        0 0 20px rgba(248,245,70,0.12),
+        0 12px 28px rgba(0,0,0,0.24);
+    outline: none;
+}
+
+.my-rotation-title-row,
+.my-detail-title-row {
+    min-width: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
 }
 
 .my-rotation-title {
@@ -231,6 +321,33 @@
     color: #fff;
     font-size: 16px;
     line-height: 1.15;
+}
+
+.my-status-badge {
+    min-height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    border: 1px solid rgba(160,170,169,0.26);
+    border-radius: 999px;
+    background: rgba(7,9,10,0.52);
+    color: rgba(242,242,242,0.82);
+    padding: 0 9px;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.my-status-badge.is-private {
+    border-color: rgba(160,170,169,0.28);
+}
+
+.my-status-badge.is-submitted {
+    border-color: rgba(248,245,70,0.52);
+    color: #F8F546;
+    box-shadow: 0 0 12px rgba(248,245,70,0.10);
 }
 
 .my-rotation-meta {
@@ -318,6 +435,186 @@
     font-weight: 900;
 }
 
+.my-rotation-detail-panel {
+    display: grid;
+    gap: 14px;
+    border: 1px solid rgba(248,245,70,0.22);
+    border-radius: 16px;
+    padding: 16px;
+    background:
+        linear-gradient(180deg, rgba(160,170,169,0.12), rgba(7,9,10,0.58)),
+        radial-gradient(circle at 12% 0%, rgba(248,245,70,0.09), transparent 36%);
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.025),
+        0 14px 32px rgba(0,0,0,0.24);
+}
+
+.my-rotation-detail-panel[hidden] {
+    display: none;
+}
+
+.my-detail-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.my-detail-header-actions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.my-detail-title-block {
+    min-width: 0;
+    display: grid;
+    gap: 6px;
+}
+
+.my-detail-title {
+    margin: 0;
+    color: #fff;
+    font-size: 20px;
+    line-height: 1.1;
+}
+
+.my-detail-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    color: rgba(160,170,169,0.82);
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.my-detail-section {
+    display: grid;
+    gap: 8px;
+}
+
+.my-detail-section-title {
+    margin: 0;
+    color: #F8F546;
+    font-size: 11px;
+    line-height: 1.1;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.my-detail-team {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 10px;
+}
+
+.my-detail-operator {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid rgba(160,170,169,0.20);
+    border-radius: 14px;
+    background:
+        linear-gradient(180deg, rgba(160,170,169,0.12), rgba(7,9,10,0.48));
+    padding: 9px;
+}
+
+.my-detail-operator.is-leader {
+    border-color: rgba(248,245,70,0.42);
+}
+
+.my-detail-operator-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+}
+
+.my-detail-operator-copy {
+    min-width: 0;
+    display: grid;
+    gap: 3px;
+}
+
+.my-detail-operator-copy strong {
+    color: #fff;
+    font-size: 13px;
+    line-height: 1.15;
+}
+
+.my-detail-operator-copy span,
+.my-detail-operator-copy em {
+    color: rgba(242,242,242,0.66);
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 1.25;
+}
+
+.my-detail-operator-copy em {
+    color: #F8F546;
+    text-transform: uppercase;
+}
+
+.my-detail-skill-sequence {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 2px 8px;
+}
+
+.my-detail-skill {
+    display: inline-grid;
+    justify-items: center;
+    gap: 4px;
+    flex: 0 0 auto;
+    min-width: 52px;
+}
+
+.my-detail-skill-label {
+    color: rgba(242,242,242,0.82);
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.my-detail-arrow {
+    flex: 0 0 auto;
+    color: rgba(248,245,70,0.72);
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.my-detail-description {
+    margin: 0;
+    color: rgba(242,242,242,0.76);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.my-detail-empty {
+    color: rgba(242,242,242,0.62);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.my-detail-actions,
+.my-detail-edit-form {
+    display: grid;
+    gap: 12px;
+}
+
+.my-detail-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
 .my-state-card {
     min-height: 150px;
     display: flex;
@@ -360,12 +657,25 @@
 
     .my-rotations-session-actions,
     .my-rotations-actions,
-    .my-rotation-actions {
+    .my-rotation-actions,
+    .my-detail-actions {
         display: grid;
         grid-template-columns: 1fr;
     }
 
     .my-rotations-list {
+        grid-template-columns: 1fr;
+    }
+
+    .my-detail-header {
+        display: grid;
+    }
+
+    .my-detail-header-actions {
+        justify-content: stretch;
+    }
+
+    .my-detail-team {
         grid-template-columns: 1fr;
     }
 }

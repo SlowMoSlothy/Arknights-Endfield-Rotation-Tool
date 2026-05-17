@@ -49,11 +49,14 @@ function updateRotationActionStates() {
     const exportButton = document.getElementById("exportRotationBtn");
     const copyShareCodeButton = document.getElementById("copyShareCodeBtn");
     const copyShareLinkButton = document.getElementById("copyShareLinkBtn");
+    const saveRotationMenuButton = document.getElementById("saveRotationMenuBtn");
     const hasRotation = hasCreatedRotation();
 
     if (exportButton) exportButton.disabled = !hasRotation;
     if (copyShareCodeButton) copyShareCodeButton.disabled = !hasRotation;
     if (copyShareLinkButton) copyShareLinkButton.disabled = !hasRotation;
+    if (saveRotationMenuButton) saveRotationMenuButton.disabled = !hasRotation;
+    if (!hasRotation && typeof closeRotationSaveMenu === "function") closeRotationSaveMenu();
 }
 
 function loadRotation() {

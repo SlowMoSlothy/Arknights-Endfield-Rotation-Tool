@@ -19,8 +19,8 @@ Interactive web tool for building, visualizing, exporting, and sharing Arknights
 - Compact share codes for team + rotation setups.
 - Share links with the setup embedded in the URL hash.
 - Export rotation images with a builder-address watermark.
-- Account-based private saves through `My Rotations`.
-- Browse, filter, sort, inspect, preview, link, and like approved Community rotations, then submit your current setup for review.
+- Account-based private saves, usernames, and avatar profiles through `My Rotations`.
+- Browse, filter, sort, inspect, preview, link, and like approved Community rotations, then submit your current setup for review when signed in.
 - LocalStorage auto-save for team, rotation, UI settings, and operator states.
 - Optional Enemy panel controlled from `js/state/appState.js`.
 
@@ -29,10 +29,12 @@ Interactive web tool for building, visualizing, exporting, and sharing Arknights
 Use the sidebar buttons:
 
 - Top-right `Sign In` and `Create Account` buttons open the account flow.
-- `My Rotations` lets signed-in users save private rotations, load them later, delete them, or submit them for Community review.
+- `Profile` lets signed-in users edit their username and avatar.
+- `My Rotations` lets signed-in users inspect saved rotations, edit title/description, overwrite a save with the current rotation, delete it, or submit it for Community review.
 - `Copy Setup` copies a short setup code.
 - `Copy Link` copies a URL that loads the team and rotation automatically.
 - `Load Setup` accepts either a setup code or a full share link.
+- The diskette button in the Rotation toolbar opens a quick save form for `My rotations` or a Community review submission.
 - Community rotation cards and detail views can copy a direct link to an approved rotation.
 
 Share links use this format:
@@ -127,9 +129,9 @@ To enable the Community modal, run this file in the Supabase SQL Editor:
 supabase/community_rotations.sql
 ```
 
-It creates `community_rotations` and the public access rules:
+It creates `community_rotations` and the access rules:
 
-- visitors can submit rotations for review.
+- signed-in users can submit rotations for review.
 - visitors can only read rotations that are public, approved, and not hidden.
 - visitors can increment view and like counters through restricted database functions.
 - pending submissions stay hidden until you approve them in Supabase.
@@ -142,8 +144,10 @@ To enable account-based saves, run this file in the Supabase SQL Editor after th
 supabase/user_rotations.sql
 ```
 
-It creates `user_rotations` with row-level security:
+It creates `user_profiles`, the public `avatars` storage bucket, and `user_rotations` with row-level security:
 
+- new accounts store a public username during registration.
+- signed-in users can update their own username and avatar.
 - signed-in users can save private rotations.
 - users can only read, update, and delete their own saved rotations.
 - saved rotations can be submitted to Community review later.
