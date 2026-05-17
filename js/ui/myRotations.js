@@ -767,7 +767,11 @@ function renderMyRotationList() {
         myRotationsState.detailEditing = false;
     }
 
-    setMyListStatus(`${myRotationsState.rotations.length} saved rotation${myRotationsState.rotations.length === 1 ? "" : "s"}.`);
+    const savedCountLabel = `${myRotationsState.rotations.length} saved rotation${myRotationsState.rotations.length === 1 ? "" : "s"}.`;
+    setMyListStatus(myRotationsState.detailRotationId
+        ? savedCountLabel
+        : `${savedCountLabel} Select a saved rotation to inspect it.`
+    );
     const visibleRows = myRotationsState.detailRotationId
         ? myRotationsState.rotations.filter(row => String(row.id) !== String(myRotationsState.detailRotationId))
         : myRotationsState.rotations;
@@ -926,7 +930,8 @@ async function signInMyAccount(event) {
 
         const passwordInput = document.getElementById("myRotationsPasswordInput");
         if (passwordInput) passwordInput.value = "";
-        await refreshMySession(true);
+        await refreshMySession(false);
+        closeMyRotationsModal();
     } catch (error) {
         console.error("Account sign in failed:", error);
         setMyAuthStatus("Sign in failed. Check the email and password.", "is-error");
@@ -982,7 +987,8 @@ async function registerMyAccount() {
             myRotationsState.session = data.session;
             await upsertMyProfile({ username });
             setMyAuthStatus("Account created.", "is-success");
-            await refreshMySession(true);
+            await refreshMySession(false);
+            closeMyRotationsModal();
             return;
         }
 
@@ -1132,12 +1138,18 @@ async function saveCurrentRotationToMyRotations(values) {
     setMyListStatus("Saving rotation...");
 
     try {
-        const { error } = await client
+        const { data, error } = await client
             .from("user_rotations")
-            .insert(buildMyRotationPayload(normalizedValues));
+            .insert(buildMyRotationPayload(normalizedValues))
+            .select("id")
+            .single();
 
         if (error) throw error;
 
+        if (data?.id) {
+            myRotationsState.detailRotationId = String(data.id);
+            myRotationsState.detailEditing = false;
+        }
         setMyListStatus("Rotation saved.", "is-success");
         await fetchMyRotations();
         return true;

@@ -20,7 +20,7 @@ Interactive web tool for building, visualizing, exporting, and sharing Arknights
 - Share links with the setup embedded in the URL hash.
 - Export rotation images with a builder-address watermark.
 - Account-based private saves, usernames, and avatar profiles through `My Rotations`.
-- Browse, filter, sort, inspect, preview, link, and like approved Community rotations, then submit your current setup for review when signed in.
+- Browse, filter, sort, inspect, preview, link, and like approved Community rotations with visible author usernames and avatars, then submit your current setup for review when signed in.
 - LocalStorage auto-save for team, rotation, UI settings, and operator states.
 - Optional Enemy panel controlled from `js/state/appState.js`.
 
@@ -147,6 +147,7 @@ supabase/user_rotations.sql
 It creates `user_profiles`, the public `avatars` storage bucket, and `user_rotations` with row-level security:
 
 - new accounts store a public username during registration.
+- public usernames and avatars can be shown on approved Community rotations.
 - signed-in users can update their own username and avatar.
 - signed-in users can save private rotations.
 - users can only read, update, and delete their own saved rotations.
