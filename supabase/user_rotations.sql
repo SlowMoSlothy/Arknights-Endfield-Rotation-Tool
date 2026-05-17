@@ -4,6 +4,148 @@
 
 create extension if not exists pgcrypto;
 
+create table if not exists public.user_profiles (
+    user_id uuid primary key references auth.users(id) on delete cascade,
+    username text not null,
+    avatar_url text not null default '',
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now(),
+    check (username ~ '^[A-Za-z0-9_]{3,24}$'),
+    check (char_length(avatar_url) <= 600)
+);
+
+alter table public.user_profiles add column if not exists username text;
+alter table public.user_profiles add column if not exists avatar_url text not null default '';
+alter table public.user_profiles add column if not exists created_at timestamptz not null default now();
+alter table public.user_profiles add column if not exists updated_at timestamptz not null default now();
+
+create unique index if not exists idx_user_profiles_username_lower
+    on public.user_profiles (lower(username));
+
+alter table public.user_profiles enable row level security;
+
+drop policy if exists "Users can read profiles" on public.user_profiles;
+create policy "Users can read profiles"
+    on public.user_profiles
+    for select
+    to authenticated
+    using (true);
+
+drop policy if exists "Users can insert own profile" on public.user_profiles;
+create policy "Users can insert own profile"
+    on public.user_profiles
+    for insert
+    to authenticated
+    with check (user_id = auth.uid());
+
+drop policy if exists "Users can update own profile" on public.user_profiles;
+create policy "Users can update own profile"
+    on public.user_profiles
+    for update
+    to authenticated
+    using (user_id = auth.uid())
+    with check (user_id = auth.uid());
+
+create or replace function public.touch_user_profile_updated_at()
+returns trigger
+language plpgsql
+as $$
+begin
+    new.updated_at = now();
+    return new;
+end;
+$$;
+
+drop trigger if exists trg_touch_user_profile_updated_at on public.user_profiles;
+create trigger trg_touch_user_profile_updated_at
+    before update on public.user_profiles
+    for each row
+    execute function public.touch_user_profile_updated_at();
+
+create or replace function public.handle_new_user_profile()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+    requested_username text := coalesce(new.raw_user_meta_data ->> 'username', split_part(new.email, '@', 1));
+    normalized_username text := regexp_replace(requested_username, '[^A-Za-z0-9_]', '', 'g');
+begin
+    if char_length(normalized_username) < 3 then
+        normalized_username := 'user_' || substring(replace(new.id::text, '-', ''), 1, 8);
+    end if;
+
+    normalized_username := substring(normalized_username, 1, 24);
+
+    insert into public.user_profiles (user_id, username)
+    values (new.id, normalized_username)
+    on conflict (user_id) do nothing;
+
+    return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created_profile on auth.users;
+create trigger on_auth_user_created_profile
+    after insert on auth.users
+    for each row
+    execute function public.handle_new_user_profile();
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+    'avatars',
+    'avatars',
+    true,
+    2097152,
+    array['image/png', 'image/jpeg', 'image/webp', 'image/gif']
+)
+on conflict (id) do update
+set
+    public = excluded.public,
+    file_size_limit = excluded.file_size_limit,
+    allowed_mime_types = excluded.allowed_mime_types;
+
+drop policy if exists "Avatar images are public" on storage.objects;
+create policy "Avatar images are public"
+    on storage.objects
+    for select
+    using (bucket_id = 'avatars');
+
+drop policy if exists "Users can upload own avatar" on storage.objects;
+create policy "Users can upload own avatar"
+    on storage.objects
+    for insert
+    to authenticated
+    with check (
+        bucket_id = 'avatars'
+        and (storage.foldername(name))[1] = auth.uid()::text
+    );
+
+drop policy if exists "Users can update own avatar" on storage.objects;
+create policy "Users can update own avatar"
+    on storage.objects
+    for update
+    to authenticated
+    using (
+        bucket_id = 'avatars'
+        and (storage.foldername(name))[1] = auth.uid()::text
+    )
+    with check (
+        bucket_id = 'avatars'
+        and (storage.foldername(name))[1] = auth.uid()::text
+    );
+
+drop policy if exists "Users can delete own avatar" on storage.objects;
+create policy "Users can delete own avatar"
+    on storage.objects
+    for delete
+    to authenticated
+    using (
+        bucket_id = 'avatars'
+        and (storage.foldername(name))[1] = auth.uid()::text
+    );
+
 create table if not exists public.user_rotations (
     id uuid primary key default gen_random_uuid(),
     user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,

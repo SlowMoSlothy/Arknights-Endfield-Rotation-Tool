@@ -1,14 +1,19 @@
 const myRotationsState = {
     session: null,
+    profile: null,
     rotations: [],
     loading: false,
     saving: false,
+    profileSaving: false,
+    authMode: "signIn",
     actionIds: new Set(),
     initialized: false,
     authStatus: "",
     authStatusClass: "",
     listStatus: "",
-    listStatusClass: ""
+    listStatusClass: "",
+    detailRotationId: "",
+    detailEditing: false
 };
 
 const MY_AUTH_MODES = {
@@ -19,10 +24,14 @@ const MY_AUTH_MODES = {
     },
     create: {
         title: "Create your account",
-        intro: "Create an account with email and password to start saving private rotations.",
-        status: "Enter an email and password, then press Create Account."
+        intro: "Create an account with username, email, and password to start saving private rotations.",
+        status: "Enter a username, email, and password, then press Create Account."
     }
 };
+
+const USERNAME_PATTERN = /^[A-Za-z0-9_]{3,24}$/;
+const AVATAR_BUCKET = "avatars";
+const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
 
 function getMySupabaseClient() {
     return typeof supabaseClient !== "undefined" ? supabaseClient : null;
@@ -86,6 +95,12 @@ function getMySkillById(skillId) {
     return getSkillById(Number(skillId));
 }
 
+function getMyRotationSkills(row) {
+    return normalizeMyList(row?.rotation_skill_ids)
+        .map(skillId => getMySkillById(skillId))
+        .filter(Boolean);
+}
+
 function getMyTeamOperators(row) {
     return normalizeMyList(row?.team_operator_ids)
         .map(operatorId => getMyOperatorById(operatorId))
@@ -112,9 +127,42 @@ function getCurrentMyRotationSkills() {
 }
 
 function getMyAuthorName() {
+    const username = String(myRotationsState.profile?.username || "").trim();
+    if (username) return username.slice(0, 40);
+
     const email = String(myRotationsState.session?.user?.email || "").trim();
     if (!email) return "Anonymous";
     return email.split("@")[0].slice(0, 40) || "Anonymous";
+}
+
+function getMyDisplayName() {
+    return String(
+        myRotationsState.profile?.username
+        || myRotationsState.session?.user?.user_metadata?.username
+        || myRotationsState.session?.user?.email
+        || "Account"
+    ).trim();
+}
+
+function sanitizeUsername(value) {
+    return String(value || "").trim().replace(/\s+/g, "_");
+}
+
+function isValidUsername(value) {
+    return USERNAME_PATTERN.test(sanitizeUsername(value));
+}
+
+function getFallbackUsername() {
+    const metadataUsername = myRotationsState.session?.user?.user_metadata?.username;
+    if (isValidUsername(metadataUsername)) return sanitizeUsername(metadataUsername);
+
+    const emailPrefix = String(myRotationsState.session?.user?.email || "")
+        .split("@")[0]
+        .replace(/[^A-Za-z0-9_]/g, "")
+        .slice(0, 24);
+    if (isValidUsername(emailPrefix)) return emailPrefix;
+
+    return `user_${String(myRotationsState.session?.user?.id || "00000000").replace(/-/g, "").slice(0, 8)}`;
 }
 
 function hasCurrentSavableRotation() {
@@ -150,6 +198,54 @@ function buildMyRotationPayload(values) {
     };
 }
 
+function normalizeMyRotationSaveValues(values = {}) {
+    return {
+        title: String(values.title || "").trim(),
+        description: String(values.description || "").trim()
+    };
+}
+
+function getMyRotationStatus(row) {
+    if (row?.submitted_for_review_at) {
+        return {
+            label: "Submitted",
+            detail: `Submitted ${formatMyDate(row.submitted_for_review_at) || ""}`.trim(),
+            className: "is-submitted"
+        };
+    }
+
+    return {
+        label: "Private",
+        detail: "Private save",
+        className: "is-private"
+    };
+}
+
+function createMyStatusBadge(row) {
+    const status = getMyRotationStatus(row);
+    const badge = createMyTextElement("span", `my-status-badge ${status.className}`, status.label);
+    badge.title = status.detail;
+    return badge;
+}
+
+function getMySelectedRotation() {
+    const selectedId = String(myRotationsState.detailRotationId || "");
+    if (!selectedId) return null;
+    return myRotationsState.rotations.find(row => String(row.id) === selectedId) || null;
+}
+
+function selectMyRotation(row, editing = false) {
+    myRotationsState.detailRotationId = String(row?.id || "");
+    myRotationsState.detailEditing = Boolean(editing);
+    renderMyRotationList();
+}
+
+function closeMyRotationDetail() {
+    myRotationsState.detailRotationId = "";
+    myRotationsState.detailEditing = false;
+    renderMyRotationList();
+}
+
 function setMyAuthStatus(text, className = "") {
     myRotationsState.authStatus = text;
     myRotationsState.authStatusClass = className;
@@ -178,28 +274,23 @@ function renderMyListStatus() {
     status.textContent = myRotationsState.listStatus;
 }
 
-function updateMySaveAvailability() {
-    const saveButton = document.getElementById("myRotationSaveButton");
-    if (!saveButton) return;
-
-    saveButton.disabled = !myRotationsState.session || myRotationsState.saving || !hasCurrentSavableRotation();
-    saveButton.textContent = myRotationsState.saving ? "Saving" : "Save Current Rotation";
-}
-
 function renderMyAuthPanel() {
     const authPanel = document.getElementById("myRotationsAuthPanel");
     const contentPanel = document.getElementById("myRotationsContentPanel");
-    const emailLabel = document.getElementById("myRotationsUserEmail");
+    const userLabel = document.getElementById("myRotationsUserName");
+    const title = document.getElementById("myRotationsTitle");
     const isSignedIn = Boolean(myRotationsState.session);
 
     if (authPanel) authPanel.hidden = isSignedIn;
     if (contentPanel) contentPanel.hidden = !isSignedIn;
-    if (emailLabel) emailLabel.textContent = myRotationsState.session?.user?.email || "Signed in";
+    if (userLabel) userLabel.textContent = getMyDisplayName();
+    if (title && isSignedIn) title.textContent = "My Rotations";
 
     renderMyAuthStatus();
     renderMyListStatus();
-    updateMySaveAvailability();
+    renderMyProfile();
     updateAccountBar();
+    if (typeof updateCommunitySubmitAvailability === "function") updateCommunitySubmitAvailability();
 }
 
 function updateAccountBar() {
@@ -207,28 +298,51 @@ function updateAccountBar() {
     const createButton = document.getElementById("accountCreateBtn");
     const signOutButton = document.getElementById("accountSignOutBtn");
     const userLabel = document.getElementById("accountUserLabel");
+    const avatar = document.getElementById("accountAvatar");
+    const openMyRotationsButton = document.getElementById("openMyRotationsBtn");
+    const openProfileButton = document.getElementById("openProfileBtn");
     const isSignedIn = Boolean(myRotationsState.session);
-    const email = myRotationsState.session?.user?.email || "";
+    const displayName = getMyDisplayName();
+    const avatarUrl = myRotationsState.profile?.avatar_url || "";
 
     if (signInButton) signInButton.hidden = isSignedIn;
     if (createButton) createButton.hidden = isSignedIn;
     if (signOutButton) signOutButton.hidden = !isSignedIn;
+    if (openMyRotationsButton) openMyRotationsButton.hidden = !isSignedIn;
+    if (openProfileButton) openProfileButton.hidden = !isSignedIn;
     if (userLabel) {
         userLabel.hidden = !isSignedIn;
-        userLabel.textContent = email;
-        userLabel.title = email;
+        userLabel.textContent = displayName;
+        userLabel.title = displayName;
+    }
+    if (avatar) {
+        avatar.hidden = !isSignedIn || !avatarUrl;
+        avatar.src = avatarUrl || "";
+        avatar.alt = avatarUrl ? `${displayName} avatar` : "";
     }
 }
 
 function setMyAuthMode(mode = "signIn") {
     const config = MY_AUTH_MODES[mode] || MY_AUTH_MODES.signIn;
+    myRotationsState.authMode = mode;
+
     const title = document.getElementById("myRotationsTitle");
     const intro = document.getElementById("myRotationsIntro");
+    const usernameField = document.getElementById("myRotationsUsernameField");
+    const usernameInput = document.getElementById("myRotationsUsernameInput");
+    const passwordInput = document.getElementById("myRotationsPasswordInput");
     const registerButton = document.getElementById("myRotationsRegisterButton");
     const signInButton = document.getElementById("myRotationsSignInButton");
 
     if (title) title.textContent = config.title;
     if (intro) intro.textContent = config.intro;
+    if (usernameField) usernameField.hidden = mode !== "create";
+    if (usernameInput) {
+        usernameInput.disabled = mode !== "create";
+        usernameInput.required = false;
+        usernameInput.setAttribute("aria-required", mode === "create" ? "true" : "false");
+    }
+    if (passwordInput) passwordInput.autocomplete = mode === "create" ? "new-password" : "current-password";
     if (registerButton) registerButton.classList.toggle("my-primary-btn", mode === "create");
     if (registerButton) registerButton.classList.toggle("my-secondary-btn", mode !== "create");
     if (signInButton) signInButton.classList.toggle("my-primary-btn", mode !== "create");
@@ -236,6 +350,35 @@ function setMyAuthMode(mode = "signIn") {
 
     if (!myRotationsState.session) {
         setMyAuthStatus(config.status);
+    }
+}
+
+function setMyProfileStatus(text, className = "") {
+    const status = document.getElementById("myProfileStatus");
+    if (!status) return;
+
+    status.className = `my-rotations-status${className ? ` ${className}` : ""}`;
+    status.textContent = text;
+}
+
+function renderMyProfile() {
+    const usernameInput = document.getElementById("myProfileUsernameInput");
+    const avatarPreview = document.getElementById("myProfileAvatarPreview");
+    const saveButton = document.getElementById("myProfileSaveButton");
+    const username = myRotationsState.profile?.username || "";
+    const avatarUrl = myRotationsState.profile?.avatar_url || "";
+
+    if (usernameInput && document.activeElement !== usernameInput) {
+        usernameInput.value = username;
+    }
+    if (avatarPreview) {
+        avatarPreview.hidden = !avatarUrl;
+        avatarPreview.src = avatarUrl || "";
+        avatarPreview.alt = avatarUrl ? `${username || "Account"} avatar` : "";
+    }
+    if (saveButton) {
+        saveButton.disabled = !myRotationsState.session || myRotationsState.profileSaving;
+        saveButton.textContent = myRotationsState.profileSaving ? "Saving" : "Save Account";
     }
 }
 
@@ -309,30 +452,252 @@ function createMyChipRow(row) {
     return chipRow;
 }
 
+function createMyDetailSection(title, child) {
+    const section = document.createElement("section");
+    section.className = "my-detail-section";
+    section.append(createMyTextElement("h4", "my-detail-section-title", title), child);
+    return section;
+}
+
+function createMyDetailTeam(row) {
+    const team = document.createElement("div");
+    team.className = "my-detail-team";
+
+    const operators = getMyTeamOperators(row);
+    if (!operators.length) {
+        team.appendChild(createMyTextElement("span", "my-detail-empty", "No team saved."));
+        return team;
+    }
+
+    operators.forEach((operator, index) => {
+        const item = document.createElement("article");
+        item.className = "my-detail-operator";
+        if (index === 0) item.classList.add("is-leader");
+
+        const avatar = createMyOperatorAvatar(operator);
+        avatar.classList.add("my-detail-operator-avatar");
+
+        const copy = document.createElement("div");
+        copy.className = "my-detail-operator-copy";
+        copy.appendChild(createMyTextElement("strong", "", operator.name || "Operator"));
+
+        const meta = [
+            operator.star ? `${operator.star} star` : "",
+            operator.operatorClass ? formatMyLabel(operator.operatorClass) : "",
+            operator.elementType ? formatMyLabel(operator.elementType) : ""
+        ].filter(Boolean).join(" - ");
+
+        copy.appendChild(createMyTextElement("span", "", meta || `Slot ${index + 1}`));
+        if (index === 0) copy.appendChild(createMyTextElement("em", "", "Leader"));
+
+        item.append(avatar, copy);
+        team.appendChild(item);
+    });
+
+    return team;
+}
+
+function createMyDetailSkillSequence(row) {
+    const sequence = document.createElement("div");
+    sequence.className = "my-detail-skill-sequence";
+
+    const skills = getMyRotationSkills(row);
+    if (!skills.length) {
+        sequence.appendChild(createMyTextElement("span", "my-detail-empty", "No skills saved."));
+        return sequence;
+    }
+
+    skills.forEach((skill, index) => {
+        if (index > 0) {
+            sequence.appendChild(createMyTextElement("span", "my-detail-arrow", "->"));
+        }
+
+        const item = document.createElement("span");
+        item.className = "my-detail-skill";
+
+        if (skill && typeof createSkillIcon === "function") {
+            item.appendChild(createSkillIcon(skill, {
+                size: "small",
+                useSmallIcon: true,
+                extraClasses: ["my-detail-skill-icon"]
+            }));
+        } else {
+            item.appendChild(createMyOperatorPlaceholder());
+        }
+
+        const label = typeof getShortSkillType === "function"
+            ? getShortSkillType(skill.type || skill.shortType)
+            : (skill.shortType || "");
+        item.appendChild(createMyTextElement("span", "my-detail-skill-label", label || "?"));
+        sequence.appendChild(item);
+    });
+
+    return sequence;
+}
+
+function createMyDetailMeta(row) {
+    const meta = document.createElement("div");
+    meta.className = "my-detail-meta";
+    const updated = formatMyDate(row.updated_at || row.created_at) || "-";
+    const skillCount = normalizeMyList(row.rotation_skill_ids).length;
+    const teamCount = normalizeMyList(row.team_operator_ids).length;
+    meta.append(
+        createMyTextElement("span", "", `Updated ${updated}`),
+        createMyTextElement("span", "", `${teamCount} operator${teamCount === 1 ? "" : "s"}`),
+        createMyTextElement("span", "", `${skillCount} skill${skillCount === 1 ? "" : "s"}`)
+    );
+    return meta;
+}
+
+function createMyDetailEditForm(row) {
+    const form = document.createElement("form");
+    form.className = "my-detail-edit-form";
+
+    const titleField = document.createElement("label");
+    titleField.className = "my-rotations-field";
+    const titleInput = document.createElement("input");
+    titleInput.type = "text";
+    titleInput.minLength = 3;
+    titleInput.maxLength = 80;
+    titleInput.required = true;
+    titleInput.value = row.title || "";
+    titleField.append(createMyTextElement("span", "", "Title"), titleInput);
+
+    const descriptionField = document.createElement("label");
+    descriptionField.className = "my-rotations-field";
+    const descriptionInput = document.createElement("textarea");
+    descriptionInput.maxLength = 600;
+    descriptionInput.rows = 3;
+    descriptionInput.value = row.description || "";
+    descriptionField.append(createMyTextElement("span", "", "Description"), descriptionInput);
+
+    const actions = document.createElement("div");
+    actions.className = "my-detail-actions";
+    const busy = myRotationsState.actionIds.has(String(row.id));
+    actions.append(
+        createMyActionButton("Save Changes", "is-primary", () => {}, busy),
+        createMyActionButton("Cancel", "", () => selectMyRotation(row, false), busy)
+    );
+
+    form.addEventListener("submit", event => {
+        event.preventDefault();
+        updateMyRotationDetails(row, {
+            title: titleInput.value,
+            description: descriptionInput.value
+        });
+    });
+    actions.querySelector(".is-primary")?.addEventListener("click", event => {
+        event.preventDefault();
+        form.requestSubmit();
+    });
+
+    form.append(titleField, descriptionField, actions);
+    window.setTimeout(() => titleInput.focus(), 0);
+    return form;
+}
+
+function renderMyRotationDetail() {
+    const panel = document.getElementById("myRotationDetailPanel");
+    if (!panel) return;
+
+    const row = getMySelectedRotation();
+    if (!myRotationsState.session || myRotationsState.loading || !row) {
+        panel.hidden = true;
+        panel.replaceChildren();
+        return;
+    }
+
+    panel.hidden = false;
+    panel.replaceChildren();
+
+    const busy = myRotationsState.actionIds.has(String(row.id));
+    const header = document.createElement("div");
+    header.className = "my-detail-header";
+
+    const titleBlock = document.createElement("div");
+    titleBlock.className = "my-detail-title-block";
+    const titleRow = document.createElement("div");
+    titleRow.className = "my-detail-title-row";
+    titleRow.append(createMyTextElement("h3", "my-detail-title", row.title || "Untitled rotation"), createMyStatusBadge(row));
+    titleBlock.append(titleRow, createMyDetailMeta(row));
+
+    const headerActions = document.createElement("div");
+    headerActions.className = "my-detail-header-actions";
+    if (!myRotationsState.detailEditing) {
+        headerActions.appendChild(createMyActionButton("Edit", "", () => selectMyRotation(row, true), busy));
+    }
+    const closeButton = createMyActionButton("Close", "", closeMyRotationDetail);
+    headerActions.appendChild(closeButton);
+    header.append(titleBlock, headerActions);
+    panel.appendChild(header);
+
+    if (myRotationsState.detailEditing) {
+        panel.appendChild(createMyDetailEditForm(row));
+        return;
+    }
+
+    const description = createMyTextElement("p", "my-detail-description", row.description || "No description added.");
+    const actions = document.createElement("div");
+    actions.className = "my-detail-actions";
+    actions.append(
+        createMyActionButton("Load", "is-primary", () => loadMyRotation(row), busy),
+        createMyActionButton("Update with Current", "", () => overwriteMyRotationWithCurrent(row), busy || !hasCurrentSavableRotation()),
+        createMyActionButton(
+            row.submitted_for_review_at ? "Submitted" : "Submit to Community",
+            "",
+            () => submitMyRotationForReview(row),
+            busy || Boolean(row.submitted_for_review_at)
+        ),
+        createMyActionButton("Delete", "is-danger", () => deleteMyRotation(row), busy)
+    );
+
+    panel.append(
+        createMyDetailSection("Team", createMyDetailTeam(row)),
+        createMyDetailSection("Rotation", createMyDetailSkillSequence(row)),
+        createMyDetailSection("Notes", description),
+        createMyDetailSection("Tags", createMyChipRow(row)),
+        actions
+    );
+}
+
 function createMyActionButton(label, className, action, disabled = false) {
     const button = document.createElement("button");
     button.className = `my-action-btn${className ? ` ${className}` : ""}`;
     button.type = "button";
     button.textContent = label;
     button.disabled = disabled;
-    button.addEventListener("click", action);
+    button.addEventListener("click", event => {
+        event.stopPropagation();
+        action(event);
+    });
     return button;
 }
 
 function createMyRotationCard(row) {
     const card = document.createElement("article");
     card.className = "my-rotation-card";
+    card.tabIndex = 0;
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", `Open ${row.title || "saved rotation"}`);
+    card.classList.toggle("is-selected", String(row.id) === String(myRotationsState.detailRotationId));
+    card.addEventListener("click", () => selectMyRotation(row));
+    card.addEventListener("keydown", event => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        selectMyRotation(row);
+    });
 
+    const titleRow = document.createElement("div");
+    titleRow.className = "my-rotation-title-row";
     const title = createMyTextElement("h3", "my-rotation-title", row.title || "Untitled rotation");
+    titleRow.append(title, createMyStatusBadge(row));
+
     const updated = formatMyDate(row.updated_at || row.created_at);
     const skillCount = normalizeMyList(row.rotation_skill_ids).length;
-    const statusText = row.submitted_for_review_at
-        ? `Submitted ${formatMyDate(row.submitted_for_review_at)}`
-        : "Private";
     const meta = createMyTextElement(
         "div",
         "my-rotation-meta",
-        [`Updated ${updated || "-"}`, `${skillCount} skill${skillCount === 1 ? "" : "s"}`, statusText].join(" - ")
+        [`Updated ${updated || "-"}`, `${skillCount} skill${skillCount === 1 ? "" : "s"}`].join(" - ")
     );
 
     const description = createMyTextElement(
@@ -355,7 +720,7 @@ function createMyRotationCard(row) {
         createMyActionButton("Delete", "is-danger", () => deleteMyRotation(row), busy)
     );
 
-    card.append(title, meta, createMyTeamPreview(row), createMyRotationPreview(row), description, createMyChipRow(row), actions);
+    card.append(titleRow, meta, createMyTeamPreview(row), createMyRotationPreview(row), description, createMyChipRow(row), actions);
     return card;
 }
 
@@ -364,10 +729,11 @@ function renderMyRotationList() {
     if (!list) return;
 
     list.replaceChildren();
-    updateMySaveAvailability();
+    list.hidden = false;
 
     if (!myRotationsState.session) {
         setMyListStatus("");
+        renderMyRotationDetail();
         return;
     }
 
@@ -380,25 +746,98 @@ function renderMyRotationList() {
         loader.setAttribute("aria-hidden", "true");
         card.append(loader, createMyTextElement("span", "", "Loading saved rotations"));
         list.appendChild(card);
+        renderMyRotationDetail();
         return;
     }
 
     if (!myRotationsState.rotations.length) {
+        myRotationsState.detailRotationId = "";
+        myRotationsState.detailEditing = false;
         setMyListStatus("No saved rotations yet.");
         const card = document.createElement("div");
         card.className = "my-state-card";
         card.appendChild(createMyTextElement("span", "", "Save your current build to see it here."));
         list.appendChild(card);
+        renderMyRotationDetail();
         return;
     }
 
+    if (myRotationsState.detailRotationId && !getMySelectedRotation()) {
+        myRotationsState.detailRotationId = "";
+        myRotationsState.detailEditing = false;
+    }
+
     setMyListStatus(`${myRotationsState.rotations.length} saved rotation${myRotationsState.rotations.length === 1 ? "" : "s"}.`);
-    myRotationsState.rotations.forEach(row => list.appendChild(createMyRotationCard(row)));
+    const visibleRows = myRotationsState.detailRotationId
+        ? myRotationsState.rotations.filter(row => String(row.id) !== String(myRotationsState.detailRotationId))
+        : myRotationsState.rotations;
+    list.hidden = visibleRows.length === 0;
+    visibleRows.forEach(row => list.appendChild(createMyRotationCard(row)));
+    renderMyRotationDetail();
 }
 
 function renderMyRotations() {
     renderMyAuthPanel();
     renderMyRotationList();
+}
+
+async function upsertMyProfile({ username, avatarUrl = "" }) {
+    const client = getMySupabaseClient();
+    const userId = myRotationsState.session?.user?.id;
+    if (!client || !userId) return null;
+
+    const payload = {
+        user_id: userId,
+        username: sanitizeUsername(username || getFallbackUsername()),
+        avatar_url: avatarUrl || myRotationsState.profile?.avatar_url || ""
+    };
+
+    const { data, error } = await client
+        .from("user_profiles")
+        .upsert(payload, { onConflict: "user_id" })
+        .select("user_id,username,avatar_url,updated_at")
+        .single();
+
+    if (error) throw error;
+
+    myRotationsState.profile = data;
+    return data;
+}
+
+async function fetchMyProfile() {
+    const client = getMySupabaseClient();
+    const userId = myRotationsState.session?.user?.id;
+    if (!client || !userId) {
+        myRotationsState.profile = null;
+        renderMyProfile();
+        updateAccountBar();
+        return null;
+    }
+
+    try {
+        const { data, error } = await client
+            .from("user_profiles")
+            .select("user_id,username,avatar_url,updated_at")
+            .eq("user_id", userId)
+            .maybeSingle();
+
+        if (error) throw error;
+
+        myRotationsState.profile = data || await upsertMyProfile({ username: getFallbackUsername() });
+        setMyProfileStatus("");
+    } catch (error) {
+        console.error("Account profile could not be loaded:", error);
+        myRotationsState.profile = {
+            user_id: userId,
+            username: getFallbackUsername(),
+            avatar_url: myRotationsState.session?.user?.user_metadata?.avatar_url || ""
+        };
+        setMyProfileStatus("Profile could not be loaded. Run the latest supabase/user_rotations.sql.", "is-error");
+    }
+
+    renderMyProfile();
+    updateAccountBar();
+    return myRotationsState.profile;
 }
 
 async function refreshMySession(loadRotations = false) {
@@ -415,11 +854,17 @@ async function refreshMySession(loadRotations = false) {
         if (error) throw error;
 
         myRotationsState.session = data?.session || null;
+        if (!myRotationsState.session) {
+            myRotationsState.profile = null;
+        }
         setMyAuthStatus("");
 
-        if (myRotationsState.session && loadRotations) {
-            await fetchMyRotations();
-            return;
+        if (myRotationsState.session) {
+            await fetchMyProfile();
+            if (loadRotations) {
+                await fetchMyRotations();
+                return;
+            }
         }
     } catch (error) {
         console.error("Account session could not be checked:", error);
@@ -501,8 +946,14 @@ async function registerMyAccount() {
     }
 
     const email = document.getElementById("myRotationsEmailInput")?.value.trim() || "";
+    const username = sanitizeUsername(document.getElementById("myRotationsUsernameInput")?.value || "");
     const password = document.getElementById("myRotationsPasswordInput")?.value || "";
     const button = document.getElementById("myRotationsRegisterButton");
+
+    if (!isValidUsername(username)) {
+        setMyAuthStatus("Username must be 3-24 characters and use only letters, numbers, or underscore.", "is-error");
+        return;
+    }
 
     if (!email || !password) {
         setMyAuthStatus("Enter an email and password first.", "is-error");
@@ -516,10 +967,20 @@ async function registerMyAccount() {
     setMyAuthStatus("Creating account...");
 
     try {
-        const { data, error } = await client.auth.signUp({ email, password });
+        const { data, error } = await client.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    username
+                }
+            }
+        });
         if (error) throw error;
 
         if (data?.session) {
+            myRotationsState.session = data.session;
+            await upsertMyProfile({ username });
             setMyAuthStatus("Account created.", "is-success");
             await refreshMySession(true);
             return;
@@ -537,6 +998,95 @@ async function registerMyAccount() {
     }
 }
 
+function handleMyRegisterButton() {
+    if (myRotationsState.authMode !== "create") {
+        setMyAuthMode("create");
+        window.setTimeout(() => document.getElementById("myRotationsUsernameInput")?.focus(), 0);
+        return;
+    }
+
+    registerMyAccount();
+}
+
+function handleMySignInButtonClick() {
+    if (myRotationsState.authMode !== "signIn") {
+        setMyAuthMode("signIn");
+    }
+}
+
+async function uploadMyAvatar(file) {
+    const client = getMySupabaseClient();
+    const userId = myRotationsState.session?.user?.id;
+    if (!client || !userId || !file) return "";
+
+    if (!file.type.startsWith("image/")) {
+        throw new Error("Please choose an image file.");
+    }
+
+    if (file.size > MAX_AVATAR_BYTES) {
+        throw new Error("Avatar image can be up to 2 MB.");
+    }
+
+    const extension = (file.name.split(".").pop() || "webp").toLowerCase().replace(/[^a-z0-9]/g, "") || "webp";
+    const filePath = `${userId}/${crypto.randomUUID()}.${extension}`;
+    const { error: uploadError } = await client.storage
+        .from(AVATAR_BUCKET)
+        .upload(filePath, file, {
+            cacheControl: "3600",
+            contentType: file.type,
+            upsert: false
+        });
+
+    if (uploadError) throw uploadError;
+
+    const { data } = client.storage.from(AVATAR_BUCKET).getPublicUrl(filePath);
+    return data?.publicUrl || "";
+}
+
+async function saveMyProfile(event) {
+    event.preventDefault();
+    const client = getMySupabaseClient();
+    if (!client || !myRotationsState.session) {
+        setMyProfileStatus("Sign in before editing your account.", "is-error");
+        return;
+    }
+
+    const username = sanitizeUsername(document.getElementById("myProfileUsernameInput")?.value || "");
+    const avatarInput = document.getElementById("myProfileAvatarInput");
+    const avatarFile = avatarInput?.files?.[0] || null;
+
+    if (!isValidUsername(username)) {
+        setMyProfileStatus("Username must be 3-24 characters and use only letters, numbers, or underscore.", "is-error");
+        return;
+    }
+
+    myRotationsState.profileSaving = true;
+    renderMyProfile();
+    setMyProfileStatus("Saving account...");
+
+    try {
+        const avatarUrl = avatarFile ? await uploadMyAvatar(avatarFile) : myRotationsState.profile?.avatar_url || "";
+        const profile = await upsertMyProfile({ username, avatarUrl });
+
+        await client.auth.updateUser({
+            data: {
+                username: profile.username,
+                avatar_url: profile.avatar_url || ""
+            }
+        });
+
+        if (avatarInput) avatarInput.value = "";
+        setMyProfileStatus("Account saved.", "is-success");
+    } catch (error) {
+        console.error("Account profile save failed:", error);
+        setMyProfileStatus(error.message || "Account could not be saved.", "is-error");
+    } finally {
+        myRotationsState.profileSaving = false;
+        renderMyProfile();
+        updateAccountBar();
+    }
+}
+
 async function signOutMyAccount() {
     const client = getMySupabaseClient();
     if (!client) return;
@@ -548,58 +1098,55 @@ async function signOutMyAccount() {
     }
 
     myRotationsState.session = null;
+    myRotationsState.profile = null;
     myRotationsState.rotations = [];
+    myRotationsState.detailRotationId = "";
+    myRotationsState.detailEditing = false;
     setMyAuthStatus("");
     setMyListStatus("");
+    closeProfileModal();
     renderMyRotations();
+    renderMyAuthPanel();
 }
 
-async function saveCurrentMyRotation(event) {
-    event.preventDefault();
+async function saveCurrentRotationToMyRotations(values) {
     const client = getMySupabaseClient();
     if (!client || !myRotationsState.session) {
         setMyListStatus("Sign in before saving a rotation.", "is-error");
-        return;
+        throw new Error("Please sign in to save rotations.");
     }
 
     if (!hasCurrentSavableRotation()) {
         setMyListStatus("Create a rotation before saving it.", "is-error");
-        return;
+        throw new Error("Create a rotation before saving it.");
     }
 
-    const titleInput = document.getElementById("myRotationTitleInput");
-    const descriptionInput = document.getElementById("myRotationDescriptionInput");
-    const values = {
-        title: String(titleInput?.value || "").trim(),
-        description: String(descriptionInput?.value || "").trim()
-    };
+    const normalizedValues = normalizeMyRotationSaveValues(values);
 
-    if (values.title.length < 3) {
+    if (normalizedValues.title.length < 3) {
         setMyListStatus("Use at least 3 characters for the title.", "is-error");
-        return;
+        throw new Error("Use at least 3 characters for the title.");
     }
 
     myRotationsState.saving = true;
-    updateMySaveAvailability();
     setMyListStatus("Saving rotation...");
 
     try {
         const { error } = await client
             .from("user_rotations")
-            .insert(buildMyRotationPayload(values));
+            .insert(buildMyRotationPayload(normalizedValues));
 
         if (error) throw error;
 
-        if (titleInput) titleInput.value = "";
-        if (descriptionInput) descriptionInput.value = "";
         setMyListStatus("Rotation saved.", "is-success");
         await fetchMyRotations();
+        return true;
     } catch (error) {
         console.error("Private rotation save failed:", error);
         setMyListStatus("This rotation could not be saved. Check the user_rotations table setup.", "is-error");
+        throw error;
     } finally {
         myRotationsState.saving = false;
-        updateMySaveAvailability();
     }
 }
 
@@ -639,6 +1186,81 @@ async function runMyRowAction(row, action) {
     }
 }
 
+async function updateMyRotationDetails(row, values) {
+    const client = getMySupabaseClient();
+    const normalizedValues = normalizeMyRotationSaveValues(values);
+
+    if (!client || !myRotationsState.session) {
+        setMyListStatus("Sign in before editing a rotation.", "is-error");
+        return;
+    }
+
+    if (normalizedValues.title.length < 3) {
+        setMyListStatus("Use at least 3 characters for the title.", "is-error");
+        return;
+    }
+
+    await runMyRowAction(row, async () => {
+        setMyListStatus("Saving changes...");
+        const { error } = await client
+            .from("user_rotations")
+            .update({
+                title: normalizedValues.title,
+                description: normalizedValues.description
+            })
+            .eq("id", row.id);
+
+        if (error) throw error;
+
+        myRotationsState.detailEditing = false;
+        myRotationsState.detailRotationId = String(row.id);
+        setMyListStatus("Rotation updated.", "is-success");
+        await fetchMyRotations();
+    }).catch(error => {
+        console.error("Private rotation update failed:", error);
+        setMyListStatus("This rotation could not be updated.", "is-error");
+    });
+}
+
+async function overwriteMyRotationWithCurrent(row) {
+    const client = getMySupabaseClient();
+    if (!client || !myRotationsState.session) {
+        setMyListStatus("Sign in before editing a rotation.", "is-error");
+        return;
+    }
+
+    if (!hasCurrentSavableRotation()) {
+        setMyListStatus("Create a rotation before updating this save.", "is-error");
+        return;
+    }
+
+    const shouldOverwrite = confirm(`Overwrite "${row.title || "this rotation"}" with your current team and rotation?`);
+    if (!shouldOverwrite) return;
+
+    await runMyRowAction(row, async () => {
+        setMyListStatus("Updating saved rotation...");
+        const payload = buildMyRotationPayload({
+            title: row.title || "Untitled rotation",
+            description: row.description || ""
+        });
+
+        const { error } = await client
+            .from("user_rotations")
+            .update(payload)
+            .eq("id", row.id);
+
+        if (error) throw error;
+
+        myRotationsState.detailEditing = false;
+        myRotationsState.detailRotationId = String(row.id);
+        setMyListStatus("Saved rotation updated with the current build.", "is-success");
+        await fetchMyRotations();
+    }).catch(error => {
+        console.error("Private rotation overwrite failed:", error);
+        setMyListStatus("This rotation could not be updated with the current build.", "is-error");
+    });
+}
+
 async function submitMyRotationForReview(row) {
     if (row.submitted_for_review_at) return;
 
@@ -654,6 +1276,7 @@ async function submitMyRotationForReview(row) {
             title: row.title,
             description: row.description || "",
             author_name: getMyAuthorName(),
+            submitted_by: myRotationsState.session.user.id,
             share_code: row.share_code,
             setup_version: 2,
             team_operator_ids: normalizeMyList(row.team_operator_ids),
@@ -701,6 +1324,10 @@ async function deleteMyRotation(row) {
 
         if (error) throw error;
 
+        if (String(myRotationsState.detailRotationId) === String(row.id)) {
+            myRotationsState.detailRotationId = "";
+            myRotationsState.detailEditing = false;
+        }
         setMyListStatus("Rotation deleted.", "is-success");
         await fetchMyRotations();
     }).catch(error => {
@@ -714,11 +1341,17 @@ function openMyRotationsModal(options = {}) {
     if (!modal) return;
 
     setMyAuthMode(options.mode || "signIn");
+    if (myRotationsState.session) renderMyAuthPanel();
     modal.classList.add("open");
     refreshMySession(true);
 
     window.setTimeout(() => {
+        const usernameInput = document.getElementById("myRotationsUsernameInput");
         const emailInput = document.getElementById("myRotationsEmailInput");
+        if (!myRotationsState.session && options.mode === "create" && usernameInput) {
+            usernameInput.focus();
+            return;
+        }
         if (!myRotationsState.session && emailInput) emailInput.focus();
     }, 0);
 }
@@ -730,30 +1363,68 @@ function closeMyRotationsModal() {
     modal.classList.remove("open");
 }
 
+function openProfileModal() {
+    if (!myRotationsState.session) {
+        openMyRotationsModal({ mode: "signIn" });
+        return;
+    }
+
+    const modal = document.getElementById("profileModal");
+    if (!modal) return;
+
+    modal.classList.add("open");
+    refreshMySession(false);
+    renderMyProfile();
+}
+
+function closeProfileModal() {
+    const modal = document.getElementById("profileModal");
+    if (!modal) return;
+
+    modal.classList.remove("open");
+}
+
 function initMyRotations() {
     if (myRotationsState.initialized) return;
     myRotationsState.initialized = true;
 
     const openButton = document.getElementById("openMyRotationsBtn");
+    const openProfileButton = document.getElementById("openProfileBtn");
     const accountSignInButton = document.getElementById("accountSignInBtn");
     const accountCreateButton = document.getElementById("accountCreateBtn");
     const accountSignOutButton = document.getElementById("accountSignOutBtn");
     const closeButton = document.getElementById("closeMyRotationsModalBtn");
+    const closeProfileButton = document.getElementById("closeProfileModalBtn");
     const authForm = document.getElementById("myRotationsAuthForm");
     const registerButton = document.getElementById("myRotationsRegisterButton");
-    const saveForm = document.getElementById("myRotationSaveForm");
+    const signInButton = document.getElementById("myRotationsSignInButton");
+    const profileForm = document.getElementById("myProfileForm");
+    const avatarInput = document.getElementById("myProfileAvatarInput");
     const refreshButton = document.getElementById("myRotationsRefreshButton");
     const signOutButton = document.getElementById("myRotationsSignOutButton");
     const modal = document.getElementById("myRotationsModal");
+    const profileModal = document.getElementById("profileModal");
 
     if (openButton) openButton.addEventListener("click", () => openMyRotationsModal());
+    if (openProfileButton) openProfileButton.addEventListener("click", openProfileModal);
     if (accountSignInButton) accountSignInButton.addEventListener("click", () => openMyRotationsModal({ mode: "signIn" }));
     if (accountCreateButton) accountCreateButton.addEventListener("click", () => openMyRotationsModal({ mode: "create" }));
     if (accountSignOutButton) accountSignOutButton.addEventListener("click", signOutMyAccount);
     if (closeButton) closeButton.addEventListener("click", closeMyRotationsModal);
+    if (closeProfileButton) closeProfileButton.addEventListener("click", closeProfileModal);
     if (authForm) authForm.addEventListener("submit", signInMyAccount);
-    if (registerButton) registerButton.addEventListener("click", registerMyAccount);
-    if (saveForm) saveForm.addEventListener("submit", saveCurrentMyRotation);
+    if (registerButton) registerButton.addEventListener("click", handleMyRegisterButton);
+    if (signInButton) signInButton.addEventListener("click", handleMySignInButtonClick);
+    if (profileForm) profileForm.addEventListener("submit", saveMyProfile);
+    if (avatarInput) {
+        avatarInput.addEventListener("change", () => {
+            const file = avatarInput.files?.[0];
+            const preview = document.getElementById("myProfileAvatarPreview");
+            if (!file || !preview) return;
+            preview.hidden = false;
+            preview.src = URL.createObjectURL(file);
+        });
+    }
     if (refreshButton) refreshButton.addEventListener("click", fetchMyRotations);
     if (signOutButton) signOutButton.addEventListener("click", signOutMyAccount);
     if (modal) {
@@ -761,11 +1432,20 @@ function initMyRotations() {
             if (event.target === modal) closeMyRotationsModal();
         });
     }
+    if (profileModal) {
+        profileModal.addEventListener("click", event => {
+            if (event.target === profileModal) closeProfileModal();
+        });
+    }
 
     document.addEventListener("keydown", event => {
         const modalElement = document.getElementById("myRotationsModal");
+        const profileModalElement = document.getElementById("profileModal");
         if (event.key === "Escape" && modalElement?.classList.contains("open")) {
             closeMyRotationsModal();
+        }
+        if (event.key === "Escape" && profileModalElement?.classList.contains("open")) {
+            closeProfileModal();
         }
     });
 
@@ -774,9 +1454,19 @@ function initMyRotations() {
         client.auth.onAuthStateChange((_event, session) => {
             myRotationsState.session = session || null;
             if (!myRotationsState.session) {
+                myRotationsState.profile = null;
                 myRotationsState.rotations = [];
+                myRotationsState.detailRotationId = "";
+                myRotationsState.detailEditing = false;
+                closeProfileModal();
+                renderMyRotations();
+                renderMyAuthPanel();
+                return;
             }
-            renderMyRotations();
+            fetchMyProfile().finally(() => {
+                renderMyRotations();
+                renderMyAuthPanel();
+            });
         });
     }
 
@@ -784,4 +1474,21 @@ function initMyRotations() {
     updateAccountBar();
 }
 
+function isMyAccountSignedIn() {
+    return Boolean(myRotationsState.session);
+}
+
+function getMyAccountProfile() {
+    return myRotationsState.profile || null;
+}
+
+function getMyAccountUserId() {
+    return myRotationsState.session?.user?.id || "";
+}
+
+window.isMyAccountSignedIn = isMyAccountSignedIn;
+window.getMyAccountProfile = getMyAccountProfile;
+window.getMyAccountUserId = getMyAccountUserId;
+window.openMyRotationsModal = openMyRotationsModal;
+window.saveCurrentRotationToMyRotations = saveCurrentRotationToMyRotations;
 window.initMyRotations = initMyRotations;

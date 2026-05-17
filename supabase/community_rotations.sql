@@ -21,6 +21,7 @@ create table if not exists public.community_rotations (
     is_public boolean not null default true,
     is_approved boolean not null default false,
     is_hidden boolean not null default false,
+    submitted_by uuid default auth.uid() references auth.users(id) on delete set null,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now(),
     check (char_length(title) between 3 and 80),
@@ -47,6 +48,7 @@ alter table public.community_rotations add column if not exists view_count integ
 alter table public.community_rotations add column if not exists is_public boolean not null default true;
 alter table public.community_rotations add column if not exists is_approved boolean not null default false;
 alter table public.community_rotations add column if not exists is_hidden boolean not null default false;
+alter table public.community_rotations add column if not exists submitted_by uuid default auth.uid() references auth.users(id) on delete set null;
 alter table public.community_rotations add column if not exists created_at timestamptz not null default now();
 alter table public.community_rotations add column if not exists updated_at timestamptz not null default now();
 
@@ -73,8 +75,10 @@ drop policy if exists "Public submit community rotations for review" on public.c
 create policy "Public submit community rotations for review"
     on public.community_rotations
     for insert
+    to authenticated
     with check (
         game = 'arknights_endfield'
+        and (submitted_by is null or submitted_by = auth.uid())
         and is_public = true
         and is_approved = false
         and is_hidden = false

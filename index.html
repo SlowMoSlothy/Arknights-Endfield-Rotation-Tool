@@ -100,6 +100,7 @@
         alt="Arknights Endfield Rotation Builder"
       >
       <div class="account-bar" aria-label="Account actions">
+        <img id="accountAvatar" class="account-avatar" alt="" hidden>
         <span id="accountUserLabel" class="account-user-label" hidden></span>
         <button id="accountSignInBtn" class="account-action-btn" type="button">Sign In</button>
         <button id="accountCreateBtn" class="account-action-btn account-action-primary" type="button">Create Account</button>
@@ -118,23 +119,57 @@
       <div class="builder-content">
         <aside class="builder-sidebar">
           <h3>Menu</h3>
-          <button id="openMyRotationsBtn" class="sidebar-command" type="button">
-            <span class="sidebar-command-icon">MY</span>
+          <button id="openMyRotationsBtn" class="sidebar-command" type="button" hidden>
+            <span class="sidebar-command-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M6 3h9l3 3v15H6z"></path>
+                <path d="M14 3v4h4"></path>
+                <path d="M9 12h6"></path>
+                <path d="M9 16h6"></path>
+              </svg>
+            </span>
             <span class="sidebar-command-label">My Rotations</span>
             <span class="sidebar-command-signal"></span>
           </button>
+          <button id="openProfileBtn" class="sidebar-command" type="button" hidden>
+            <span class="sidebar-command-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <circle cx="12" cy="8" r="4"></circle>
+                <path d="M5 20c1.2-4 3.6-6 7-6s5.8 2 7 6"></path>
+              </svg>
+            </span>
+            <span class="sidebar-command-label">Profile</span>
+            <span class="sidebar-command-signal"></span>
+          </button>
           <button id="openCommunityRotationsBtn" class="sidebar-command" type="button">
-            <span class="sidebar-command-icon">CM</span>
+            <span class="sidebar-command-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <circle cx="9" cy="8" r="3"></circle>
+                <circle cx="17" cy="10" r="2.5"></circle>
+                <path d="M3.5 20c.9-4 2.7-6 5.5-6s4.6 2 5.5 6"></path>
+                <path d="M14.5 15c2.8.2 4.8 1.9 6 5"></path>
+              </svg>
+            </span>
             <span class="sidebar-command-label">Community</span>
             <span class="sidebar-command-signal"></span>
           </button>
           <button id="openAdminPanelBtn" class="sidebar-command" type="button" hidden>
-            <span class="sidebar-command-icon">AD</span>
+            <span class="sidebar-command-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M12 3l7 3v5c0 4.5-2.5 7.8-7 10-4.5-2.2-7-5.5-7-10V6z"></path>
+                <path d="M9 12l2 2 4-5"></path>
+              </svg>
+            </span>
             <span class="sidebar-command-label">Admin</span>
             <span class="sidebar-command-signal"></span>
           </button>
           <button id="openSettingsBtn" class="sidebar-command" type="button">
-            <span class="sidebar-command-icon">⚙</span>
+            <span class="sidebar-command-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.08V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.08-.4H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.08V3a2 2 0 0 1 4 0v.09A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 .6 1 1.7 1.7 0 0 0 1.08.4H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.51.6z"></path>
+              </svg>
+            </span>
             <span class="sidebar-command-label">Settings</span>
             <span class="sidebar-command-signal"></span>
           </button>
@@ -176,6 +211,20 @@
                       <path d="M8.3 13.2l7.4 4.4"></path>
                     </svg>
                   </button>
+                </span>
+                <span id="saveRotationMenuHost" class="rotation-action-tooltip-host rotation-save-menu-host" data-action-tooltip="Save Rotation in...">
+                  <button id="saveRotationMenuBtn" class="rotation-action-btn" type="button" onclick="toggleRotationSaveMenu(event)" aria-label="Save Rotation in..." aria-haspopup="menu" aria-expanded="false" disabled>
+                    <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M5 4h12l2 2v14H5z"></path>
+                      <path d="M8 4v6h8V4"></path>
+                      <path d="M8 17h8"></path>
+                      <path d="M9 10h6"></path>
+                    </svg>
+                  </button>
+                  <div id="rotationSaveMenu" class="rotation-save-menu" role="menu" hidden>
+                    <button type="button" role="menuitem" onclick="saveRotationInMyRotations()">My rotations</button>
+                    <button type="button" role="menuitem" onclick="saveRotationInCommunity()">Community Rotations</button>
+                  </div>
                 </span>
                 <span class="rotation-action-tooltip-host" data-action-tooltip="Import share code or share link">
                   <button class="rotation-action-btn" type="button" onclick="loadBuildShareCode()" aria-label="Import share code or share link">
@@ -241,6 +290,10 @@
             <span>Email</span>
             <input id="myRotationsEmailInput" type="email" autocomplete="email" required placeholder="you@example.com">
           </label>
+          <label id="myRotationsUsernameField" class="my-rotations-field" hidden>
+            <span>Username</span>
+            <input id="myRotationsUsernameInput" type="text" autocomplete="username" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" placeholder="Endministrator">
+          </label>
           <label class="my-rotations-field">
             <span>Password</span>
             <input id="myRotationsPasswordInput" type="password" autocomplete="current-password" minlength="6" required placeholder="Password">
@@ -257,7 +310,7 @@
         <div class="my-rotations-session-bar">
           <div class="my-rotations-session-copy">
             <span>Signed in as</span>
-            <strong id="myRotationsUserEmail">Account</strong>
+            <strong id="myRotationsUserName">Account</strong>
           </div>
           <div class="my-rotations-session-actions">
             <button id="myRotationsRefreshButton" class="my-secondary-btn" type="button">Refresh</button>
@@ -265,23 +318,69 @@
           </div>
         </div>
 
-        <form id="myRotationSaveForm" class="my-rotation-save-form">
-          <label class="my-rotations-field">
-            <span>Title</span>
-            <input id="myRotationTitleInput" type="text" minlength="3" maxlength="80" required placeholder="Electric opener">
-          </label>
-          <label class="my-rotations-field">
-            <span>Description</span>
-            <textarea id="myRotationDescriptionInput" maxlength="600" rows="3" placeholder="Private notes for this rotation"></textarea>
-          </label>
-          <div class="my-rotations-actions">
-            <button id="myRotationSaveButton" class="my-primary-btn" type="submit" disabled>Save Current Rotation</button>
-          </div>
-        </form>
-
         <div id="myRotationsListStatus" class="my-rotations-status"></div>
+        <div id="myRotationDetailPanel" class="my-rotation-detail-panel" hidden></div>
         <div id="myRotationsList" class="my-rotations-list"></div>
       </section>
+    </div>
+  </div>
+
+  <div id="profileModal" class="settings-modal my-rotations-modal">
+    <div class="settings-dialog my-profile-dialog">
+      <div class="settings-header">
+        <h2 class="settings-title">Profile</h2>
+        <button id="closeProfileModalBtn" class="settings-close" type="button">&times;</button>
+      </div>
+
+      <section class="my-account-panel">
+        <div class="my-account-header">
+          <div>
+            <h3>Account</h3>
+            <p>Change your public username and avatar.</p>
+          </div>
+          <img id="myProfileAvatarPreview" class="my-profile-avatar" alt="" hidden>
+        </div>
+        <form id="myProfileForm" class="my-profile-form">
+          <label class="my-rotations-field">
+            <span>Username</span>
+            <input id="myProfileUsernameInput" type="text" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" required placeholder="Endministrator">
+          </label>
+          <label class="my-rotations-field">
+            <span>Avatar</span>
+            <input id="myProfileAvatarInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+          </label>
+          <div id="myProfileStatus" class="my-rotations-status"></div>
+          <div class="my-rotations-actions">
+            <button id="myProfileSaveButton" class="my-secondary-btn" type="submit">Save Account</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </div>
+
+  <div id="rotationQuickSaveModal" class="settings-modal my-rotations-modal">
+    <div class="settings-dialog rotation-quick-save-dialog">
+      <div class="settings-header">
+        <h2 id="rotationQuickSaveTitle" class="settings-title">Save Rotation</h2>
+        <button id="closeRotationQuickSaveModalBtn" class="settings-close" type="button">&times;</button>
+      </div>
+
+      <p id="rotationQuickSaveIntro" class="my-rotations-intro">Save this rotation.</p>
+      <form id="rotationQuickSaveForm" class="rotation-quick-save-form">
+        <label class="my-rotations-field">
+          <span>Title</span>
+          <input id="rotationQuickSaveTitleInput" type="text" minlength="3" maxlength="80" required placeholder="Electric opener">
+        </label>
+        <label class="my-rotations-field">
+          <span>Description</span>
+          <textarea id="rotationQuickSaveDescriptionInput" maxlength="600" rows="3" placeholder="Short notes for this rotation"></textarea>
+        </label>
+        <div id="rotationQuickSaveStatus" class="my-rotations-status"></div>
+        <div class="my-rotations-actions">
+          <button id="cancelRotationQuickSaveBtn" class="my-secondary-btn" type="button">Cancel</button>
+          <button id="submitRotationQuickSaveBtn" class="my-primary-btn" type="submit">Save Rotation</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -335,7 +434,7 @@
           </label>
           <label class="community-field">
             <span>Author</span>
-            <input id="communitySubmitAuthor" type="text" maxlength="40" placeholder="Optional">
+            <input id="communitySubmitAuthor" type="text" maxlength="40" placeholder="Account username" readonly>
           </label>
         </div>
         <label class="community-field">
@@ -412,7 +511,7 @@
 
   <footer class="site-footer">
     <span>&copy; 2026 Arknights Endfield Rotation Builder</span>
-    <span>App Version 2.6.2</span>
+    <span>App Version 2.11.5</span>
     <span>Fan-made tool, not affiliated with Gryphline or Hypergryph.</span>
   </footer>
 
