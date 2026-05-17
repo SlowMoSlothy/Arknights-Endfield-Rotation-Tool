@@ -174,7 +174,8 @@
 
 .my-primary-btn,
 .my-secondary-btn,
-.my-action-btn {
+.my-action-btn,
+.my-link-btn {
     min-height: 34px;
     border: 1px solid rgba(160,170,169,0.30);
     border-radius: 999px;
@@ -197,6 +198,13 @@
     background: linear-gradient(180deg, #F8F546, #d6d336);
 }
 
+.my-link-btn {
+    color: #F8F546;
+    border-color: rgba(248,245,70,0.26);
+    background:
+        linear-gradient(180deg, rgba(248,245,70,0.08), rgba(18,20,22,0.88));
+}
+
 .my-action-btn.is-danger {
     border-color: rgba(255,125,115,0.42);
     color: #ffb1ab;
@@ -204,7 +212,8 @@
 
 .my-primary-btn:hover,
 .my-secondary-btn:hover,
-.my-action-btn:hover {
+.my-action-btn:hover,
+.my-link-btn:hover {
     border-color: rgba(248,245,70,0.7);
     color: #F8F546;
     box-shadow:
@@ -219,7 +228,8 @@
 
 .my-primary-btn:disabled,
 .my-secondary-btn:disabled,
-.my-action-btn:disabled {
+.my-action-btn:disabled,
+.my-link-btn:disabled {
     cursor: not-allowed;
     opacity: 0.62;
 }
@@ -437,10 +447,10 @@
 
 .my-rotation-detail-panel {
     display: grid;
-    gap: 14px;
+    gap: 10px;
     border: 1px solid rgba(248,245,70,0.22);
     border-radius: 16px;
-    padding: 16px;
+    padding: 14px;
     background:
         linear-gradient(180deg, rgba(160,170,169,0.12), rgba(7,9,10,0.58)),
         radial-gradient(circle at 12% 0%, rgba(248,245,70,0.09), transparent 36%);
@@ -457,7 +467,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 12px;
+    gap: 10px;
 }
 
 .my-detail-header-actions {
@@ -471,20 +481,20 @@
 .my-detail-title-block {
     min-width: 0;
     display: grid;
-    gap: 6px;
+    gap: 4px;
 }
 
 .my-detail-title {
     margin: 0;
     color: #fff;
-    font-size: 20px;
+    font-size: 18px;
     line-height: 1.1;
 }
 
 .my-detail-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px 12px;
+    gap: 4px 10px;
     color: rgba(160,170,169,0.82);
     font-size: 11px;
     font-weight: 800;
@@ -492,7 +502,7 @@
 
 .my-detail-section {
     display: grid;
-    gap: 8px;
+    gap: 6px;
 }
 
 .my-detail-section-title {
@@ -506,20 +516,20 @@
 
 .my-detail-team {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 8px;
 }
 
 .my-detail-operator {
     min-width: 0;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     border: 1px solid rgba(160,170,169,0.20);
     border-radius: 14px;
     background:
         linear-gradient(180deg, rgba(160,170,169,0.12), rgba(7,9,10,0.48));
-    padding: 9px;
+    padding: 7px;
 }
 
 .my-detail-operator.is-leader {
@@ -527,9 +537,9 @@
 }
 
 .my-detail-operator-avatar {
-    width: 46px;
-    height: 46px;
-    border-radius: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
 }
 
 .my-detail-operator-copy {
@@ -561,17 +571,17 @@
 .my-detail-skill-sequence {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
     overflow-x: auto;
-    padding: 4px 2px 8px;
+    padding: 2px 2px 6px;
 }
 
 .my-detail-skill {
     display: inline-grid;
     justify-items: center;
-    gap: 4px;
+    gap: 3px;
     flex: 0 0 auto;
-    min-width: 52px;
+    min-width: 48px;
 }
 
 .my-detail-skill-label {
@@ -592,7 +602,7 @@
     color: rgba(242,242,242,0.76);
     font-size: 12px;
     font-weight: 700;
-    line-height: 1.5;
+    line-height: 1.4;
 }
 
 .my-detail-empty {
@@ -604,7 +614,7 @@
 .my-detail-actions,
 .my-detail-edit-form {
     display: grid;
-    gap: 12px;
+    gap: 10px;
 }
 
 .my-detail-actions {

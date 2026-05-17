@@ -300,6 +300,7 @@
           </label>
           <div id="myRotationsAuthStatus" class="my-rotations-status"></div>
           <div class="my-rotations-actions">
+            <button id="myRotationsForgotPasswordButton" class="my-link-btn" type="button">Forgot password?</button>
             <button id="myRotationsRegisterButton" class="my-secondary-btn" type="button">Create Account</button>
             <button id="myRotationsSignInButton" class="my-primary-btn" type="submit">Sign In</button>
           </div>
@@ -351,10 +352,36 @@
           </label>
           <div id="myProfileStatus" class="my-rotations-status"></div>
           <div class="my-rotations-actions">
+            <button id="myProfileRemoveAvatarButton" class="my-secondary-btn" type="button">Remove Avatar</button>
             <button id="myProfileSaveButton" class="my-secondary-btn" type="submit">Save Account</button>
           </div>
         </form>
       </section>
+    </div>
+  </div>
+
+  <div id="passwordResetModal" class="settings-modal my-rotations-modal">
+    <div class="settings-dialog my-profile-dialog">
+      <div class="settings-header">
+        <h2 class="settings-title">Reset Password</h2>
+        <button id="closePasswordResetModalBtn" class="settings-close" type="button">&times;</button>
+      </div>
+
+      <p class="my-rotations-intro">Enter a new password for your account.</p>
+      <form id="myPasswordResetForm" class="my-profile-form">
+        <label class="my-rotations-field">
+          <span>New Password</span>
+          <input id="myPasswordResetInput" type="password" autocomplete="new-password" minlength="6" required placeholder="New password">
+        </label>
+        <label class="my-rotations-field">
+          <span>Confirm Password</span>
+          <input id="myPasswordResetConfirmInput" type="password" autocomplete="new-password" minlength="6" required placeholder="Repeat password">
+        </label>
+        <div id="myPasswordResetStatus" class="my-rotations-status"></div>
+        <div class="my-rotations-actions">
+          <button id="myPasswordResetSaveButton" class="my-primary-btn" type="submit">Save Password</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -511,7 +538,7 @@
 
   <footer class="site-footer">
     <span>&copy; 2026 Arknights Endfield Rotation Builder</span>
-    <span>App Version 2.11.5</span>
+    <span>App Version 2.13.3</span>
     <span>Fan-made tool, not affiliated with Gryphline or Hypergryph.</span>
   </footer>
 

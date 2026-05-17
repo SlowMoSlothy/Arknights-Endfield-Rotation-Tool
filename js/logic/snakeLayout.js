@@ -46,13 +46,13 @@ function getSnakeSlotMap() {
             if (hasNextSlot) {
                 if (!isLastInRow) {
                     arrow = {
-                        text: isReverse ? "←" : "→",
+                        direction: isReverse ? "left" : "right",
                         gridColumn: isReverse ? gridColumn - 1 : gridColumn + 1,
                         gridRow
                     };
                 } else {
                     arrow = {
-                        text: "↓",
+                        direction: "down",
                         gridColumn,
                         gridRow: gridRow + 1
                     };

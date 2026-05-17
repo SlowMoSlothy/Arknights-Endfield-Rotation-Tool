@@ -5,6 +5,9 @@ const myRotationsState = {
     loading: false,
     saving: false,
     profileSaving: false,
+    avatarRemovalRequested: false,
+    passwordResetSending: false,
+    passwordUpdating: false,
     authMode: "signIn",
     actionIds: new Set(),
     initialized: false,
@@ -150,6 +153,37 @@ function sanitizeUsername(value) {
 
 function isValidUsername(value) {
     return USERNAME_PATTERN.test(sanitizeUsername(value));
+}
+
+function getFriendlyMyAccountError(error, fallbackMessage = "Account action failed.") {
+    const message = String(error?.message || error || "").trim();
+    const lowerMessage = message.toLowerCase();
+
+    if (lowerMessage.includes("duplicate") || lowerMessage.includes("23505") || lowerMessage.includes("idx_user_profiles_username")) {
+        return "This username is already taken.";
+    }
+
+    if (lowerMessage.includes("user already registered") || lowerMessage.includes("already registered")) {
+        return "This email is already registered. Try signing in instead.";
+    }
+
+    if (lowerMessage.includes("password")) {
+        return "Use a password with at least 6 characters.";
+    }
+
+    if (lowerMessage.includes("email")) {
+        return "Check the email address and try again.";
+    }
+
+    return message || fallbackMessage;
+}
+
+function getAuthRedirectUrl() {
+    if (window.location.protocol === "http:" || window.location.protocol === "https:") {
+        return `${window.location.origin}${window.location.pathname}`;
+    }
+
+    return window.location.href.split("#")[0];
 }
 
 function getFallbackUsername() {
@@ -333,6 +367,7 @@ function setMyAuthMode(mode = "signIn") {
     const passwordInput = document.getElementById("myRotationsPasswordInput");
     const registerButton = document.getElementById("myRotationsRegisterButton");
     const signInButton = document.getElementById("myRotationsSignInButton");
+    const forgotPasswordButton = document.getElementById("myRotationsForgotPasswordButton");
 
     if (title) title.textContent = config.title;
     if (intro) intro.textContent = config.intro;
@@ -347,6 +382,7 @@ function setMyAuthMode(mode = "signIn") {
     if (registerButton) registerButton.classList.toggle("my-secondary-btn", mode !== "create");
     if (signInButton) signInButton.classList.toggle("my-primary-btn", mode !== "create");
     if (signInButton) signInButton.classList.toggle("my-secondary-btn", mode === "create");
+    if (forgotPasswordButton) forgotPasswordButton.hidden = mode === "create";
 
     if (!myRotationsState.session) {
         setMyAuthStatus(config.status);
@@ -361,17 +397,31 @@ function setMyProfileStatus(text, className = "") {
     status.textContent = text;
 }
 
+function clearMyAvatarObjectUrl(preview) {
+    const objectUrl = preview?.dataset?.objectUrl || "";
+    if (!objectUrl) return;
+
+    URL.revokeObjectURL(objectUrl);
+    delete preview.dataset.objectUrl;
+}
+
 function renderMyProfile() {
     const usernameInput = document.getElementById("myProfileUsernameInput");
     const avatarPreview = document.getElementById("myProfileAvatarPreview");
+    const avatarInput = document.getElementById("myProfileAvatarInput");
     const saveButton = document.getElementById("myProfileSaveButton");
+    const removeAvatarButton = document.getElementById("myProfileRemoveAvatarButton");
     const username = myRotationsState.profile?.username || "";
-    const avatarUrl = myRotationsState.profile?.avatar_url || "";
+    const avatarUrl = myRotationsState.avatarRemovalRequested ? "" : myRotationsState.profile?.avatar_url || "";
 
     if (usernameInput && document.activeElement !== usernameInput) {
         usernameInput.value = username;
     }
+    if (avatarInput && myRotationsState.avatarRemovalRequested) {
+        avatarInput.value = "";
+    }
     if (avatarPreview) {
+        clearMyAvatarObjectUrl(avatarPreview);
         avatarPreview.hidden = !avatarUrl;
         avatarPreview.src = avatarUrl || "";
         avatarPreview.alt = avatarUrl ? `${username || "Account"} avatar` : "";
@@ -379,6 +429,9 @@ function renderMyProfile() {
     if (saveButton) {
         saveButton.disabled = !myRotationsState.session || myRotationsState.profileSaving;
         saveButton.textContent = myRotationsState.profileSaving ? "Saving" : "Save Account";
+    }
+    if (removeAvatarButton) {
+        removeAvatarButton.disabled = !myRotationsState.session || myRotationsState.profileSaving || (!avatarUrl && !myRotationsState.profile?.avatar_url);
     }
 }
 
@@ -767,7 +820,11 @@ function renderMyRotationList() {
         myRotationsState.detailEditing = false;
     }
 
-    setMyListStatus(`${myRotationsState.rotations.length} saved rotation${myRotationsState.rotations.length === 1 ? "" : "s"}.`);
+    const savedCountLabel = `${myRotationsState.rotations.length} saved rotation${myRotationsState.rotations.length === 1 ? "" : "s"}.`;
+    setMyListStatus(myRotationsState.detailRotationId
+        ? savedCountLabel
+        : `${savedCountLabel} Select a saved rotation to inspect it.`
+    );
     const visibleRows = myRotationsState.detailRotationId
         ? myRotationsState.rotations.filter(row => String(row.id) !== String(myRotationsState.detailRotationId))
         : myRotationsState.rotations;
@@ -926,14 +983,55 @@ async function signInMyAccount(event) {
 
         const passwordInput = document.getElementById("myRotationsPasswordInput");
         if (passwordInput) passwordInput.value = "";
-        await refreshMySession(true);
+        await refreshMySession(false);
+        closeMyRotationsModal();
     } catch (error) {
         console.error("Account sign in failed:", error);
-        setMyAuthStatus("Sign in failed. Check the email and password.", "is-error");
+        setMyAuthStatus(getFriendlyMyAccountError(error, "Sign in failed. Check the email and password."), "is-error");
     } finally {
         if (button) {
             button.disabled = false;
             button.textContent = "Sign In";
+        }
+    }
+}
+
+async function sendMyPasswordReset() {
+    const client = getMySupabaseClient();
+    if (!client) {
+        setMyAuthStatus("Supabase is not available right now.", "is-error");
+        return;
+    }
+
+    const email = document.getElementById("myRotationsEmailInput")?.value.trim() || "";
+    const button = document.getElementById("myRotationsForgotPasswordButton");
+    if (!email) {
+        setMyAuthStatus("Enter your email first, then press Forgot password.", "is-error");
+        return;
+    }
+
+    myRotationsState.passwordResetSending = true;
+    if (button) {
+        button.disabled = true;
+        button.textContent = "Sending";
+    }
+    setMyAuthStatus("Sending password reset email...");
+
+    try {
+        const { error } = await client.auth.resetPasswordForEmail(email, {
+            redirectTo: getAuthRedirectUrl()
+        });
+        if (error) throw error;
+
+        setMyAuthStatus("Password reset email sent. Open the link in your email.", "is-success");
+    } catch (error) {
+        console.error("Password reset email failed:", error);
+        setMyAuthStatus(getFriendlyMyAccountError(error, "Password reset email could not be sent."), "is-error");
+    } finally {
+        myRotationsState.passwordResetSending = false;
+        if (button) {
+            button.disabled = false;
+            button.textContent = "Forgot password?";
         }
     }
 }
@@ -982,14 +1080,15 @@ async function registerMyAccount() {
             myRotationsState.session = data.session;
             await upsertMyProfile({ username });
             setMyAuthStatus("Account created.", "is-success");
-            await refreshMySession(true);
+            await refreshMySession(false);
+            closeMyRotationsModal();
             return;
         }
 
         setMyAuthStatus("Account created. Check your email to confirm it, then sign in.", "is-success");
     } catch (error) {
         console.error("Account registration failed:", error);
-        setMyAuthStatus(error.message || "Account could not be created.", "is-error");
+        setMyAuthStatus(getFriendlyMyAccountError(error, "Account could not be created."), "is-error");
     } finally {
         if (button) {
             button.disabled = false;
@@ -1006,6 +1105,16 @@ function handleMyRegisterButton() {
     }
 
     registerMyAccount();
+}
+
+function handleMyAuthFormSubmit(event) {
+    if (myRotationsState.authMode === "create") {
+        event.preventDefault();
+        registerMyAccount();
+        return;
+    }
+
+    signInMyAccount(event);
 }
 
 function handleMySignInButtonClick() {
@@ -1043,6 +1152,43 @@ async function uploadMyAvatar(file) {
     return data?.publicUrl || "";
 }
 
+function getMyAvatarStoragePath(avatarUrl) {
+    const url = String(avatarUrl || "").trim();
+    if (!url) return "";
+
+    try {
+        const parsedUrl = new URL(url);
+        const decodedPath = decodeURIComponent(parsedUrl.pathname);
+        const marker = `/object/public/${AVATAR_BUCKET}/`;
+        const markerIndex = decodedPath.indexOf(marker);
+        return markerIndex >= 0 ? decodedPath.slice(markerIndex + marker.length) : "";
+    } catch (_error) {
+        const marker = `/object/public/${AVATAR_BUCKET}/`;
+        const markerIndex = url.indexOf(marker);
+        return markerIndex >= 0 ? decodeURIComponent(url.slice(markerIndex + marker.length)) : "";
+    }
+}
+
+async function deleteMyStoredAvatar(avatarUrl) {
+    const client = getMySupabaseClient();
+    const storagePath = getMyAvatarStoragePath(avatarUrl);
+    if (!client || !storagePath) return;
+
+    try {
+        await client.storage.from(AVATAR_BUCKET).remove([storagePath]);
+    } catch (error) {
+        console.warn("Old avatar could not be deleted:", error);
+    }
+}
+
+function markMyAvatarForRemoval() {
+    myRotationsState.avatarRemovalRequested = true;
+    const avatarInput = document.getElementById("myProfileAvatarInput");
+    if (avatarInput) avatarInput.value = "";
+    setMyProfileStatus("Avatar will be removed when you save.", "is-success");
+    renderMyProfile();
+}
+
 async function saveMyProfile(event) {
     event.preventDefault();
     const client = getMySupabaseClient();
@@ -1054,6 +1200,7 @@ async function saveMyProfile(event) {
     const username = sanitizeUsername(document.getElementById("myProfileUsernameInput")?.value || "");
     const avatarInput = document.getElementById("myProfileAvatarInput");
     const avatarFile = avatarInput?.files?.[0] || null;
+    const previousAvatarUrl = myRotationsState.profile?.avatar_url || "";
 
     if (!isValidUsername(username)) {
         setMyProfileStatus("Username must be 3-24 characters and use only letters, numbers, or underscore.", "is-error");
@@ -1065,7 +1212,9 @@ async function saveMyProfile(event) {
     setMyProfileStatus("Saving account...");
 
     try {
-        const avatarUrl = avatarFile ? await uploadMyAvatar(avatarFile) : myRotationsState.profile?.avatar_url || "";
+        const avatarUrl = myRotationsState.avatarRemovalRequested
+            ? ""
+            : avatarFile ? await uploadMyAvatar(avatarFile) : previousAvatarUrl;
         const profile = await upsertMyProfile({ username, avatarUrl });
 
         await client.auth.updateUser({
@@ -1075,11 +1224,16 @@ async function saveMyProfile(event) {
             }
         });
 
+        if ((myRotationsState.avatarRemovalRequested || avatarFile) && previousAvatarUrl && previousAvatarUrl !== avatarUrl) {
+            await deleteMyStoredAvatar(previousAvatarUrl);
+        }
+
         if (avatarInput) avatarInput.value = "";
+        myRotationsState.avatarRemovalRequested = false;
         setMyProfileStatus("Account saved.", "is-success");
     } catch (error) {
         console.error("Account profile save failed:", error);
-        setMyProfileStatus(error.message || "Account could not be saved.", "is-error");
+        setMyProfileStatus(getFriendlyMyAccountError(error, "Account could not be saved."), "is-error");
     } finally {
         myRotationsState.profileSaving = false;
         renderMyProfile();
@@ -1132,12 +1286,18 @@ async function saveCurrentRotationToMyRotations(values) {
     setMyListStatus("Saving rotation...");
 
     try {
-        const { error } = await client
+        const { data, error } = await client
             .from("user_rotations")
-            .insert(buildMyRotationPayload(normalizedValues));
+            .insert(buildMyRotationPayload(normalizedValues))
+            .select("id")
+            .single();
 
         if (error) throw error;
 
+        if (data?.id) {
+            myRotationsState.detailRotationId = String(data.id);
+            myRotationsState.detailEditing = false;
+        }
         setMyListStatus("Rotation saved.", "is-success");
         await fetchMyRotations();
         return true;
@@ -1363,6 +1523,85 @@ function closeMyRotationsModal() {
     modal.classList.remove("open");
 }
 
+function setMyPasswordResetStatus(text, className = "") {
+    const status = document.getElementById("myPasswordResetStatus");
+    if (!status) return;
+
+    status.className = `my-rotations-status${className ? ` ${className}` : ""}`;
+    status.textContent = text;
+}
+
+function openPasswordResetModal() {
+    const modal = document.getElementById("passwordResetModal");
+    if (!modal) return;
+
+    const passwordInput = document.getElementById("myPasswordResetInput");
+    const confirmInput = document.getElementById("myPasswordResetConfirmInput");
+    if (passwordInput) passwordInput.value = "";
+    if (confirmInput) confirmInput.value = "";
+    setMyPasswordResetStatus("");
+    modal.classList.add("open");
+    window.setTimeout(() => passwordInput?.focus(), 0);
+}
+
+function closePasswordResetModal() {
+    const modal = document.getElementById("passwordResetModal");
+    if (!modal) return;
+
+    modal.classList.remove("open");
+}
+
+async function saveMyNewPassword(event) {
+    event.preventDefault();
+    const client = getMySupabaseClient();
+    const passwordInput = document.getElementById("myPasswordResetInput");
+    const confirmInput = document.getElementById("myPasswordResetConfirmInput");
+    const saveButton = document.getElementById("myPasswordResetSaveButton");
+    const password = passwordInput?.value || "";
+    const confirmation = confirmInput?.value || "";
+
+    if (!client) {
+        setMyPasswordResetStatus("Supabase is not available right now.", "is-error");
+        return;
+    }
+
+    if (password.length < 6) {
+        setMyPasswordResetStatus("Use at least 6 characters.", "is-error");
+        return;
+    }
+
+    if (password !== confirmation) {
+        setMyPasswordResetStatus("Passwords do not match.", "is-error");
+        return;
+    }
+
+    myRotationsState.passwordUpdating = true;
+    if (saveButton) {
+        saveButton.disabled = true;
+        saveButton.textContent = "Saving";
+    }
+    setMyPasswordResetStatus("Saving new password...");
+
+    try {
+        const { error } = await client.auth.updateUser({ password });
+        if (error) throw error;
+
+        if (passwordInput) passwordInput.value = "";
+        if (confirmInput) confirmInput.value = "";
+        setMyPasswordResetStatus("Password updated.", "is-success");
+        window.setTimeout(closePasswordResetModal, 800);
+    } catch (error) {
+        console.error("Password update failed:", error);
+        setMyPasswordResetStatus(getFriendlyMyAccountError(error, "Password could not be updated."), "is-error");
+    } finally {
+        myRotationsState.passwordUpdating = false;
+        if (saveButton) {
+            saveButton.disabled = false;
+            saveButton.textContent = "Save Password";
+        }
+    }
+}
+
 function openProfileModal() {
     if (!myRotationsState.session) {
         openMyRotationsModal({ mode: "signIn" });
@@ -1381,7 +1620,13 @@ function closeProfileModal() {
     const modal = document.getElementById("profileModal");
     if (!modal) return;
 
+    myRotationsState.avatarRemovalRequested = false;
+    const avatarInput = document.getElementById("myProfileAvatarInput");
+    const avatarPreview = document.getElementById("myProfileAvatarPreview");
+    if (avatarInput) avatarInput.value = "";
+    clearMyAvatarObjectUrl(avatarPreview);
     modal.classList.remove("open");
+    renderMyProfile();
 }
 
 function initMyRotations() {
@@ -1395,15 +1640,20 @@ function initMyRotations() {
     const accountSignOutButton = document.getElementById("accountSignOutBtn");
     const closeButton = document.getElementById("closeMyRotationsModalBtn");
     const closeProfileButton = document.getElementById("closeProfileModalBtn");
+    const closePasswordResetButton = document.getElementById("closePasswordResetModalBtn");
     const authForm = document.getElementById("myRotationsAuthForm");
     const registerButton = document.getElementById("myRotationsRegisterButton");
     const signInButton = document.getElementById("myRotationsSignInButton");
+    const forgotPasswordButton = document.getElementById("myRotationsForgotPasswordButton");
     const profileForm = document.getElementById("myProfileForm");
     const avatarInput = document.getElementById("myProfileAvatarInput");
+    const removeAvatarButton = document.getElementById("myProfileRemoveAvatarButton");
+    const passwordResetForm = document.getElementById("myPasswordResetForm");
     const refreshButton = document.getElementById("myRotationsRefreshButton");
     const signOutButton = document.getElementById("myRotationsSignOutButton");
     const modal = document.getElementById("myRotationsModal");
     const profileModal = document.getElementById("profileModal");
+    const passwordResetModal = document.getElementById("passwordResetModal");
 
     if (openButton) openButton.addEventListener("click", () => openMyRotationsModal());
     if (openProfileButton) openProfileButton.addEventListener("click", openProfileModal);
@@ -1412,17 +1662,26 @@ function initMyRotations() {
     if (accountSignOutButton) accountSignOutButton.addEventListener("click", signOutMyAccount);
     if (closeButton) closeButton.addEventListener("click", closeMyRotationsModal);
     if (closeProfileButton) closeProfileButton.addEventListener("click", closeProfileModal);
-    if (authForm) authForm.addEventListener("submit", signInMyAccount);
+    if (closePasswordResetButton) closePasswordResetButton.addEventListener("click", closePasswordResetModal);
+    if (authForm) authForm.addEventListener("submit", handleMyAuthFormSubmit);
     if (registerButton) registerButton.addEventListener("click", handleMyRegisterButton);
     if (signInButton) signInButton.addEventListener("click", handleMySignInButtonClick);
+    if (forgotPasswordButton) forgotPasswordButton.addEventListener("click", sendMyPasswordReset);
     if (profileForm) profileForm.addEventListener("submit", saveMyProfile);
+    if (removeAvatarButton) removeAvatarButton.addEventListener("click", markMyAvatarForRemoval);
+    if (passwordResetForm) passwordResetForm.addEventListener("submit", saveMyNewPassword);
     if (avatarInput) {
         avatarInput.addEventListener("change", () => {
             const file = avatarInput.files?.[0];
             const preview = document.getElementById("myProfileAvatarPreview");
             if (!file || !preview) return;
+            myRotationsState.avatarRemovalRequested = false;
+            clearMyAvatarObjectUrl(preview);
             preview.hidden = false;
-            preview.src = URL.createObjectURL(file);
+            const objectUrl = URL.createObjectURL(file);
+            preview.dataset.objectUrl = objectUrl;
+            preview.src = objectUrl;
+            setMyProfileStatus("Avatar selected. Save the account to apply it.");
         });
     }
     if (refreshButton) refreshButton.addEventListener("click", fetchMyRotations);
@@ -1437,21 +1696,30 @@ function initMyRotations() {
             if (event.target === profileModal) closeProfileModal();
         });
     }
+    if (passwordResetModal) {
+        passwordResetModal.addEventListener("click", event => {
+            if (event.target === passwordResetModal) closePasswordResetModal();
+        });
+    }
 
     document.addEventListener("keydown", event => {
         const modalElement = document.getElementById("myRotationsModal");
         const profileModalElement = document.getElementById("profileModal");
+        const passwordResetModalElement = document.getElementById("passwordResetModal");
         if (event.key === "Escape" && modalElement?.classList.contains("open")) {
             closeMyRotationsModal();
         }
         if (event.key === "Escape" && profileModalElement?.classList.contains("open")) {
             closeProfileModal();
         }
+        if (event.key === "Escape" && passwordResetModalElement?.classList.contains("open")) {
+            closePasswordResetModal();
+        }
     });
 
     const client = getMySupabaseClient();
     if (client?.auth?.onAuthStateChange) {
-        client.auth.onAuthStateChange((_event, session) => {
+        client.auth.onAuthStateChange((event, session) => {
             myRotationsState.session = session || null;
             if (!myRotationsState.session) {
                 myRotationsState.profile = null;
@@ -1459,8 +1727,17 @@ function initMyRotations() {
                 myRotationsState.detailRotationId = "";
                 myRotationsState.detailEditing = false;
                 closeProfileModal();
+                closePasswordResetModal();
                 renderMyRotations();
                 renderMyAuthPanel();
+                return;
+            }
+            if (event === "PASSWORD_RECOVERY") {
+                closeMyRotationsModal();
+                fetchMyProfile().finally(() => {
+                    renderMyAuthPanel();
+                    openPasswordResetModal();
+                });
                 return;
             }
             fetchMyProfile().finally(() => {

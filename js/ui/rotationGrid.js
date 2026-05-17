@@ -556,10 +556,20 @@ function renderRotation() {
         container.appendChild(slot);
         if (slotInfo.arrow) {
             const arrow = document.createElement("div");
+            const arrowDirection = slotInfo.arrow.direction || "right";
             arrow.className = "rotation-arrow";
-            arrow.textContent = slotInfo.arrow.text;
+            arrow.classList.add(`is-${arrowDirection}`);
+            if (slotInfo.arrow.gridRow !== slotInfo.gridRow) {
+                arrow.classList.add("is-vertical");
+            }
+            arrow.setAttribute("aria-hidden", "true");
             arrow.style.gridColumn = String(slotInfo.arrow.gridColumn);
             arrow.style.gridRow = String(slotInfo.arrow.gridRow);
+            const arrowLine = document.createElement("span");
+            arrowLine.className = "rotation-arrow-line";
+            const arrowHead = document.createElement("span");
+            arrowHead.className = "rotation-arrow-head";
+            arrow.append(arrowLine, arrowHead);
             const currentEntry = rotation[index];
             const nextIndex = index + 1;
             const isUsed = nextIndex < rotation.length && currentEntry !== null && rotation[nextIndex] !== null;

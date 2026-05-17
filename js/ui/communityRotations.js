@@ -9,6 +9,7 @@ const communityRotationState = {
     likedRotationIds: new Set(),
     likingRotationIds: new Set(),
     viewedRotationIds: new Set(),
+    profilesByUserId: new Map(),
     loaded: false,
     loading: false,
     submitting: false,
@@ -161,6 +162,66 @@ function getCommunityClasses(row) {
     if (directClasses.length) return directClasses;
 
     return uniqueCommunityLabels(getCommunityTeamOperators(row).map(operator => operator.operatorClass));
+}
+
+function getCommunityAuthorProfile(row) {
+    const userId = String(row?.submitted_by || "");
+    if (!userId) return null;
+    return communityRotationState.profilesByUserId.get(userId) || null;
+}
+
+function getCommunityAuthorName(row) {
+    const profile = getCommunityAuthorProfile(row);
+    return String(profile?.username || row?.author_name || "Anonymous").trim() || "Anonymous";
+}
+
+function isOwnCommunityRotation(row) {
+    const currentUserId = typeof getCommunityAccountUserId === "function" ? getCommunityAccountUserId() : "";
+    return Boolean(currentUserId && row?.submitted_by && String(currentUserId) === String(row.submitted_by));
+}
+
+function getCommunityAuthorInitials(row) {
+    return getCommunityAuthorName(row)
+        .split(/\s+|_+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map(part => part[0]?.toUpperCase() || "")
+        .join("") || "?";
+}
+
+function createCommunityAuthorAvatar(row) {
+    const profile = getCommunityAuthorProfile(row);
+    const avatarUrl = String(profile?.avatar_url || "").trim();
+
+    if (avatarUrl) {
+        const image = document.createElement("img");
+        image.className = "community-author-avatar";
+        image.src = avatarUrl;
+        image.alt = `${getCommunityAuthorName(row)} avatar`;
+        image.loading = "lazy";
+        image.addEventListener("error", () => image.replaceWith(createCommunityAuthorAvatar({ ...row, submitted_by: "" })), { once: true });
+        return image;
+    }
+
+    const fallback = document.createElement("span");
+    fallback.className = "community-author-avatar community-author-fallback";
+    fallback.textContent = getCommunityAuthorInitials(row);
+    return fallback;
+}
+
+function createCommunityAuthorChip(row, options = {}) {
+    const chip = document.createElement("div");
+    chip.className = `community-author-chip${options.isLarge ? " is-large" : ""}`;
+
+    const copy = document.createElement("div");
+    copy.className = "community-author-copy";
+    copy.appendChild(createCommunityTextElement("strong", "community-author-name", getCommunityAuthorName(row)));
+    if (isOwnCommunityRotation(row)) {
+        copy.appendChild(createCommunityTextElement("span", "community-author-you", "Submitted by you"));
+    }
+
+    chip.append(createCommunityAuthorAvatar(row), copy);
+    return chip;
 }
 
 function getAvailableCommunityValues(accessor) {
@@ -433,7 +494,7 @@ function getCommunitySearchText(row) {
     return [
         row.title,
         row.description,
-        row.author_name,
+        getCommunityAuthorName(row),
         teamNames,
         getCommunityElements(row).join(" "),
         getCommunityClasses(row).join(" ")
@@ -621,20 +682,21 @@ function renderCommunityDetailPanel() {
     panel.dataset.communityRotationId = String(row.id || "");
     const teamOperators = getCommunityTeamOperators(row);
     const skillCount = getCommunitySkillCount(row);
-    const author = row.author_name ? row.author_name : "Anonymous";
+    const author = getCommunityAuthorName(row);
     const submittedDate = formatCommunityDate(row.created_at);
 
     const header = document.createElement("div");
     header.className = "community-detail-header";
 
     const titleWrap = document.createElement("div");
+    titleWrap.className = "community-detail-title-wrap";
     titleWrap.append(
         createCommunityTextElement("h3", "community-detail-title", row.title || "Untitled rotation"),
+        createCommunityAuthorChip(row, { isLarge: true }),
         createCommunityTextElement(
             "div",
             "community-detail-meta",
             [
-                `by ${author}`,
                 submittedDate,
                 `${skillCount} skill${skillCount === 1 ? "" : "s"}`
             ].filter(Boolean).join(" - ")
@@ -669,7 +731,7 @@ function renderCommunityDetailPanel() {
     const stats = document.createElement("div");
     stats.className = "community-detail-meta-grid";
     stats.append(
-        createCommunityDetailMetaBlock("Author", author),
+        createCommunityDetailMetaBlock("Author", isOwnCommunityRotation(row) ? `${author} (you)` : author),
         createCommunityDetailMetaBlock("Submitted", submittedDate),
         createCommunityDetailMetaBlock("Views", String(Number(row.view_count) || 0)),
         createCommunityDetailMetaBlock("Likes", String(Number(row.likes_count) || 0))
@@ -1053,12 +1115,11 @@ function createCommunityRotationCard(row) {
     header.className = "community-card-header";
 
     const titleWrap = document.createElement("div");
+    titleWrap.className = "community-card-title-wrap";
     const title = createCommunityTextElement("h3", "community-card-title", row.title || "Untitled rotation");
-    const author = row.author_name ? row.author_name : "Anonymous";
     const date = formatCommunityDate(row.created_at);
-    const metaParts = [`by ${author}`];
-    if (date) metaParts.push(date);
-    titleWrap.append(title, createCommunityTextElement("div", "community-card-meta", metaParts.join(" - ")));
+    titleWrap.append(title, createCommunityAuthorChip(row));
+    if (date) titleWrap.appendChild(createCommunityTextElement("div", "community-card-meta", date));
 
     header.append(titleWrap, createCommunityLoadButton(row));
 
@@ -1127,6 +1188,39 @@ function handleCommunityRotationDeepLink() {
     return true;
 }
 
+async function fetchCommunityAuthorProfiles(rows) {
+    communityRotationState.profilesByUserId = new Map();
+
+    if (typeof supabaseClient === "undefined" || !supabaseClient) return;
+
+    const userIds = [...new Set(
+        normalizeCommunityList(rows)
+            .map(row => String(row?.submitted_by || "").trim())
+            .filter(Boolean)
+    )];
+    if (!userIds.length) return;
+
+    try {
+        const { data, error } = await supabaseClient
+            .from("user_profiles")
+            .select("user_id,username,avatar_url")
+            .in("user_id", userIds);
+
+        if (error) throw error;
+
+        normalizeCommunityList(data).forEach(profile => {
+            const userId = String(profile?.user_id || "");
+            if (!userId) return;
+            communityRotationState.profilesByUserId.set(userId, {
+                username: profile.username || "",
+                avatar_url: profile.avatar_url || ""
+            });
+        });
+    } catch (error) {
+        console.warn("Community author profiles could not be loaded:", error);
+    }
+}
+
 async function fetchCommunityRotations(force = false) {
     if (communityRotationState.loading) return;
     if (communityRotationState.loaded && !force) {
@@ -1150,7 +1244,7 @@ async function fetchCommunityRotations(force = false) {
     try {
         const { data, error } = await supabaseClient
             .from("community_rotations")
-            .select("id,title,description,author_name,share_code,team_operator_ids,rotation_skill_ids,element_types,operator_classes,likes_count,view_count,created_at")
+            .select("id,title,description,author_name,submitted_by,share_code,team_operator_ids,rotation_skill_ids,element_types,operator_classes,likes_count,view_count,created_at")
             .eq("game", "arknights_endfield")
             .eq("is_public", true)
             .eq("is_approved", true)
@@ -1161,6 +1255,7 @@ async function fetchCommunityRotations(force = false) {
         if (error) throw error;
 
         communityRotationState.rotations = Array.isArray(data) ? data : [];
+        await fetchCommunityAuthorProfiles(communityRotationState.rotations);
         communityRotationState.loaded = true;
     } catch (error) {
         console.error("Community rotations could not be loaded:", error);

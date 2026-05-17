@@ -190,9 +190,9 @@ function addExportWatermark(clonedDoc, clonedRotation, url) {
     const watermark = clonedDoc.createElement("div");
     watermark.className = "export-watermark";
     watermark.textContent = `Builder: ${url}`;
-    watermark.style.marginTop = "12px";
+    watermark.style.marginTop = "26px";
     watermark.style.paddingLeft = "6px";
-    watermark.style.paddingTop = "8px";
+    watermark.style.paddingTop = "10px";
     watermark.style.borderTop = "1px solid rgba(160,170,169,0.24)";
     watermark.style.color = "rgba(248,245,70,0.76)";
     watermark.style.fontSize = "11px";
@@ -251,7 +251,7 @@ function exportImage() {
     element.classList.add("export-mode");
 
     const exportWidth = Math.ceil(Math.max(element.scrollWidth, element.offsetWidth, exportTeamWidth));
-    const exportHeight = Math.ceil(Math.max(element.scrollHeight, element.offsetHeight)) + exportTeamHeight + (watermarkUrl ? 80 : 0);
+    const exportHeight = Math.ceil(Math.max(element.scrollHeight, element.offsetHeight)) + exportTeamHeight + (watermarkUrl ? 120 : 0);
     const exportViewportWidth = document.documentElement.clientWidth || window.innerWidth || exportWidth;
     element.style.width = `${exportWidth}px`;
     element.style.maxWidth = "none";

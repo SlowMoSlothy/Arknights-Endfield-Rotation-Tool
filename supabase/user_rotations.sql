@@ -25,10 +25,11 @@ create unique index if not exists idx_user_profiles_username_lower
 alter table public.user_profiles enable row level security;
 
 drop policy if exists "Users can read profiles" on public.user_profiles;
-create policy "Users can read profiles"
+drop policy if exists "Public can read profiles" on public.user_profiles;
+create policy "Public can read profiles"
     on public.user_profiles
     for select
-    to authenticated
+    to anon, authenticated
     using (true);
 
 drop policy if exists "Users can insert own profile" on public.user_profiles;
