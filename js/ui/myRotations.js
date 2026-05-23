@@ -99,9 +99,26 @@ function getMySkillById(skillId) {
 }
 
 function getMyRotationSkills(row) {
+    if (row?.share_code && typeof parseBuildShareCode === "function" && typeof getRotationActionData === "function") {
+        try {
+            const payload = parseBuildShareCode(row.share_code);
+            const actions = Array.isArray(payload?.rotation)
+                ? payload.rotation.map(entry => getRotationActionData(entry)).filter(Boolean)
+                : [];
+            if (actions.length) return actions;
+        } catch (error) {
+            console.warn("My rotation preview share code could not be parsed:", error);
+        }
+    }
+
     return normalizeMyList(row?.rotation_skill_ids)
         .map(skillId => getMySkillById(skillId))
         .filter(Boolean);
+}
+
+function getMyRotationActionCount(row) {
+    const actionCount = getMyRotationSkills(row).length;
+    return actionCount || normalizeMyList(row?.rotation_skill_ids).length;
 }
 
 function getMyTeamOperators(row) {
@@ -220,7 +237,7 @@ function buildMyRotationPayload(values) {
         title: values.title,
         description: values.description,
         share_code: shareCode,
-        setup_version: 2,
+        setup_version: 3,
         team_operator_ids: teamIds,
         rotation_skill_ids: rotationSkillIds,
         element_types: uniqueMyLabels([
@@ -492,7 +509,7 @@ function createMyRotationPreview(row) {
 
     const preview = document.createElement("div");
     preview.className = "my-rotation-preview";
-    preview.textContent = `${normalizeMyList(row.rotation_skill_ids).length} skills`;
+    preview.textContent = `${getMyRotationActionCount(row)} actions`;
     return preview;
 }
 
@@ -568,7 +585,12 @@ function createMyDetailSkillSequence(row) {
         const item = document.createElement("span");
         item.className = "my-detail-skill";
 
-        if (skill && typeof createSkillIcon === "function") {
+        if (skill?.isBasicAttack && typeof createBasicAttackIcon === "function") {
+            item.appendChild(createBasicAttackIcon(skill, {
+                size: "small",
+                extraClasses: ["my-detail-skill-icon"]
+            }));
+        } else if (skill && typeof createSkillIcon === "function") {
             item.appendChild(createSkillIcon(skill, {
                 size: "small",
                 useSmallIcon: true,
@@ -592,12 +614,12 @@ function createMyDetailMeta(row) {
     const meta = document.createElement("div");
     meta.className = "my-detail-meta";
     const updated = formatMyDate(row.updated_at || row.created_at) || "-";
-    const skillCount = normalizeMyList(row.rotation_skill_ids).length;
+    const skillCount = getMyRotationActionCount(row);
     const teamCount = normalizeMyList(row.team_operator_ids).length;
     meta.append(
         createMyTextElement("span", "", `Updated ${updated}`),
         createMyTextElement("span", "", `${teamCount} operator${teamCount === 1 ? "" : "s"}`),
-        createMyTextElement("span", "", `${skillCount} skill${skillCount === 1 ? "" : "s"}`)
+        createMyTextElement("span", "", `${skillCount} action${skillCount === 1 ? "" : "s"}`)
     );
     return meta;
 }
@@ -746,11 +768,11 @@ function createMyRotationCard(row) {
     titleRow.append(title, createMyStatusBadge(row));
 
     const updated = formatMyDate(row.updated_at || row.created_at);
-    const skillCount = normalizeMyList(row.rotation_skill_ids).length;
+    const skillCount = getMyRotationActionCount(row);
     const meta = createMyTextElement(
         "div",
         "my-rotation-meta",
-        [`Updated ${updated || "-"}`, `${skillCount} skill${skillCount === 1 ? "" : "s"}`].join(" - ")
+        [`Updated ${updated || "-"}`, `${skillCount} action${skillCount === 1 ? "" : "s"}`].join(" - ")
     );
 
     const description = createMyTextElement(

@@ -46,8 +46,23 @@ const alesh = {
             shortType: "BS",
             cooldown: 20,
             energy: 60,
+            sp_cost: 100,
             elementType: "cryo",
             description: "Consumes Cryo Infliction or Originium Crystals to apply Solidification.",
+            spRecovery: {
+                effects: [
+                    "cryo_infliction",
+                    "originium_crystal"
+                ],
+                amountByStacks: {
+                    "1": 10,
+                    "2": 20,
+                    "3": 30,
+                    "4": 40
+                },
+                maxStacks: 4,
+                source: "Unconventional Lure"
+            },
             consumeDebuffs: [
                 "cryo_infliction",
                 "originium_crystal"
@@ -83,6 +98,10 @@ const alesh = {
             cooldown: 9,
             energy: 0,
             description: "Triggers when an Arts Reaction or Originium Crystals are consumed. Deals Physical DMG and recovers SP.",
+            spRecovery: {
+                amount: 10,
+                source: "Auger Angling"
+            },
             comboTriggerMode: "all",
             comboTriggers: [
                 {
@@ -114,7 +133,11 @@ const alesh = {
             cooldown: 20,
             energy: 60,
             elementType: "cryo",
-            description: "Cryo Ultimate. Deals Cryo DMG."
+            description: "Cryo Ultimate. Deals Cryo DMG.",
+            spRecovery: {
+                amount: 20,
+                source: "One Monster Catch!"
+            }
         }
     ]
 };

@@ -34,6 +34,7 @@ const akekuri = {
             type: "Battle Skill",
             cooldown: 20,
             energy: 60,
+            sp_cost: 100,
             elementType: "heat",
             debuffs: [
                 {
@@ -60,6 +61,10 @@ const akekuri = {
             energy: 100,
             elementType: "physical",
             description: "Triggers when an enemy becomes Staggered or hits a Stagger Node. Recovers SP.",
+            spRecovery: {
+                amount: 15,
+                source: "Flash and Dash"
+            },
             comboTriggers: [
                 {
                     effect: "stagger",
@@ -87,7 +92,11 @@ const akekuri = {
             cooldown: 20,
             energy: 60,
             elementType: "heat",
-            description: "Ultimate"
+            description: "Ultimate",
+            spRecovery: {
+                amount: 58,
+                source: "SQUAD! ON ME!"
+            }
         }
     ]
 }

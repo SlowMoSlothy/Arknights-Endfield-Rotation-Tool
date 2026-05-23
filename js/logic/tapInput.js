@@ -3,6 +3,50 @@ let activeSlotMenuIndex = null;
 let tapInputInitialized = false;
 let activeTooltipUid = null;
 
+function getSelectedTapActionKey(action) {
+    if (!action) return "";
+    if (action.actionType === BASIC_ATTACK_ACTION_TYPE) return `${BASIC_ATTACK_ACTION_TYPE}:${action.operatorId}`;
+    return `skill:${action.id}`;
+}
+
+function getTapActionFromSkillElement(skillEl) {
+    if (skillEl.dataset.actionType === BASIC_ATTACK_ACTION_TYPE) {
+        const operatorId = parseInt(skillEl.dataset.operatorId, 10);
+        if (Number.isNaN(operatorId) || !getBasicAttackByOperatorId(operatorId)) return null;
+        return {
+            actionType: BASIC_ATTACK_ACTION_TYPE,
+            operatorId
+        };
+    }
+
+    const id = parseInt(skillEl.dataset.id, 10);
+    if (!id) return null;
+
+    return {
+        actionType: "skill",
+        id
+    };
+}
+
+function placeSelectedActionInSlot(index, replaceExisting = false) {
+    if (!selectedSkill) return;
+
+    if (selectedSkill.actionType === BASIC_ATTACK_ACTION_TYPE) {
+        return;
+    }
+
+    placeSkillInSlot(index, selectedSkill.id, replaceExisting);
+}
+
+function getTapActionLane(action) {
+    return action?.actionType === BASIC_ATTACK_ACTION_TYPE ? "batk" : "skill";
+}
+
+function canPlaceTapActionInSlot(action, slotEl) {
+    const lane = slotEl?.dataset?.lane;
+    return !lane || (lane === "skill" && getTapActionLane(action) === "skill");
+}
+
 function toggleMobileTooltip(skillEl) {
     const uid = skillEl.dataset.uid;
 
@@ -86,7 +130,7 @@ function handleTapInput(e) {
 
         if (action === "replace") {
             if (selectedSkill) {
-                placeSkillInSlot(index, selectedSkill.id, true);
+                placeSelectedActionInSlot(index, true);
                 selectedSkill = null;
                 closeSlotMenu();
                 updateSelectedUI();
@@ -118,17 +162,25 @@ function handleTapInput(e) {
         e.preventDefault();
         e.stopPropagation();
 
-        const id = parseInt(skillEl.dataset.id, 10);
-        if (!id) return;
+        const action = getTapActionFromSkillElement(skillEl);
+        if (!action) return;
+        if (action.actionType === BASIC_ATTACK_ACTION_TYPE) {
+            selectedSkill = null;
+            closeSlotMenu();
+            updateSelectedUI();
+            updateSelectedSlotsUI();
+            return;
+        }
+        const actionKey = getSelectedTapActionKey(action);
 
-        if (selectedSkill && selectedSkill.id === id) {
+        if (selectedSkill && getSelectedTapActionKey(selectedSkill) === actionKey) {
             selectedSkill = null;
             updateSelectedUI();
             updateSelectedSlotsUI();
             return;
         }
 
-        selectedSkill = { id };
+        selectedSkill = action;
         closeSlotMenu();
         updateSelectedUI();
         updateSelectedSlotsUI();
@@ -146,7 +198,11 @@ function handleTapInput(e) {
             e.preventDefault();
             e.stopPropagation();
 
-            placeSkillInSlot(index, selectedSkill.id, true);
+            if (!canPlaceTapActionInSlot(selectedSkill, slotEl)) {
+                return;
+            }
+
+            placeSelectedActionInSlot(index, true);
 
             selectedSkill = null;
             closeSlotMenu();
@@ -204,16 +260,33 @@ function placeSkillInSlot(index, skillId, replaceExisting = false) {
     saveRotation();
 }
 
+function placeBasicAttackInSlot(index, operatorId, replaceExisting = false) {
+    const basicAttackEntry = createBasicAttackRotationEntry(operatorId);
+    if (!basicAttackEntry) return;
+
+    if (replaceExisting) {
+        rotation[index] = basicAttackEntry;
+    } else {
+        rotation.splice(index, 0, basicAttackEntry);
+    }
+
+    compactRotation();
+    ensureSlotCount(rotation.filter(slot => slot !== null).length + 1);
+    saveRotation();
+}
+
 function updateSelectedUI() {
     document.querySelectorAll(".skill-small").forEach(el => {
-        const id = parseInt(el.dataset.id, 10);
-        el.classList.toggle("selected", !!selectedSkill && selectedSkill.id === id);
+        const action = getTapActionFromSkillElement(el);
+        el.classList.toggle("selected", !!selectedSkill && getSelectedTapActionKey(selectedSkill) === getSelectedTapActionKey(action));
     });
 }
 
 function updateSelectedSlotsUI() {
     document.querySelectorAll(".rotation-slot").forEach(slot => {
-        slot.classList.toggle("tap-target", !!selectedSkill);
+        const canPlace = !!selectedSkill && canPlaceTapActionInSlot(selectedSkill, slot);
+        slot.classList.toggle("tap-target", canPlace);
+        slot.classList.toggle("tap-target-blocked", !!selectedSkill && !canPlace);
     });
 }
 

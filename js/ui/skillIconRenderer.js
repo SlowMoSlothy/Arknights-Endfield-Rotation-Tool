@@ -45,6 +45,20 @@ function getSkillFillMode(skillData) {
     return type === "ultimate" ? "full" : "half";
 }
 
+function isBattleSkillType(skillData) {
+    const type = String(skillData?.type || skillData?.baseType || "").trim().toLowerCase();
+    const shortType = String(skillData?.shortType || "").trim().toLowerCase();
+    return type === "battle skill" || shortType === "bs";
+}
+
+function getBattleSkillSpCost(skillData) {
+    if (!isBattleSkillType(skillData)) return null;
+
+    const value = skillData?.sp_cost ?? skillData?.spCost ?? skillData?.sp ?? skillData?.energy;
+    const cost = Number(value);
+    return Number.isFinite(cost) ? cost : null;
+}
+
 function createSkillIcon(skillData, options = {}) {
     const {
         size = "small",

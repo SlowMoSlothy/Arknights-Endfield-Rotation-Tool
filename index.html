@@ -3,35 +3,30 @@
 
 <head>
   <meta name="google-site-verification" content="3HTRnl53o187nzooCTo5wvQL0SCGiNXD-183J0SOC1o" />
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- SEO -->
-    <title>Arknights Endfield Rotation Builder</title>
+  <!-- SEO -->
+  <title>Arknights Endfield Rotation Builder</title>
 
-    <meta name="description"
-          content="Build and optimize Arknights Endfield rotations with combo triggers, arts reactions, buffs and debuffs.">
+  <meta name="description"
+    content="Build and optimize Arknights Endfield rotations with combo triggers, arts reactions, buffs and debuffs.">
 
-    <meta name="keywords"
-          content="Arknights Endfield, Rotation Builder, Combo Planner, Team Builder">
+  <meta name="keywords" content="Arknights Endfield, Rotation Builder, Combo Planner, Team Builder">
 
-    <meta property="og:title"
-          content="Arknights Endfield Rotation Builder">
+  <meta property="og:title" content="Arknights Endfield Rotation Builder">
 
-    <meta property="og:description"
-          content="Interactive combo and rotation planner for Arknights Endfield.">
+  <meta property="og:description" content="Interactive combo and rotation planner for Arknights Endfield.">
 
-    <meta property="og:type"
-          content="website">
+  <meta property="og:type" content="website">
 
-    <meta property="og:url"
-          content="https://github.com/SlowMoSlothy/Arknights-Endfield-Rotation-Tool">
-<meta property="og:image" content="https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/assets/banner.png">
-<meta property="og:image:width" content="1128">
-<meta property="og:image:height" content="449">
-<meta name="twitter:card" content="summary_large_image">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/mobile.css">
+  <meta property="og:url" content="https://github.com/SlowMoSlothy/Arknights-Endfield-Rotation-Tool">
+  <meta property="og:image" content="https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/assets/banner.png">
+  <meta property="og:image:width" content="1128">
+  <meta property="og:image:height" content="449">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/mobile.css">
 </head>
 
 <body class="app-loading">
@@ -40,11 +35,7 @@
 
   <div id="appLoadingScreen" class="app-loading-screen" role="status" aria-live="polite" aria-busy="true">
     <div class="app-loading-card">
-      <img
-        class="app-loading-logo"
-        src="assets/header.png"
-        alt="Arknights Endfield Rotation Builder"
-      >
+      <img class="app-loading-logo" src="assets/header.png" alt="Arknights Endfield Rotation Builder">
       <div class="app-loading-orbit" aria-hidden="true">
         <span></span>
       </div>
@@ -57,8 +48,8 @@
 
   <div id="selectionScreen" style="display:none;">
     <button id="closeTeamModalBtn" class="close-team-modal-btn" onclick="closeTeamSelectionModal()">
-  ×
-</button>
+      ×
+    </button>
     <div class="selection-hero">
       <div class="selection-brand">
         <span>TEAM BUILDER FOR</span>
@@ -70,8 +61,8 @@
         <span>Confirm team</span>
       </button>
       <button class="mobile-confirm-fab" onclick="confirmTeam()">
-  ✓
-</button>
+        ✓
+      </button>
     </div>
 
     <div class="selection-divider"></div>
@@ -94,16 +85,13 @@
 
   <div id="builderScreen" style="display:none;">
     <header class="app-brand">
-      <img
-        class="app-logo"
-        src="assets/header.png"
-        alt="Arknights Endfield Rotation Builder"
-      >
+      <img class="app-logo" src="assets/header.png" alt="Arknights Endfield Rotation Builder">
       <div class="account-bar" aria-label="Account actions">
         <img id="accountAvatar" class="account-avatar" alt="" hidden>
         <span id="accountUserLabel" class="account-user-label" hidden></span>
         <button id="accountSignInBtn" class="account-action-btn" type="button">Sign In</button>
-        <button id="accountCreateBtn" class="account-action-btn account-action-primary" type="button">Create Account</button>
+        <button id="accountCreateBtn" class="account-action-btn account-action-primary" type="button">Create
+          Account</button>
         <button id="accountSignOutBtn" class="account-action-btn" type="button" hidden>Sign Out</button>
       </div>
     </header>
@@ -167,7 +155,9 @@
             <span class="sidebar-command-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false">
                 <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.08V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.08-.4H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.08V3a2 2 0 0 1 4 0v.09A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 .6 1 1.7 1.7 0 0 0 1.08.4H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.51.6z"></path>
+                <path
+                  d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.08V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.08-.4H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.08V3a2 2 0 0 1 4 0v.09A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 .6 1 1.7 1.7 0 0 0 1.08.4H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.51.6z">
+                </path>
               </svg>
             </span>
             <span class="sidebar-command-label">Settings</span>
@@ -177,15 +167,10 @@
 
         <main class="builder-main">
           <section class="builder-panel">
-            <h3>Skills</h3>
-            <div id="skillList" class="skills-panel"></div>
-          </section>
-          <section class="builder-panel">
-            <h3>Rotation</h3>
-            <div id="rotation" class="rotation-panel">
-              <div class="rotation-actions" aria-label="Rotation actions">
+            <div class="rotation-actions" aria-label="Rotation actions">
                 <span class="rotation-action-tooltip-host" data-action-tooltip="Export rotation as PNG image">
-                  <button id="exportRotationBtn" class="rotation-action-btn rotation-action-primary" type="button" onclick="exportImage()" aria-label="Export rotation as PNG image" disabled>
+                  <button id="exportRotationBtn" class="rotation-action-btn rotation-action-primary" type="button"
+                    onclick="exportImage()" aria-label="Export rotation as PNG image" disabled>
                     <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
                       <rect x="4" y="5" width="16" height="14" rx="2"></rect>
                       <circle cx="9" cy="10" r="1.5"></circle>
@@ -194,7 +179,8 @@
                   </button>
                 </span>
                 <span class="rotation-action-tooltip-host" data-action-tooltip="Copy share code">
-                  <button id="copyShareCodeBtn" class="rotation-action-btn" type="button" onclick="copyBuildShareCode()" aria-label="Copy share code" disabled>
+                  <button id="copyShareCodeBtn" class="rotation-action-btn" type="button" onclick="copyBuildShareCode()"
+                    aria-label="Copy share code" disabled>
                     <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
                       <rect x="8" y="8" width="11" height="11" rx="2"></rect>
                       <path d="M5 15V7a2 2 0 0 1 2-2h8"></path>
@@ -202,7 +188,8 @@
                   </button>
                 </span>
                 <span class="rotation-action-tooltip-host" data-action-tooltip="Copy share link">
-                  <button id="copyShareLinkBtn" class="rotation-action-btn" type="button" onclick="copyBuildShareLink()" aria-label="Copy share link" disabled>
+                  <button id="copyShareLinkBtn" class="rotation-action-btn" type="button" onclick="copyBuildShareLink()"
+                    aria-label="Copy share link" disabled>
                     <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
                       <circle class="rotation-action-icon-dot" cx="18" cy="5" r="2.5"></circle>
                       <circle class="rotation-action-icon-dot" cx="6" cy="12" r="2.5"></circle>
@@ -212,8 +199,11 @@
                     </svg>
                   </button>
                 </span>
-                <span id="saveRotationMenuHost" class="rotation-action-tooltip-host rotation-save-menu-host" data-action-tooltip="Save Rotation in...">
-                  <button id="saveRotationMenuBtn" class="rotation-action-btn" type="button" onclick="toggleRotationSaveMenu(event)" aria-label="Save Rotation in..." aria-haspopup="menu" aria-expanded="false" disabled>
+                <span id="saveRotationMenuHost" class="rotation-action-tooltip-host rotation-save-menu-host"
+                  data-action-tooltip="Save Rotation in...">
+                  <button id="saveRotationMenuBtn" class="rotation-action-btn" type="button"
+                    onclick="toggleRotationSaveMenu(event)" aria-label="Save Rotation in..." aria-haspopup="menu"
+                    aria-expanded="false" disabled>
                     <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
                       <path d="M5 4h12l2 2v14H5z"></path>
                       <path d="M8 4v6h8V4"></path>
@@ -223,11 +213,13 @@
                   </button>
                   <div id="rotationSaveMenu" class="rotation-save-menu" role="menu" hidden>
                     <button type="button" role="menuitem" onclick="saveRotationInMyRotations()">My rotations</button>
-                    <button type="button" role="menuitem" onclick="saveRotationInCommunity()">Community Rotations</button>
+                    <button type="button" role="menuitem" onclick="saveRotationInCommunity()">Community
+                      Rotations</button>
                   </div>
                 </span>
                 <span class="rotation-action-tooltip-host" data-action-tooltip="Import share code or share link">
-                  <button class="rotation-action-btn" type="button" onclick="loadBuildShareCode()" aria-label="Import share code or share link">
+                  <button class="rotation-action-btn" type="button" onclick="loadBuildShareCode()"
+                    aria-label="Import share code or share link">
                     <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
                       <path d="M3.5 8.5h6l2 2h9v7a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"></path>
                       <path d="M3.5 8.5V6a2 2 0 0 1 2-2h4l2 2h4"></path>
@@ -237,7 +229,8 @@
                   </button>
                 </span>
                 <span class="rotation-action-tooltip-host" data-action-tooltip="Create new rotation">
-                  <button class="rotation-action-btn rotation-action-danger" type="button" onclick="createNewRotation()" aria-label="Create new rotation">
+                  <button class="rotation-action-btn rotation-action-danger" type="button" onclick="createNewRotation()"
+                    aria-label="Create new rotation">
                     <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
                       <path d="M12 5v14"></path>
                       <path d="M5 12h14"></path>
@@ -245,8 +238,14 @@
                   </button>
                 </span>
               </div>
-              <div id="rotationDropZone"></div>
-            </div>
+              <div class="rotation-skills-dock">
+                <h3>Skills</h3>
+                <div id="skillList" class="skills-panel"></div>
+              </div>
+              <h3 class="rotation-panel-title">Rotation</h3>
+              <div id="rotation" class="rotation-panel">
+                <div id="rotationDropZone"></div>
+              </div>
           </section>
           <section id="enemyPanel" class="builder-panel">
             <h3>Enemy</h3>
@@ -265,12 +264,53 @@
         <button id="closeSettingsBtn" class="settings-close" type="button">×</button>
       </div>
       <div class="settings-section">
+        <span class="settings-label">Rotation Mode</span>
+        <div class="settings-option-row settings-mode-row">
+          <button class="settings-option-btn settings-mode-btn" data-setting="timelineMode" data-value="slot">
+            <div class="settings-option-title">Slot Mode</div>
+            <div class="settings-size-label">Fixed order</div>
+          </button>
+          <button class="settings-option-btn settings-mode-btn" data-setting="timelineMode" data-value="simulation">
+            <div class="settings-option-title">Simulation Mode</div>
+            <div class="settings-size-label">0.1s free placement</div>
+          </button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <label class="settings-label" for="simulationSpPerSecondInput">SP per second</label>
+        <input id="simulationSpPerSecondInput" class="settings-number-input" type="number" min="0" max="200" step="0.1" value="8">
+      </div>
+      <div class="settings-section">
         <span class="settings-label">Rotation Skill Size</span>
         <div class="settings-option-row">
-          <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="medium"><div class="settings-option-title">Medium</div><div class="settings-preview"><div class="settings-preview-box" style="width: 52px; height: 52px;"></div></div><div class="settings-size-label">72px</div></button>
-          <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="large"><div class="settings-option-title">Large</div><div class="settings-preview"><div class="settings-preview-box" style="width: 66px; height: 66px;"></div></div><div class="settings-size-label">88px</div></button>
-          <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="xl"><div class="settings-option-title">XL</div><div class="settings-preview"><div class="settings-preview-box" style="width: 78px; height: 78px;"></div></div><div class="settings-size-label">104px</div></button>
-          <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="xxl"><div class="settings-option-title">XXL</div><div class="settings-preview"><div class="settings-preview-box" style="width: 92px; height: 92px;"></div></div><div class="settings-size-label">120px</div></button>
+          <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="medium">
+            <div class="settings-option-title">Medium</div>
+            <div class="settings-preview">
+              <div class="settings-preview-box" style="width: 52px; height: 52px;"></div>
+            </div>
+            <div class="settings-size-label">72px</div>
+          </button>
+          <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="large">
+            <div class="settings-option-title">Large</div>
+            <div class="settings-preview">
+              <div class="settings-preview-box" style="width: 66px; height: 66px;"></div>
+            </div>
+            <div class="settings-size-label">88px</div>
+          </button>
+          <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="xl">
+            <div class="settings-option-title">XL</div>
+            <div class="settings-preview">
+              <div class="settings-preview-box" style="width: 78px; height: 78px;"></div>
+            </div>
+            <div class="settings-size-label">104px</div>
+          </button>
+          <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="xxl">
+            <div class="settings-option-title">XXL</div>
+            <div class="settings-preview">
+              <div class="settings-preview-box" style="width: 92px; height: 92px;"></div>
+            </div>
+            <div class="settings-size-label">120px</div>
+          </button>
         </div>
       </div>
     </div>
@@ -284,7 +324,8 @@
       </div>
 
       <section id="myRotationsAuthPanel" class="my-rotations-auth-panel">
-        <p id="myRotationsIntro" class="my-rotations-intro">Create an account or sign in to save private rotations and submit them for Community review later.</p>
+        <p id="myRotationsIntro" class="my-rotations-intro">Create an account or sign in to save private rotations and
+          submit them for Community review later.</p>
         <form id="myRotationsAuthForm" class="my-rotations-form">
           <label class="my-rotations-field">
             <span>Email</span>
@@ -292,11 +333,13 @@
           </label>
           <label id="myRotationsUsernameField" class="my-rotations-field" hidden>
             <span>Username</span>
-            <input id="myRotationsUsernameInput" type="text" autocomplete="username" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" placeholder="Endministrator">
+            <input id="myRotationsUsernameInput" type="text" autocomplete="username" minlength="3" maxlength="24"
+              pattern="[A-Za-z0-9_]{3,24}" placeholder="Endministrator">
           </label>
           <label class="my-rotations-field">
             <span>Password</span>
-            <input id="myRotationsPasswordInput" type="password" autocomplete="current-password" minlength="6" required placeholder="Password">
+            <input id="myRotationsPasswordInput" type="password" autocomplete="current-password" minlength="6" required
+              placeholder="Password">
           </label>
           <div id="myRotationsAuthStatus" class="my-rotations-status"></div>
           <div class="my-rotations-actions">
@@ -344,7 +387,8 @@
         <form id="myProfileForm" class="my-profile-form">
           <label class="my-rotations-field">
             <span>Username</span>
-            <input id="myProfileUsernameInput" type="text" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" required placeholder="Endministrator">
+            <input id="myProfileUsernameInput" type="text" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}"
+              required placeholder="Endministrator">
           </label>
           <label class="my-rotations-field">
             <span>Avatar</span>
@@ -371,11 +415,13 @@
       <form id="myPasswordResetForm" class="my-profile-form">
         <label class="my-rotations-field">
           <span>New Password</span>
-          <input id="myPasswordResetInput" type="password" autocomplete="new-password" minlength="6" required placeholder="New password">
+          <input id="myPasswordResetInput" type="password" autocomplete="new-password" minlength="6" required
+            placeholder="New password">
         </label>
         <label class="my-rotations-field">
           <span>Confirm Password</span>
-          <input id="myPasswordResetConfirmInput" type="password" autocomplete="new-password" minlength="6" required placeholder="Repeat password">
+          <input id="myPasswordResetConfirmInput" type="password" autocomplete="new-password" minlength="6" required
+            placeholder="Repeat password">
         </label>
         <div id="myPasswordResetStatus" class="my-rotations-status"></div>
         <div class="my-rotations-actions">
@@ -396,11 +442,13 @@
       <form id="rotationQuickSaveForm" class="rotation-quick-save-form">
         <label class="my-rotations-field">
           <span>Title</span>
-          <input id="rotationQuickSaveTitleInput" type="text" minlength="3" maxlength="80" required placeholder="Electric opener">
+          <input id="rotationQuickSaveTitleInput" type="text" minlength="3" maxlength="80" required
+            placeholder="Electric opener">
         </label>
         <label class="my-rotations-field">
           <span>Description</span>
-          <textarea id="rotationQuickSaveDescriptionInput" maxlength="600" rows="3" placeholder="Short notes for this rotation"></textarea>
+          <textarea id="rotationQuickSaveDescriptionInput" maxlength="600" rows="3"
+            placeholder="Short notes for this rotation"></textarea>
         </label>
         <div id="rotationQuickSaveStatus" class="my-rotations-status"></div>
         <div class="my-rotations-actions">
@@ -421,7 +469,8 @@
       <div class="community-toolbar">
         <label class="community-search-wrap">
           <span>Search</span>
-          <input id="communitySearchInput" class="community-search-input" type="search" placeholder="Rotation, author, operator">
+          <input id="communitySearchInput" class="community-search-input" type="search"
+            placeholder="Rotation, author, operator">
         </label>
         <div class="community-toolbar-actions">
           <button id="refreshCommunityRotationsBtn" class="community-refresh-btn" type="button">Refresh</button>
@@ -457,7 +506,8 @@
         <div class="community-form-grid">
           <label class="community-field">
             <span>Title</span>
-            <input id="communitySubmitTitle" type="text" minlength="3" maxlength="80" required placeholder="Electric burst opener">
+            <input id="communitySubmitTitle" type="text" minlength="3" maxlength="80" required
+              placeholder="Electric burst opener">
           </label>
           <label class="community-field">
             <span>Author</span>
@@ -466,7 +516,8 @@
         </div>
         <label class="community-field">
           <span>Description</span>
-          <textarea id="communitySubmitDescription" maxlength="600" rows="3" placeholder="Short notes for this rotation"></textarea>
+          <textarea id="communitySubmitDescription" maxlength="600" rows="3"
+            placeholder="Short notes for this rotation"></textarea>
         </label>
         <div id="communitySubmitStatus" class="community-submit-status"></div>
         <div class="community-submit-actions">
@@ -497,7 +548,8 @@
           </label>
           <label class="admin-field">
             <span>Password</span>
-            <input id="adminPasswordInput" type="password" autocomplete="current-password" required placeholder="Password">
+            <input id="adminPasswordInput" type="password" autocomplete="current-password" required
+              placeholder="Password">
           </label>
           <div id="adminLoginStatus" class="admin-status"></div>
           <div class="admin-login-actions">
@@ -538,7 +590,7 @@
 
   <footer class="site-footer">
     <span>&copy; 2026 Arknights Endfield Rotation Builder</span>
-    <span>App Version 2.13.3</span>
+    <span>App Version 2.14.3</span>
     <span>Fan-made tool, not affiliated with Gryphline or Hypergryph.</span>
   </footer>
 
@@ -553,11 +605,11 @@
   <script src="js/data/effectGroups.js"></script>
   <script src="js/data/reactionRules.js"></script>
   <script src="js/data/enemies/trainingDummy.js"></script>
-<script src="js/data/enemies/heatAttacker.js"></script>
-<script src="js/data/enemies/frostAttacker.js"></script>
-<script src="js/data/enemies/electricAttacker.js"></script>
-<script src="js/data/enemies/physicalAttacker.js"></script>
-<script src="js/data/enemies/bossDummy.js"></script>
+  <script src="js/data/enemies/heatAttacker.js"></script>
+  <script src="js/data/enemies/frostAttacker.js"></script>
+  <script src="js/data/enemies/electricAttacker.js"></script>
+  <script src="js/data/enemies/physicalAttacker.js"></script>
+  <script src="js/data/enemies/bossDummy.js"></script>
   <script src="js/data/enemySkills.js"></script>
   <script src="js/data/operators/alesh.js"></script>
   <script src="js/data/operators/antal.js"></script>
@@ -588,6 +640,7 @@
   <script src="js/data/operators.js"></script>
   <script src="js/state/appState.js"></script>
   <script src="js/logic/operatorStateEngine.js"></script>
+  <script src="js/logic/basicAttack.js"></script>
   <script src="js/logic/storage.js"></script>
   <script src="js/logic/shareCode.js"></script>
   <script src="js/logic/export.js"></script>
@@ -609,4 +662,5 @@
   <script src="js/ui/adminPanel.js"></script>
   <script src="js/main.js"></script>
 </body>
+
 </html>

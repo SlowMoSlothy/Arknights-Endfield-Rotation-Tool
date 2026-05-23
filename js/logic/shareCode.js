@@ -1,6 +1,22 @@
 const BUILD_SHARE_CODE_PREFIX_V1 = "AERT1:";
-const BUILD_SHARE_CODE_PREFIX = "AERT2:";
+const BUILD_SHARE_CODE_PREFIX_V2 = "AERT2:";
+const BUILD_SHARE_CODE_PREFIX_V3 = "AERT3:";
+const BUILD_SHARE_CODE_PREFIX_V4 = "AERT4:";
+const BUILD_SHARE_CODE_PREFIX = "AERT5:";
 const BUILD_SHARE_HASH_KEY = "setup";
+const BUILD_SHARE_UI_FLAG_SIMULATION_MODE = 1;
+const BUILD_SHARE_UI_FLAG_HAS_SP_PER_SECOND = 2;
+const BUILD_SHARE_UI_FLAG_HAS_SIMULATION_DURATION = 4;
+
+function hasKnownBuildShareCodePrefix(value) {
+    return [
+        BUILD_SHARE_CODE_PREFIX,
+        BUILD_SHARE_CODE_PREFIX_V4,
+        BUILD_SHARE_CODE_PREFIX_V3,
+        BUILD_SHARE_CODE_PREFIX_V2,
+        BUILD_SHARE_CODE_PREFIX_V1
+    ].some(prefix => String(value || "").startsWith(prefix));
+}
 
 function encodeShareText(text) {
     return btoa(text)
@@ -66,10 +82,26 @@ function readVarInt(cursor) {
 function getShareableRotation() {
     const entries = rotation.map(entry => {
         if (!entry) return null;
+        const time = Number(entry.time);
+        const shareTime = Number.isFinite(time)
+            ? { time: Math.max(0, Math.round(time * 10) / 10) }
+            : {};
+
+        if (typeof isBasicAttackEntry === "function" && isBasicAttackEntry(entry)) {
+            return {
+                type: BASIC_ATTACK_ACTION_TYPE,
+                operatorId: Number(entry.operatorId),
+                hitCount: Number(entry.hitCount || DEFAULT_BASIC_ATTACK_HITS),
+                finalHitCount: Number(entry.finalHitCount || DEFAULT_BASIC_ATTACK_FINAL_HITS),
+                ...shareTime
+            };
+        }
 
         return {
+            type: "skill",
             id: entry.id,
-            autoInserted: entry.autoInserted === true
+            autoInserted: entry.autoInserted === true,
+            ...shareTime
         };
     });
 
@@ -88,6 +120,35 @@ function getActiveUltimateStateIds() {
         .sort((a, b) => a - b);
 }
 
+function getShareableUiSettings() {
+    const timelineMode = typeof uiSettings !== "undefined" && uiSettings?.timelineMode === "simulation"
+        ? "simulation"
+        : "slot";
+    const fallbackSpPerSecond = typeof DEFAULT_SIMULATION_SP_PER_SECOND !== "undefined"
+        ? DEFAULT_SIMULATION_SP_PER_SECOND
+        : 8;
+    const spPerSecond = Number(typeof uiSettings !== "undefined"
+        ? uiSettings?.simulationSpPerSecond
+        : fallbackSpPerSecond);
+
+    const simulationDurationSeconds = Number(typeof uiSettings !== "undefined"
+        ? uiSettings?.simulationDurationSeconds
+        : NaN);
+
+    const settings = {
+        timelineMode,
+        simulationSpPerSecond: Number.isFinite(spPerSecond) && spPerSecond >= 0
+            ? Math.round(spPerSecond * 10) / 10
+            : fallbackSpPerSecond
+    };
+
+    if (Number.isFinite(simulationDurationSeconds) && simulationDurationSeconds > 0) {
+        settings.simulationDurationSeconds = Math.round(simulationDurationSeconds * 10) / 10;
+    }
+
+    return settings;
+}
+
 function createCompactShareBytes() {
     const bytes = [];
     selectedTeam.slice(0, 4).forEach(operatorId => {
@@ -102,8 +163,26 @@ function createCompactShareBytes() {
             return;
         }
 
+        if (entry.type === BASIC_ATTACK_ACTION_TYPE) {
+            const time = Number(entry.time);
+            const hasTime = Number.isFinite(time);
+            writeVarInt(bytes, 2);
+            writeVarInt(bytes, Number(entry.operatorId) + 1);
+            writeVarInt(bytes, Number(entry.hitCount) || DEFAULT_BASIC_ATTACK_HITS);
+            writeVarInt(bytes, Number(entry.finalHitCount) || DEFAULT_BASIC_ATTACK_FINAL_HITS);
+            writeVarInt(bytes, hasTime ? 1 : 0);
+            if (hasTime) writeVarInt(bytes, Math.max(0, Math.round(time * 10)));
+            return;
+        }
+
         const autoInsertedFlag = entry.autoInserted === true ? 1 : 0;
-        writeVarInt(bytes, (Number(entry.id) * 2) + autoInsertedFlag + 1);
+        const time = Number(entry.time);
+        const hasTime = Number.isFinite(time);
+        writeVarInt(bytes, 1);
+        writeVarInt(bytes, Number(entry.id));
+        writeVarInt(bytes, autoInsertedFlag);
+        writeVarInt(bytes, hasTime ? 1 : 0);
+        if (hasTime) writeVarInt(bytes, Math.max(0, Math.round(time * 10)));
     });
 
     const activeUltimateStateIds = getActiveUltimateStateIds();
@@ -111,6 +190,24 @@ function createCompactShareBytes() {
     activeUltimateStateIds.forEach(operatorId => {
         writeVarInt(bytes, operatorId);
     });
+
+    const shareableUiSettings = getShareableUiSettings();
+    let uiFlags = 0;
+    if (shareableUiSettings.timelineMode === "simulation") uiFlags |= BUILD_SHARE_UI_FLAG_SIMULATION_MODE;
+    if (Number.isFinite(Number(shareableUiSettings.simulationSpPerSecond))) {
+        uiFlags |= BUILD_SHARE_UI_FLAG_HAS_SP_PER_SECOND;
+    }
+    if (Number.isFinite(Number(shareableUiSettings.simulationDurationSeconds))) {
+        uiFlags |= BUILD_SHARE_UI_FLAG_HAS_SIMULATION_DURATION;
+    }
+
+    writeVarInt(bytes, uiFlags);
+    if (uiFlags & BUILD_SHARE_UI_FLAG_HAS_SP_PER_SECOND) {
+        writeVarInt(bytes, Math.max(0, Math.round(Number(shareableUiSettings.simulationSpPerSecond) * 10)));
+    }
+    if (uiFlags & BUILD_SHARE_UI_FLAG_HAS_SIMULATION_DURATION) {
+        writeVarInt(bytes, Math.max(0, Math.round(Number(shareableUiSettings.simulationDurationSeconds) * 10)));
+    }
 
     return bytes;
 }
@@ -180,7 +277,7 @@ function extractBuildShareCode(input) {
         if (searchCode) return searchCode;
 
         const hash = url.hash.replace(/^#/, "");
-        if (hash.startsWith(BUILD_SHARE_CODE_PREFIX) || hash.startsWith(BUILD_SHARE_CODE_PREFIX_V1)) {
+        if (hasKnownBuildShareCodePrefix(hash)) {
             return hash;
         }
 
@@ -201,7 +298,19 @@ function parseBuildShareCode(code) {
     const trimmed = extractBuildShareCode(code);
 
     if (trimmed.startsWith(BUILD_SHARE_CODE_PREFIX)) {
-        return parseCompactBuildShareCode(trimmed.slice(BUILD_SHARE_CODE_PREFIX.length));
+        return parseCompactBuildShareCodeV5(trimmed.slice(BUILD_SHARE_CODE_PREFIX.length));
+    }
+
+    if (trimmed.startsWith(BUILD_SHARE_CODE_PREFIX_V4)) {
+        return parseCompactBuildShareCodeV4(trimmed.slice(BUILD_SHARE_CODE_PREFIX_V4.length));
+    }
+
+    if (trimmed.startsWith(BUILD_SHARE_CODE_PREFIX_V3)) {
+        return parseCompactBuildShareCode(trimmed.slice(BUILD_SHARE_CODE_PREFIX_V3.length));
+    }
+
+    if (trimmed.startsWith(BUILD_SHARE_CODE_PREFIX_V2)) {
+        return parseCompactBuildShareCodeV2(trimmed.slice(BUILD_SHARE_CODE_PREFIX_V2.length));
     }
 
     return parseLegacyBuildShareCode(trimmed);
@@ -224,7 +333,226 @@ function parseLegacyBuildShareCode(code) {
     return payload;
 }
 
+function readOptionalShareTime(cursor) {
+    const hasTime = readVarInt(cursor) === 1;
+    return hasTime ? Math.max(0, Math.round(readVarInt(cursor)) / 10) : null;
+}
+
+function readCompactShareTeam(cursor) {
+    return [null, null, null, null].map(() => {
+        const storedOperatorId = readVarInt(cursor);
+        return storedOperatorId === 0 ? null : storedOperatorId - 1;
+    });
+}
+
+function readCompactShareRotation(cursor) {
+    const rotationLength = readVarInt(cursor);
+    const importedRotation = [];
+    for (let index = 0; index < rotationLength; index++) {
+        const entryType = readVarInt(cursor);
+        if (entryType === 0) {
+            importedRotation.push(null);
+            continue;
+        }
+
+        if (entryType === 2) {
+            const storedOperatorId = readVarInt(cursor);
+            const basicAttackEntry = {
+                type: BASIC_ATTACK_ACTION_TYPE,
+                operatorId: storedOperatorId - 1,
+                hitCount: readVarInt(cursor),
+                finalHitCount: readVarInt(cursor)
+            };
+            const time = readOptionalShareTime(cursor);
+            if (time !== null) basicAttackEntry.time = time;
+            importedRotation.push(basicAttackEntry);
+            continue;
+        }
+
+        if (entryType !== 1) {
+            throw new Error("Unsupported rotation entry type.");
+        }
+
+        const skillEntry = {
+            type: "skill",
+            id: readVarInt(cursor),
+            autoInserted: readVarInt(cursor) === 1
+        };
+        const time = readOptionalShareTime(cursor);
+        if (time !== null) skillEntry.time = time;
+        importedRotation.push(skillEntry);
+    }
+
+    return importedRotation;
+}
+
+function readCompactShareUltimateStates(cursor) {
+    const ultimateStateCount = cursor.index < cursor.bytes.length ? readVarInt(cursor) : 0;
+    const importedUltimateStates = {};
+    for (let index = 0; index < ultimateStateCount; index++) {
+        importedUltimateStates[readVarInt(cursor)] = true;
+    }
+
+    return importedUltimateStates;
+}
+
+function readCompactShareUiSettingsV5(cursor) {
+    const uiFlags = cursor.index < cursor.bytes.length ? readVarInt(cursor) : 0;
+    const uiSettingsPayload = {
+        timelineMode: (uiFlags & BUILD_SHARE_UI_FLAG_SIMULATION_MODE) ? "simulation" : "slot"
+    };
+
+    if ((uiFlags & BUILD_SHARE_UI_FLAG_HAS_SP_PER_SECOND) && cursor.index < cursor.bytes.length) {
+        uiSettingsPayload.simulationSpPerSecond = readVarInt(cursor) / 10;
+    }
+
+    if ((uiFlags & BUILD_SHARE_UI_FLAG_HAS_SIMULATION_DURATION) && cursor.index < cursor.bytes.length) {
+        uiSettingsPayload.simulationDurationSeconds = readVarInt(cursor) / 10;
+    }
+
+    return uiSettingsPayload;
+}
+
+function parseCompactBuildShareCodeV5(encoded) {
+    const bytes = decodeShareBytes(encoded.replace(/\s/g, ""));
+    const cursor = { bytes, index: 0 };
+    const team = readCompactShareTeam(cursor);
+    const importedRotation = readCompactShareRotation(cursor);
+    const importedUltimateStates = readCompactShareUltimateStates(cursor);
+
+    return {
+        v: 5,
+        team,
+        rotation: importedRotation,
+        operatorUltimateStates: importedUltimateStates,
+        uiSettings: readCompactShareUiSettingsV5(cursor)
+    };
+}
+
+function parseCompactBuildShareCodeV4(encoded) {
+    const bytes = decodeShareBytes(encoded.replace(/\s/g, ""));
+    const cursor = { bytes, index: 0 };
+    const team = [null, null, null, null].map(() => {
+        const storedOperatorId = readVarInt(cursor);
+        return storedOperatorId === 0 ? null : storedOperatorId - 1;
+    });
+
+    const rotationLength = readVarInt(cursor);
+    const importedRotation = [];
+    for (let index = 0; index < rotationLength; index++) {
+        const entryType = readVarInt(cursor);
+        if (entryType === 0) {
+            importedRotation.push(null);
+            continue;
+        }
+
+        if (entryType === 2) {
+            const storedOperatorId = readVarInt(cursor);
+            const basicAttackEntry = {
+                type: BASIC_ATTACK_ACTION_TYPE,
+                operatorId: storedOperatorId - 1,
+                hitCount: readVarInt(cursor),
+                finalHitCount: readVarInt(cursor)
+            };
+            const time = readOptionalShareTime(cursor);
+            if (time !== null) basicAttackEntry.time = time;
+            importedRotation.push(basicAttackEntry);
+            continue;
+        }
+
+        if (entryType !== 1) {
+            throw new Error("Unsupported rotation entry type.");
+        }
+
+        const skillEntry = {
+            type: "skill",
+            id: readVarInt(cursor),
+            autoInserted: readVarInt(cursor) === 1
+        };
+        const time = readOptionalShareTime(cursor);
+        if (time !== null) skillEntry.time = time;
+        importedRotation.push(skillEntry);
+    }
+
+    const ultimateStateCount = cursor.index < bytes.length ? readVarInt(cursor) : 0;
+    const importedUltimateStates = {};
+    for (let index = 0; index < ultimateStateCount; index++) {
+        importedUltimateStates[readVarInt(cursor)] = true;
+    }
+
+    const timelineMode = cursor.index < bytes.length && readVarInt(cursor) === 1
+        ? "simulation"
+        : "slot";
+    const spPerSecond = cursor.index < bytes.length
+        ? readVarInt(cursor) / 10
+        : null;
+
+    return {
+        v: 4,
+        team,
+        rotation: importedRotation,
+        operatorUltimateStates: importedUltimateStates,
+        uiSettings: {
+            timelineMode,
+            ...(Number.isFinite(spPerSecond) ? { simulationSpPerSecond: spPerSecond } : {})
+        }
+    };
+}
+
 function parseCompactBuildShareCode(encoded) {
+    const bytes = decodeShareBytes(encoded.replace(/\s/g, ""));
+    const cursor = { bytes, index: 0 };
+    const team = [null, null, null, null].map(() => {
+        const storedOperatorId = readVarInt(cursor);
+        return storedOperatorId === 0 ? null : storedOperatorId - 1;
+    });
+
+    const rotationLength = readVarInt(cursor);
+    const importedRotation = [];
+    for (let index = 0; index < rotationLength; index++) {
+        const entryType = readVarInt(cursor);
+        if (entryType === 0) {
+            importedRotation.push(null);
+            continue;
+        }
+
+        if (entryType === 2) {
+            const storedOperatorId = readVarInt(cursor);
+            importedRotation.push({
+                type: BASIC_ATTACK_ACTION_TYPE,
+                operatorId: storedOperatorId - 1,
+                hitCount: readVarInt(cursor),
+                finalHitCount: readVarInt(cursor)
+            });
+            continue;
+        }
+
+        if (entryType !== 1) {
+            throw new Error("Unsupported rotation entry type.");
+        }
+
+        importedRotation.push({
+            type: "skill",
+            id: readVarInt(cursor),
+            autoInserted: readVarInt(cursor) === 1
+        });
+    }
+
+    const ultimateStateCount = cursor.index < bytes.length ? readVarInt(cursor) : 0;
+    const importedUltimateStates = {};
+    for (let index = 0; index < ultimateStateCount; index++) {
+        importedUltimateStates[readVarInt(cursor)] = true;
+    }
+
+    return {
+        v: 3,
+        team,
+        rotation: importedRotation,
+        operatorUltimateStates: importedUltimateStates
+    };
+}
+
+function parseCompactBuildShareCodeV2(encoded) {
     const bytes = decodeShareBytes(encoded.replace(/\s/g, ""));
     const cursor = { bytes, index: 0 };
     const team = [null, null, null, null].map(() => {
@@ -243,6 +571,7 @@ function parseCompactBuildShareCode(encoded) {
 
         const packedEntry = storedEntry - 1;
         importedRotation.push({
+            type: "skill",
             id: Math.floor(packedEntry / 2),
             autoInserted: (packedEntry % 2) === 1
         });
@@ -270,7 +599,7 @@ function getBuildShareCodeFromUrl() {
     const hash = window.location.hash.replace(/^#/, "");
     if (!hash) return null;
 
-    if (hash.startsWith(BUILD_SHARE_CODE_PREFIX) || hash.startsWith(BUILD_SHARE_CODE_PREFIX_V1)) {
+    if (hasKnownBuildShareCodePrefix(hash)) {
         return hash;
     }
 
@@ -314,19 +643,61 @@ function normalizeImportedRotation(importedRotation) {
     const normalizedRotation = importedRotation.map(entry => {
         if (!entry) return null;
 
+        if (typeof isBasicAttackEntry === "function" && isBasicAttackEntry(entry)) {
+            const operatorId = Number(entry.operatorId);
+            const basicAttackEntry = createBasicAttackRotationEntry(operatorId, entry);
+            if (!basicAttackEntry) {
+                throw new Error(`Unknown basic attack operator id: ${operatorId}`);
+            }
+            const time = Number(entry.time);
+            if (Number.isFinite(time) && time >= 0) {
+                basicAttackEntry.time = Math.round(time * 10) / 10;
+            }
+            return basicAttackEntry;
+        }
+
         const skillId = Number(typeof entry === "object" ? entry.id : entry);
         if (!Number.isFinite(skillId) || !getSkillById(skillId)) {
             throw new Error(`Unknown skill id: ${skillId}`);
         }
 
-        return {
+        const normalizedEntry = {
             uid: crypto.randomUUID(),
             id: skillId,
             autoInserted: typeof entry === "object" && entry.autoInserted === true
         };
+
+        const time = Number(typeof entry === "object" ? entry.time : NaN);
+        if (Number.isFinite(time) && time >= 0) {
+            normalizedEntry.time = Math.round(time * 10) / 10;
+        }
+
+        return normalizedEntry;
     });
 
     return normalizedRotation.length > 0 ? normalizedRotation : [null];
+}
+
+function applyImportedUiSettings(payload) {
+    const importedSettings = payload?.uiSettings;
+    if (!importedSettings || typeof uiSettings === "undefined") return;
+
+    if (importedSettings.timelineMode === "slot" || importedSettings.timelineMode === "simulation") {
+        uiSettings.timelineMode = importedSettings.timelineMode;
+    }
+
+    const spPerSecond = Number(importedSettings.simulationSpPerSecond);
+    if (Number.isFinite(spPerSecond) && spPerSecond >= 0) {
+        uiSettings.simulationSpPerSecond = Math.round(spPerSecond * 10) / 10;
+    }
+
+    const simulationDurationSeconds = Number(importedSettings.simulationDurationSeconds);
+    if (Number.isFinite(simulationDurationSeconds) && simulationDurationSeconds > 0) {
+        uiSettings.simulationDurationSeconds = Math.round(simulationDurationSeconds * 10) / 10;
+    }
+
+    if (typeof saveUiSettings === "function") saveUiSettings();
+    if (typeof applyUiSettings === "function") applyUiSettings();
 }
 
 function applyBuildShareCode(code) {
@@ -338,6 +709,7 @@ function applyBuildShareCode(code) {
         ? payload.operatorUltimateStates
         : {};
     activeSlotIndex = null;
+    applyImportedUiSettings(payload);
 
     compactRotation();
     ensureSlotCount(rotation.filter(entry => entry !== null).length + 1);

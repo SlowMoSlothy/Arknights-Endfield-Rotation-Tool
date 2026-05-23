@@ -5,8 +5,18 @@ const UI_SIZE_OPTIONS = {
     xxl: "xxl"
 };
 
+const TIMELINE_MODE_OPTIONS = {
+    slot: "slot",
+    simulation: "simulation"
+};
+
+const DEFAULT_SIMULATION_SP_PER_SECOND = 8;
+
 let uiSettings = {
-    rotationSkillSize: UI_SIZE_OPTIONS.medium
+    rotationSkillSize: UI_SIZE_OPTIONS.medium,
+    timelineMode: TIMELINE_MODE_OPTIONS.slot,
+    simulationSpPerSecond: DEFAULT_SIMULATION_SP_PER_SECOND,
+    simulationDurationSeconds: null
 };
 
 function loadUiSettings() {
@@ -45,6 +55,22 @@ function applyUiSettings() {
     uiSettings.rotationSkillSize = size;
     root.classList.add(`rotation-size-${size}`);
 
+    const timelineMode = Object.values(TIMELINE_MODE_OPTIONS).includes(uiSettings.timelineMode)
+        ? uiSettings.timelineMode
+        : TIMELINE_MODE_OPTIONS.slot;
+    uiSettings.timelineMode = timelineMode;
+    root.classList.toggle("rotation-mode-simulation", timelineMode === TIMELINE_MODE_OPTIONS.simulation);
+
+    const spPerSecond = Number(uiSettings.simulationSpPerSecond);
+    uiSettings.simulationSpPerSecond = Number.isFinite(spPerSecond) && spPerSecond >= 0
+        ? spPerSecond
+        : DEFAULT_SIMULATION_SP_PER_SECOND;
+
+    const simulationDurationSeconds = Number(uiSettings.simulationDurationSeconds);
+    uiSettings.simulationDurationSeconds = Number.isFinite(simulationDurationSeconds) && simulationDurationSeconds > 0
+        ? Math.round(simulationDurationSeconds * 10) / 10
+        : null;
+
     updateSettingsUi();
 }
 
@@ -52,6 +78,39 @@ function setRotationSkillSize(size) {
     if (!Object.values(UI_SIZE_OPTIONS).includes(size)) return;
 
     uiSettings.rotationSkillSize = size;
+    saveUiSettings();
+    applyUiSettings();
+
+    if (typeof renderRotation === "function") {
+        renderRotation();
+    }
+}
+
+function setTimelineMode(mode) {
+    if (!Object.values(TIMELINE_MODE_OPTIONS).includes(mode)) return;
+
+    uiSettings.timelineMode = mode;
+    saveUiSettings();
+    applyUiSettings();
+
+    if (typeof renderRotation === "function") {
+        renderRotation();
+    }
+
+    if (typeof renderSkills === "function") {
+        renderSkills();
+    }
+
+    if (typeof initSkillDragDrop === "function") {
+        initSkillDragDrop();
+    }
+}
+
+function setSimulationSpPerSecond(value) {
+    const spPerSecond = Number(value);
+    if (!Number.isFinite(spPerSecond) || spPerSecond < 0) return;
+
+    uiSettings.simulationSpPerSecond = Math.round(spPerSecond * 10) / 10;
     saveUiSettings();
     applyUiSettings();
 
@@ -80,6 +139,16 @@ function updateSettingsUi() {
         const value = btn.dataset.value;
         btn.classList.toggle("active", value === uiSettings.rotationSkillSize);
     });
+
+    document.querySelectorAll("[data-setting='timelineMode']").forEach(btn => {
+        const value = btn.dataset.value;
+        btn.classList.toggle("active", value === uiSettings.timelineMode);
+    });
+
+    const spPerSecondInput = document.getElementById("simulationSpPerSecondInput");
+    if (spPerSecondInput) {
+        spPerSecondInput.value = String(uiSettings.simulationSpPerSecond);
+    }
 }
 
 function initUiSettings() {
@@ -111,4 +180,18 @@ function initUiSettings() {
             setRotationSkillSize(value);
         });
     });
+
+    document.querySelectorAll("[data-setting='timelineMode']").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const value = btn.dataset.value;
+            setTimelineMode(value);
+        });
+    });
+
+    const spPerSecondInput = document.getElementById("simulationSpPerSecondInput");
+    if (spPerSecondInput) {
+        spPerSecondInput.addEventListener("change", () => {
+            setSimulationSpPerSecond(spPerSecondInput.value);
+        });
+    }
 }

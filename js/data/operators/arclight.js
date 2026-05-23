@@ -39,8 +39,14 @@ const arclight = {
             shortType: "BS",
             cooldown: 20,
             energy: 100,
+            sp_cost: 100,
             elementType: "electric",
             description: "Consumes Electrification to launch an additional Electric attack and recover SP.",
+            spRecovery: {
+                amount: 30,
+                requiresEffect: "electrification",
+                source: "Tempestuous Arc"
+            },
             debuffs: [
                 {
                     id: "electrification_consumed",
@@ -72,6 +78,10 @@ const arclight = {
             energy: 100,
             elementType: "physical",
             description: "Triggers when Electrification is applied or consumed. Recovers SP.",
+            spRecovery: {
+                amount: 8,
+                source: "Peal of Thunder"
+            },
             comboTriggerMode: "any",
             comboTriggers: [
                 { effect: "electrification", minStacks: 1 },
