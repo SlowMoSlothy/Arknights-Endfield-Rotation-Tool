@@ -453,6 +453,14 @@
     text-transform: uppercase;
 }
 
+.operator-gallery-detail-skill-copy .operator-gallery-detail-skill-trigger {
+    color: rgba(248,245,70,0.78);
+    font-size: 10px;
+    font-weight: 900;
+    line-height: 1.25;
+    text-transform: none;
+}
+
 .operator-gallery-detail-skill-copy p,
 .operator-gallery-detail-empty {
     margin: 0;
@@ -460,6 +468,27 @@
     font-size: 12px;
     font-weight: 700;
     line-height: 1.45;
+}
+
+.operator-gallery-detail-skill-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding-top: 3px;
+}
+
+.operator-gallery-detail-skill-chip {
+    min-height: 20px;
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid rgba(248,245,70,0.24);
+    background: rgba(248,245,70,0.08);
+    color: rgba(242,242,242,0.82);
+    padding: 0 7px;
+    font-size: 9px;
+    font-weight: 900;
+    line-height: 1;
+    text-transform: uppercase;
 }
 
 .seo-feature-grid {
