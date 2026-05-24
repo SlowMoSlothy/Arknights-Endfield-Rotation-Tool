@@ -40,6 +40,7 @@ function mapDatabaseOperator(row, skillRows) {
         name: row.name || raw.name,
         star: row.star ?? raw.star,
         operatorClass: row.operator_class || raw.operatorClass,
+        sortOrder: row.sort_order ?? raw.sortOrder,
         icon: row.icon_path || raw.icon,
         canEnterUltimateState: row.can_enter_ultimate_state ?? raw.canEnterUltimateState,
         elementType: row.element_type || raw.elementType,

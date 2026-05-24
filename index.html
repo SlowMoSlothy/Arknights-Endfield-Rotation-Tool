@@ -10,9 +10,10 @@
     <title>Arknights: Endfield Rotation Builder [Open Beta]</title>
 
     <meta name="description"
-      content="Arknights: Endfield Rotation Builder [Open Beta] - Interactive combo planner with reactions, buffs, debuffs, stack tracking and mobile support.">
+      content="Arknights: Endfield Rotation Builder for planning teams, operator skills, combo rotations, reactions, buffs, debuffs and shared combat timelines.">
     <meta name="keywords"
           content="Arknights Endfield, Rotation Builder, Combo Planner, Team Builder">
+    <link rel="canonical" href="https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/">
 
    <meta property="og:title"
       content="Arknights: Endfield Rotation Builder [Open Beta]">
@@ -22,11 +23,23 @@
 
   <meta property="og:type" content="website">
 
-  <meta property="og:url" content="https://github.com/SlowMoSlothy/Arknights-Endfield-Rotation-Tool">
+  <meta property="og:url" content="https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/">
   <meta property="og:image" content="https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/assets/banner.png">
   <meta property="og:image:width" content="1128">
   <meta property="og:image:height" content="449">
   <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Arknights: Endfield Rotation Builder",
+      "url": "https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/",
+      "applicationCategory": "GameApplication",
+      "operatingSystem": "Any",
+      "description": "Interactive rotation builder for Arknights: Endfield teams, operator skills, reactions, buffs, debuffs and shared combat timelines.",
+      "isAccessibleForFree": true
+    }
+  </script>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/mobile.css">
 </head>
@@ -141,6 +154,18 @@
               </svg>
             </span>
             <span class="sidebar-command-label">Community</span>
+            <span class="sidebar-command-signal"></span>
+          </button>
+          <button id="openOperatorGalleryBtn" class="sidebar-command" type="button">
+            <span class="sidebar-command-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <rect x="4" y="5" width="6" height="6" rx="1"></rect>
+                <rect x="14" y="5" width="6" height="6" rx="1"></rect>
+                <rect x="4" y="15" width="6" height="6" rx="1"></rect>
+                <rect x="14" y="15" width="6" height="6" rx="1"></rect>
+              </svg>
+            </span>
+            <span class="sidebar-command-label">Operator Gallery</span>
             <span class="sidebar-command-signal"></span>
           </button>
           <button id="openAdminPanelBtn" class="sidebar-command" type="button" hidden>
@@ -534,6 +559,52 @@
     </div>
   </div>
 
+  <div id="operatorGalleryModal" class="settings-modal operator-gallery-modal">
+    <div class="settings-dialog operator-gallery-dialog">
+      <div class="settings-header">
+        <h2 class="settings-title">Operator Gallery</h2>
+        <button id="closeOperatorGalleryBtn" class="settings-close" type="button">&times;</button>
+      </div>
+
+      <div class="operator-gallery-toolbar">
+        <label class="operator-gallery-search-wrap">
+          <span>Search</span>
+          <input id="operatorGallerySearchInput" class="operator-gallery-search-input" type="search"
+            placeholder="Operator name">
+        </label>
+        <div class="operator-gallery-count" id="operatorGalleryCount"></div>
+      </div>
+
+      <div class="operator-gallery-filter-panel" aria-label="Operator gallery filters">
+        <div class="operator-gallery-filter-group">
+          <span class="operator-gallery-filter-label">Stars</span>
+          <div id="operatorGalleryStarFilters" class="operator-gallery-filter-options"></div>
+        </div>
+        <div class="operator-gallery-filter-group">
+          <span class="operator-gallery-filter-label">Class</span>
+          <div id="operatorGalleryClassFilters" class="operator-gallery-filter-options"></div>
+        </div>
+        <div class="operator-gallery-filter-group">
+          <span class="operator-gallery-filter-label">Element</span>
+          <div id="operatorGalleryElementFilters" class="operator-gallery-filter-options"></div>
+        </div>
+      </div>
+
+      <div id="operatorGalleryList" class="operator-gallery-list"></div>
+    </div>
+  </div>
+
+  <div id="operatorDetailModal" class="settings-modal operator-detail-modal">
+    <div class="settings-dialog operator-gallery-dialog">
+      <div class="settings-header">
+        <h2 class="settings-title">Operator Details</h2>
+        <button id="closeOperatorDetailBtn" class="settings-close" type="button">&times;</button>
+      </div>
+
+      <section id="operatorGalleryDetail" class="operator-gallery-detail"></section>
+    </div>
+  </div>
+
   <div id="adminModal" class="settings-modal admin-modal">
     <div class="settings-dialog admin-dialog">
       <div class="settings-header">
@@ -589,19 +660,93 @@
       <div id="enemyModalList" class="settings-section"></div>
     </div>
   </div>
-<section class="seo-description">
-  <h2>Arknights: Endfield Rotation Builder [Open Beta]</h2>
+  <section class="seo-description" aria-labelledby="seoTitle">
+    <div class="seo-intro">
+      <p class="seo-kicker">Open Beta Combat Planner</p>
+      <h1 id="seoTitle">Arknights: Endfield Rotation Builder</h1>
 
-  <p>
-    Create advanced team rotations, combo setups, reactions,
-    buffs, debuffs and stack interactions for Arknights: Endfield.
-  </p>
+      <p>
+        Plan Arknights: Endfield team rotations with operator skills, combo triggers, elemental reactions,
+        buffs, debuffs, cooldowns and stack interactions. The tool is built for testing combat timelines,
+        comparing team ideas and sharing repeatable rotations with other players.
+      </p>
 
-  <p>
-    This interactive Endfield combat planner supports mobile devices,
-    rotation sharing, reaction tracking and skill timeline planning.
-  </p>
-</section>
+      <p>
+        Use the planner to build a four-operator team, arrange the skill order, inspect reaction outcomes and
+        track important effects such as Vulnerable, Stagger, Combustion, Solidification, Electrification,
+        Corrosion and Arts Susceptibility.
+      </p>
+
+    </div>
+
+    <div class="seo-feature-grid">
+      <article>
+        <h3>Rotation planning</h3>
+        <p>Create skill timelines for Final Strikes, Battle Skills, Combo Skills and Ultimates.</p>
+      </article>
+      <article>
+        <h3>Reaction tracking</h3>
+        <p>Review elemental interactions for heat, cryo, electric, nature and physical damage setups.</p>
+      </article>
+      <article>
+        <h3>Team sharing</h3>
+        <p>Save, export and share rotation ideas for testing community team compositions.</p>
+      </article>
+    </div>
+
+    <section class="seo-operator-section" aria-labelledby="operatorGalleryTitle">
+      <h3 id="operatorGalleryTitle">Operator gallery</h3>
+      <p>
+        The builder currently includes playable planning data for these Arknights: Endfield operators,
+        including their class, element and rotation-ready skill entries.
+      </p>
+      <div id="seoOperatorGallery" class="seo-operator-gallery">
+        <article><img src="assets/operators/avatars/Ardelia.png" alt="Ardelia operator avatar"><strong>Ardelia</strong><span>Supporter - Nature</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="12">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Antal.png" alt="Antal operator avatar"><strong>Antal</strong><span>Supporter - Electric</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="8">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Alesh.png" alt="Alesh operator avatar"><strong>Alesh</strong><span>Vanguard - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="10">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Chen.png" alt="Chen Qianyu operator avatar"><strong>Chen Qianyu</strong><span>Guard - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="14">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Catcher.png" alt="Catcher operator avatar"><strong>Catcher</strong><span>Defender - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="13">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Dapan.png" alt="Da Pan operator avatar"><strong>Da Pan</strong><span>Striker - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="16">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Ember.png" alt="Ember operator avatar"><strong>Ember</strong><span>Defender - Heat</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="17">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Estella.png" alt="Estella operator avatar"><strong>Estella</strong><span>Guard - Cryo</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="18">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Fluorite.png" alt="Fluorite operator avatar"><strong>Fluorite</strong><span>Caster - Nature</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="19">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Last_Rite.png" alt="Last Rite operator avatar"><strong>Last Rite</strong><span>Striker - Cryo</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="20">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Lifeng.png" alt="Lifeng operator avatar"><strong>Lifeng</strong><span>Guard - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="21">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Snowshine.png" alt="Snowshine operator avatar"><strong>Snowshine</strong><span>Defender - Cryo</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="23">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Wulfgard.png" alt="Wulfgard operator avatar"><strong>Wulfgard</strong><span>Caster - Heat</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="24">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Xaihi.png" alt="Xaihi operator avatar"><strong>Xaihi</strong><span>Supporter - Cryo</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="25">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Pogranichnik.png" alt="Pogranichnik operator avatar"><strong>Pogranichnik</strong><span>Vanguard - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="22">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Zhuang.png" alt="Zhuang operator avatar"><strong>Zhuang</strong><span>Striker - Electric</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="9">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Avywenna.png" alt="Avywenna operator avatar"><strong>Avywenna</strong><span>Striker - Electric</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="7">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Arclight.png" alt="Arclight operator avatar"><strong>Arclight</strong><span>Vanguard - Electric</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="6">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Laevatain.png" alt="Laevatain operator avatar"><strong>Laevatain</strong><span>Striker - Heat</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="1">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Akekuri.png" alt="Akekuri operator avatar"><strong>Akekuri</strong><span>Vanguard - Heat</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="2">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Endmin.png" alt="Endministrator operator avatar"><strong>Endministrator</strong><span>Guard - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="3">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Perlica.png" alt="Perlica operator avatar"><strong>Perlica</strong><span>Caster - Electric</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="4">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Rossi.png" alt="Rossi operator avatar"><strong>Rossi</strong><span>Guard - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="5">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Tangtang.png" alt="Tangtang operator avatar"><strong>Tangtang</strong><span>Caster - Cryo</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="15">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Gilberta.png" alt="Gilberta operator avatar"><strong>Gilberta</strong><span>Supporter - Nature</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="11">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Yvonne.png" alt="Yvonne operator avatar"><strong>Yvonne</strong><span>Caster - Cryo</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="26">Show rotation</a></article>
+        <article><img src="assets/operators/avatars/Mi_Fu.png" alt="Mi Fu operator avatar"><strong>Mi Fu</strong><span>Guard - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="27">Show rotation</a></article>
+      </div>
+    </section>
+
+    <section class="seo-faq" aria-labelledby="seoFaqTitle">
+      <h3 id="seoFaqTitle">Arknights: Endfield rotation planner FAQ</h3>
+      <details>
+        <summary>What is this rotation builder for?</summary>
+        <p>It helps players test Endfield team rotations, skill timing, combo conditions and reaction chains before sharing or refining a setup.</p>
+      </details>
+      <details>
+        <summary>Which combat details can be tracked?</summary>
+        <p>The planner tracks operator skills, cooldowns, energy, buffs, debuffs, stacks, elemental reactions and selected enemy targets.</p>
+      </details>
+      <details>
+        <summary>Can rotations be shared?</summary>
+        <p>Yes. The tool supports shareable rotation data and community rotation workflows for comparing team ideas.</p>
+      </details>
+    </section>
+  </section>
   <footer class="site-footer">
     <span>&copy; 2026 Arknights Endfield Rotation Builder</span>
     <span>App Version 2.14.3</span>
@@ -672,6 +817,7 @@
   <script src="js/ui/rotationGrid.js"></script>
   <script src="js/ui/teamSelection.js"></script>
   <script src="js/ui/communityRotations.js"></script>
+  <script src="js/ui/operatorGallery.js"></script>
   <script src="js/ui/myRotations.js"></script>
   <script src="js/ui/adminPanel.js"></script>
   <script src="js/main.js"></script>
