@@ -144,8 +144,14 @@ function initRotationDragDrop() {
                 if (Number.isNaN(removeIndex)) return;
                 rotation[removeIndex] = null;
                 compactRotation();
+                if (typeof normalizeQingboMovesInRotation === "function") {
+                    normalizeQingboMovesInRotation();
+                }
                 ensureSlotCount(rotation.filter(slot => slot !== null).length + 1);
                 saveRotation();
+                if (typeof refreshSkillsAfterRotationChange === "function") {
+                    refreshSkillsAfterRotationChange();
+                }
             },
             onMove: (evt) => {
                 document.querySelectorAll(".rotation-slot").forEach(s => s.classList.remove("drag-hover"));
@@ -168,8 +174,14 @@ function initRotationDragDrop() {
                         if (oldIndex < index) insertIndex--;
                         rotation.splice(insertIndex, 0, movedItem);
                         compactRotation();
+                        if (typeof normalizeQingboMovesInRotation === "function") {
+                            normalizeQingboMovesInRotation();
+                        }
                         ensureSlotCount(rotation.filter(slot => slot !== null).length + 1);
                         saveRotation();
+                        if (typeof refreshSkillsAfterRotationChange === "function") {
+                            refreshSkillsAfterRotationChange();
+                        }
                         return;
                     }
                 }
@@ -183,8 +195,14 @@ function initRotationDragDrop() {
                 handleUltimateStateToggle(draggedId);
                 insertComboChain(finalSkillId, index);
                 compactRotation();
+                if (typeof normalizeQingboMovesInRotation === "function") {
+                    normalizeQingboMovesInRotation();
+                }
                 ensureSlotCount(rotation.filter(slot => slot !== null).length + 1);
                 saveRotation();
+                if (typeof refreshSkillsAfterRotationChange === "function") {
+                    refreshSkillsAfterRotationChange();
+                }
             }
         });
         slotSortables.push(sortable);

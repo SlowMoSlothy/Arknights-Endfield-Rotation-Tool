@@ -1,4 +1,208 @@
 let activeSkillTooltipElement = null;
+let qingboSkillMoveState = {};
+
+function isQingboTriplexMove(skill) {
+    return String(skill?.name || "").startsWith("Qingbo Triplex - Move")
+        && Number.isFinite(Number(skill?.qingboMove));
+}
+
+function getQingboMovesForOperator(op) {
+    if (!Array.isArray(op?.skills)) return [];
+
+    return op.skills
+        .filter(isQingboTriplexMove)
+        .sort((a, b) => Number(a.qingboMove) - Number(b.qingboMove));
+}
+
+function getDisplaySkillsForOperator(op) {
+    const qingboMoves = getQingboMovesForOperator(op);
+    if (qingboMoves.length <= 1) {
+        return (op.skills || []).map(skill => ({ skill }));
+    }
+
+    const selectedId = qingboSkillMoveState[op.id];
+    const activeMove = qingboMoves.find(skill => skill.id === selectedId) || qingboMoves[0];
+    qingboSkillMoveState[op.id] = activeMove.id;
+
+    const displaySkills = [];
+    let qingboInserted = false;
+
+    (op.skills || []).forEach(skill => {
+        if (isQingboTriplexMove(skill)) {
+            if (!qingboInserted) {
+                displaySkills.push({
+                    skill: activeMove,
+                    switchGroup: qingboMoves
+                });
+                qingboInserted = true;
+            }
+            return;
+        }
+
+        displaySkills.push({ skill });
+    });
+
+    return displaySkills;
+}
+
+function getNextQingboMoveForSkill(op, skillData) {
+    const qingboMoves = getQingboMovesForOperator(op);
+    if (qingboMoves.length <= 1 || !isQingboTriplexMove(skillData)) return null;
+
+    const nextMoveNumber = Number(skillData.nextQingboMove);
+    const currentIndex = qingboMoves.findIndex(skill => skill.id === skillData.id);
+
+    return Number.isFinite(nextMoveNumber)
+        ? qingboMoves.find(skill => Number(skill.qingboMove) === nextMoveNumber) || null
+        : qingboMoves[(currentIndex + 1 + qingboMoves.length) % qingboMoves.length] || null;
+}
+
+function getQingboMoveByNumber(op, moveNumber) {
+    return getQingboMovesForOperator(op).find(skill => Number(skill.qingboMove) === Number(moveNumber)) || null;
+}
+
+function getFirstQingboMove(op) {
+    return getQingboMovesForOperator(op)[0] || null;
+}
+
+function getNextQingboMoveInSequence(op, currentSkill) {
+    return getNextQingboMoveForSkill(op, currentSkill) || getFirstQingboMove(op);
+}
+
+function normalizeQingboMovesInRotation() {
+    if (!Array.isArray(rotation)) return false;
+
+    const expectedMoveByOperatorId = {};
+    let changed = false;
+
+    rotation.forEach(entry => {
+        if (!entry) return;
+
+        const skillData = typeof getSkillById === "function" ? getSkillById(entry.id) : null;
+        if (!isQingboTriplexMove(skillData)) return;
+
+        const op = typeof getOperatorBySkillId === "function" ? getOperatorBySkillId(entry.id) : null;
+        if (!op) return;
+
+        const expectedMove = expectedMoveByOperatorId[op.id] || getFirstQingboMove(op);
+        if (!expectedMove) return;
+
+        if (entry.id !== expectedMove.id) {
+            entry.id = expectedMove.id;
+            changed = true;
+        }
+
+        expectedMoveByOperatorId[op.id] = getNextQingboMoveInSequence(op, expectedMove) || expectedMove;
+    });
+
+    return changed;
+}
+
+function syncQingboMoveStateFromRotation() {
+    if (!Array.isArray(rotation)) return;
+
+    const nextMoveByOperatorId = {};
+
+    if (typeof operators !== "undefined" && Array.isArray(operators)) {
+        operators.forEach(op => {
+            const qingboMoves = getQingboMovesForOperator(op);
+            if (qingboMoves.length > 1) {
+                nextMoveByOperatorId[op.id] = qingboMoves[0].id;
+            }
+        });
+    }
+
+    rotation.forEach(entry => {
+        if (!entry) return;
+
+        const skillData = typeof getSkillById === "function" ? getSkillById(entry.id) : null;
+        if (!isQingboTriplexMove(skillData)) return;
+
+        const op = typeof getOperatorBySkillId === "function" ? getOperatorBySkillId(entry.id) : null;
+        if (!op) return;
+
+        const nextMove = getNextQingboMoveInSequence(op, skillData);
+        if (nextMove) {
+            nextMoveByOperatorId[op.id] = nextMove.id;
+        }
+    });
+
+    Object.entries(nextMoveByOperatorId).forEach(([operatorId, skillId]) => {
+        qingboSkillMoveState[operatorId] = skillId;
+    });
+}
+
+function refreshSkillsAfterRotationChange() {
+    syncQingboMoveStateFromRotation();
+    renderSkills();
+    if (typeof initSkillDragDrop === "function") initSkillDragDrop();
+    if (typeof updateSelectedUI === "function") updateSelectedUI();
+}
+
+function cycleQingboMove(op, currentSkillId) {
+    const qingboMoves = getQingboMovesForOperator(op);
+    if (qingboMoves.length <= 1) return;
+
+    const currentIndex = qingboMoves.findIndex(skill => skill.id === currentSkillId);
+    const nextMove = qingboMoves[(currentIndex + 1 + qingboMoves.length) % qingboMoves.length];
+    qingboSkillMoveState[op.id] = nextMove.id;
+
+    if (typeof selectedSkill !== "undefined" && selectedSkill && qingboMoves.some(skill => skill.id === selectedSkill.id)) {
+        selectedSkill = { id: nextMove.id };
+    }
+
+    renderSkills();
+    if (typeof initSkillDragDrop === "function") initSkillDragDrop();
+    if (typeof updateSelectedUI === "function") updateSelectedUI();
+}
+
+function advanceQingboMoveAfterPlacement(skillId) {
+    const skillData = typeof getSkillById === "function" ? getSkillById(skillId) : null;
+    if (!isQingboTriplexMove(skillData)) return false;
+
+    const op = typeof getOperatorBySkillId === "function" ? getOperatorBySkillId(skillId) : null;
+    const qingboMoves = getQingboMovesForOperator(op);
+    if (!op || qingboMoves.length <= 1) return false;
+
+    const nextMove = getNextQingboMoveForSkill(op, skillData);
+    if (!nextMove) return false;
+
+    qingboSkillMoveState[op.id] = nextMove.id;
+
+    if (typeof selectedSkill !== "undefined" && selectedSkill && qingboMoves.some(skill => skill.id === selectedSkill.id)) {
+        selectedSkill = { id: nextMove.id };
+    }
+
+    renderSkills();
+    if (typeof initSkillDragDrop === "function") initSkillDragDrop();
+    if (typeof updateSelectedUI === "function") updateSelectedUI();
+
+    return true;
+}
+
+function createQingboSwitchButton(op, skillData, switchGroup) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "qingbo-switch-btn";
+    button.textContent = String(skillData.qingboMove);
+    button.dataset.buttonTooltip = "Switch Qingbo move";
+    button.setAttribute("aria-label", `Switch ${skillData.name}`);
+    button.setAttribute("title", `Move ${skillData.qingboMove} of ${switchGroup.length}`);
+
+    const stopSwitchEvent = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+    };
+
+    button.addEventListener("pointerdown", stopSwitchEvent);
+    button.addEventListener("pointerup", stopSwitchEvent);
+    button.addEventListener("click", (event) => {
+        stopSwitchEvent(event);
+        cycleQingboMove(op, skillData.id);
+    });
+
+    return button;
+}
 
 function ensureGlobalSkillTooltip() {
     let tooltip = document.getElementById("globalSkillTooltip");
@@ -185,13 +389,18 @@ function renderSkills() {
         }
         const skillRow = document.createElement("div");
         skillRow.className = "skill-row";
-        op.skills.forEach(skill => {
+        getDisplaySkillsForOperator(op).forEach(({ skill, switchGroup }) => {
             const div = document.createElement("div");
             div.className = "skill skill-small";
             div.dataset.id = String(skill.id);
             div.dataset.largeIcon = skill.icon;
             const skillData = { ...skill, operator: op.name };
             div.appendChild(createSkillIcon(skillData, { size: "small", useSmallIcon: true }));
+            if (Array.isArray(switchGroup) && switchGroup.length > 1) {
+                div.classList.add("qingbo-switch");
+                div.dataset.qingboMove = String(skillData.qingboMove);
+                div.appendChild(createQingboSwitchButton(op, skillData, switchGroup));
+            }
             skillRow.appendChild(div);
             attachSkillTooltipEvents(div, skillData);
         });

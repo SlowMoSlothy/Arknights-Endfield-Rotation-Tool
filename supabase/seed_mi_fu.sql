@@ -3,7 +3,9 @@
 -- Image placeholders expected:
 --   assets/operators/avatars/Mi_Fu.png
 --   assets/operators/skills/mifu/fs_small.png
---   assets/operators/skills/mifu/bs_small.png
+--   assets/operators/skills/mifu/bs_1.svg
+--   assets/operators/skills/mifu/bs_2.svg
+--   assets/operators/skills/mifu/bs_3.svg
 --   assets/operators/skills/mifu/cs_small.png
 --   assets/operators/skills/mifu/ult_small.png
 
@@ -32,19 +34,7 @@ insert into public.operators (
     'assets/operators/avatars/Mi_Fu.png',
     false,
     27,
-    $json$
-    {
-        "id": 27,
-        "name": "Mi Fu",
-        "star": 6,
-        "operatorClass": "Guard",
-        "icon": "assets/operators/avatars/Mi_Fu.png",
-        "elementType": "physical",
-        "weaponType": "Greatsword",
-        "mainAttribute": "Strength",
-        "sourceNote": "Pre-release/operator preview data. Cooldowns, SP costs, and exact multipliers should be updated once live values are available."
-    }
-    $json$::jsonb
+    '{"id":27,"name":"Mi Fu","star":6,"operatorClass":"Guard","icon":"assets/operators/avatars/Mi_Fu.png","elementType":"physical","weaponType":"Greatsword","mainAttribute":"Strength","sourceNote":"Pre-release/operator preview data. Cooldowns, SP costs, and exact multipliers should be updated once live values are available."}'::jsonb
 )
 on conflict (id) do update set
     game = excluded.game,
@@ -60,8 +50,7 @@ on conflict (id) do update set
     updated_at = now();
 
 delete from public.operator_skills
-where operator_id = 27
-  and id not in (2701, 2702, 2703, 2704);
+where operator_id = 27;
 
 insert into public.operator_skills (
     id,
@@ -95,88 +84,63 @@ insert into public.operator_skills (
     'Physical Final Strike. Deals massive Physical DMG and restores some SP.',
     null,
     null,
-    $json$
-    {
-        "id": 2701,
-        "name": "Fistmancer of Blades",
-        "icon": "assets/operators/avatars/Mi_Fu.png",
-        "iconSmall": "assets/operators/skills/mifu/fs_small.png",
-        "type": "Final Strike",
-        "shortType": "FS",
-        "cooldown": null,
-        "energy": null,
-        "elementType": "physical",
-        "description": "Physical Final Strike. Deals massive Physical DMG and restores some SP.",
-        "debuffs": [
-            {
-                "id": "final_strike",
-                "name": "Final Strike",
-                "appliesEffect": "final_strike",
-                "persistsForCombo": false,
-                "visible": false
-            }
-        ]
-    }
-    $json$::jsonb
+    '{"id":2701,"name":"Fistmancer of Blades","icon":"assets/operators/avatars/Mi_Fu.png","iconSmall":"assets/operators/skills/mifu/fs_small.png","type":"Final Strike","shortType":"FS","cooldown":null,"energy":null,"elementType":"physical","description":"Physical Final Strike. Deals massive Physical DMG and restores some SP.","debuffs":[{"id":"final_strike","name":"Final Strike","appliesEffect":"final_strike","persistsForCombo":false,"visible":false}]}'::jsonb
 ),
 (
     2702,
     27,
     2,
-    'Qingbo Triplex',
+    'Qingbo Triplex - Move 1',
     'Battle Skill',
     'BS',
     null,
     null,
     'physical',
     'assets/operators/avatars/Mi_Fu.png',
-    'assets/operators/skills/mifu/bs_small.png',
-    'Three-move Battle Skill. Move 1 pulls small enemies or dashes to large enemies. Move 2 applies Crush and consumes Vulnerability. Move 3 becomes available after consuming at least 3 Vulnerability stacks and deals heavy frontal Physical DMG.',
+    'assets/operators/skills/mifu/bs_1.svg',
+    'Move 1 pulls in nearby enemies, deals DMG, and replaces the next Battle Skill with Move 2.',
     null,
     null,
-    $json$
-    {
-        "id": 2702,
-        "name": "Qingbo Triplex",
-        "icon": "assets/operators/avatars/Mi_Fu.png",
-        "iconSmall": "assets/operators/skills/mifu/bs_small.png",
-        "type": "Battle Skill",
-        "shortType": "BS",
-        "cooldown": null,
-        "energy": null,
-        "elementType": "physical",
-        "description": "Three-move Battle Skill. Move 1 pulls small enemies or dashes to large enemies. Move 2 applies Crush and consumes Vulnerability. Move 3 becomes available after consuming at least 3 Vulnerability stacks and deals heavy frontal Physical DMG.",
-        "comboNotes": [
-            "Move 1: Cloudtrapper",
-            "Move 2: Trail and Mangle",
-            "Move 3: World Splitter"
-        ],
-        "consumeDebuffs": [
-            "vulnerable"
-        ],
-        "debuffs": [
-            {
-                "id": "pull",
-                "name": "Pull",
-                "appliesEffect": "pull",
-                "persistsForCombo": false,
-                "visible": true
-            },
-            {
-                "id": "crush",
-                "name": "Crush",
-                "appliesEffect": "crush",
-                "persistsForCombo": false,
-                "visible": true
-            }
-        ]
-    }
-    $json$::jsonb
+    '{"id":2702,"name":"Qingbo Triplex - Move 1","icon":"assets/operators/avatars/Mi_Fu.png","iconSmall":"assets/operators/skills/mifu/bs_1.svg","type":"Battle Skill","shortType":"BS","cooldown":null,"energy":null,"elementType":"physical","description":"Move 1 pulls in nearby enemies, deals DMG, and replaces the next Battle Skill with Move 2.","qingboMove":1,"nextQingboMove":2,"debuffs":[{"id":"pull","name":"Pull","appliesEffect":"pull","persistsForCombo":false,"visible":true}]}'::jsonb
+),
+(
+    2705,
+    27,
+    3,
+    'Qingbo Triplex - Move 2',
+    'Battle Skill',
+    'BS',
+    null,
+    null,
+    'physical',
+    'assets/operators/avatars/Mi_Fu.png',
+    'assets/operators/skills/mifu/bs_2.svg',
+    'Move 2 applies Crush. If at least 3 Vulnerability stacks are consumed, the next Battle Skill will be replaced with Move 3.',
+    null,
+    null,
+    '{"id":2705,"name":"Qingbo Triplex - Move 2","icon":"assets/operators/avatars/Mi_Fu.png","iconSmall":"assets/operators/skills/mifu/bs_2.svg","type":"Battle Skill","shortType":"BS","cooldown":null,"energy":null,"elementType":"physical","description":"Move 2 applies Crush. If at least 3 Vulnerability stacks are consumed, the next Battle Skill will be replaced with Move 3.","qingboMove":2,"requiresConsumedVulnerableStacks":3,"nextQingboMove":3,"consumeDebuffs":["vulnerable"],"debuffs":[{"id":"crush","name":"Crush","appliesEffect":"crush","persistsForCombo":false,"visible":true}]}'::jsonb
+),
+(
+    2706,
+    27,
+    4,
+    'Qingbo Triplex - Move 3',
+    'Battle Skill',
+    'BS',
+    null,
+    null,
+    'physical',
+    'assets/operators/avatars/Mi_Fu.png',
+    'assets/operators/skills/mifu/bs_3.svg',
+    'Move 3 deals massive DMG in one hit to enemies in a frontal area.',
+    null,
+    null,
+    '{"id":2706,"name":"Qingbo Triplex - Move 3","icon":"assets/operators/avatars/Mi_Fu.png","iconSmall":"assets/operators/skills/mifu/bs_3.svg","type":"Battle Skill","shortType":"BS","cooldown":null,"energy":null,"elementType":"physical","description":"Move 3 deals massive DMG in one hit to enemies in a frontal area.","qingboMove":3}'::jsonb
 ),
 (
     2703,
     27,
-    3,
+    5,
     'Fists of No Regrets',
     'Combo Skill',
     'CS',
@@ -188,44 +152,12 @@ insert into public.operator_skills (
     'Triggers when an enemy reaches 3 Vulnerability stacks. Deals Physical DMG, applies Physical Susceptibility, and replaces Mi Fu''s next Battle Skill Move 1 with Move 2.',
     '3 Vulnerability stacks',
     'all',
-    $json$
-    {
-        "id": 2703,
-        "name": "Fists of No Regrets",
-        "icon": "assets/operators/avatars/Mi_Fu.png",
-        "iconSmall": "assets/operators/skills/mifu/cs_small.png",
-        "type": "Combo Skill",
-        "shortType": "CS",
-        "cooldown": null,
-        "energy": null,
-        "elementType": "physical",
-        "description": "Triggers when an enemy reaches 3 Vulnerability stacks. Deals Physical DMG, applies Physical Susceptibility, and replaces Mi Fu's next Battle Skill Move 1 with Move 2.",
-        "comboTrigger": "3 Vulnerability stacks",
-        "comboTriggerMode": "all",
-        "allowSelfTrigger": true,
-        "comboTriggers": [
-            {
-                "effect": "vulnerable",
-                "minStacks": 3
-            }
-        ],
-        "debuffs": [
-            {
-                "id": "physical_susceptibility",
-                "name": "Physical Susceptibility",
-                "appliesEffect": "physical_susceptibility",
-                "persistsForCombo": true,
-                "visible": true,
-                "stackable": false
-            }
-        ]
-    }
-    $json$::jsonb
+    '{"id":2703,"name":"Fists of No Regrets","icon":"assets/operators/avatars/Mi_Fu.png","iconSmall":"assets/operators/skills/mifu/cs_small.png","type":"Combo Skill","shortType":"CS","cooldown":null,"energy":null,"elementType":"physical","description":"Triggers when an enemy reaches 3 Vulnerability stacks. Deals Physical DMG, applies Physical Susceptibility, and replaces Mi Fu''s next Battle Skill Move 1 with Move 2.","comboTrigger":"3 Vulnerability stacks","comboTriggerMode":"all","allowSelfTrigger":true,"comboTriggers":[{"effect":"vulnerable","minStacks":3}],"debuffs":[{"id":"physical_susceptibility","name":"Physical Susceptibility","appliesEffect":"physical_susceptibility","persistsForCombo":true,"visible":true,"stackable":false}]}'::jsonb
 ),
 (
     2704,
     27,
-    4,
+    6,
     'Pile of No Mercy',
     'Ultimate',
     'Ult',
@@ -237,29 +169,7 @@ insert into public.operator_skills (
     'Forcibly Lifts a target, slams it down to deal Physical DMG, and replaces Mi Fu''s next Battle Skill Move 1 with Move 2.',
     null,
     null,
-    $json$
-    {
-        "id": 2704,
-        "name": "Pile of No Mercy",
-        "icon": "assets/operators/avatars/Mi_Fu.png",
-        "iconSmall": "assets/operators/skills/mifu/ult_small.png",
-        "type": "Ultimate",
-        "shortType": "Ult",
-        "cooldown": null,
-        "energy": null,
-        "elementType": "physical",
-        "description": "Forcibly Lifts a target, slams it down to deal Physical DMG, and replaces Mi Fu's next Battle Skill Move 1 with Move 2.",
-        "debuffs": [
-            {
-                "id": "lift",
-                "name": "Lift",
-                "appliesEffect": "lift",
-                "persistsForCombo": false,
-                "visible": true
-            }
-        ]
-    }
-    $json$::jsonb
+    '{"id":2704,"name":"Pile of No Mercy","icon":"assets/operators/avatars/Mi_Fu.png","iconSmall":"assets/operators/skills/mifu/ult_small.png","type":"Ultimate","shortType":"Ult","cooldown":null,"energy":null,"elementType":"physical","description":"Forcibly Lifts a target, slams it down to deal Physical DMG, and replaces Mi Fu''s next Battle Skill Move 1 with Move 2.","debuffs":[{"id":"lift","name":"Lift","appliesEffect":"lift","persistsForCombo":false,"visible":true}]}'::jsonb
 )
 on conflict (id) do update set
     operator_id = excluded.operator_id,
