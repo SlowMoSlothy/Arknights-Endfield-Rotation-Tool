@@ -414,7 +414,7 @@ function renderSkills() {
         }
         const skillRow = document.createElement("div");
         skillRow.className = "skill-row";
-        op.skills.forEach(skill => {
+        getDisplaySkillsForOperator(op).forEach(({ skill, switchGroup }) => {
             if (uiSettings?.timelineMode === "simulation" && isFinalStrikeSkillForPanel(skill)) return;
             const div = document.createElement("div");
             div.className = "skill skill-small";

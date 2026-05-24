@@ -647,6 +647,36 @@ function removeBasicAttackEntriesFromRotation() {
     }
 }
 
+function removeRotationEntryAtIndex(index, options = {}) {
+    const removeIndex = parseInt(index, 10);
+    if (!Array.isArray(rotation) || Number.isNaN(removeIndex) || !rotation[removeIndex]) {
+        return false;
+    }
+
+    rotation[removeIndex] = null;
+    compactRotation();
+
+    if (typeof normalizeQingboMovesInRotation === "function") {
+        normalizeQingboMovesInRotation();
+    }
+
+    if (options.ensureTrailingSlot && typeof ensureSlotCount === "function") {
+        ensureSlotCount(rotation.filter(slot => slot !== null).length + 1);
+    }
+
+    if (options.trimTrailingEmptyRows && typeof trimTrailingEmptyRows === "function") {
+        trimTrailingEmptyRows();
+    }
+
+    saveRotation();
+
+    if (typeof refreshSkillsAfterRotationChange === "function") {
+        refreshSkillsAfterRotationChange();
+    }
+
+    return true;
+}
+
 function isSimulationTimelineMode() {
     return uiSettings?.timelineMode === "simulation";
 }
@@ -2499,6 +2529,7 @@ function createSimulationSkillElement(entry, index, skillData, secondsPerSlot, p
     removeBtn.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
+        removeRotationEntryAtIndex(index);
     });
 
     if (!options.readOnly) {
