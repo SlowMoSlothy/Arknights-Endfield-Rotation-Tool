@@ -1198,7 +1198,13 @@ function setRotationEntryTime(index, value, options = {}) {
     rotation[index].time = options.snapBattleSkill
         ? getSnappedSimulationEntryTime(index, value, options.secondsPerSlot)
         : roundSimulationTime(value);
+    if (typeof normalizeQingboMovesInRotation === "function") {
+        normalizeQingboMovesInRotation();
+    }
     localStorage.setItem("rotation", JSON.stringify(rotation));
+    if (typeof refreshSkillsAfterRotationChange === "function") {
+        refreshSkillsAfterRotationChange();
+    }
 }
 
 function createSimulationTimeRuler(durationSeconds, pixelsPerSecond) {

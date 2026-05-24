@@ -74,8 +74,24 @@ function normalizeQingboMovesInRotation() {
 
     const expectedMoveByOperatorId = {};
     let changed = false;
+    const useSimulationOrder = typeof isSimulationTimelineMode === "function" && isSimulationTimelineMode();
+    const rotationItems = rotation
+        .map((entry, index) => ({ entry, index }))
+        .filter(item => item.entry);
 
-    rotation.forEach(entry => {
+    if (useSimulationOrder) {
+        rotationItems.sort((left, right) => {
+            const leftTime = typeof getRotationEntryTime === "function"
+                ? getRotationEntryTime(left.entry, left.index, 0)
+                : Number(left.entry?.time || 0);
+            const rightTime = typeof getRotationEntryTime === "function"
+                ? getRotationEntryTime(right.entry, right.index, 0)
+                : Number(right.entry?.time || 0);
+            return (leftTime - rightTime) || (left.index - right.index);
+        });
+    }
+
+    rotationItems.forEach(({ entry }) => {
         if (!entry) return;
 
         const skillData = typeof getSkillById === "function" ? getSkillById(entry.id) : null;
@@ -102,6 +118,7 @@ function syncQingboMoveStateFromRotation() {
     if (!Array.isArray(rotation)) return;
 
     const nextMoveByOperatorId = {};
+    const useSimulationOrder = typeof isSimulationTimelineMode === "function" && isSimulationTimelineMode();
 
     if (typeof operators !== "undefined" && Array.isArray(operators)) {
         operators.forEach(op => {
@@ -112,7 +129,23 @@ function syncQingboMoveStateFromRotation() {
         });
     }
 
-    rotation.forEach(entry => {
+    const rotationItems = rotation
+        .map((entry, index) => ({ entry, index }))
+        .filter(item => item.entry);
+
+    if (useSimulationOrder) {
+        rotationItems.sort((left, right) => {
+            const leftTime = typeof getRotationEntryTime === "function"
+                ? getRotationEntryTime(left.entry, left.index, 0)
+                : Number(left.entry?.time || 0);
+            const rightTime = typeof getRotationEntryTime === "function"
+                ? getRotationEntryTime(right.entry, right.index, 0)
+                : Number(right.entry?.time || 0);
+            return (leftTime - rightTime) || (left.index - right.index);
+        });
+    }
+
+    rotationItems.forEach(({ entry }) => {
         if (!entry) return;
 
         const skillData = typeof getSkillById === "function" ? getSkillById(entry.id) : null;

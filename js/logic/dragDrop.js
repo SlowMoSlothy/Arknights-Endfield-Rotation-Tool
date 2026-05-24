@@ -168,9 +168,9 @@ function initRotationDragDrop() {
                     if (!removeBtn) return;
                     const removeIndex = parseInt(removeBtn.dataset.index, 10);
                     if (Number.isNaN(removeIndex)) return;
-                    rotation[removeIndex] = null;
-                    compactRotation();
-                    saveRotation();
+                    if (typeof removeRotationEntryAtIndex === "function") {
+                        removeRotationEntryAtIndex(removeIndex);
+                    }
                 },
                 onEnd: endDrag,
                 onUnchoose: cleanupDragArtifacts,
@@ -203,7 +203,13 @@ function initRotationDragDrop() {
                     }
                     handleUltimateStateToggle(draggedId);
                     compactRotation();
+                    if (typeof normalizeQingboMovesInRotation === "function") {
+                        normalizeQingboMovesInRotation();
+                    }
                     saveRotation();
+                    if (typeof refreshSkillsAfterRotationChange === "function") {
+                        refreshSkillsAfterRotationChange();
+                    }
                 }
             });
             slotSortables.push(sortable);
