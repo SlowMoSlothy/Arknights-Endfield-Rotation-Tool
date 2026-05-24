@@ -34,6 +34,23 @@ function hydrateDragPreview(previewEl, sourceEl) {
 
     previewEl.classList.add("neutral-drag-preview");
 
+    const actionType = sourceEl?.dataset?.actionType || previewEl.dataset.actionType;
+    if (actionType === BASIC_ATTACK_ACTION_TYPE) {
+        const operatorId = parseInt(sourceEl?.dataset?.operatorId || previewEl.dataset.operatorId, 10);
+        const attackData = Number.isNaN(operatorId) ? null : getBasicAttackByOperatorId(operatorId);
+        if (!attackData || previewEl.querySelector(".basic-attack-icon")) return;
+
+        previewEl.innerHTML = "";
+        previewEl.dataset.actionType = BASIC_ATTACK_ACTION_TYPE;
+        previewEl.dataset.operatorId = String(operatorId);
+        if (sourceEl?.dataset?.uid) previewEl.dataset.uid = sourceEl.dataset.uid;
+        previewEl.appendChild(createBasicAttackIcon(attackData, {
+            size: "small",
+            extraClasses: ["drag-basic-attack-icon"]
+        }));
+        return;
+    }
+
     const skillId = parseInt(sourceEl?.dataset?.id || previewEl.dataset.id, 10);
     const skillData = Number.isNaN(skillId) ? null : getSkillById(skillId);
     if (!skillData || previewEl.querySelector(".ef-skill-icon")) return;
@@ -65,6 +82,15 @@ function handleDragStart(evt) {
     scheduleDragPreviewHydration(evt.item);
 }
 
+function getDraggedActionLane(item) {
+    return item?.dataset?.actionType === BASIC_ATTACK_ACTION_TYPE ? "batk" : "skill";
+}
+
+function canPlaceDraggedActionInSlot(item, slot) {
+    const lane = slot?.dataset?.lane;
+    return !lane || (lane === "skill" && getDraggedActionLane(item) === "skill");
+}
+
 function createSourceSortable(target) {
     return new Sortable(target, {
         group: {
@@ -73,7 +99,7 @@ function createSourceSortable(target) {
             put: false
         },
         sort: false,
-        draggable: ".skill-small",
+        draggable: ".skill-small:not(.basic-attack-small)",
         forceFallback: true,
         fallbackOnBody: true,
         fallbackClass: "drag-ghost",
@@ -116,6 +142,75 @@ function initRotationDragDrop() {
 
     cleanupDragArtifacts();
 
+    const legacySimulationTrack = document.getElementById("rotationSimulationSkillTrack");
+    const simulationTracks = Array.from(document.querySelectorAll(".rotation-sim-skill-drop-track"));
+    if (legacySimulationTrack && !simulationTracks.includes(legacySimulationTrack)) {
+        simulationTracks.push(legacySimulationTrack);
+    }
+
+    if (simulationTracks.length) {
+        simulationTracks.forEach(simulationTrack => {
+            const sortable = new Sortable(simulationTrack, {
+                group: {
+                    name: "skills",
+                    pull: false,
+                    put: true
+                },
+                sort: false,
+                draggable: ".rotation-sim-sortable-source-only",
+                filter: ".remove-btn, .rotation-sim-nudge",
+                preventOnFilter: true,
+                forceFallback: true,
+                fallbackOnBody: true,
+                onStart: handleDragStart,
+                onFilter: (evt) => {
+                    const removeBtn = evt.target.closest(".remove-btn");
+                    if (!removeBtn) return;
+                    const removeIndex = parseInt(removeBtn.dataset.index, 10);
+                    if (Number.isNaN(removeIndex)) return;
+                    rotation[removeIndex] = null;
+                    compactRotation();
+                    saveRotation();
+                },
+                onEnd: endDrag,
+                onUnchoose: cleanupDragArtifacts,
+                onAdd: (evt) => {
+                    const draggedId = parseInt(evt.item.dataset.id, 10);
+                    evt.item.remove();
+                    if (!draggedId) return;
+
+                    const originalSkill = getSkillById(draggedId);
+                    let finalSkillId = draggedId;
+                    if (!originalSkill?.togglesUltimateState) {
+                        finalSkillId = getMappedSkillIdForOperatorState(draggedId);
+                    }
+
+                    const rect = simulationTrack.getBoundingClientRect();
+                    const clientX = evt.originalEvent?.clientX ?? rect.left;
+                    const rawSeconds = (clientX - rect.left + simulationTrack.scrollLeft) / SIMULATION_PIXELS_PER_SECOND;
+                    const time = typeof roundSimulationTime === "function"
+                        ? roundSimulationTime(rawSeconds)
+                        : Math.max(0, Math.round(rawSeconds * 10) / 10);
+
+                    rotation.push({
+                        uid: crypto.randomUUID(),
+                        id: finalSkillId,
+                        time
+                    });
+                    const newIndex = rotation.length - 1;
+                    if (typeof getSnappedSimulationEntryTime === "function") {
+                        rotation[newIndex].time = getSnappedSimulationEntryTime(newIndex, time);
+                    }
+                    handleUltimateStateToggle(draggedId);
+                    compactRotation();
+                    saveRotation();
+                }
+            });
+            slotSortables.push(sortable);
+        });
+        return;
+    }
+
     const slots = document.querySelectorAll(".rotation-slot");
 
     slots.forEach((slot, index) => {
@@ -157,12 +252,20 @@ function initRotationDragDrop() {
                 document.querySelectorAll(".rotation-slot").forEach(s => s.classList.remove("drag-hover"));
                 const targetSlot = evt.to?.classList?.contains("rotation-slot") ? evt.to : evt.to?.closest?.(".rotation-slot");
                 if (targetSlot) targetSlot.classList.add("drag-hover");
-                return true;
+                return canPlaceDraggedActionInSlot(evt.dragged, targetSlot);
             },
             onEnd: endDrag,
             onUnchoose: cleanupDragArtifacts,
             onAdd: (evt) => {
+                if (!canPlaceDraggedActionInSlot(evt.item, slot)) {
+                    evt.item.remove();
+                    renderRotation();
+                    return;
+                }
+
                 const draggedUid = evt.item.dataset.uid;
+                const draggedActionType = evt.item.dataset.actionType;
+                const draggedOperatorId = parseInt(evt.item.dataset.operatorId, 10);
                 const draggedId = parseInt(evt.item.dataset.id, 10);
                 evt.item.remove();
                 if (draggedUid) {
@@ -184,6 +287,18 @@ function initRotationDragDrop() {
                         }
                         return;
                     }
+                }
+                if (draggedActionType === BASIC_ATTACK_ACTION_TYPE) {
+                    const basicAttackEntry = Number.isNaN(draggedOperatorId)
+                        ? null
+                        : createBasicAttackRotationEntry(draggedOperatorId);
+                    if (!basicAttackEntry) return;
+
+                    rotation[index] = basicAttackEntry;
+                    compactRotation();
+                    ensureSlotCount(rotation.filter(slot => slot !== null).length + 1);
+                    saveRotation();
+                    return;
                 }
                 if (!draggedId) return;
                 const originalSkill = getSkillById(draggedId);

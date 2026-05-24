@@ -7,8 +7,29 @@ function addAmountToEffectMap(effectMap, effectName, amount = 1, maxStacks = nul
 
 function removeConsumedDebuffsFromEffectMap(skillData, effectMap) {
     if (!Array.isArray(skillData?.consumeDebuffs)) return;
-    skillData.consumeDebuffs.forEach(effectName => {
+    skillData.consumeDebuffs.forEach(value => {
+        const effectName = getConsumedDebuffEffectName(value);
+        if (!effectName) return;
         delete effectMap[effectName];
+    });
+}
+
+function getConsumedDebuffEffectName(value) {
+    if (typeof value === "string") return value;
+    return value?.effect || value?.id || value?.appliesEffect || value?.name || "";
+}
+
+function addConsumedDebuffTriggersForSkill(skillData, effectMap, contextEffectMap = effectMap) {
+    if (!Array.isArray(skillData?.consumeDebuffs)) return;
+
+    skillData.consumeDebuffs.forEach(value => {
+        const effectName = getConsumedDebuffEffectName(value);
+        if (!effectName || Number(contextEffectMap?.[effectName] || 0) <= 0) return;
+
+        const consumedEffectName = `${effectName}_consumed`;
+        if (Number(effectMap[consumedEffectName] || 0) <= 0) {
+            addAmountToEffectMap(effectMap, consumedEffectName, 1);
+        }
     });
 }
 
@@ -231,6 +252,7 @@ function collectEffectsFromSkill(skillData, contextEffectMap = {}) {
     if (!skillData) return effectMap;
 
     applySkillEffectsToComboMap(skillData, effectMap, false, true, contextEffectMap);
+    addConsumedDebuffTriggersForSkill(skillData, effectMap, contextEffectMap);
     addTransientSkillTypeTriggers(skillData, effectMap);
 
     return effectMap;

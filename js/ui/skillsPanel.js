@@ -219,8 +219,32 @@ function ensureGlobalSkillTooltip() {
 
 function buildSkillTooltipHtml(skillData) {
     const elementType = normalizeSkillElementType(skillData.elementType);
-    const cooldown = skillData.cooldown ?? "-";
-    const energy = skillData.energy ?? "-";
+    const isBasicAttack = skillData.isBasicAttack === true;
+    const battleSkillSpCost = typeof getBattleSkillSpCost === "function"
+        ? getBattleSkillSpCost(skillData)
+        : null;
+    const firstStatLabel = isBasicAttack ? "Hits" : "CD";
+    const firstStatValue = isBasicAttack ? skillData.hitCount : `${skillData.cooldown ?? "-"}s`;
+    const secondStatLabel = isBasicAttack ? "Final" : (battleSkillSpCost !== null ? "SP" : "EN");
+    const secondStatValue = isBasicAttack
+        ? `${skillData.finalHitCount || 1} hit${Number(skillData.finalHitCount || 1) === 1 ? "" : "s"}`
+        : (battleSkillSpCost ?? skillData.energy ?? "-");
+    const basicAttackTiming = isBasicAttack && typeof getBasicAttackHitTimeline === "function"
+        ? getBasicAttackHitTimeline(skillData)
+            .map(hit => `${hit.hit}: ${formatBasicAttackSeconds(hit.time)}`)
+            .join(" / ")
+        : "";
+    const animationSummary = isBasicAttack && Array.isArray(skillData.animations)
+        ? skillData.animations
+            .map(animation => `${animation.label}: ${animation.hits} hit${animation.hits === 1 ? "" : "s"} in ${formatBasicAttackSeconds(animation.duration)}`)
+            .join(" / ")
+        : "";
+    const basicAttackDetails = isBasicAttack
+        ? `
+            <div class="tooltip-description">Hit timing: ${basicAttackTiming || "-"}</div>
+            <div class="tooltip-description">Animations: ${animationSummary || "-"}</div>
+        `
+        : "";
 
     return `
         <div class="tooltip-card tooltip-element-${elementType}">
@@ -234,17 +258,18 @@ function buildSkillTooltipHtml(skillData) {
 
             <div class="tooltip-stat-row">
                 <div class="tooltip-stat">
-                    <span>CD</span>
-                    <strong>${cooldown}s</strong>
+                    <span>${firstStatLabel}</span>
+                    <strong>${firstStatValue}</strong>
                 </div>
                 <div class="tooltip-stat-divider"></div>
                 <div class="tooltip-stat">
-                    <span>EN</span>
-                    <strong>${energy}</strong>
+                    <span>${secondStatLabel}</span>
+                    <strong>${secondStatValue}</strong>
                 </div>
             </div>
 
             <div class="tooltip-description">${formatTooltipDescription(skillData.description)}</div>
+            ${basicAttackDetails}
         </div>
     `;
 }
@@ -389,7 +414,8 @@ function renderSkills() {
         }
         const skillRow = document.createElement("div");
         skillRow.className = "skill-row";
-        getDisplaySkillsForOperator(op).forEach(({ skill, switchGroup }) => {
+        op.skills.forEach(skill => {
+            if (uiSettings?.timelineMode === "simulation" && isFinalStrikeSkillForPanel(skill)) return;
             const div = document.createElement("div");
             div.className = "skill skill-small";
             div.dataset.id = String(skill.id);
@@ -411,6 +437,12 @@ function renderSkills() {
         wrapper.appendChild(operatorWrapper);
     });
     list.appendChild(wrapper);
+}
+
+function isFinalStrikeSkillForPanel(skill) {
+    const type = String(skill?.type || skill?.baseType || "").toLowerCase();
+    const shortType = String(skill?.shortType || "").toLowerCase();
+    return type === "final strike" || shortType === "fs";
 }
 
 function getSkillById(id) {

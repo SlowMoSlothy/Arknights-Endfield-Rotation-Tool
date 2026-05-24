@@ -13,6 +13,7 @@ Interactive web tool for building, visualizing, exporting, and sharing Arknights
 - Build a team with up to 4 operators.
 - Empty team slots show a `+` button so new users can start immediately.
 - Drag and drop skills into a snake-style rotation layout.
+- Add operator basic attacks (`BATK`) to rotations with visible hit-chain indicators.
 - Tap-friendly mobile controls for adding, moving, and removing skills.
 - Skill tooltips with cooldown, energy, type, effects, buffs, and debuffs.
 - Operator buff and enemy debuff indicators on the rotation.
@@ -40,7 +41,7 @@ Use the sidebar buttons:
 Share links use this format:
 
 ```text
-https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/#setup=AERT2:...
+https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/#setup=AERT5:...
 ```
 
 Approved Community rotations can also be opened directly:
@@ -49,7 +50,7 @@ Approved Community rotations can also be opened directly:
 https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/#community=ROTATION_ID
 ```
 
-Current share codes use the compact `AERT2:` format. Older `AERT1:` codes can still be imported.
+Current share codes use the compact `AERT5:` format, including simulation mode, free skill timings, SP settings, and `BATK` rotation entries. Older `AERT4:`, `AERT3:`, `AERT2:`, and `AERT1:` codes can still be imported.
 
 ## Exporting Images
 
@@ -85,6 +86,23 @@ let builderWatermarkUrl = "https://slowmoslothy.github.io/Arknights-Endfield-Rot
 
 Set `showEnemyPanel` to `true` to show the Enemy section again.
 Set `useSupabaseOperators` to `false` to force the local operator files instead of Supabase.
+Operators can override the default `BATK` chain in their operator data:
+
+```js
+basicAttack: {
+  hitCount: 5,
+  finalHitCount: 2,
+  secondsPerSlot: 1,
+  hitTimings: [0.16, 0.34, 0.55, 0.76, 1.0],
+  animations: [
+    { label: "A1", hits: 2, duration: 0.34 },
+    { label: "A2", hits: 1, duration: 0.21 },
+    { label: "A3", hits: 2, duration: 0.45 }
+  ]
+}
+```
+
+`secondsPerSlot` defaults to `1`, so each rotation slot represents one second. `hitTimings` controls where the numbered red timeline markers appear under the slot. `animations` documents how many hits belong to each attack animation and how long that animation lasts.
 
 ## Supabase Database
 
@@ -198,6 +216,7 @@ css/
 js/
   data/
   logic/
+    basicAttack.js
     comboEngine.js
     dragDrop.js
     export.js

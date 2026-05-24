@@ -308,15 +308,205 @@
         padding: 28px 0 34px;
     }
 
+    :root.rotation-mode-simulation #rotationDropZone {
+        width: 100%;
+        min-width: 100%;
+    }
+
     .rotation-slot {
         width: 58px;
         height: 58px;
         overflow: visible;
     }
 
+    .rotation-timeline-labels,
+    .rotation-timeline-step {
+        grid-template-rows: 18px 58px 78px;
+        row-gap: 12px;
+    }
+
+    .rotation-timeline-slot-mode .rotation-timeline-labels,
+    .rotation-timeline-slot-mode .rotation-timeline-step {
+        grid-template-rows: 58px;
+        row-gap: 0;
+    }
+
+    .rotation-timeline::before {
+        left: 50px;
+        top: 139px;
+    }
+
+    .rotation-timeline-labels {
+        min-width: 50px;
+        padding-right: 8px;
+    }
+
+    .rotation-timeline-label {
+        font-size: 10px;
+    }
+
+    .rotation-batk-sequence {
+        height: 38px;
+    }
+
     .rotation-skill {
         width: 58px;
         height: 58px;
+    }
+
+    .rotation-batk-hit-sequence {
+        inset: 0 5px;
+    }
+
+    .rotation-batk-hit-marker {
+        width: 13px;
+        height: 13px;
+        font-size: 7px;
+    }
+
+    .rotation-sim {
+        grid-template-columns: 82px 1fr;
+    }
+
+    .rotation-sim-cursor-toolbar {
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        padding: 7px;
+    }
+
+    .rotation-sim-cursor-controls {
+        grid-column: 1 / -1;
+    }
+
+    .rotation-sim-cursor-button {
+        min-width: 44px;
+        height: 26px;
+        padding: 0 7px;
+        font-size: 9px;
+    }
+
+    .rotation-sim-cursor-stat {
+        padding: 4px 6px;
+    }
+
+    .rotation-sim-cursor-stat > strong {
+        font-size: 10px;
+    }
+
+    .rotation-sim-labels,
+    .rotation-sim-body {
+        grid-template-rows: 24px 104px 58px 122px 56px 60px;
+        row-gap: 12px;
+    }
+
+    .rotation-sim-skill-track {
+        min-height: 104px;
+    }
+
+    .rotation-sim-skill-track.is-combo-skill {
+        min-height: 122px;
+    }
+
+    .rotation-sim .rotation-sim-skill.rotation-skill {
+        width: 48px;
+        height: 48px;
+    }
+
+    .rotation-sim .rotation-sim-skill.is-auto-event {
+        --rotation-effect-size: 13px;
+        --rotation-effect-tray-width: 58px;
+        width: 42px;
+        height: 42px;
+    }
+
+    .rotation-sim .rotation-sim-skill.is-auto-event .rotation-debuff-tray {
+        bottom: -34px;
+    }
+
+    .rotation-sim .rotation-sim-skill.is-auto-event .rotation-debuff-tray.is-multi-row {
+        bottom: -50px;
+    }
+
+    .rotation-sim-cooldown-track {
+        min-height: 42px;
+    }
+
+    .rotation-sim-cooldown-track.is-combo-skill {
+        min-height: 56px;
+    }
+
+    .rotation-sim-time-badge {
+        right: -12px;
+        top: 4px;
+        min-width: 30px;
+        height: 16px;
+        font-size: 9px;
+        line-height: 16px;
+    }
+
+    .rotation-sim-inspector {
+        width: 238px;
+        max-width: min(238px, calc(100vw - 24px));
+        padding: 9px;
+    }
+
+    .rotation-sim-inspector-line {
+        grid-template-columns: 64px minmax(0, 1fr);
+        gap: 6px;
+    }
+
+    .rotation-sim-cooldown-line {
+        top: calc(10px + (var(--sim-cd-row, 0) * 9px));
+        height: 3px;
+    }
+
+    .rotation-sim-cooldown-line span {
+        min-width: 38px;
+        height: 15px;
+        padding: 0 5px;
+        font-size: 8px;
+        line-height: 15px;
+    }
+
+    .rotation-sim-log {
+        --sim-log-label-width: 82px;
+    }
+
+    .rotation-sim-log-header {
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .rotation-sim-problems {
+        grid-template-columns: 1fr;
+        align-items: flex-start;
+    }
+
+    .rotation-sim-problem-chips {
+        justify-content: flex-start;
+    }
+
+    .rotation-sim-log-list {
+        max-height: 220px;
+    }
+
+    .rotation-sim-log-event {
+        grid-template-columns: 44px 26px minmax(150px, 1fr);
+        gap: 6px;
+        padding: 6px;
+    }
+
+    .rotation-sim-log-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+    }
+
+    .rotation-sim-log-sp {
+        grid-column: 3;
+        justify-self: start;
+        max-width: 100%;
+        text-align: left;
     }
 
     .rotation-arrow {

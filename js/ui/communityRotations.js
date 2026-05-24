@@ -120,6 +120,18 @@ function getCommunityTeamOperators(row) {
 function getCommunityRotationSkills(row) {
     if (typeof getSkillById !== "function") return [];
 
+    if (row?.share_code && typeof parseBuildShareCode === "function" && typeof getRotationActionData === "function") {
+        try {
+            const payload = parseBuildShareCode(row.share_code);
+            const actions = Array.isArray(payload?.rotation)
+                ? payload.rotation.map(entry => getRotationActionData(entry)).filter(Boolean)
+                : [];
+            if (actions.length) return actions;
+        } catch (error) {
+            console.warn("Community preview share code could not be parsed:", error);
+        }
+    }
+
     return normalizeCommunityList(row.rotation_skill_ids)
         .map(skillId => getSkillById(Number(skillId)))
         .filter(Boolean);
@@ -383,7 +395,12 @@ function createCommunitySkillPreviewItem(skill, isExpanded = false) {
     item.className = `community-preview-skill${isExpanded ? " is-expanded" : ""}`;
 
     let icon;
-    if (skill && typeof createSkillIcon === "function") {
+    if (skill?.isBasicAttack && typeof createBasicAttackIcon === "function") {
+        icon = createBasicAttackIcon(skill, {
+            size: "small",
+            extraClasses: ["community-preview-skill-icon"]
+        });
+    } else if (skill && typeof createSkillIcon === "function") {
         icon = createSkillIcon(skill, {
             size: "small",
             useSmallIcon: true,
@@ -527,7 +544,8 @@ function getCommunityCreatedTime(row) {
 }
 
 function getCommunitySkillCount(row) {
-    return normalizeCommunityList(row.rotation_skill_ids).length;
+    const actionCount = getCommunityRotationSkills(row).length;
+    return actionCount || normalizeCommunityList(row.rotation_skill_ids).length;
 }
 
 function sortCommunityRotations(rotations) {
@@ -698,7 +716,7 @@ function renderCommunityDetailPanel() {
             "community-detail-meta",
             [
                 submittedDate,
-                `${skillCount} skill${skillCount === 1 ? "" : "s"}`
+                `${skillCount} action${skillCount === 1 ? "" : "s"}`
             ].filter(Boolean).join(" - ")
         )
     );
@@ -791,16 +809,32 @@ function getCurrentCommunityRotationEntries() {
 
     return rotation
         .filter(Boolean)
-        .map(entry => ({
-            id: Number(entry.id),
-            autoInserted: entry.autoInserted === true
-        }))
-        .filter(entry => Number.isFinite(entry.id) && typeof getSkillById === "function" && getSkillById(entry.id));
+        .map(entry => {
+            if (typeof isBasicAttackEntry === "function" && isBasicAttackEntry(entry)) {
+                const operatorId = Number(entry.operatorId);
+                if (!Number.isFinite(operatorId) || !getBasicAttackByOperatorId(operatorId)) return null;
+                return {
+                    type: BASIC_ATTACK_ACTION_TYPE,
+                    operatorId,
+                    hitCount: Number(entry.hitCount || DEFAULT_BASIC_ATTACK_HITS),
+                    finalHitCount: Number(entry.finalHitCount || DEFAULT_BASIC_ATTACK_FINAL_HITS)
+                };
+            }
+
+            const id = Number(entry.id);
+            if (!Number.isFinite(id) || typeof getSkillById !== "function" || !getSkillById(id)) return null;
+            return {
+                type: "skill",
+                id,
+                autoInserted: entry.autoInserted === true
+            };
+        })
+        .filter(Boolean);
 }
 
 function getCurrentCommunityRotationSkills() {
     return getCurrentCommunityRotationEntries()
-        .map(entry => getSkillById(entry.id))
+        .map(entry => typeof getRotationActionData === "function" ? getRotationActionData(entry) : getSkillById(entry.id))
         .filter(Boolean);
 }
 
@@ -900,11 +934,10 @@ function validateCommunitySubmission(values) {
 }
 
 function buildCommunitySubmission(values) {
-    const teamIds = getCurrentCommunityTeamIds();
-    const rotationEntries = getCurrentCommunityRotationEntries();
-    const rotationSkillIds = rotationEntries.map(entry => entry.id);
-    const teamOperators = getCurrentCommunityTeamOperators();
-    const rotationSkills = getCurrentCommunityRotationSkills();
+    const shareCode = createBuildShareCode();
+    const persistence = createBuildPersistencePayloadFromShareCode(shareCode, {
+        timestampKey: "submittedAt"
+    });
 
     return {
         game: "arknights_endfield",
@@ -912,33 +945,13 @@ function buildCommunitySubmission(values) {
         description: values.description.trim(),
         author_name: getCommunitySubmitAuthorName().slice(0, 40),
         submitted_by: getCommunityAccountUserId() || null,
-        share_code: createBuildShareCode(),
-        setup_version: 2,
-        team_operator_ids: teamIds,
-        rotation_skill_ids: rotationSkillIds,
-        element_types: getCurrentCommunityElements(),
-        operator_classes: getCurrentCommunityClasses(),
-        payload: {
-            version: 1,
-            submittedAt: new Date().toISOString(),
-            team: teamOperators.map(operator => ({
-                id: operator.id,
-                name: operator.name,
-                elementType: operator.elementType,
-                operatorClass: operator.operatorClass
-            })),
-            rotation: rotationEntries.map((entry, index) => {
-                const skill = rotationSkills[index];
-                return {
-                    id: entry.id,
-                    name: skill?.name || "",
-                    type: skill?.type || "",
-                    shortType: skill?.shortType || "",
-                    elementType: skill?.elementType || "",
-                    autoInserted: entry.autoInserted
-                };
-            })
-        },
+        share_code: shareCode,
+        setup_version: persistence.setupVersion,
+        team_operator_ids: persistence.teamOperatorIds,
+        rotation_skill_ids: persistence.rotationSkillIds,
+        element_types: persistence.elementTypes,
+        operator_classes: persistence.operatorClasses,
+        payload: persistence.payload,
         likes_count: 0,
         view_count: 0,
         is_public: true,
@@ -1148,9 +1161,9 @@ function createCommunityRotationCard(row) {
 
     const footer = document.createElement("div");
     footer.className = "community-card-footer";
-    const skillCount = normalizeCommunityList(row.rotation_skill_ids).length;
+    const skillCount = getCommunitySkillCount(row);
     const statText = [
-        `${skillCount} skill${skillCount === 1 ? "" : "s"}`,
+        `${skillCount} action${skillCount === 1 ? "" : "s"}`,
         `${Number(row.view_count) || 0} views`
     ].join(" - ");
     footer.appendChild(createCommunityTextElement("span", "community-stat", statText));
@@ -1244,7 +1257,7 @@ async function fetchCommunityRotations(force = false) {
     try {
         const { data, error } = await supabaseClient
             .from("community_rotations")
-            .select("id,title,description,author_name,submitted_by,share_code,team_operator_ids,rotation_skill_ids,element_types,operator_classes,likes_count,view_count,created_at")
+            .select("id,title,description,author_name,submitted_by,share_code,setup_version,team_operator_ids,rotation_skill_ids,element_types,operator_classes,payload,likes_count,view_count,created_at")
             .eq("game", "arknights_endfield")
             .eq("is_public", true)
             .eq("is_approved", true)

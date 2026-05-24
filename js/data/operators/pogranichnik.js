@@ -47,8 +47,22 @@ pogranichnik.skills = [
         shortType: "BS",
         cooldown: 0,
         energy: 100,
+        sp_cost: 100,
         elementType: "physical",
         description: "Deals Physical DMG, applies Breach, and consumes Vulnerability stacks for SP recovery.",
+        spRecovery: {
+            effects: [
+                "vulnerable"
+            ],
+            amountByStacks: {
+                "1": 5,
+                "2": 10,
+                "3": 20,
+                "4": 30
+            },
+            maxStacks: 4,
+            source: "The Pulverizing Front"
+        },
         consumeDebuffs: [
     "vulnerable"
 ],
@@ -75,6 +89,20 @@ pogranichnik.skills = [
         energy: 0,
         elementType: "physical",
         description: "Triggers when Breach or Crush consumes Vulnerability stacks. Deals Physical DMG and recovers SP.",
+        spRecovery: {
+            effects: [
+                "vulnerable"
+            ],
+            amountByStacks: {
+                "1": 5,
+                "2": 12,
+                "3": 25,
+                "4": 35
+            },
+            maxStacks: 4,
+            fallbackStacks: 1,
+            source: "Full Moon Slash"
+        },
         comboTriggerMode: "any",
         allowSelfTrigger: true, 
         comboTriggers: [

@@ -99,9 +99,26 @@ function getMySkillById(skillId) {
 }
 
 function getMyRotationSkills(row) {
+    if (row?.share_code && typeof parseBuildShareCode === "function" && typeof getRotationActionData === "function") {
+        try {
+            const payload = parseBuildShareCode(row.share_code);
+            const actions = Array.isArray(payload?.rotation)
+                ? payload.rotation.map(entry => getRotationActionData(entry)).filter(Boolean)
+                : [];
+            if (actions.length) return actions;
+        } catch (error) {
+            console.warn("My rotation preview share code could not be parsed:", error);
+        }
+    }
+
     return normalizeMyList(row?.rotation_skill_ids)
         .map(skillId => getMySkillById(skillId))
         .filter(Boolean);
+}
+
+function getMyRotationActionCount(row) {
+    const actionCount = getMyRotationSkills(row).length;
+    return actionCount || normalizeMyList(row?.rotation_skill_ids).length;
 }
 
 function getMyTeamOperators(row) {
@@ -206,29 +223,22 @@ function hasCurrentSavableRotation() {
 }
 
 function buildMyRotationPayload(values) {
-    const teamIds = getCurrentMyTeamIds();
-    const rotationEntries = getCurrentMyRotationEntries();
-    const rotationSkillIds = rotationEntries
-        .map(entry => Number(entry.id))
-        .filter(Number.isFinite);
-    const teamOperators = teamIds.map(getMyOperatorById).filter(Boolean);
-    const rotationSkills = getCurrentMyRotationSkills();
     const shareCode = createBuildShareCode();
+    const persistence = createBuildPersistencePayloadFromShareCode(shareCode, {
+        timestampKey: "savedAt"
+    });
 
     return {
         game: "arknights_endfield",
         title: values.title,
         description: values.description,
         share_code: shareCode,
-        setup_version: 2,
-        team_operator_ids: teamIds,
-        rotation_skill_ids: rotationSkillIds,
-        element_types: uniqueMyLabels([
-            ...teamOperators.map(operator => operator.elementType),
-            ...rotationSkills.map(skill => skill.elementType)
-        ]),
-        operator_classes: uniqueMyLabels(teamOperators.map(operator => operator.operatorClass)),
-        payload: typeof parseBuildShareCode === "function" ? parseBuildShareCode(shareCode) : {}
+        setup_version: persistence.setupVersion,
+        team_operator_ids: persistence.teamOperatorIds,
+        rotation_skill_ids: persistence.rotationSkillIds,
+        element_types: persistence.elementTypes,
+        operator_classes: persistence.operatorClasses,
+        payload: persistence.payload
     };
 }
 
@@ -492,7 +502,7 @@ function createMyRotationPreview(row) {
 
     const preview = document.createElement("div");
     preview.className = "my-rotation-preview";
-    preview.textContent = `${normalizeMyList(row.rotation_skill_ids).length} skills`;
+    preview.textContent = `${getMyRotationActionCount(row)} actions`;
     return preview;
 }
 
@@ -568,7 +578,12 @@ function createMyDetailSkillSequence(row) {
         const item = document.createElement("span");
         item.className = "my-detail-skill";
 
-        if (skill && typeof createSkillIcon === "function") {
+        if (skill?.isBasicAttack && typeof createBasicAttackIcon === "function") {
+            item.appendChild(createBasicAttackIcon(skill, {
+                size: "small",
+                extraClasses: ["my-detail-skill-icon"]
+            }));
+        } else if (skill && typeof createSkillIcon === "function") {
             item.appendChild(createSkillIcon(skill, {
                 size: "small",
                 useSmallIcon: true,
@@ -592,12 +607,12 @@ function createMyDetailMeta(row) {
     const meta = document.createElement("div");
     meta.className = "my-detail-meta";
     const updated = formatMyDate(row.updated_at || row.created_at) || "-";
-    const skillCount = normalizeMyList(row.rotation_skill_ids).length;
+    const skillCount = getMyRotationActionCount(row);
     const teamCount = normalizeMyList(row.team_operator_ids).length;
     meta.append(
         createMyTextElement("span", "", `Updated ${updated}`),
         createMyTextElement("span", "", `${teamCount} operator${teamCount === 1 ? "" : "s"}`),
-        createMyTextElement("span", "", `${skillCount} skill${skillCount === 1 ? "" : "s"}`)
+        createMyTextElement("span", "", `${skillCount} action${skillCount === 1 ? "" : "s"}`)
     );
     return meta;
 }
@@ -746,11 +761,11 @@ function createMyRotationCard(row) {
     titleRow.append(title, createMyStatusBadge(row));
 
     const updated = formatMyDate(row.updated_at || row.created_at);
-    const skillCount = normalizeMyList(row.rotation_skill_ids).length;
+    const skillCount = getMyRotationActionCount(row);
     const meta = createMyTextElement(
         "div",
         "my-rotation-meta",
-        [`Updated ${updated || "-"}`, `${skillCount} skill${skillCount === 1 ? "" : "s"}`].join(" - ")
+        [`Updated ${updated || "-"}`, `${skillCount} action${skillCount === 1 ? "" : "s"}`].join(" - ")
     );
 
     const description = createMyTextElement(
@@ -941,7 +956,7 @@ async function fetchMyRotations() {
     try {
         const { data, error } = await client
             .from("user_rotations")
-            .select("id,title,description,share_code,team_operator_ids,rotation_skill_ids,element_types,operator_classes,submitted_for_review_at,created_at,updated_at")
+            .select("id,title,description,share_code,setup_version,team_operator_ids,rotation_skill_ids,element_types,operator_classes,payload,submitted_for_review_at,created_at,updated_at")
             .eq("game", "arknights_endfield")
             .order("updated_at", { ascending: false });
 
@@ -1430,6 +1445,16 @@ async function submitMyRotationForReview(row) {
     await runMyRowAction(row, async () => {
         const client = getMySupabaseClient();
         if (!client || !myRotationsState.session) return;
+        let persistence = null;
+        if (typeof createBuildPersistencePayloadFromShareCode === "function") {
+            try {
+                persistence = createBuildPersistencePayloadFromShareCode(row.share_code, {
+                    timestampKey: "submittedAt"
+                });
+            } catch (error) {
+                console.warn("Saved rotation payload could not be rebuilt from share code:", error);
+            }
+        }
 
         const communityPayload = {
             game: "arknights_endfield",
@@ -1438,12 +1463,12 @@ async function submitMyRotationForReview(row) {
             author_name: getMyAuthorName(),
             submitted_by: myRotationsState.session.user.id,
             share_code: row.share_code,
-            setup_version: 2,
-            team_operator_ids: normalizeMyList(row.team_operator_ids),
-            rotation_skill_ids: normalizeMyList(row.rotation_skill_ids),
-            element_types: normalizeMyList(row.element_types),
-            operator_classes: normalizeMyList(row.operator_classes),
-            payload: {}
+            setup_version: persistence?.setupVersion || Number(row.setup_version) || 5,
+            team_operator_ids: persistence?.teamOperatorIds?.length ? persistence.teamOperatorIds : normalizeMyList(row.team_operator_ids),
+            rotation_skill_ids: persistence?.rotationSkillIds?.length ? persistence.rotationSkillIds : normalizeMyList(row.rotation_skill_ids),
+            element_types: persistence?.elementTypes?.length ? persistence.elementTypes : normalizeMyList(row.element_types),
+            operator_classes: persistence?.operatorClasses?.length ? persistence.operatorClasses : normalizeMyList(row.operator_classes),
+            payload: persistence?.payload || row.payload || {}
         };
 
         const { error: insertError } = await client

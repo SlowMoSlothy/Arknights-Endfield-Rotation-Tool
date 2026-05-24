@@ -51,8 +51,25 @@ function updateRotationActionStates() {
     const copyShareLinkButton = document.getElementById("copyShareLinkBtn");
     const saveRotationMenuButton = document.getElementById("saveRotationMenuBtn");
     const hasRotation = hasCreatedRotation();
+    const isSimulationMode = typeof isSimulationTimelineMode === "function"
+        ? isSimulationTimelineMode()
+        : (typeof uiSettings !== "undefined" && uiSettings?.timelineMode === "simulation");
 
-    if (exportButton) exportButton.disabled = !hasRotation;
+    if (exportButton) {
+        exportButton.disabled = !hasRotation || isSimulationMode;
+        exportButton.setAttribute(
+            "aria-label",
+            isSimulationMode
+                ? "PNG export is available in Slot Mode only"
+                : "Export rotation as PNG image"
+        );
+        const tooltipHost = exportButton.closest(".rotation-action-tooltip-host");
+        if (tooltipHost) {
+            tooltipHost.dataset.actionTooltip = isSimulationMode
+                ? "PNG export is available in Slot Mode only"
+                : "Export rotation as PNG image";
+        }
+    }
     if (copyShareCodeButton) copyShareCodeButton.disabled = !hasRotation;
     if (copyShareLinkButton) copyShareLinkButton.disabled = !hasRotation;
     if (saveRotationMenuButton) saveRotationMenuButton.disabled = !hasRotation;

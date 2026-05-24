@@ -706,7 +706,7 @@ async function fetchAdminReviewRotations() {
     try {
         let query = client
             .from("community_rotations")
-            .select("id,title,description,author_name,share_code,team_operator_ids,rotation_skill_ids,element_types,operator_classes,likes_count,view_count,is_approved,is_hidden,review_note,reviewed_at,created_at,updated_at")
+            .select("id,title,description,author_name,share_code,setup_version,team_operator_ids,rotation_skill_ids,element_types,operator_classes,payload,likes_count,view_count,is_approved,is_hidden,review_note,reviewed_at,created_at,updated_at")
             .eq("game", "arknights_endfield");
 
         query = applyAdminTabOrdering(applyAdminTabFilters(query, activeTabId), activeTabId);
