@@ -714,6 +714,7 @@ const SIMULATION_PROBLEM_CHIPS = [
 ];
 let simulationCursorTime = 0;
 let simulationCursorPlaybackTimer = null;
+let simulationCursorKeyboardHandler = null;
 
 function roundSimulationTime(value) {
     const number = Number(value);
@@ -1388,7 +1389,9 @@ function setSimulationCursorButtonIcon(button, iconName, label) {
         button.dataset.iconName = iconName;
     }
     button.setAttribute("aria-label", label);
-    button.title = label;
+    button.title = button.dataset.shortcutLabel
+        ? `${label} (${button.dataset.shortcutLabel})`
+        : label;
 }
 
 function createSimulationCursorButton(label, className = "", options = {}) {
@@ -1397,7 +1400,13 @@ function createSimulationCursorButton(label, className = "", options = {}) {
     button.className = `rotation-sim-cursor-button ${className}`.trim();
     const accessibleLabel = options.ariaLabel || options.title || label;
     button.setAttribute("aria-label", accessibleLabel);
-    button.title = accessibleLabel;
+    if (options.shortcut) {
+        button.dataset.shortcutLabel = options.shortcut;
+        button.title = `${accessibleLabel} (${options.shortcut})`;
+        button.setAttribute("aria-keyshortcuts", options.keyShortcuts || options.shortcut);
+    } else {
+        button.title = accessibleLabel;
+    }
 
     if (options.icon) {
         button.classList.add("is-icon");
@@ -1582,31 +1591,43 @@ function createSimulationCursorController(body, events, durationSeconds, pixelsP
     controls.className = "rotation-sim-cursor-controls";
     const startButton = createSimulationCursorButton("Start", "", {
         icon: "start",
-        ariaLabel: "Jump to timeline start"
+        ariaLabel: "Jump to timeline start",
+        shortcut: "Home"
     });
     const previousEventButton = createSimulationCursorButton("Previous skill", "", {
         icon: "previous",
-        ariaLabel: "Jump to previous skill"
+        ariaLabel: "Jump to previous skill",
+        shortcut: "Shift + Left",
+        keyShortcuts: "Shift+ArrowLeft"
     });
     const backButton = createSimulationCursorButton("Back 0.1 seconds", "", {
         icon: "stepBack",
-        ariaLabel: "Move 0.1 seconds earlier"
+        ariaLabel: "Move 0.1 seconds earlier",
+        shortcut: "Left",
+        keyShortcuts: "ArrowLeft"
     });
     const playButton = createSimulationCursorButton("Play", "is-primary", {
         icon: "play",
-        ariaLabel: "Play timeline"
+        ariaLabel: "Play timeline",
+        shortcut: "Space / K",
+        keyShortcuts: "Space K"
     });
     const forwardButton = createSimulationCursorButton("Forward 0.1 seconds", "", {
         icon: "stepForward",
-        ariaLabel: "Move 0.1 seconds later"
+        ariaLabel: "Move 0.1 seconds later",
+        shortcut: "Right",
+        keyShortcuts: "ArrowRight"
     });
     const nextEventButton = createSimulationCursorButton("Next skill", "", {
         icon: "next",
-        ariaLabel: "Jump to next skill"
+        ariaLabel: "Jump to next skill",
+        shortcut: "Shift + Right",
+        keyShortcuts: "Shift+ArrowRight"
     });
     const endButton = createSimulationCursorButton("End", "", {
         icon: "end",
-        ariaLabel: "Jump to timeline end"
+        ariaLabel: "Jump to timeline end",
+        shortcut: "End"
     });
     controls.append(
         startButton,
@@ -1723,39 +1744,95 @@ function createSimulationCursorController(body, events, durationSeconds, pixelsP
         });
     };
 
-    startButton.addEventListener("click", () => {
+    const jumpToStart = () => {
         stopSimulationCursorPlayback();
         setCursorTime(0, { autoScroll: true, scrollTrack: true, scrollTrackInstant: true });
-    });
-    previousEventButton.addEventListener("click", () => {
-        stopSimulationCursorPlayback();
-        jumpToClosestEvent(-1);
-    });
-    playButton.addEventListener("click", startPlayback);
-    backButton.addEventListener("click", () => {
-        stopSimulationCursorPlayback();
-        setCursorTime(simulationCursorTime - SIMULATION_TIME_STEP, {
-            autoScroll: true,
-            scrollTrack: true,
-            scrollTrackInstant: true
-        });
-    });
-    forwardButton.addEventListener("click", () => {
-        stopSimulationCursorPlayback();
-        setCursorTime(simulationCursorTime + SIMULATION_TIME_STEP, {
-            autoScroll: true,
-            scrollTrack: true,
-            scrollTrackInstant: true
-        });
-    });
-    nextEventButton.addEventListener("click", () => {
-        stopSimulationCursorPlayback();
-        jumpToClosestEvent(1);
-    });
-    endButton.addEventListener("click", () => {
+    };
+
+    const jumpToEnd = () => {
         stopSimulationCursorPlayback();
         setCursorTime(durationSeconds, { autoScroll: true, scrollTrack: true, scrollTrackInstant: true });
-    });
+    };
+
+    const stepCursor = (direction) => {
+        stopSimulationCursorPlayback();
+        setCursorTime(simulationCursorTime + (SIMULATION_TIME_STEP * direction), {
+            autoScroll: true,
+            scrollTrack: true,
+            scrollTrackInstant: true
+        });
+    };
+
+    const jumpToPreviousEvent = () => {
+        stopSimulationCursorPlayback();
+        jumpToClosestEvent(-1);
+    };
+
+    const jumpToNextEvent = () => {
+        stopSimulationCursorPlayback();
+        jumpToClosestEvent(1);
+    };
+
+    startButton.addEventListener("click", jumpToStart);
+    previousEventButton.addEventListener("click", jumpToPreviousEvent);
+    playButton.addEventListener("click", startPlayback);
+    backButton.addEventListener("click", () => stepCursor(-1));
+    forwardButton.addEventListener("click", () => stepCursor(1));
+    nextEventButton.addEventListener("click", jumpToNextEvent);
+    endButton.addEventListener("click", jumpToEnd);
+
+    if (simulationCursorKeyboardHandler) {
+        document.removeEventListener("keydown", simulationCursorKeyboardHandler);
+        simulationCursorKeyboardHandler = null;
+    }
+
+    simulationCursorKeyboardHandler = (event) => {
+        if (!toolbar.isConnected || !isSimulationTimelineMode()) {
+            document.removeEventListener("keydown", simulationCursorKeyboardHandler);
+            simulationCursorKeyboardHandler = null;
+            return;
+        }
+
+        const target = event.target;
+        if (
+            event.defaultPrevented
+            || event.altKey
+            || event.ctrlKey
+            || event.metaKey
+            || target?.closest?.("input, textarea, select, [contenteditable='true']")
+        ) {
+            return;
+        }
+
+        const key = event.key;
+        const lowerKey = String(key || "").toLowerCase();
+        let handled = true;
+
+        if (key === "Home" && !event.shiftKey) {
+            jumpToStart();
+        } else if (key === "End" && !event.shiftKey) {
+            jumpToEnd();
+        } else if (key === "ArrowLeft" && event.shiftKey) {
+            jumpToPreviousEvent();
+        } else if (key === "ArrowRight" && event.shiftKey) {
+            jumpToNextEvent();
+        } else if (key === "ArrowLeft") {
+            stepCursor(-1);
+        } else if (key === "ArrowRight") {
+            stepCursor(1);
+        } else if (lowerKey === "k" || ((key === " " || key === "Spacebar") && !target?.closest?.("button"))) {
+            if (event.repeat) return;
+            startPlayback();
+        } else {
+            handled = false;
+        }
+
+        if (handled) {
+            event.preventDefault();
+        }
+    };
+
+    document.addEventListener("keydown", simulationCursorKeyboardHandler);
 
     const getTimeFromPointer = event => {
         const rect = body.getBoundingClientRect();
