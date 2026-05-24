@@ -47,6 +47,211 @@ function mapDatabaseOperator(row, skillRows) {
     };
 }
 
+function mapDatabaseDebuffRegistryEntry(row) {
+    const raw = isPlainObject(row.raw_data) ? row.raw_data : {};
+
+    return {
+        key: row.effect_key,
+        value: {
+            ...raw,
+            name: row.name || raw.name,
+            icon: row.icon_path || raw.icon,
+            iconBase: row.icon_base_path || raw.iconBase,
+            stackable: row.stackable ?? raw.stackable,
+            maxStacks: row.max_stacks ?? raw.maxStacks,
+            extension: row.extension || raw.extension
+        }
+    };
+}
+
+function mapDatabaseBuffRegistryEntry(row) {
+    const raw = isPlainObject(row.raw_data) ? row.raw_data : {};
+
+    return {
+        key: row.effect_key,
+        value: {
+            ...raw,
+            name: row.name || raw.name,
+            icon: row.icon_path || raw.icon,
+            iconBase: row.icon_base_path || raw.iconBase,
+            stackable: row.stackable ?? raw.stackable,
+            maxStacks: row.max_stacks ?? raw.maxStacks,
+            extension: row.extension || raw.extension,
+            consumeOnSkillType: row.consume_on_skill_type || raw.consumeOnSkillType,
+            consumeStacks: row.consume_stacks ?? raw.consumeStacks,
+            onFullyConsumedEffect: row.on_fully_consumed_effect || raw.onFullyConsumedEffect
+        }
+    };
+}
+
+function mapDatabaseReactionRule(row) {
+    const raw = isPlainObject(row.raw_data) ? row.raw_data : {};
+
+    return {
+        ...raw,
+        id: row.reaction_key || raw.id,
+        name: row.name || raw.name,
+        requires: Array.isArray(row.requires_effects) ? row.requires_effects : raw.requires,
+        appliesEffect: row.applies_effect || raw.appliesEffect,
+        reactionEffect: row.reaction_effect || raw.reactionEffect,
+        persistsForCombo: row.persists_for_combo ?? raw.persistsForCombo
+    };
+}
+
+function mapDatabaseEffectGroup(row) {
+    return {
+        key: row.group_key,
+        effects: Array.isArray(row.effects) ? row.effects : []
+    };
+}
+
+async function loadRegistryTableFromSupabase(tableName, mapper, label) {
+    if (!supabaseClient) {
+        console.warn(`Supabase client is not available. Using local ${label}.`);
+        return [];
+    }
+
+    const { data, error } = await supabaseClient
+        .from(tableName)
+        .select("*")
+        .eq("game", "arknights_endfield")
+        .order("sort_order", { ascending: true });
+
+    if (error) {
+        console.error(`${label} could not be loaded from Supabase:`, error);
+        return [];
+    }
+
+    return Array.isArray(data) ? data.map(mapper) : [];
+}
+
+async function loadDebuffRegistryFromSupabase() {
+    return loadRegistryTableFromSupabase("debuff_registry", mapDatabaseDebuffRegistryEntry, "debuff registry");
+}
+
+async function loadBuffRegistryFromSupabase() {
+    return loadRegistryTableFromSupabase("buff_registry", mapDatabaseBuffRegistryEntry, "buff registry");
+}
+
+async function loadReactionRulesFromSupabase() {
+    return loadRegistryTableFromSupabase("reaction_rules", mapDatabaseReactionRule, "reaction rules");
+}
+
+async function loadEffectGroupsFromSupabase() {
+    return loadRegistryTableFromSupabase("effect_groups", mapDatabaseEffectGroup, "effect groups");
+}
+
+function replaceRegistryObject(target, entries) {
+    Object.keys(target).forEach(key => {
+        delete target[key];
+    });
+
+    entries.forEach(entry => {
+        if (!entry.key) return;
+        target[entry.key] = entry.value;
+    });
+}
+
+function replaceRegistrySet(target, values) {
+    target.clear();
+    values.forEach(value => target.add(value));
+}
+
+async function hydrateDebuffRegistryFromSupabase() {
+    if (typeof DEBUFF_REGISTRY === "undefined") {
+        return false;
+    }
+
+    let databaseDebuffs = [];
+    try {
+        databaseDebuffs = await loadDebuffRegistryFromSupabase();
+        if (!databaseDebuffs.length) {
+            return false;
+        }
+    } catch (error) {
+        console.error("Debuff registry loading failed. Using local debuff registry.", error);
+        return false;
+    }
+
+    replaceRegistryObject(DEBUFF_REGISTRY, databaseDebuffs);
+
+    console.info(`Debuff registry loaded from Supabase: ${databaseDebuffs.length}`);
+    return true;
+}
+
+async function hydrateBuffRegistryFromSupabase() {
+    if (typeof BUFF_REGISTRY === "undefined") {
+        return false;
+    }
+
+    let databaseBuffs = [];
+    try {
+        databaseBuffs = await loadBuffRegistryFromSupabase();
+        if (!databaseBuffs.length) {
+            return false;
+        }
+    } catch (error) {
+        console.error("Buff registry loading failed. Using local buff registry.", error);
+        return false;
+    }
+
+    replaceRegistryObject(BUFF_REGISTRY, databaseBuffs);
+
+    console.info(`Buff registry loaded from Supabase: ${databaseBuffs.length}`);
+    return true;
+}
+
+async function hydrateReactionRulesFromSupabase() {
+    if (typeof ARTS_REACTIONS === "undefined" || !Array.isArray(ARTS_REACTIONS)) {
+        return false;
+    }
+
+    let databaseRules = [];
+    try {
+        databaseRules = await loadReactionRulesFromSupabase();
+        if (!databaseRules.length) {
+            return false;
+        }
+    } catch (error) {
+        console.error("Reaction rules loading failed. Using local reaction rules.", error);
+        return false;
+    }
+
+    ARTS_REACTIONS.splice(0, ARTS_REACTIONS.length, ...databaseRules);
+
+    console.info(`Reaction rules loaded from Supabase: ${databaseRules.length}`);
+    return true;
+}
+
+async function hydrateEffectGroupsFromSupabase() {
+    if (
+        typeof EXCLUSIVE_INFLICTIONS === "undefined" ||
+        typeof PHYSICAL_DEBUFFS === "undefined" ||
+        typeof UTILITY_DEBUFFS === "undefined"
+    ) {
+        return false;
+    }
+
+    let databaseGroups = [];
+    try {
+        databaseGroups = await loadEffectGroupsFromSupabase();
+        if (!databaseGroups.length) {
+            return false;
+        }
+    } catch (error) {
+        console.error("Effect groups loading failed. Using local effect groups.", error);
+        return false;
+    }
+
+    const groupsByKey = new Map(databaseGroups.map(group => [group.key, group.effects]));
+    if (groupsByKey.has("exclusive_inflictions")) replaceRegistrySet(EXCLUSIVE_INFLICTIONS, groupsByKey.get("exclusive_inflictions"));
+    if (groupsByKey.has("physical_debuffs")) replaceRegistrySet(PHYSICAL_DEBUFFS, groupsByKey.get("physical_debuffs"));
+    if (groupsByKey.has("utility_debuffs")) replaceRegistrySet(UTILITY_DEBUFFS, groupsByKey.get("utility_debuffs"));
+
+    console.info(`Effect groups loaded from Supabase: ${databaseGroups.length}`);
+    return true;
+}
+
 async function loadOperatorsFromSupabase() {
     if (!supabaseClient) {
         console.warn("Supabase client is not available. Using local operator data.");

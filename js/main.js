@@ -290,6 +290,22 @@ async function initApp() {
     setAppLoading(true);
 
     try {
+        if (typeof hydrateDebuffRegistryFromSupabase === "function") {
+            await hydrateDebuffRegistryFromSupabase();
+        }
+
+        if (typeof hydrateBuffRegistryFromSupabase === "function") {
+            await hydrateBuffRegistryFromSupabase();
+        }
+
+        if (typeof hydrateReactionRulesFromSupabase === "function") {
+            await hydrateReactionRulesFromSupabase();
+        }
+
+        if (typeof hydrateEffectGroupsFromSupabase === "function") {
+            await hydrateEffectGroupsFromSupabase();
+        }
+
         if (typeof hydrateOperatorsFromSupabase === "function") {
             await hydrateOperatorsFromSupabase();
         }
