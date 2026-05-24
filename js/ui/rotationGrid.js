@@ -1243,6 +1243,21 @@ function getSimulationCursorSortedEvents(events) {
         .sort((left, right) => (left.time - right.time) || (left.order - right.order));
 }
 
+function getSimulationNavigationEventTimes(events, durationSeconds) {
+    const times = getSimulationCursorSortedEvents(events)
+        .map(event => clampSimulationCursorTime(event.time, durationSeconds))
+        .filter(time => Number.isFinite(time));
+    const uniqueTimes = [];
+
+    times.forEach(time => {
+        if (!uniqueTimes.some(currentTime => Math.abs(currentTime - time) < 0.001)) {
+            uniqueTimes.push(time);
+        }
+    });
+
+    return uniqueTimes;
+}
+
 function getSimulationCursorState(events, time) {
     const sortedEvents = getSimulationCursorSortedEvents(events);
     const tolerance = (SIMULATION_TIME_STEP / 2) + 0.001;
@@ -1341,11 +1356,57 @@ function createSimulationCursorStat(label, value = "") {
     };
 }
 
-function createSimulationCursorButton(label, className = "") {
+function createSimulationCursorIcon(name) {
+    const pathMap = {
+        start: ["M6 5v14", "M18 6l-8 6 8 6V6z"],
+        previous: ["M11 6l-7 6 7 6V6z", "M20 6l-7 6 7 6V6z"],
+        stepBack: ["M15 7l-7 5 7 5V7z"],
+        play: ["M8 5l11 7-11 7V5z"],
+        pause: ["M8 5h4v14H8z", "M14 5h4v14h-4z"],
+        stepForward: ["M9 7l7 5-7 5V7z"],
+        next: ["M13 6l7 6-7 6V6z", "M4 6l7 6-7 6V6z"],
+        end: ["M18 5v14", "M6 6l8 6-8 6V6z"]
+    };
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("aria-hidden", "true");
+    svg.setAttribute("focusable", "false");
+
+    (pathMap[name] || pathMap.play).forEach(pathData => {
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", pathData);
+        svg.appendChild(path);
+    });
+
+    return svg;
+}
+
+function setSimulationCursorButtonIcon(button, iconName, label) {
+    if (!button) return;
+    if (button.dataset.iconName !== iconName) {
+        button.replaceChildren(createSimulationCursorIcon(iconName));
+        button.dataset.iconName = iconName;
+    }
+    button.setAttribute("aria-label", label);
+    button.title = label;
+}
+
+function createSimulationCursorButton(label, className = "", options = {}) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = `rotation-sim-cursor-button ${className}`.trim();
-    button.textContent = label;
+    const accessibleLabel = options.ariaLabel || options.title || label;
+    button.setAttribute("aria-label", accessibleLabel);
+    button.title = accessibleLabel;
+
+    if (options.icon) {
+        button.classList.add("is-icon");
+        button.appendChild(createSimulationCursorIcon(options.icon));
+        button.dataset.iconName = options.icon;
+    } else {
+        button.textContent = label;
+    }
+
     return button;
 }
 
@@ -1430,6 +1491,7 @@ function scrollSimulationTrackToTime(time, pixelsPerSecond, options = {}) {
             left: nextLeft,
             behavior: options.instant ? "auto" : "smooth"
         });
+        if (options.instant) scrollArea.scrollLeft = nextLeft;
     } else {
         scrollArea.scrollLeft = nextLeft;
     }
@@ -1518,10 +1580,43 @@ function createSimulationCursorController(body, events, durationSeconds, pixelsP
 
     const controls = document.createElement("div");
     controls.className = "rotation-sim-cursor-controls";
-    const playButton = createSimulationCursorButton("Play", "is-primary");
-    const backButton = createSimulationCursorButton("-0.1s");
-    const forwardButton = createSimulationCursorButton("+0.1s");
-    controls.append(playButton, backButton, forwardButton);
+    const startButton = createSimulationCursorButton("Start", "", {
+        icon: "start",
+        ariaLabel: "Jump to timeline start"
+    });
+    const previousEventButton = createSimulationCursorButton("Previous skill", "", {
+        icon: "previous",
+        ariaLabel: "Jump to previous skill"
+    });
+    const backButton = createSimulationCursorButton("Back 0.1 seconds", "", {
+        icon: "stepBack",
+        ariaLabel: "Move 0.1 seconds earlier"
+    });
+    const playButton = createSimulationCursorButton("Play", "is-primary", {
+        icon: "play",
+        ariaLabel: "Play timeline"
+    });
+    const forwardButton = createSimulationCursorButton("Forward 0.1 seconds", "", {
+        icon: "stepForward",
+        ariaLabel: "Move 0.1 seconds later"
+    });
+    const nextEventButton = createSimulationCursorButton("Next skill", "", {
+        icon: "next",
+        ariaLabel: "Jump to next skill"
+    });
+    const endButton = createSimulationCursorButton("End", "", {
+        icon: "end",
+        ariaLabel: "Jump to timeline end"
+    });
+    controls.append(
+        startButton,
+        previousEventButton,
+        backButton,
+        playButton,
+        forwardButton,
+        nextEventButton,
+        endButton
+    );
 
     const timeStat = createSimulationCursorStat("Time");
     const spStat = createSimulationCursorStat("SP");
@@ -1559,8 +1654,13 @@ function createSimulationCursorController(body, events, durationSeconds, pixelsP
     body.appendChild(cursor);
 
     const updatePlayButton = () => {
-        playButton.textContent = simulationCursorPlaybackTimer ? "Pause" : "Play";
-        playButton.classList.toggle("is-playing", Boolean(simulationCursorPlaybackTimer));
+        const isPlaying = Boolean(simulationCursorPlaybackTimer);
+        setSimulationCursorButtonIcon(
+            playButton,
+            isPlaying ? "pause" : "play",
+            isPlaying ? "Pause timeline" : "Play timeline"
+        );
+        playButton.classList.toggle("is-playing", isPlaying);
     };
 
     const setCursorTime = (value, options = {}) => {
@@ -1582,6 +1682,11 @@ function createSimulationCursorController(body, events, durationSeconds, pixelsP
         syncSimulationCursorEvents(syncEvents, {
             autoScroll: Boolean(options.autoScroll || simulationCursorPlaybackTimer)
         });
+        if (options.scrollTrack) {
+            scrollSimulationTrackToTime(simulationCursorTime, pixelsPerSecond, {
+                instant: Boolean(options.scrollTrackInstant)
+            });
+        }
         updatePlayButton();
     };
 
@@ -1605,14 +1710,51 @@ function createSimulationCursorController(body, events, durationSeconds, pixelsP
         updatePlayButton();
     };
 
+    const jumpToClosestEvent = (direction) => {
+        const eventTimes = getSimulationNavigationEventTimes(events, durationSeconds);
+        const tolerance = (SIMULATION_TIME_STEP / 2) + 0.001;
+        const targetTime = direction < 0
+            ? [...eventTimes].reverse().find(time => time < simulationCursorTime - tolerance)
+            : eventTimes.find(time => time > simulationCursorTime + tolerance);
+        setCursorTime(targetTime ?? (direction < 0 ? 0 : durationSeconds), {
+            autoScroll: true,
+            scrollTrack: true,
+            scrollTrackInstant: true
+        });
+    };
+
+    startButton.addEventListener("click", () => {
+        stopSimulationCursorPlayback();
+        setCursorTime(0, { autoScroll: true, scrollTrack: true, scrollTrackInstant: true });
+    });
+    previousEventButton.addEventListener("click", () => {
+        stopSimulationCursorPlayback();
+        jumpToClosestEvent(-1);
+    });
     playButton.addEventListener("click", startPlayback);
     backButton.addEventListener("click", () => {
         stopSimulationCursorPlayback();
-        setCursorTime(simulationCursorTime - SIMULATION_TIME_STEP, { autoScroll: true });
+        setCursorTime(simulationCursorTime - SIMULATION_TIME_STEP, {
+            autoScroll: true,
+            scrollTrack: true,
+            scrollTrackInstant: true
+        });
     });
     forwardButton.addEventListener("click", () => {
         stopSimulationCursorPlayback();
-        setCursorTime(simulationCursorTime + SIMULATION_TIME_STEP, { autoScroll: true });
+        setCursorTime(simulationCursorTime + SIMULATION_TIME_STEP, {
+            autoScroll: true,
+            scrollTrack: true,
+            scrollTrackInstant: true
+        });
+    });
+    nextEventButton.addEventListener("click", () => {
+        stopSimulationCursorPlayback();
+        jumpToClosestEvent(1);
+    });
+    endButton.addEventListener("click", () => {
+        stopSimulationCursorPlayback();
+        setCursorTime(durationSeconds, { autoScroll: true, scrollTrack: true, scrollTrackInstant: true });
     });
 
     const getTimeFromPointer = event => {
@@ -1944,23 +2086,60 @@ function createSimulationSpMarkerInspector(marker) {
 
 function closeSimulationInspectors(exceptHost = null) {
     document.querySelectorAll(".rotation-sim-inspector-host.is-inspector-open").forEach(host => {
-        if (host !== exceptHost) host.classList.remove("is-inspector-open");
+        if (host !== exceptHost) {
+            host.classList.remove("is-inspector-open");
+            hideFloatingSimulationInspector(host);
+        }
     });
 }
 
-function updateSimulationInspectorSide(host) {
-    const panel = host.querySelector(".rotation-sim-inspector");
+function hideFloatingSimulationInspector(host) {
+    const panel = host?.__simulationInspectorPanel;
     if (!panel) return;
+    panel.classList.remove("is-visible");
+    host.classList.remove("is-inspector-hover");
+}
+
+function cleanupDetachedSimulationInspectors() {
+    document.querySelectorAll(".rotation-sim-inspector.is-floating").forEach(panel => panel.remove());
+}
+
+function positionFloatingSimulationInspector(host) {
+    const panel = host?.__simulationInspectorPanel;
+    if (!panel) return;
+
     const rect = host.getBoundingClientRect();
     const viewportWidth = document.documentElement.clientWidth || window.innerWidth || 0;
-    panel.classList.toggle("is-left", rect.right + 310 > viewportWidth && rect.left > 310);
+    const viewportHeight = document.documentElement.clientHeight || window.innerHeight || 0;
+    const gap = 14;
+
+    panel.classList.add("is-floating", "is-visible");
+    panel.classList.remove("is-left");
+    panel.style.left = "0px";
+    panel.style.top = "0px";
+
+    const panelRect = panel.getBoundingClientRect();
+    const placeLeft = rect.right + gap + panelRect.width > viewportWidth - 8 && rect.left > panelRect.width + gap + 8;
+    let left = placeLeft ? rect.left - panelRect.width - gap : rect.right + gap;
+    let top = rect.top + (rect.height / 2) - (panelRect.height / 2);
+
+    left = Math.max(8, Math.min(left, viewportWidth - panelRect.width - 8));
+    top = Math.max(8, Math.min(top, viewportHeight - panelRect.height - 8));
+
+    panel.classList.toggle("is-left", placeLeft);
+    panel.style.left = `${left}px`;
+    panel.style.top = `${top}px`;
 }
 
 function toggleSimulationInspector(host) {
-    updateSimulationInspectorSide(host);
     const shouldOpen = !host.classList.contains("is-inspector-open");
     closeSimulationInspectors(host);
     host.classList.toggle("is-inspector-open", shouldOpen);
+    if (shouldOpen) {
+        positionFloatingSimulationInspector(host);
+    } else {
+        hideFloatingSimulationInspector(host);
+    }
 }
 
 function ensureSimulationInspectorCloseHandler() {
@@ -1968,13 +2147,21 @@ function ensureSimulationInspectorCloseHandler() {
     window.__rotationSimulationInspectorCloseHandler = true;
 
     document.addEventListener("click", event => {
-        if (!event.target.closest(".rotation-sim-inspector-host")) {
+        if (!event.target.closest(".rotation-sim-inspector-host") && !event.target.closest(".rotation-sim-inspector")) {
             closeSimulationInspectors();
         }
     });
 
     document.addEventListener("keydown", event => {
         if (event.key === "Escape") closeSimulationInspectors();
+    });
+
+    window.addEventListener("scroll", () => {
+        document.querySelectorAll(".rotation-sim-inspector-host.is-inspector-open").forEach(positionFloatingSimulationInspector);
+    }, true);
+
+    window.addEventListener("resize", () => {
+        document.querySelectorAll(".rotation-sim-inspector-host.is-inspector-open").forEach(positionFloatingSimulationInspector);
     });
 }
 
@@ -1984,11 +2171,29 @@ function attachSimulationInspector(host, panel, label = "Inspect simulation even
     host.classList.add("rotation-sim-inspector-host");
     if (!host.hasAttribute("tabindex")) host.tabIndex = 0;
     if (!host.hasAttribute("aria-label")) host.setAttribute("aria-label", label);
-    host.appendChild(panel);
+    panel.classList.add("is-floating");
+    document.body.appendChild(panel);
+    host.__simulationInspectorPanel = panel;
     ensureSimulationInspectorCloseHandler();
 
-    host.addEventListener("pointerenter", () => updateSimulationInspectorSide(host));
-    host.addEventListener("focus", () => updateSimulationInspectorSide(host));
+    host.addEventListener("pointerenter", () => {
+        host.classList.add("is-inspector-hover");
+        positionFloatingSimulationInspector(host);
+    });
+    host.addEventListener("pointerleave", () => {
+        if (!host.classList.contains("is-inspector-open")) {
+            hideFloatingSimulationInspector(host);
+        }
+    });
+    host.addEventListener("focus", () => {
+        host.classList.add("is-inspector-hover");
+        positionFloatingSimulationInspector(host);
+    });
+    host.addEventListener("blur", () => {
+        if (!host.classList.contains("is-inspector-open")) {
+            hideFloatingSimulationInspector(host);
+        }
+    });
     host.addEventListener("pointerup", event => {
         if (event.target.closest("button") || event.target.closest(".rotation-sim-inspector")) return;
         if (host.__rotationWasDraggedForInspector) return;
@@ -2464,7 +2669,7 @@ function createSimulationSkillElement(entry, index, skillData, secondsPerSlot, p
 
         const spBadge = document.createElement("div");
         spBadge.className = "rotation-sim-sp-badge";
-        spBadge.textContent = `-${formatSimulationSpValue(spState.cost)}`;
+        spBadge.textContent = `${formatSimulationSpValue(spState.cost)} SP`;
         spBadge.title = spState.affordable
             ? `SP ${formatSimulationSpValue(spState.before)} -> ${formatSimulationSpValue(spState.after)}`
             : `Not enough SP: ${formatSimulationSpValue(spState.before)} / ${formatSimulationSpValue(spState.cost)}`;
@@ -3295,7 +3500,9 @@ function renderSimulationRotation() {
     const container = document.getElementById("rotationDropZone");
     if (!container) return;
     stopSimulationCursorPlayback();
+    cleanupDetachedSimulationInspectors();
     removeBasicAttackEntriesFromRotation();
+    const previousTrackScrollLeft = container.querySelector(".rotation-sim-track-scroll")?.scrollLeft || 0;
     container.innerHTML = "";
 
     const timelineBasicAttackData = getTimelineBasicAttackData();
@@ -3444,6 +3651,7 @@ function renderSimulationRotation() {
     container.appendChild(trackScroll);
     container.appendChild(eventLog);
     window.requestAnimationFrame(() => {
+        trackScroll.scrollLeft = previousTrackScrollLeft;
         syncSimulationCursorEvents(getSimulationCursorState(skillEvents, simulationCursorTime).currentEvents);
     });
 

@@ -606,14 +606,18 @@
 
 .rotation-sim-cursor-controls {
     display: flex;
-    gap: 5px;
+    gap: 4px;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .rotation-sim-cursor-button {
-    min-width: 48px;
-    height: 28px;
-    padding: 0 9px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    height: 30px;
+    padding: 0 8px;
     border: 1px solid rgba(160,170,169,0.22);
     border-radius: 999px;
     background:
@@ -625,6 +629,23 @@
     cursor: pointer;
 }
 
+.rotation-sim-cursor-button.is-icon {
+    width: 34px;
+    min-width: 34px;
+    padding: 0;
+}
+
+.rotation-sim-cursor-button.is-icon svg {
+    display: block;
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.15;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
 .rotation-sim-cursor-button:hover,
 .rotation-sim-cursor-button:focus-visible {
     border-color: rgba(248,245,70,0.52);
@@ -634,6 +655,8 @@
 }
 
 .rotation-sim-cursor-button.is-primary {
+    width: 38px;
+    min-width: 38px;
     border-color: rgba(248,245,70,0.58);
     color: #f8f546;
 }
@@ -910,16 +933,16 @@
     height: 18px;
     padding: 0 6px;
     transform: translate(-50%, -50%);
-    border: 1px solid rgba(86,216,255,0.55);
+    border: 1px solid rgba(248,245,70,0.48);
     border-radius: 999px;
-    background: rgba(7,16,20,0.92);
-    color: #56d8ff;
+    background: rgba(24,23,10,0.92);
+    color: #f8f546;
     font-size: 9px;
     font-weight: 1000;
     line-height: 17px;
     text-align: center;
     z-index: 8;
-    box-shadow: 0 0 9px rgba(86,216,255,0.24);
+    box-shadow: 0 0 9px rgba(248,245,70,0.18);
 }
 
 .rotation-sim-sp-marker.is-recovery {
@@ -980,6 +1003,22 @@
     pointer-events: none;
     transition: opacity 0.14s ease, transform 0.14s ease;
     z-index: 45;
+}
+
+.rotation-sim-inspector.is-floating {
+    position: fixed;
+    left: 0;
+    top: 0;
+    max-height: calc(100vh - 16px);
+    overflow-y: auto;
+    transform: none;
+    z-index: 10000;
+}
+
+.rotation-sim-inspector.is-floating.is-visible {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
 }
 
 .rotation-sim-inspector.is-left {
@@ -1383,44 +1422,67 @@
 
 .rotation-sim-time-badge {
     position: absolute;
-    left: auto;
-    right: -14px;
-    top: 6px;
+    left: 50%;
+    right: auto;
+    top: -28px;
     min-width: 34px;
     height: 17px;
-    transform: none;
+    transform: translate(-50%, 4px);
     border: 1px solid rgba(160,170,169,0.34);
     border-radius: 999px;
-    background: rgba(10,12,14,0.94);
-    color: rgba(244,245,242,0.86);
+    background: rgba(10,12,14,0.88);
+    color: rgba(244,245,242,0.78);
     font-size: 9px;
     font-weight: 900;
     line-height: 17px;
     text-align: center;
     pointer-events: none;
     z-index: 16;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.42);
+    opacity: 0;
+    transition: opacity 0.14s ease, transform 0.14s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.34);
 }
 
 .rotation-sim-sp-badge {
     position: absolute;
-    right: -20px;
-    bottom: -7px;
-    min-width: 28px;
-    height: 17px;
-    padding: 0 5px;
-    border: 1px solid rgba(86,216,255,0.48);
+    left: 50%;
+    right: auto;
+    bottom: -28px;
+    min-width: 46px;
+    height: 16px;
+    padding: 0 7px;
+    transform: translate(-50%, -4px);
+    border: 1px solid rgba(248,245,70,0.44);
     border-radius: 999px;
-    background: rgba(7,16,20,0.92);
-    color: #56d8ff;
+    background: rgba(24,23,10,0.90);
+    color: #f8f546;
     font-size: 9px;
     font-weight: 1000;
-    line-height: 16px;
+    line-height: 15px;
     text-align: center;
     text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-    pointer-events: auto;
+    pointer-events: none;
     z-index: 15;
-    box-shadow: 0 0 9px rgba(86,216,255,0.22);
+    opacity: 0;
+    transition: opacity 0.14s ease, transform 0.14s ease;
+    box-shadow: 0 0 9px rgba(248,245,70,0.14);
+}
+
+.rotation-sim-skill:hover .rotation-sim-time-badge,
+.rotation-sim-skill:focus-within .rotation-sim-time-badge,
+.rotation-sim-skill.is-cursor-active .rotation-sim-time-badge,
+.rotation-sim-inspector-host.is-inspector-open .rotation-sim-time-badge {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+.rotation-sim-skill:hover .rotation-sim-sp-badge,
+.rotation-sim-skill:focus-within .rotation-sim-sp-badge,
+.rotation-sim-skill.is-cursor-active .rotation-sim-sp-badge,
+.rotation-sim-inspector-host.is-inspector-open .rotation-sim-sp-badge,
+.rotation-sim .rotation-sim-skill.is-sp-invalid .rotation-sim-sp-badge {
+    opacity: 1;
+    transform: translate(-50%, 0);
 }
 
 .rotation-sim .rotation-sim-skill.is-sp-invalid .rotation-skill-composite {
