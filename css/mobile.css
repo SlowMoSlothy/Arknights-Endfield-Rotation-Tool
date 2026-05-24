@@ -325,6 +325,12 @@
         row-gap: 12px;
     }
 
+    .rotation-timeline-slot-mode .rotation-timeline-labels,
+    .rotation-timeline-slot-mode .rotation-timeline-step {
+        grid-template-rows: 58px;
+        row-gap: 0;
+    }
+
     .rotation-timeline::before {
         left: 50px;
         top: 139px;
@@ -360,6 +366,31 @@
 
     .rotation-sim {
         grid-template-columns: 82px 1fr;
+    }
+
+    .rotation-sim-cursor-toolbar {
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        padding: 7px;
+    }
+
+    .rotation-sim-cursor-controls {
+        grid-column: 1 / -1;
+    }
+
+    .rotation-sim-cursor-button {
+        min-width: 44px;
+        height: 26px;
+        padding: 0 7px;
+        font-size: 9px;
+    }
+
+    .rotation-sim-cursor-stat {
+        padding: 4px 6px;
+    }
+
+    .rotation-sim-cursor-stat > strong {
+        font-size: 10px;
     }
 
     .rotation-sim-labels,
@@ -444,6 +475,15 @@
     .rotation-sim-log-header {
         align-items: flex-start;
         gap: 8px;
+    }
+
+    .rotation-sim-problems {
+        grid-template-columns: 1fr;
+        align-items: flex-start;
+    }
+
+    .rotation-sim-problem-chips {
+        justify-content: flex-start;
     }
 
     .rotation-sim-log-list {

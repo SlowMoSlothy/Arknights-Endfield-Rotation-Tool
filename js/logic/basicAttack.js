@@ -280,7 +280,11 @@ function createBasicAttackHitRow(attackData, className = "basic-attack-hit-row")
 function formatBasicAttackSeconds(value) {
     const number = Number(value);
     if (!Number.isFinite(number)) return "-";
-    return `${number.toFixed(number % 1 === 0 ? 0 : 2).replace(/0$/, "").replace(/\.$/, "")}s`;
+    const rounded = Math.round(number * 100) / 100;
+    const text = Math.abs(rounded - Math.round(rounded)) < 0.001
+        ? String(Math.round(rounded))
+        : rounded.toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
+    return `${text}s`;
 }
 
 function getBasicAttackHitTimeline(attackData) {

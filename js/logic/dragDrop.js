@@ -157,7 +157,7 @@ function initRotationDragDrop() {
                     put: true
                 },
                 sort: false,
-                draggable: ".rotation-sim-skill",
+                draggable: ".rotation-sim-sortable-source-only",
                 filter: ".remove-btn, .rotation-sim-nudge",
                 preventOnFilter: true,
                 forceFallback: true,

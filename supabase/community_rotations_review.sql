@@ -13,7 +13,9 @@ select
     rotation_skill_ids,
     element_types,
     operator_classes,
-    share_code
+    setup_version,
+    share_code,
+    payload
 from public.community_rotations
 where game = 'arknights_endfield'
     and is_public = true

@@ -223,29 +223,22 @@ function hasCurrentSavableRotation() {
 }
 
 function buildMyRotationPayload(values) {
-    const teamIds = getCurrentMyTeamIds();
-    const rotationEntries = getCurrentMyRotationEntries();
-    const rotationSkillIds = rotationEntries
-        .map(entry => Number(entry.id))
-        .filter(Number.isFinite);
-    const teamOperators = teamIds.map(getMyOperatorById).filter(Boolean);
-    const rotationSkills = getCurrentMyRotationSkills();
     const shareCode = createBuildShareCode();
+    const persistence = createBuildPersistencePayloadFromShareCode(shareCode, {
+        timestampKey: "savedAt"
+    });
 
     return {
         game: "arknights_endfield",
         title: values.title,
         description: values.description,
         share_code: shareCode,
-        setup_version: 3,
-        team_operator_ids: teamIds,
-        rotation_skill_ids: rotationSkillIds,
-        element_types: uniqueMyLabels([
-            ...teamOperators.map(operator => operator.elementType),
-            ...rotationSkills.map(skill => skill.elementType)
-        ]),
-        operator_classes: uniqueMyLabels(teamOperators.map(operator => operator.operatorClass)),
-        payload: typeof parseBuildShareCode === "function" ? parseBuildShareCode(shareCode) : {}
+        setup_version: persistence.setupVersion,
+        team_operator_ids: persistence.teamOperatorIds,
+        rotation_skill_ids: persistence.rotationSkillIds,
+        element_types: persistence.elementTypes,
+        operator_classes: persistence.operatorClasses,
+        payload: persistence.payload
     };
 }
 
@@ -963,7 +956,7 @@ async function fetchMyRotations() {
     try {
         const { data, error } = await client
             .from("user_rotations")
-            .select("id,title,description,share_code,team_operator_ids,rotation_skill_ids,element_types,operator_classes,submitted_for_review_at,created_at,updated_at")
+            .select("id,title,description,share_code,setup_version,team_operator_ids,rotation_skill_ids,element_types,operator_classes,payload,submitted_for_review_at,created_at,updated_at")
             .eq("game", "arknights_endfield")
             .order("updated_at", { ascending: false });
 
@@ -1452,6 +1445,16 @@ async function submitMyRotationForReview(row) {
     await runMyRowAction(row, async () => {
         const client = getMySupabaseClient();
         if (!client || !myRotationsState.session) return;
+        let persistence = null;
+        if (typeof createBuildPersistencePayloadFromShareCode === "function") {
+            try {
+                persistence = createBuildPersistencePayloadFromShareCode(row.share_code, {
+                    timestampKey: "submittedAt"
+                });
+            } catch (error) {
+                console.warn("Saved rotation payload could not be rebuilt from share code:", error);
+            }
+        }
 
         const communityPayload = {
             game: "arknights_endfield",
@@ -1460,12 +1463,12 @@ async function submitMyRotationForReview(row) {
             author_name: getMyAuthorName(),
             submitted_by: myRotationsState.session.user.id,
             share_code: row.share_code,
-            setup_version: 2,
-            team_operator_ids: normalizeMyList(row.team_operator_ids),
-            rotation_skill_ids: normalizeMyList(row.rotation_skill_ids),
-            element_types: normalizeMyList(row.element_types),
-            operator_classes: normalizeMyList(row.operator_classes),
-            payload: {}
+            setup_version: persistence?.setupVersion || Number(row.setup_version) || 5,
+            team_operator_ids: persistence?.teamOperatorIds?.length ? persistence.teamOperatorIds : normalizeMyList(row.team_operator_ids),
+            rotation_skill_ids: persistence?.rotationSkillIds?.length ? persistence.rotationSkillIds : normalizeMyList(row.rotation_skill_ids),
+            element_types: persistence?.elementTypes?.length ? persistence.elementTypes : normalizeMyList(row.element_types),
+            operator_classes: persistence?.operatorClasses?.length ? persistence.operatorClasses : normalizeMyList(row.operator_classes),
+            payload: persistence?.payload || row.payload || {}
         };
 
         const { error: insertError } = await client

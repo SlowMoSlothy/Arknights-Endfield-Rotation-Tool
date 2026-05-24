@@ -10,7 +10,7 @@ create table if not exists public.community_rotations (
     description text not null default '',
     author_name text not null default '',
     share_code text not null,
-    setup_version smallint not null default 2,
+    setup_version smallint not null default 5,
     team_operator_ids integer[] not null default '{}'::integer[],
     rotation_skill_ids integer[] not null default '{}'::integer[],
     element_types text[] not null default '{}'::text[],
@@ -37,7 +37,8 @@ alter table public.community_rotations add column if not exists title text;
 alter table public.community_rotations add column if not exists description text not null default '';
 alter table public.community_rotations add column if not exists author_name text not null default '';
 alter table public.community_rotations add column if not exists share_code text;
-alter table public.community_rotations add column if not exists setup_version smallint not null default 2;
+alter table public.community_rotations add column if not exists setup_version smallint not null default 5;
+alter table public.community_rotations alter column setup_version set default 5;
 alter table public.community_rotations add column if not exists team_operator_ids integer[] not null default '{}'::integer[];
 alter table public.community_rotations add column if not exists rotation_skill_ids integer[] not null default '{}'::integer[];
 alter table public.community_rotations add column if not exists element_types text[] not null default '{}'::text[];

@@ -212,11 +212,21 @@ function isLocalFileExportBlocked() {
     return window.location.protocol === "file:";
 }
 
+function isSimulationExportBlocked() {
+    return typeof isSimulationTimelineMode === "function"
+        ? isSimulationTimelineMode()
+        : (typeof uiSettings !== "undefined" && uiSettings?.timelineMode === "simulation");
+}
+
+function showSimulationExportMessage() {
+    alert("PNG export is available in Slot Mode only.");
+}
+
 function showExportSecurityMessage() {
     alert(
-        "Der Export kann nicht direkt aus einer lokalen file:// Seite erstellt werden.\n\n" +
-        "Bitte starte den Builder ueber einen lokalen Webserver oder die GitHub-Pages-Adresse. " +
-        "Dann kann der Browser die Bilder sicher in das Export-Bild einbetten."
+        "PNG export cannot run directly from a local file:// page.\n\n" +
+        "Please open the builder through a local web server or the GitHub Pages address. " +
+        "Then the browser can safely embed images into the export."
     );
 }
 
@@ -230,6 +240,11 @@ function exportImage() {
     if (!element) return Promise.resolve(false);
 
     if (typeof hasCreatedRotation === "function" && !hasCreatedRotation()) {
+        return Promise.resolve(false);
+    }
+
+    if (isSimulationExportBlocked()) {
+        showSimulationExportMessage();
         return Promise.resolve(false);
     }
 

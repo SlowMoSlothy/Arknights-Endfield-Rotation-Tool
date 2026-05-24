@@ -934,13 +934,10 @@ function validateCommunitySubmission(values) {
 }
 
 function buildCommunitySubmission(values) {
-    const teamIds = getCurrentCommunityTeamIds();
-    const rotationEntries = getCurrentCommunityRotationEntries();
-    const rotationSkillIds = rotationEntries
-        .map(entry => Number(entry.id))
-        .filter(Number.isFinite);
-    const teamOperators = getCurrentCommunityTeamOperators();
-    const rotationSkills = getCurrentCommunityRotationSkills();
+    const shareCode = createBuildShareCode();
+    const persistence = createBuildPersistencePayloadFromShareCode(shareCode, {
+        timestampKey: "submittedAt"
+    });
 
     return {
         game: "arknights_endfield",
@@ -948,35 +945,13 @@ function buildCommunitySubmission(values) {
         description: values.description.trim(),
         author_name: getCommunitySubmitAuthorName().slice(0, 40),
         submitted_by: getCommunityAccountUserId() || null,
-        share_code: createBuildShareCode(),
-        setup_version: 3,
-        team_operator_ids: teamIds,
-        rotation_skill_ids: rotationSkillIds,
-        element_types: getCurrentCommunityElements(),
-        operator_classes: getCurrentCommunityClasses(),
-        payload: {
-            version: 1,
-            submittedAt: new Date().toISOString(),
-            team: teamOperators.map(operator => ({
-                id: operator.id,
-                name: operator.name,
-                elementType: operator.elementType,
-                operatorClass: operator.operatorClass
-            })),
-            rotation: rotationEntries.map((entry, index) => {
-                const skill = rotationSkills[index];
-                return {
-                    actionType: entry.type || "skill",
-                    id: entry.id,
-                    operatorId: entry.operatorId,
-                    name: skill?.name || "",
-                    type: skill?.type || "",
-                    shortType: skill?.shortType || "",
-                    elementType: skill?.elementType || "",
-                    autoInserted: entry.autoInserted
-                };
-            })
-        },
+        share_code: shareCode,
+        setup_version: persistence.setupVersion,
+        team_operator_ids: persistence.teamOperatorIds,
+        rotation_skill_ids: persistence.rotationSkillIds,
+        element_types: persistence.elementTypes,
+        operator_classes: persistence.operatorClasses,
+        payload: persistence.payload,
         likes_count: 0,
         view_count: 0,
         is_public: true,
@@ -1282,7 +1257,7 @@ async function fetchCommunityRotations(force = false) {
     try {
         const { data, error } = await supabaseClient
             .from("community_rotations")
-            .select("id,title,description,author_name,submitted_by,share_code,team_operator_ids,rotation_skill_ids,element_types,operator_classes,likes_count,view_count,created_at")
+            .select("id,title,description,author_name,submitted_by,share_code,setup_version,team_operator_ids,rotation_skill_ids,element_types,operator_classes,payload,likes_count,view_count,created_at")
             .eq("game", "arknights_endfield")
             .eq("is_public", true)
             .eq("is_approved", true)
