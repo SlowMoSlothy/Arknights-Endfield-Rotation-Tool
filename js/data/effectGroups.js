@@ -14,6 +14,7 @@ const EXCLUSIVE_INFLICTIONS = new Set([
 
 const PHYSICAL_DEBUFFS = new Set([
     "vulnerable",
+    "physical_susceptibility",
     "lift",
     "knock_down",
     "crush",

@@ -99,7 +99,7 @@ const DEBUFF_REGISTRY = {
     },
     physical_susceptibility: {
         name: "Physical Susceptibility",
-        iconBase: "assets/ui/debuffs/physical_susceptibility",
+        icon: "assets/ui/debuffs/elements/physical.webp",
         stackable: false,
         maxStacks: 0,
         extension: "png"
@@ -180,6 +180,13 @@ const DEBUFF_REGISTRY = {
         stackable: false,
         maxStacks: 0,
         extension: "png"
+    },
+    breach: {
+        name: "Breach",
+        icon: "assets/ui/debuffs/breach.svg",
+        stackable: false,
+        maxStacks: 0,
+        extension: "svg"
     },
     operator_attacked: {
         name: "Operator Attacked",

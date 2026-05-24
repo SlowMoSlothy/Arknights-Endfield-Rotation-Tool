@@ -47,17 +47,41 @@ lifeng.skills = [
         shortType: "BS",
         cooldown: 0,
         energy: 100,
+        sp_cost: 100,
         elementType: "physical",
-        description: "Deals Physical DMG and applies Physical Susceptibility.",
+        description: "Deals 3 hits of Physical DMG, applies Knock Down and 1 Vulnerable stack. If the target had no Vulnerable stacks before the last hit, also applies Physical Susceptibility.",
+        conditionalDebuffs: [
+            {
+                noneOf: ["vulnerable"],
+                debuffs: [
+                    {
+                        id: "physical_susceptibility",
+                        name: "Physical Susceptibility",
+                        appliesEffect: "physical_susceptibility",
+                        persistsForCombo: true,
+                        visible: true,
+                        stackable: false
+                    }
+                ]
+            }
+        ],
         debuffs: [
             {
-                id: "physical_susceptibility",
-                name: "Physical Susceptibility",
-                appliesEffect: "physical_susceptibility",
+                id: "knock_down",
+                name: "Knock Down",
+                appliesEffect: "knock_down",
+                persistsForCombo: false,
+                visible: true
+            },
+            {
+                id: "vulnerable",
+                name: "Vulnerable",
+                appliesEffect: "vulnerable",
                 persistsForCombo: true,
                 visible: true,
-                stackable: false,
-                iconBase: "assets/debuffs/physical_susceptibility"
+                stackable: true,
+                stacksApplied: 1,
+                maxStacks: 4
             }
         ]
     },
@@ -72,12 +96,17 @@ lifeng.skills = [
         cooldown: 0,
         energy: 0,
         elementType: "physical",
-        description: "Deals Physical DMG and grants Link status.",
-        comboTriggerMode: "any",
+        description: "Triggers when the controlled operator performs a Final Strike on an enemy with Physical Susceptibility or Breach. Deals Physical DMG and grants Link.",
+        comboTriggerMode: "all",
         allowSelfTrigger: true,
         comboTriggers: [
-            { effect: "knock_down", minStacks: 1 },
-            { effect: "pull", minStacks: 1 }
+            { effect: "final_strike", minStacks: 1 },
+            {
+                anyOf: [
+                    { effect: "physical_susceptibility", minStacks: 1 },
+                    { effect: "breach", minStacks: 1 }
+                ]
+            }
         ],
         buffs: [
             {

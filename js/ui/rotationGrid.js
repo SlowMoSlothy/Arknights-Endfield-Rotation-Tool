@@ -175,9 +175,50 @@ function getActiveBuffsFromRotationState(stackState, metaState) {
     }));
 }
 
-function getMatchedConditionalRules(skillData, activeBuffMetaState, activeBuffStackState) {
+function hasRequiredRotationConditionalEffects(rule, activeBuffMetaState, activeBuffStackState, debuffMetaState = {}, debuffStackState = {}) {
+    const normalizeKey = value => normalizeRotationConsumeKey(value);
+    const hasEffect = (effectName, minStacks = 1) => {
+        const key = normalizeKey(effectName);
+        const buffStacks = Number(activeBuffStackState[key] || 0);
+        const debuffStacks = Number(debuffStackState[key] || 0);
+        return Math.max(buffStacks, debuffStacks) >= Number(minStacks || 1);
+    };
+
+    if (rule?.requiresBuffStacks) {
+        const key = normalizeKey(rule.requiresBuffStacks.buff);
+        return Number(activeBuffStackState[key] || 0) >= Number(rule.requiresBuffStacks.minStacks || 1);
+    }
+
+    if (rule?.requiresEffectStacks) {
+        const effectName = rule.requiresEffectStacks.effect || rule.requiresEffectStacks.debuff || rule.requiresEffectStacks.buff;
+        if (!hasEffect(effectName, rule.requiresEffectStacks.minStacks)) return false;
+    }
+
+    const requiredEffects = [
+        ...(Array.isArray(rule?.requiresBuff) ? rule.requiresBuff : [rule?.requiresBuff]),
+        ...(Array.isArray(rule?.requiresEffect) ? rule.requiresEffect : [rule?.requiresEffect]),
+        ...(Array.isArray(rule?.requiresDebuff) ? rule.requiresDebuff : [rule?.requiresDebuff])
+    ].filter(Boolean);
+
+    const hasRequiredEffects = requiredEffects.every(effectName => {
+        const key = normalizeKey(effectName);
+        return Boolean(activeBuffMetaState[key] || debuffMetaState[key] || hasEffect(key));
+    });
+    const hasNoExcludedEffects = (Array.isArray(rule?.noneOf) ? rule.noneOf : [rule?.noneOf])
+        .filter(Boolean)
+        .every(effectName => !hasEffect(effectName));
+
+    return hasRequiredEffects && hasNoExcludedEffects;
+}
+
+function getMatchedConditionalRules(skillData, activeBuffMetaState, activeBuffStackState, debuffMetaState = {}, debuffStackState = {}) {
     if (!Array.isArray(skillData?.conditionalDebuffs)) return [];
-    return skillData.conditionalDebuffs.filter(rule => hasRequiredRotationBuff(rule, activeBuffMetaState, activeBuffStackState));
+    return skillData.conditionalDebuffs.filter(rule => {
+        if (rule?.requiresEffect || rule?.requiresDebuff || rule?.requiresEffectStacks || rule?.noneOf) {
+            return hasRequiredRotationConditionalEffects(rule, activeBuffMetaState, activeBuffStackState, debuffMetaState, debuffStackState);
+        }
+        return hasRequiredRotationBuff(rule, activeBuffMetaState, activeBuffStackState);
+    });
 }
 
 function shouldSkipNormalBuffs(skillData, activeBuffMetaState, activeBuffStackState) {
@@ -207,8 +248,18 @@ function hasRequiredRotationBuff(rule, activeBuffMetaState, activeBuffStackState
     return requiredList.every(buffName => Boolean(activeBuffMetaState[normalizeRotationConsumeKey(buffName)]));
 }
 
-function applyConditionalDebuffsToRotationState(skillData, activeBuffMetaState, activeBuffStackState, debuffStackState, debuffMetaState, buffStackState, buffMetaState) {
-    const matchedRules = getMatchedConditionalRules(skillData, activeBuffMetaState, activeBuffStackState);
+function applyConditionalDebuffsToRotationState(
+    skillData,
+    activeBuffMetaState,
+    activeBuffStackState,
+    debuffStackState,
+    debuffMetaState,
+    buffStackState,
+    buffMetaState,
+    contextDebuffMetaState = debuffMetaState,
+    contextDebuffStackState = debuffStackState
+) {
+    const matchedRules = getMatchedConditionalRules(skillData, activeBuffMetaState, activeBuffStackState, contextDebuffMetaState, contextDebuffStackState);
     matchedRules.forEach(rule => {
         if (!Array.isArray(rule.debuffs)) return;
         if (rule.consumeBuffStacks) consumeSpecificBuffStacks(rule.consumeBuffStacks, buffStackState, buffMetaState);
@@ -358,12 +409,25 @@ function getActiveDebuffsFromRotationState(stackState, metaState) {
 }
 
 function applySkillDebuffsAndGetActiveState(skillData, activeBuffMetaState, activeBuffStackState, debuffStackState, debuffMetaState, buffStackState, buffMetaState) {
+    const debuffStackStateBeforeSkill = { ...debuffStackState };
+    const debuffMetaStateBeforeSkill = { ...debuffMetaState };
+
     if (!shouldSkipNormalDebuffs(skillData, activeBuffMetaState, activeBuffStackState)) {
         getVisibleRotationDebuffs(skillData).forEach(effect => {
             if (effect.persistsForCombo !== false) addDebuffToRotationState(effect, debuffStackState, debuffMetaState);
         });
     }
-    applyConditionalDebuffsToRotationState(skillData, activeBuffMetaState, activeBuffStackState, debuffStackState, debuffMetaState, buffStackState, buffMetaState);
+    applyConditionalDebuffsToRotationState(
+        skillData,
+        activeBuffMetaState,
+        activeBuffStackState,
+        debuffStackState,
+        debuffMetaState,
+        buffStackState,
+        buffMetaState,
+        debuffMetaStateBeforeSkill,
+        debuffStackStateBeforeSkill
+    );
     applyConsumeInflictionToBuff(skillData, debuffStackState, debuffMetaState, buffStackState, buffMetaState);
     applyMatchingInflictionToRotationState(skillData, debuffStackState, debuffMetaState);
     resolveRotationArtsReactionsWithFullConsume(debuffStackState, debuffMetaState);

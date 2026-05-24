@@ -85,7 +85,35 @@ function consumeStackedComboEffectsForSkill(skillData, effectMap, outputMap = ef
         }
     });
 }
+function hasRequiredComboRuleEffects(rule, effectMap) {
+    const hasEffect = (effectName, minStacks = 1) => {
+        const key = normalizeComboEffectKey(effectName);
+        return Number(effectMap?.[key] || 0) >= Number(minStacks || 1);
+    };
+
+    const requiredEffects = [
+        ...(Array.isArray(rule?.requiresBuff) ? rule.requiresBuff : [rule?.requiresBuff]),
+        ...(Array.isArray(rule?.requiresEffect) ? rule.requiresEffect : [rule?.requiresEffect]),
+        ...(Array.isArray(rule?.requiresDebuff) ? rule.requiresDebuff : [rule?.requiresDebuff])
+    ].filter(Boolean);
+
+    const hasRequiredEffects = requiredEffects.every(effectName => hasEffect(effectName));
+    const hasRequiredStacks = !rule?.requiresEffectStacks || hasEffect(
+        rule.requiresEffectStacks.effect || rule.requiresEffectStacks.debuff || rule.requiresEffectStacks.buff,
+        rule.requiresEffectStacks.minStacks
+    );
+    const hasNoExcludedEffects = (Array.isArray(rule?.noneOf) ? rule.noneOf : [rule?.noneOf])
+        .filter(Boolean)
+        .every(effectName => !hasEffect(effectName));
+
+    return hasRequiredEffects && hasRequiredStacks && hasNoExcludedEffects;
+}
+
 function hasRequiredComboBuff(rule, effectMap) {
+    if (rule?.requiresEffect || rule?.requiresDebuff || rule?.requiresEffectStacks || rule?.noneOf) {
+        return hasRequiredComboRuleEffects(rule, effectMap);
+    }
+
     const requiredList = Array.isArray(rule?.requiresBuff) ? rule.requiresBuff : [rule?.requiresBuff];
     return requiredList.every(buffName => Boolean(effectMap[normalizeComboEffectKey(buffName)]));
 }
