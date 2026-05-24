@@ -95,6 +95,10 @@ function loadRotation() {
             if (rotation.length === 0) {
                 rotation = [null];
             }
+
+            if (typeof normalizeQingboMovesInRotation === "function") {
+                normalizeQingboMovesInRotation();
+            }
         } else {
             rotation = [null];
         }
@@ -110,6 +114,9 @@ function clearRotation() {
     rotation = [null];
     localStorage.removeItem("rotation");
     renderRotation();
+    if (typeof refreshSkillsAfterRotationChange === "function") {
+        refreshSkillsAfterRotationChange();
+    }
 }
 
 async function createNewRotation() {

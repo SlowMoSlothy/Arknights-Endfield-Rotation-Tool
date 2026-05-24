@@ -122,9 +122,15 @@ function handleTapInput(e) {
         if (action === "remove") {
             rotation[index] = null;
             compactRotation();
+            if (typeof normalizeQingboMovesInRotation === "function") {
+                normalizeQingboMovesInRotation();
+            }
             trimTrailingEmptyRows();
             closeSlotMenu();
             saveRotation();
+            if (typeof refreshSkillsAfterRotationChange === "function") {
+                refreshSkillsAfterRotationChange();
+            }
             return;
         }
 
@@ -256,8 +262,14 @@ function placeSkillInSlot(index, skillId, replaceExisting = false) {
     insertComboChain(finalSkillId, index);
 
     compactRotation();
+    if (typeof normalizeQingboMovesInRotation === "function") {
+        normalizeQingboMovesInRotation();
+    }
     ensureSlotCount(rotation.filter(slot => slot !== null).length + 1);
     saveRotation();
+    if (typeof refreshSkillsAfterRotationChange === "function") {
+        refreshSkillsAfterRotationChange();
+    }
 }
 
 function placeBasicAttackInSlot(index, operatorId, replaceExisting = false) {

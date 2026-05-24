@@ -11,6 +11,12 @@ function showBuilderScreen() {
     }
 
     renderSelectedOperators();
+    if (typeof normalizeQingboMovesInRotation === "function") {
+        normalizeQingboMovesInRotation();
+    }
+    if (typeof syncQingboMoveStateFromRotation === "function") {
+        syncQingboMoveStateFromRotation();
+    }
     renderSkills();
     renderRotation();
     initSkillDragDrop();
