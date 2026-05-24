@@ -256,6 +256,41 @@ function createOperatorGalleryDetailMeta(label, value) {
     return item;
 }
 
+function getOperatorGallerySkillEffects(skill) {
+    const effects = [];
+
+    [
+        ...(Array.isArray(skill.debuffs) ? skill.debuffs : []),
+        ...(Array.isArray(skill.buffs) ? skill.buffs : [])
+    ].forEach(effect => {
+        const label = String(effect.name || effect.id || effect.appliesEffect || effect.buffName || "").trim();
+        if (label && !effects.includes(label)) effects.push(label);
+    });
+
+    if (Array.isArray(skill.consumeDebuffs)) {
+        skill.consumeDebuffs.forEach(effect => {
+            const label = `${String(effect || "").trim()} consumed`;
+            if (label.trim() && !effects.includes(label)) effects.push(label);
+        });
+    }
+
+    return effects;
+}
+
+function createOperatorGallerySkillChip(label) {
+    const chip = document.createElement("span");
+    chip.className = "operator-gallery-detail-skill-chip";
+    chip.textContent = label;
+    return chip;
+}
+
+function hasOperatorGalleryNumber(value) {
+    return value !== null
+        && value !== undefined
+        && value !== ""
+        && Number.isFinite(Number(value));
+}
+
 function createOperatorGalleryDetailSkill(skill) {
     const item = document.createElement("article");
     item.className = "operator-gallery-detail-skill";
@@ -284,14 +319,30 @@ function createOperatorGalleryDetailSkill(skill) {
     meta.textContent = [
         skill.type,
         skill.elementType && typeof formatElementLabel === "function" ? formatElementLabel(skill.elementType) : skill.elementType,
-        Number.isFinite(Number(skill.cooldown)) ? `${skill.cooldown}s` : "",
-        Number.isFinite(Number(skill.energy)) ? `${skill.energy} SP` : ""
+        hasOperatorGalleryNumber(skill.cooldown) ? `${skill.cooldown}s` : "",
+        hasOperatorGalleryNumber(skill.energy) ? `${skill.energy} SP` : ""
     ].filter(Boolean).join(" - ");
+
+    const trigger = document.createElement("span");
+    trigger.className = "operator-gallery-detail-skill-trigger";
+    trigger.textContent = skill.comboTrigger
+        ? `Trigger: ${skill.comboTrigger}`
+        : "";
 
     const description = document.createElement("p");
     description.textContent = skill.description || "No skill description available.";
 
-    copy.append(title, meta, description);
+    const chips = document.createElement("div");
+    chips.className = "operator-gallery-detail-skill-chips";
+    const effectLabels = getOperatorGallerySkillEffects(skill);
+    if (effectLabels.length) {
+        chips.replaceChildren(...effectLabels.slice(0, 8).map(createOperatorGallerySkillChip));
+    }
+
+    copy.append(title, meta);
+    if (trigger.textContent) copy.appendChild(trigger);
+    copy.appendChild(description);
+    if (effectLabels.length) copy.appendChild(chips);
     item.append(icon, copy);
     return item;
 }
