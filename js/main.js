@@ -322,6 +322,7 @@ async function initApp() {
         initEnemyPanel();
         initRotationSaveMenu();
         if (typeof initCommunityRotations === "function") initCommunityRotations();
+        if (typeof initOperatorGallery === "function") initOperatorGallery();
         if (typeof initMyRotations === "function") initMyRotations();
         if (typeof initAdminPanel === "function") initAdminPanel();
 

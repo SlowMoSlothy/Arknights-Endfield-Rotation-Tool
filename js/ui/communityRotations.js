@@ -6,6 +6,7 @@ const communityRotationState = {
     sort: "newest",
     detailRotationId: "",
     deepLinkRotationId: "",
+    focusedOperatorId: null,
     likedRotationIds: new Set(),
     likingRotationIds: new Set(),
     viewedRotationIds: new Set(),
@@ -18,6 +19,7 @@ const communityRotationState = {
 
 const COMMUNITY_LIKES_STORAGE_KEY = "aertLikedCommunityRotations";
 const COMMUNITY_ROTATION_HASH_KEY = "community";
+const COMMUNITY_ROTATIONS_HASH = "community-rotations";
 
 let communityRotationsInitialized = false;
 
@@ -274,6 +276,13 @@ function createCommunityTextElement(tagName, className, text) {
     return element;
 }
 
+function getFocusedCommunityOperator() {
+    const operatorId = Number(communityRotationState.focusedOperatorId);
+    if (!Number.isFinite(operatorId)) return null;
+
+    return getCommunityOperatorById(operatorId);
+}
+
 function createCommunityStateCard({ type = "", title, message, actionLabel = "", action = null, loading = false }) {
     const card = document.createElement("div");
     card.className = `community-state-card${type ? ` is-${type}` : ""}`;
@@ -522,9 +531,12 @@ function getFilteredCommunityRotations() {
     const query = communityRotationState.search.trim().toLowerCase();
     const elementFilter = normalizeCommunityFilterValue(communityRotationState.elementFilter);
     const classFilter = normalizeCommunityFilterValue(communityRotationState.classFilter);
+    const focusedOperatorId = Number(communityRotationState.focusedOperatorId);
 
     const filteredRotations = communityRotationState.rotations.filter(row => {
         const matchesSearch = !query || getCommunitySearchText(row).includes(query);
+        const matchesFocusedOperator = !Number.isFinite(focusedOperatorId)
+            || normalizeCommunityList(row.team_operator_ids).some(operatorId => Number(operatorId) === focusedOperatorId);
         const matchesElement = elementFilter === "all" || getCommunityElements(row)
             .map(normalizeCommunityFilterValue)
             .includes(elementFilter);
@@ -532,7 +544,7 @@ function getFilteredCommunityRotations() {
             .map(normalizeCommunityFilterValue)
             .includes(classFilter);
 
-        return matchesSearch && matchesElement && matchesClass;
+        return matchesSearch && matchesFocusedOperator && matchesElement && matchesClass;
     });
 
     return sortCommunityRotations(filteredRotations);
@@ -575,6 +587,7 @@ function sortCommunityRotations(rotations) {
 
 function hasActiveCommunityFilters() {
     return Boolean(communityRotationState.search.trim())
+        || Number.isFinite(Number(communityRotationState.focusedOperatorId))
         || communityRotationState.elementFilter !== "all"
         || communityRotationState.classFilter !== "all";
 }
@@ -1077,7 +1090,16 @@ function renderCommunityRotations() {
     const filteredRotations = getFilteredCommunityRotations();
     if (!filteredRotations.length) {
         setCommunityStatus("");
-        if (hasActiveCommunityFilters()) {
+        const focusedOperator = getFocusedCommunityOperator();
+        if (focusedOperator) {
+            renderCommunityListState(list, {
+                type: "empty",
+                title: `No rotations found for ${focusedOperator.name}`,
+                message: "No community rotation was found for this operator, but you can create your own rotation.",
+                actionLabel: "Create rotation",
+                action: () => createRotationWithCommunityOperator(focusedOperator.id)
+            });
+        } else if (hasActiveCommunityFilters()) {
             renderCommunityListState(list, {
                 type: "empty",
                 title: "No matching rotations",
@@ -1199,6 +1221,38 @@ function handleCommunityRotationDeepLink() {
     communityRotationState.deepLinkRotationId = String(rotationId);
     openCommunityRotationsModal({ forceRefresh: !communityRotationState.loaded });
     return true;
+}
+
+function isCommunityRotationsHash() {
+    return window.location.hash.replace(/^#/, "") === COMMUNITY_ROTATIONS_HASH;
+}
+
+function handleCommunityRotationsHash() {
+    if (!isCommunityRotationsHash()) return false;
+
+    openCommunityRotationsModal({ forceRefresh: !communityRotationState.loaded });
+    return true;
+}
+
+function openCommunityRotationsFromLink(event) {
+    if (event) event.preventDefault();
+
+    const operatorId = Number(event?.currentTarget?.dataset?.communityOperatorId);
+    if (Number.isFinite(operatorId) && filterCommunityRotationsByOperator(operatorId)) {
+        return;
+    }
+
+    if (!isCommunityRotationsHash()) {
+        window.location.hash = COMMUNITY_ROTATIONS_HASH;
+        return;
+    }
+
+    handleCommunityRotationsHash();
+}
+
+function handleCommunityHashNavigation() {
+    if (handleCommunityRotationDeepLink()) return true;
+    return handleCommunityRotationsHash();
 }
 
 async function fetchCommunityAuthorProfiles(rows) {
@@ -1399,6 +1453,7 @@ function closeCommunityRotationsModal() {
 
 function resetCommunityFilters() {
     communityRotationState.search = "";
+    communityRotationState.focusedOperatorId = null;
     communityRotationState.elementFilter = "all";
     communityRotationState.classFilter = "all";
     communityRotationState.sort = "newest";
@@ -1407,6 +1462,38 @@ function resetCommunityFilters() {
     if (searchInput) searchInput.value = "";
 
     renderCommunityRotations();
+}
+
+function createRotationWithCommunityOperator(operatorId) {
+    const operator = getCommunityOperatorById(operatorId);
+    if (!operator) return;
+
+    selectedTeam = [operator.id, null, null, null];
+    activeSlotIndex = 1;
+    saveTeam();
+    clearRotation();
+    closeCommunityRotationsModal();
+    showBuilderScreen();
+    window.requestAnimationFrame(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+}
+
+function filterCommunityRotationsByOperator(operatorId) {
+    const operator = getCommunityOperatorById(operatorId);
+    if (!operator) return false;
+
+    communityRotationState.search = operator.name;
+    communityRotationState.focusedOperatorId = operator.id;
+    communityRotationState.elementFilter = "all";
+    communityRotationState.classFilter = "all";
+    communityRotationState.detailRotationId = "";
+
+    const searchInput = document.getElementById("communitySearchInput");
+    if (searchInput) searchInput.value = operator.name;
+
+    openCommunityRotationsModal({ forceRefresh: !communityRotationState.loaded });
+    return true;
 }
 
 function initCommunityRotations() {
@@ -1424,8 +1511,12 @@ function initCommunityRotations() {
     const sortSelect = document.getElementById("communitySortSelect");
     const clearFiltersButton = document.getElementById("clearCommunityFiltersBtn");
     const modal = document.getElementById("communityModal");
+    const communityLinks = document.querySelectorAll("[data-open-community-rotations]");
 
     if (openButton) openButton.addEventListener("click", () => openCommunityRotationsModal());
+    communityLinks.forEach(link => {
+        link.addEventListener("click", openCommunityRotationsFromLink);
+    });
     if (closeButton) closeButton.addEventListener("click", closeCommunityRotationsModal);
     if (refreshButton) refreshButton.addEventListener("click", () => fetchCommunityRotations(true));
     if (submitToggle) submitToggle.addEventListener("click", () => setCommunitySubmitFormOpen(true));
@@ -1434,6 +1525,7 @@ function initCommunityRotations() {
     if (searchInput) {
         searchInput.addEventListener("input", event => {
             communityRotationState.search = event.target.value;
+            communityRotationState.focusedOperatorId = null;
             renderCommunityRotations();
         });
     }
@@ -1458,13 +1550,15 @@ function initCommunityRotations() {
         }
     });
 
-    window.addEventListener("hashchange", handleCommunityRotationDeepLink);
-    if (getCommunityRotationIdFromUrl()) {
-        window.setTimeout(handleCommunityRotationDeepLink, 0);
+    window.addEventListener("hashchange", handleCommunityHashNavigation);
+    if (getCommunityRotationIdFromUrl() || isCommunityRotationsHash()) {
+        window.setTimeout(handleCommunityHashNavigation, 0);
     }
 }
 
 window.openCommunityRotationsModal = openCommunityRotationsModal;
+window.filterCommunityRotationsByOperator = filterCommunityRotationsByOperator;
+window.createRotationWithCommunityOperator = createRotationWithCommunityOperator;
 window.setCommunitySubmitFormOpen = setCommunitySubmitFormOpen;
 window.submitCurrentRotationToCommunity = submitCurrentRotationToCommunity;
 window.initCommunityRotations = initCommunityRotations;
