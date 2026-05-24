@@ -3834,13 +3834,6 @@ function renderRotation() {
     const timeline = document.createElement("div");
     timeline.className = "rotation-timeline rotation-timeline-slot-mode";
 
-    const labelColumn = document.createElement("div");
-    labelColumn.className = "rotation-timeline-labels";
-    labelColumn.append(
-        createRotationTimelineLabel("Skills")
-    );
-    timeline.appendChild(labelColumn);
-
     const rotationDebuffStackState = {};
     const rotationDebuffMetaState = {};
     const rotationBuffStackState = {};
