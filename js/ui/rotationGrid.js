@@ -1302,7 +1302,8 @@ function createSimulationCursorEffectList(items, type) {
     if (!Array.isArray(items) || items.length === 0) {
         const empty = document.createElement("span");
         empty.className = "rotation-sim-cursor-empty";
-        empty.textContent = "None";
+        empty.textContent = "-";
+        empty.title = "None";
         list.appendChild(empty);
         return list;
     }
@@ -1642,24 +1643,39 @@ function createSimulationCursorController(body, events, durationSeconds, pixelsP
     const timeStat = createSimulationCursorStat("Time");
     const spStat = createSimulationCursorStat("SP");
     const eventStat = createSimulationCursorStat("Event");
+    timeStat.item.classList.add("is-time");
+    spStat.item.classList.add("is-sp");
+    eventStat.item.classList.add("is-event");
+
+    const readout = document.createElement("div");
+    readout.className = "rotation-sim-cursor-readout";
+    readout.setAttribute("aria-label", "Simulation status");
+    readout.append(timeStat.item, spStat.item, eventStat.item);
 
     const buffStat = document.createElement("div");
-    buffStat.className = "rotation-sim-cursor-stat is-effects";
+    buffStat.className = "rotation-sim-cursor-stat is-effects is-buffs";
+    buffStat.title = "Buffs";
     const buffLabel = document.createElement("span");
-    buffLabel.textContent = "Buffs";
+    buffLabel.textContent = "B";
     const buffValue = document.createElement("div");
     buffValue.className = "rotation-sim-cursor-effect-slot";
     buffStat.append(buffLabel, buffValue);
 
     const debuffStat = document.createElement("div");
-    debuffStat.className = "rotation-sim-cursor-stat is-effects";
+    debuffStat.className = "rotation-sim-cursor-stat is-effects is-debuffs";
+    debuffStat.title = "Debuffs";
     const debuffLabel = document.createElement("span");
-    debuffLabel.textContent = "Debuffs";
+    debuffLabel.textContent = "D";
     const debuffValue = document.createElement("div");
     debuffValue.className = "rotation-sim-cursor-effect-slot";
     debuffStat.append(debuffLabel, debuffValue);
 
-    toolbar.append(controls, timeStat.item, spStat.item, eventStat.item, buffStat, debuffStat);
+    const effectsPanel = document.createElement("div");
+    effectsPanel.className = "rotation-sim-cursor-effects-panel";
+    effectsPanel.setAttribute("aria-label", "Active buffs and debuffs");
+    effectsPanel.append(buffStat, debuffStat);
+
+    toolbar.append(controls, readout, effectsPanel);
 
     const cursor = document.createElement("div");
     cursor.className = "rotation-sim-cursor";
@@ -1694,7 +1710,9 @@ function createSimulationCursorController(body, events, durationSeconds, pixelsP
         timeStat.valueElement.textContent = formattedTime;
         spStat.valueElement.textContent = `${formatSimulationSpValue(state.sp)} / ${SIMULATION_MAX_SP}`;
         spStat.item.classList.toggle("is-warning", state.sp < 100);
-        eventStat.valueElement.textContent = formatSimulationCursorEventSummary(state);
+        const eventSummary = formatSimulationCursorEventSummary(state);
+        eventStat.valueElement.textContent = eventSummary;
+        eventStat.valueElement.title = eventSummary;
         replaceSimulationCursorEffects(buffValue, state.activeBuffs, "buff");
         replaceSimulationCursorEffects(debuffValue, state.activeDebuffs, "debuff");
         const syncEvents = Array.isArray(options.extraEvents) && options.extraEvents.length > 0

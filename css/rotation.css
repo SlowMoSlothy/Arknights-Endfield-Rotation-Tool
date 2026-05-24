@@ -587,13 +587,14 @@
 }
 
 .rotation-sim-cursor-toolbar {
+    box-sizing: border-box;
     display: grid;
-    grid-template-columns: auto auto auto minmax(180px, 1fr) minmax(120px, auto) minmax(120px, auto);
-    gap: 8px;
-    align-items: stretch;
+    grid-template-columns: auto minmax(260px, 1fr) auto;
+    gap: 6px;
+    align-items: center;
     width: 100%;
     margin: 0 0 10px;
-    padding: 8px;
+    padding: 6px 8px;
     border: 1px solid rgba(160,170,169,0.16);
     border-radius: 8px;
     background:
@@ -678,6 +679,48 @@
     background: rgba(255,255,255,0.024);
 }
 
+.rotation-sim-cursor-readout {
+    display: grid;
+    grid-template-columns: minmax(54px, auto) minmax(82px, auto) minmax(0, 1fr);
+    align-items: center;
+    min-width: 0;
+    min-height: 30px;
+    overflow: hidden;
+    border: 1px solid rgba(160,170,169,0.14);
+    border-radius: 999px;
+    background:
+        linear-gradient(180deg, rgba(255,255,255,0.034), rgba(255,255,255,0.010)),
+        rgba(255,255,255,0.018);
+}
+
+.rotation-sim-cursor-readout .rotation-sim-cursor-stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 28px;
+    padding: 0 9px;
+    border: 0;
+    border-left: 1px solid rgba(160,170,169,0.12);
+    border-radius: 0;
+    background: transparent;
+}
+
+.rotation-sim-cursor-readout .rotation-sim-cursor-stat:first-child {
+    border-left: 0;
+}
+
+.rotation-sim-cursor-readout .rotation-sim-cursor-stat.is-event {
+    min-width: 0;
+}
+
+.rotation-sim-cursor-readout .rotation-sim-cursor-stat > span {
+    flex: 0 0 auto;
+}
+
+.rotation-sim-cursor-readout .rotation-sim-cursor-stat > strong {
+    min-width: 0;
+}
+
 .rotation-sim-cursor-stat > span {
     color: rgba(160,170,169,0.62);
     font-size: 8px;
@@ -700,8 +743,36 @@
     color: #ffb1aa;
 }
 
+.rotation-sim-cursor-effects-panel {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 0;
+}
+
 .rotation-sim-cursor-stat.is-effects {
-    min-width: 120px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 48px;
+    min-height: 30px;
+    padding: 0 8px;
+    border-radius: 999px;
+}
+
+.rotation-sim-cursor-effects-panel .rotation-sim-cursor-stat > span {
+    width: 10px;
+    color: rgba(248,245,70,0.68);
+    text-align: center;
+}
+
+.rotation-sim-cursor-effects-panel .rotation-sim-cursor-stat.is-buffs > span {
+    color: rgba(83,255,140,0.72);
+}
+
+.rotation-sim-cursor-effects-panel .rotation-sim-cursor-stat > strong {
+    display: none;
 }
 
 .rotation-sim-cursor-effect-slot {
@@ -747,6 +818,21 @@
     font-size: 10px;
     font-weight: 900;
     line-height: 17px;
+}
+
+@media (max-width: 1160px) {
+    .rotation-sim-cursor-toolbar {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .rotation-sim-cursor-readout {
+        grid-column: 1 / -1;
+        order: 3;
+    }
+
+    .rotation-sim-cursor-effects-panel {
+        justify-content: flex-end;
+    }
 }
 
 .rotation-sim-cursor {
@@ -1790,6 +1876,7 @@
 }
 
 .rotation-sim-log-scrollbar {
+    box-sizing: border-box;
     position: sticky;
     top: 0;
     width: 14px;
