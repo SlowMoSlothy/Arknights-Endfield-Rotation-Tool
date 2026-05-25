@@ -35,10 +35,11 @@ const zhuang = {
             iconSmall: "assets/operators/skills/zhuang/bs_small.svg",
             type: "Battle Skill",
             cooldown: 20,
-            energy: 60,
+            energy: 100,
+            sp_cost: 100,
             elementType: "electric",
             shortType: "BS",
-            description: "Consumes Electrification and grants Electric Amp.",
+            description: "Consumes Electrification to create Sunderblades, channels nearby Sunderblades for Thunder Strikes, and grants Electric Amp.",
             consumeDebuffs: ["electrification"],
             buffs: [
                 {
@@ -57,17 +58,20 @@ const zhuang = {
             icon: "assets/operators/avatars/Zhuang.png",
             iconSmall: "assets/operators/skills/zhuang/cs_small.png",
             type: "Combo Skill",
-            cooldown: 18,
-            energy: 100,
+            cooldown: 17,
+            energy: 0,
             elementType: "electric",
             shortType: "CS",
-            description: "Triggers on Final Strike against a target with Electric Infliction. Applies Electrification.",
+            description: "Triggers on Final Strike or Finisher against a target with Electric Infliction. Consumes Electric Infliction to forcibly apply Electrification.",
             comboTriggerMode: "all",
             comboTriggers: [
                 { effect: "final_strike", minStacks: 1 },
                 { effect: "electric_infliction", minStacks: 1 }
             ],
             allowSelfTrigger: true,
+            consumeDebuffs: [
+                "electric_infliction"
+            ],
             debuffs: [
                 {
                     id: "electrification",
@@ -86,10 +90,10 @@ const zhuang = {
             iconSmall: "assets/operators/skills/zhuang/ult_small.png",
             type: "Ultimate",
             cooldown: 20,
-            energy: 60,
+            energy: 240,
             elementType: "electric",
             shortType: "Ult",
-            description: "Ultimate"
+            description: "Transforms into Empyrean of Truth, enhancing Zhuang Fangyi's basic attacks, Battle Skill, and Combo Skill for a duration."
         }
     ],
     altSkills: [

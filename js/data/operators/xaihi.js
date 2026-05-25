@@ -47,25 +47,19 @@ xaihi.skills = [
         shortType: "BS",
         cooldown: 20,
         energy: 100,
+        sp_cost: 100,
         elementType: "cryo",
-        description: "Summons Auxiliary Crystal. Provides HP Treatment after Final Strike and grants Arts Amp if HP is full.",
+        description: "Summons Auxiliary Crystal. The crystal provides HP Treatment after Final Strikes and grants Arts Amp if HP is full.",
         buffs: [
             {
-    id: "auxiliary_crystal",
-    name: "Auxiliary Crystal",
-    appliesEffect: "auxiliary_crystal",
-    persistsForCombo: true,
-    visible: true,
-    stackable: true,
-    stacksApplied: 2,
-    maxStacks: 2
-},
-            {
-                id: "arts_amp",
-                name: "Arts Amp",
-                appliesEffect: "arts_amp",
+                id: "auxiliary_crystal",
+                name: "Auxiliary Crystal",
+                appliesEffect: "auxiliary_crystal",
                 persistsForCombo: true,
-                visible: true
+                visible: true,
+                stackable: true,
+                stacksApplied: 2,
+                maxStacks: 2
             }
         ]
     },

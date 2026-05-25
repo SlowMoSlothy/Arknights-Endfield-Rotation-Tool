@@ -1,9 +1,69 @@
 let activeSkillTooltipElement = null;
 let qingboSkillMoveState = {};
 
+const QINGBO_MOVE_NAME_PATTERNS = [
+    { move: 1, pattern: /\b(move\s*1|cloudtrapper)\b/i },
+    { move: 2, pattern: /\b(move\s*2|trail\s+and\s+mangle)\b/i },
+    { move: 3, pattern: /\b(move\s*3|world\s+splitter)\b/i }
+];
+
+const QINGBO_MOVE_ALIAS_PATTERNS = [
+    { move: 1, pattern: /\bcloudtrapper\b/i },
+    { move: 2, pattern: /\btrail\s+and\s+mangle\b/i },
+    { move: 3, pattern: /\bworld\s+splitter\b/i }
+];
+
+const QINGBO_MOVE_IDS = {
+    2702: 1,
+    2705: 2,
+    2706: 3
+};
+
+function isValidQingboMoveNumber(value) {
+    const number = Number(value);
+    return Number.isInteger(number) && number >= 1 && number <= 3;
+}
+
+function getQingboMoveNumber(skill) {
+    const directMove = Number(skill?.qingboMove ?? skill?.qingbo_move);
+    if (isValidQingboMoveNumber(directMove)) return directMove;
+
+    const skillId = Number(skill?.id);
+    if (Number.isFinite(skillId) && QINGBO_MOVE_IDS[skillId]) {
+        return QINGBO_MOVE_IDS[skillId];
+    }
+
+    const iconPath = String(skill?.iconSmall || skill?.icon || "");
+    const normalizedIconPath = iconPath.toLowerCase();
+    const iconMoveMatch = normalizedIconPath.match(/(?:^|\/)bs[_-]?([123])\.(?:svg|png|webp)$/i);
+    if (/\/(?:mifu|mi[_-]?fu)\//i.test(normalizedIconPath) && iconMoveMatch) {
+        return Number(iconMoveMatch[1]);
+    }
+
+    const skillName = String(skill?.name || "");
+    if (!/qingbo\s+triplex/i.test(skillName)) {
+        const aliasMatch = QINGBO_MOVE_ALIAS_PATTERNS.find(item => item.pattern.test(skillName));
+        return aliasMatch ? aliasMatch.move : null;
+    }
+
+    const nameMatch = QINGBO_MOVE_NAME_PATTERNS.find(item => item.pattern.test(skillName));
+    return nameMatch ? nameMatch.move : null;
+}
+
+function ensureQingboMoveMetadata(skill) {
+    const moveNumber = getQingboMoveNumber(skill);
+    if (!isValidQingboMoveNumber(moveNumber)) return null;
+
+    skill.qingboMove = moveNumber;
+    if (!Number.isFinite(Number(skill.nextQingboMove)) && moveNumber < 3) {
+        skill.nextQingboMove = moveNumber + 1;
+    }
+
+    return moveNumber;
+}
+
 function isQingboTriplexMove(skill) {
-    return String(skill?.name || "").startsWith("Qingbo Triplex - Move")
-        && Number.isFinite(Number(skill?.qingboMove));
+    return Number.isFinite(ensureQingboMoveMetadata(skill));
 }
 
 function getQingboMovesForOperator(op) {

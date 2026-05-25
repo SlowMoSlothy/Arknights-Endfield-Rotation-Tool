@@ -46,6 +46,7 @@ ember.skills = [
         shortType: "BS",
         cooldown: 20,
         energy: 100,
+        sp_cost: 100,
         elementType: "heat",
         description: "Deals Heat DMG and applies Knock Down. If Ember takes DMG while casting, the slam deals additional Stagger.",
         debuffs: [

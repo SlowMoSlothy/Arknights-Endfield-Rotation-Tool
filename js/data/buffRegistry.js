@@ -71,12 +71,35 @@ const BUFF_REGISTRY = {
         iconBase: "assets/operators/skills/lastrite/bs_small",
         stackable: false,
         maxStacks: 0,
-        extension: "png"
+        extension: "png",
+        consumeOnSkillType: "final_strike",
+        consumeStacks: 1
     }
     ,
     shield: {
         name: "Shield",
         iconBase: "assets/ui/buffs/ember/shield",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+    protection: {
+        name: "Protection",
+        iconBase: "assets/ui/buffs/protection",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+    whirlpool: {
+        name: "Whirlpool",
+        iconBase: "assets/operators/skills/tangtang/65px-Combo-Tangtang",
+        stackable: true,
+        maxStacks: 2,
+        extension: "webp"
+    },
+    rossi_crit_buff: {
+        name: "Crit Rate / Crit DMG",
+        iconBase: "assets/buffs/rossi/crit_buff",
         stackable: false,
         maxStacks: 0,
         extension: "png"

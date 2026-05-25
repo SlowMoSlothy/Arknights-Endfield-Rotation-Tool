@@ -47,6 +47,7 @@ fluorite.skills = [
         shortType: "BS",
         cooldown: 20,
         energy: 100,
+        sp_cost: 100,
         elementType: "nature",
         description: "Deals Nature DMG, slows enemies, and applies Nature Infliction.",
         debuffs: [

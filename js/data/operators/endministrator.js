@@ -15,7 +15,7 @@ const endministrator = {
             shortType: "FS",
             cooldown: 0,
             energy: 0,
-            description: "FS",
+            description: "Physical Final Strike.",
             elementType: "physical",
             debuffs: [
                 {
@@ -35,9 +35,32 @@ const endministrator = {
             type: "Battle Skill",
             shortType: "BS",
             cooldown: 20,
-            energy: 60,
+            energy: 100,
+            sp_cost: 100,
             elementType: "physical",
-            description: "BS"
+            description: "Deals Physical DMG, applies Crush and Vulnerable, and can shatter Originium Crystals for burst damage.",
+            consumeDebuffs: [
+                "originium_crystal"
+            ],
+            debuffs: [
+                {
+                    id: "crush",
+                    name: "Crush",
+                    appliesEffect: "crush",
+                    persistsForCombo: false,
+                    visible: true
+                },
+                {
+                    id: "vulnerable",
+                    name: "Vulnerable",
+                    appliesEffect: "vulnerable",
+                    persistsForCombo: true,
+                    visible: true,
+                    stackable: true,
+                    stacksApplied: 1,
+                    maxStacks: 4
+                }
+            ]
         },
         {
             id: 303,
@@ -47,10 +70,22 @@ const endministrator = {
             type: "Combo Skill",
             shortType: "CS",
             cooldown: 16,
-            energy: 60,
+            energy: 0,
             elementType: "physical",
-            description: "Triggers when another operator uses a Combo Skill.",
-            comboTriggers: ["combo_skill"]
+            description: "Triggers when another operator uses a Combo Skill. Places Originium Crystals that can be shattered by Endministrator's Battle Skill or Ultimate.",
+            comboTriggers: ["combo_skill"],
+            debuffs: [
+                {
+                    id: "originium_crystal",
+                    name: "Originium Crystal",
+                    appliesEffect: "originium_crystal",
+                    persistsForCombo: true,
+                    visible: true,
+                    stackable: true,
+                    stacksApplied: 1,
+                    maxStacks: 4
+                }
+            ]
         },
         {
             id: 304,
@@ -61,8 +96,11 @@ const endministrator = {
             type: "Ultimate",
             shortType: "Ult",
             cooldown: 20,
-            energy: 60,
-            description: "Ultimate"
+            energy: 90,
+            description: "Deals Physical DMG and shatters all Originium Crystals on the field.",
+            consumeDebuffs: [
+                "originium_crystal"
+            ]
         }
     ]
 };

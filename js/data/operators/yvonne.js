@@ -47,6 +47,7 @@ yvonne.skills = [
         shortType: "BS",
         cooldown: 20,
         energy: 100,
+        sp_cost: 100,
         elementType: "cryo",
         description: "Consumes Cryo Infliction or Nature Infliction to apply Solidification.",
         consumeDebuffs: [
@@ -125,7 +126,7 @@ yvonne.skills = [
         cooldown: 20,
         energy: 220,
         elementType: "cryo",
-        description: "Enhanced attack state. Enhanced Final Strike can consume Solidification for an additional Cryo attack.",
+        description: "Enhanced attack state. When the skill ends, Yvonne's last basic attack becomes a Final Strike.",
         debuffs: [
             {
                 id: "final_strike",
@@ -134,9 +135,6 @@ yvonne.skills = [
                 persistsForCombo: false,
                 visible: false
             }
-        ],
-        consumeDebuffs: [
-            "solidification"
         ]
     }
 ];

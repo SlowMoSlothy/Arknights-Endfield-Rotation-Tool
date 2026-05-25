@@ -20,6 +20,48 @@ const DEBUFF_REGISTRY = {
         maxStacks: 0,
         extension: "png"
     },
+    arts_reaction_consumed: {
+        name: "Arts Reaction Consumed",
+        iconBase: "assets/ui/debuffs/arts_reaction",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+    combustion_consumed: {
+        name: "Combustion Consumed",
+        iconBase: "assets/ui/debuffs/combustion",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+    corrosion_consumed: {
+        name: "Corrosion Consumed",
+        iconBase: "assets/ui/debuffs/corrosion",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+    solidification_consumed: {
+        name: "Solidification Consumed",
+        iconBase: "assets/ui/debuffs/solidification",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+    vulnerable_consumed: {
+        name: "Vulnerable Consumed",
+        iconBase: "assets/ui/debuffs/vulnerable",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+    arts_infliction_consumed: {
+        name: "Arts Infliction Consumed",
+        iconBase: "assets/ui/debuffs/arts",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
     combustion: {
         name: "Combustion",
         iconBase: "assets/ui/debuffs/combustion",
@@ -62,6 +104,20 @@ const DEBUFF_REGISTRY = {
         maxStacks: 4,
         extension: "png"
     },
+    originium_crystal: {
+        name: "Originium Crystal",
+        iconBase: "assets/operators/skills/endmin/cs_small",
+        stackable: true,
+        maxStacks: 4,
+        extension: "png"
+    },
+    originium_crystal_consumed: {
+        name: "Originium Crystal Consumed",
+        iconBase: "assets/operators/skills/endmin/bs_small",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
     arts_susceptibility: {
         name: "Arts Susceptibility",
         iconBase: "assets/ui/debuffs/arts_susceptibility",
@@ -88,6 +144,13 @@ const DEBUFF_REGISTRY = {
         iconBase: "assets/ui/debuffs/cryo_infliction",
         stackable: true,
         maxStacks: 4,
+        extension: "png"
+    },
+    cryo_burst: {
+        name: "Cryo Burst",
+        iconBase: "assets/ui/debuffs/cryo_burst",
+        stackable: false,
+        maxStacks: 0,
         extension: "png"
     },
     cryo_susceptibility: {
@@ -187,6 +250,20 @@ const DEBUFF_REGISTRY = {
         stackable: false,
         maxStacks: 0,
         extension: "svg"
+    },
+    push: {
+        name: "Push",
+        iconBase: "assets/ui/debuffs/push",
+        stackable: false,
+        maxStacks: 0,
+        extension: "png"
+    },
+    steel_oath: {
+        name: "Steel Oath",
+        iconBase: "assets/buffs/steel_oath",
+        stackable: true,
+        maxStacks: 5,
+        extension: "png"
     },
     operator_attacked: {
         name: "Operator Attacked",
