@@ -808,12 +808,15 @@ function openOperatorGalleryDetail(operatorId) {
 
 function startOperatorGalleryLeaderRotation(operatorId) {
     closeOperatorGalleryDetail();
-    if (getOperatorGallerySlugFromHash()) {
-        history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
-    }
     if (typeof createRotationWithCommunityOperator === "function") {
         createRotationWithCommunityOperator(operatorId);
     }
+}
+
+function clearOperatorGalleryDetailHash() {
+    if (!getOperatorGallerySlugFromHash()) return;
+
+    history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
 }
 
 function closeOperatorGalleryDetail() {
@@ -824,6 +827,7 @@ function closeOperatorGalleryDetail() {
         detail.replaceChildren();
     }
     operatorGalleryState.detailOperatorId = null;
+    clearOperatorGalleryDetailHash();
 }
 
 function handleOperatorGalleryDeepLink() {
