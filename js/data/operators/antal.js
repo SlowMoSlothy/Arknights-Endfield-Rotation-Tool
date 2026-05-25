@@ -12,6 +12,7 @@ const antal = {
             icon: "assets/operators/avatars/Antal.png",
             iconSmall: "assets/operators/skills/antal/fs_small.png",
             type: "Final Strike",
+            shortType: "FS",
             cooldown: 20,
             energy: 60,
             elementType: "electric",
@@ -32,8 +33,10 @@ const antal = {
             icon: "assets/operators/avatars/Antal.png",
             iconSmall: "assets/operators/skills/antal/bs_small.png",
             type: "Battle Skill",
+            shortType: "BS",
             cooldown: 20,
             energy: 100,
+            sp_cost: 100,
             elementType: "electric",
             description: "Applies Focus. Focused enemies suffer Electric Susceptibility and Heat Susceptibility.",
             debuffs: [
@@ -69,10 +72,11 @@ const antal = {
             icon: "assets/operators/avatars/Antal.png",
             iconSmall: "assets/operators/skills/antal/cs_small.png",
             type: "Combo Skill",
+            shortType: "CS",
             cooldown: 25,
-            energy: 100,
+            energy: 0,
             elementType: "electric",
-            description: "Triggers when a focused enemy suffers a Physical Status or Arts Infliction.",
+            description: "Triggers when a focused enemy suffers a Physical Status or Arts Infliction, then applies another stack of the same effect.",
             comboTriggerMode: "all",
             comboTriggers: [
                 { effect: "focus", minStacks: 1 },
@@ -89,7 +93,23 @@ const antal = {
                         { effect: "stagger", minStacks: 1 }
                     ]
                 }
-            ]
+            ],
+            matchingInfliction: {
+                candidateEffects: [
+                    "arts_infliction",
+                    "heat_infliction",
+                    "electric_infliction",
+                    "cryo_infliction",
+                    "nature_infliction",
+                    "vulnerable",
+                    "slow",
+                    "lift",
+                    "stagger"
+                ],
+                minStacks: 1,
+                stacksApplied: 1,
+                maxStacks: 4
+            }
         },
         {
             id: 804,
@@ -97,6 +117,7 @@ const antal = {
             icon: "assets/operators/avatars/Antal.png",
             iconSmall: "assets/operators/skills/antal/ult_small.png",
             type: "Ultimate",
+            shortType: "Ult",
             cooldown: 20,
             energy: 100,
             elementType: "electric",

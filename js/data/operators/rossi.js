@@ -35,7 +35,8 @@ const rossi = {
             type: "Battle Skill",
             shortType: "BS",
             cooldown: 20,
-            energy: 60,
+            energy: 100,
+            sp_cost: 100,
             elementType: "physical",
             description: "Applies Lift. If Vulnerability is present, Rossi also performs a Heat follow-up.",
             debuffs: [
@@ -63,10 +64,10 @@ const rossi = {
             iconSmall: "assets/operators/skills/rossi/cs_small.png",
             type: "Combo Skill",
             shortType: "CS",
-            cooldown: 15,
-            energy: 60,
+            cooldown: 14,
+            energy: 0,
             elementType: "physical",
-            description: "Triggers when the enemy has Vulnerability and any Arts Infliction. Applies Lift and buffs Rossi's Crit stats.",
+            description: "Triggers when the enemy has Vulnerability and any Arts Infliction. Consumes all Arts Infliction stacks, applies Lift, and buffs Rossi's Crit stats.",
             comboTriggerMode: "all",
             comboTriggers: [
                 { effect: "vulnerable", minStacks: 1 },
@@ -78,6 +79,13 @@ const rossi = {
                         { effect: "cryo_infliction", minStacks: 1 }
                     ]
                 }
+            ],
+            consumeDebuffs: [
+                "arts_infliction",
+                "heat_infliction",
+                "electric_infliction",
+                "nature_infliction",
+                "cryo_infliction"
             ],
             debuffs: [
                 {

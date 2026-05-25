@@ -42,6 +42,9 @@ const arclight = {
             sp_cost: 100,
             elementType: "electric",
             description: "Consumes Electrification to launch an additional Electric attack and recover SP.",
+            consumeDebuffs: [
+                "electrification"
+            ],
             spRecovery: {
                 amount: 30,
                 requiresEffect: "electrification",
@@ -107,7 +110,7 @@ const arclight = {
             type: "Ultimate",
             shortType: "Ult",
             cooldown: 20,
-            energy: 60,
+            energy: 90,
             elementType: "electric",
             description: "Applies Electric Infliction. Lingering arcs can consume Electric Infliction to forcibly apply Electrification.",
             debuffs: [

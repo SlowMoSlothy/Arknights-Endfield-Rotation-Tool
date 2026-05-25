@@ -39,6 +39,7 @@ estella.skills = [
         shortType: "BS",
         cooldown: 20,
         energy: 100,
+        sp_cost: 100,
         elementType: "cryo",
         description: "Deals Cryo DMG and applies Cryo Infliction.",
         debuffs: [

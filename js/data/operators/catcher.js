@@ -14,8 +14,10 @@ catcher.skills = [
         icon: catcher.icon,
         iconSmall: "assets/operators/skills/catcher/fs_small.png",
         type: "Final Strike",
+        shortType: "FS",
         cooldown: 20,
         energy: 60,
+        description: "Physical Final Strike.",
         debuffs: [
             {
                 id: "final_strike",
@@ -36,6 +38,7 @@ catcher.skills = [
     shortType: "BS",
     cooldown: 20,
     energy: 100,
+    sp_cost: 100,
     elementType: "physical",
     description: "Raises a shield, grants Protection, returns SP, and can retaliate when attacked to apply Vulnerability.",
     buffs: [
@@ -94,8 +97,19 @@ catcher.skills = [
         icon: catcher.icon,
         iconSmall: "assets/operators/skills/catcher/ult_small.png",
         type: "Ultimate",
+        shortType: "Ult",
         cooldown: 20,
         energy: 60,
-        elementType: "physical"
+        elementType: "physical",
+        description: "Performs two Physical slashes and a powerful downward slam that applies Knock Down.",
+        debuffs: [
+            {
+                id: "knock_down",
+                name: "Knock Down",
+                appliesEffect: "knock_down",
+                persistsForCombo: false,
+                visible: true
+            }
+        ]
     }
 ];

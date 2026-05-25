@@ -4,10 +4,10 @@
 --   assets/operators/avatars/Mi_Fu.png
 --   assets/operators/skills/mifu/fs_small.png
 --   assets/operators/skills/mifu/bs_1.svg
---   assets/operators/skills/mifu/bs_2.svg
+--   assets/operators/skills/mifu/bs_2.png
 --   assets/operators/skills/mifu/bs_3.svg
---   assets/operators/skills/mifu/cs_small.png
---   assets/operators/skills/mifu/ult_small.png
+--   assets/operators/skills/mifu/cs_small.svg
+--   assets/operators/skills/mifu/ult_small.svg
 
 begin;
 
@@ -90,7 +90,7 @@ insert into public.operator_skills (
     2702,
     27,
     2,
-    'Qingbo Triplex - Move 1',
+    'Qingbo Triplex - Cloudtrapper',
     'Battle Skill',
     'BS',
     null,
@@ -98,33 +98,33 @@ insert into public.operator_skills (
     'physical',
     'assets/operators/avatars/Mi_Fu.png',
     'assets/operators/skills/mifu/bs_1.svg',
-    'Move 1 pulls in nearby enemies, deals DMG, and replaces the next Battle Skill with Move 2.',
+    'Cloudtrapper pulls in nearby enemies, deals DMG, dashes forward if the enemy cannot be pulled, and replaces the next Battle Skill with Trail and Mangle.',
     null,
     null,
-    '{"id":2702,"name":"Qingbo Triplex - Move 1","icon":"assets/operators/avatars/Mi_Fu.png","iconSmall":"assets/operators/skills/mifu/bs_1.svg","type":"Battle Skill","shortType":"BS","cooldown":null,"energy":null,"elementType":"physical","description":"Move 1 pulls in nearby enemies, deals DMG, and replaces the next Battle Skill with Move 2.","qingboMove":1,"nextQingboMove":2,"debuffs":[{"id":"pull","name":"Pull","appliesEffect":"pull","persistsForCombo":false,"visible":true}]}'::jsonb
+    '{"id":2702,"name":"Qingbo Triplex - Cloudtrapper","icon":"assets/operators/avatars/Mi_Fu.png","iconSmall":"assets/operators/skills/mifu/bs_1.svg","type":"Battle Skill","shortType":"BS","cooldown":null,"energy":null,"elementType":"physical","description":"Cloudtrapper pulls in nearby enemies, deals DMG, dashes forward if the enemy cannot be pulled, and replaces the next Battle Skill with Trail and Mangle.","qingboMove":1,"nextQingboMove":2,"debuffs":[{"id":"pull","name":"Pull","appliesEffect":"pull","persistsForCombo":false,"visible":true}]}'::jsonb
 ),
 (
     2705,
     27,
     3,
-    'Qingbo Triplex - Move 2',
+    'Qingbo Triplex - Trail and Mangle',
     'Battle Skill',
     'BS',
     null,
     null,
     'physical',
     'assets/operators/avatars/Mi_Fu.png',
-    'assets/operators/skills/mifu/bs_2.svg',
-    'Move 2 applies Crush. If at least 3 Vulnerability stacks are consumed, the next Battle Skill will be replaced with Move 3.',
+    'assets/operators/skills/mifu/bs_2.png',
+    'Trail and Mangle applies Crush. If at least 3 Vulnerability stacks are consumed, the next Battle Skill will be replaced with World Splitter.',
     null,
     null,
-    '{"id":2705,"name":"Qingbo Triplex - Move 2","icon":"assets/operators/avatars/Mi_Fu.png","iconSmall":"assets/operators/skills/mifu/bs_2.svg","type":"Battle Skill","shortType":"BS","cooldown":null,"energy":null,"elementType":"physical","description":"Move 2 applies Crush. If at least 3 Vulnerability stacks are consumed, the next Battle Skill will be replaced with Move 3.","qingboMove":2,"requiresConsumedVulnerableStacks":3,"nextQingboMove":3,"consumeDebuffs":["vulnerable"],"debuffs":[{"id":"crush","name":"Crush","appliesEffect":"crush","persistsForCombo":false,"visible":true}]}'::jsonb
+    '{"id":2705,"name":"Qingbo Triplex - Trail and Mangle","icon":"assets/operators/avatars/Mi_Fu.png","iconSmall":"assets/operators/skills/mifu/bs_2.png","type":"Battle Skill","shortType":"BS","cooldown":null,"energy":null,"elementType":"physical","description":"Trail and Mangle applies Crush. If at least 3 Vulnerability stacks are consumed, the next Battle Skill will be replaced with World Splitter.","qingboMove":2,"requiresConsumedVulnerableStacks":3,"nextQingboMove":3,"consumeDebuffs":["vulnerable"],"debuffs":[{"id":"crush","name":"Crush","appliesEffect":"crush","persistsForCombo":false,"visible":true}]}'::jsonb
 ),
 (
     2706,
     27,
     4,
-    'Qingbo Triplex - Move 3',
+    'Qingbo Triplex - World Splitter',
     'Battle Skill',
     'BS',
     null,
@@ -132,10 +132,10 @@ insert into public.operator_skills (
     'physical',
     'assets/operators/avatars/Mi_Fu.png',
     'assets/operators/skills/mifu/bs_3.svg',
-    'Move 3 deals massive DMG in one hit to enemies in a frontal area.',
+    'World Splitter deals massive DMG in one hit to enemies in a frontal area. It is considered a Crush hit but does not consume Vulnerability stacks.',
     null,
     null,
-    '{"id":2706,"name":"Qingbo Triplex - Move 3","icon":"assets/operators/avatars/Mi_Fu.png","iconSmall":"assets/operators/skills/mifu/bs_3.svg","type":"Battle Skill","shortType":"BS","cooldown":null,"energy":null,"elementType":"physical","description":"Move 3 deals massive DMG in one hit to enemies in a frontal area.","qingboMove":3}'::jsonb
+    '{"id":2706,"name":"Qingbo Triplex - World Splitter","icon":"assets/operators/avatars/Mi_Fu.png","iconSmall":"assets/operators/skills/mifu/bs_3.svg","type":"Battle Skill","shortType":"BS","cooldown":null,"energy":null,"elementType":"physical","description":"World Splitter deals massive DMG in one hit to enemies in a frontal area. It is considered a Crush hit but does not consume Vulnerability stacks.","qingboMove":3,"debuffs":[{"id":"crush","name":"Crush","appliesEffect":"crush","persistsForCombo":false,"visible":true}]}'::jsonb
 ),
 (
     2703,
@@ -148,11 +148,11 @@ insert into public.operator_skills (
     null,
     'physical',
     'assets/operators/avatars/Mi_Fu.png',
-    'assets/operators/skills/mifu/cs_small.png',
+    'assets/operators/skills/mifu/cs_small.svg',
     'Triggers when an enemy reaches 3 Vulnerability stacks. Deals Physical DMG, applies Physical Susceptibility, and replaces Mi Fu''s next Battle Skill Move 1 with Move 2.',
     '3 Vulnerability stacks',
     'all',
-    '{"id":2703,"name":"Fists of No Regrets","icon":"assets/operators/avatars/Mi_Fu.png","iconSmall":"assets/operators/skills/mifu/cs_small.png","type":"Combo Skill","shortType":"CS","cooldown":null,"energy":null,"elementType":"physical","description":"Triggers when an enemy reaches 3 Vulnerability stacks. Deals Physical DMG, applies Physical Susceptibility, and replaces Mi Fu''s next Battle Skill Move 1 with Move 2.","comboTrigger":"3 Vulnerability stacks","comboTriggerMode":"all","allowSelfTrigger":true,"comboTriggers":[{"effect":"vulnerable","minStacks":3}],"debuffs":[{"id":"physical_susceptibility","name":"Physical Susceptibility","appliesEffect":"physical_susceptibility","persistsForCombo":true,"visible":true,"stackable":false}]}'::jsonb
+    '{"id":2703,"name":"Fists of No Regrets","icon":"assets/operators/avatars/Mi_Fu.png","iconSmall":"assets/operators/skills/mifu/cs_small.svg","type":"Combo Skill","shortType":"CS","cooldown":null,"energy":null,"elementType":"physical","description":"Triggers when an enemy reaches 3 Vulnerability stacks. Deals Physical DMG, applies Physical Susceptibility, and replaces Mi Fu''s next Battle Skill Move 1 with Move 2.","comboTrigger":"3 Vulnerability stacks","comboTriggerMode":"all","allowSelfTrigger":true,"comboTriggers":[{"effect":"vulnerable","minStacks":3}],"debuffs":[{"id":"physical_susceptibility","name":"Physical Susceptibility","appliesEffect":"physical_susceptibility","persistsForCombo":true,"visible":true,"stackable":false}]}'::jsonb
 ),
 (
     2704,
@@ -165,11 +165,11 @@ insert into public.operator_skills (
     null,
     'physical',
     'assets/operators/avatars/Mi_Fu.png',
-    'assets/operators/skills/mifu/ult_small.png',
+    'assets/operators/skills/mifu/ult_small.svg',
     'Forcibly Lifts a target, slams it down to deal Physical DMG, and replaces Mi Fu''s next Battle Skill Move 1 with Move 2.',
     null,
     null,
-    '{"id":2704,"name":"Pile of No Mercy","icon":"assets/operators/avatars/Mi_Fu.png","iconSmall":"assets/operators/skills/mifu/ult_small.png","type":"Ultimate","shortType":"Ult","cooldown":null,"energy":null,"elementType":"physical","description":"Forcibly Lifts a target, slams it down to deal Physical DMG, and replaces Mi Fu''s next Battle Skill Move 1 with Move 2.","debuffs":[{"id":"lift","name":"Lift","appliesEffect":"lift","persistsForCombo":false,"visible":true}]}'::jsonb
+    '{"id":2704,"name":"Pile of No Mercy","icon":"assets/operators/avatars/Mi_Fu.png","iconSmall":"assets/operators/skills/mifu/ult_small.svg","type":"Ultimate","shortType":"Ult","cooldown":null,"energy":null,"elementType":"physical","description":"Forcibly Lifts a target, slams it down to deal Physical DMG, and replaces Mi Fu''s next Battle Skill Move 1 with Move 2.","debuffs":[{"id":"lift","name":"Lift","appliesEffect":"lift","persistsForCombo":false,"visible":true}]}'::jsonb
 )
 on conflict (id) do update set
     operator_id = excluded.operator_id,

@@ -183,6 +183,20 @@ function consumeInflictionToBuffFromComboMaps(skillData, maps) {
     };
 }
 
+function getConsumedInflictionBuffFromContext(skillData, contextEffectMap) {
+    const config = skillData?.consumeInflictionToBuff;
+    if (!config || !config.infliction) return null;
+
+    const consumedStacks = Number(contextEffectMap?.[config.infliction] || 0);
+    if (consumedStacks <= 0) return null;
+
+    return {
+        buffName: config.grantBuff,
+        amount: consumedStacks * Number(config.ratio || 1),
+        maxStacks: Number(config.maxStacks || 4)
+    };
+}
+
 function getMatchingInflictionEffect(skillData, effectMap) {
     const config = skillData?.matchingInfliction;
     if (!config || !Array.isArray(config.candidateEffects)) return null;
@@ -241,9 +255,26 @@ function applySkillEffectsToComboMap(
 
     applyConditionalDebuffsToComboMap(skillData, effectMap, contextEffectMap);
     removeConsumedDebuffsFromEffectMap(skillData, effectMap);
-    consumeInflictionToBuffFromEffectMap(skillData, effectMap);
 
-    const matchingInfliction = getMatchingInflictionEffect(skillData, effectMap);
+    const consumedInflictionBuff = consumeInflictionToBuffFromEffectMap(skillData, effectMap) ||
+        getConsumedInflictionBuffFromContext(skillData, contextEffectMap);
+
+    if (consumedInflictionBuff) {
+        addAmountToEffectMap(
+            effectMap,
+            consumedInflictionBuff.buffName,
+            consumedInflictionBuff.amount,
+            consumedInflictionBuff.maxStacks
+        );
+    }
+
+    const matchingInfliction = getMatchingInflictionEffect(
+        skillData,
+        {
+            ...contextEffectMap,
+            ...effectMap
+        }
+    );
     if (matchingInfliction) {
         addAmountToEffectMap(
             effectMap,

@@ -56,8 +56,13 @@ lastrite.skills = [
         shortType: "BS",
         cooldown: 20,
         energy: 100,
+        sp_cost: 100,
         elementType: "cryo",
-        description: "Buffs the next Final Strike with Last Rite's Mirages. The Mirage attack deals Cryo DMG and applies Cryo Infliction.",
+        description: "Applies Hypothermic Perfusion to the controlled operator's weapon and returns 30 SP. The next Final Strike within the duration creates Last Rite's Mirage, dealing Cryo DMG and applying Cryo Infliction.",
+        spRecovery: {
+            amount: 30,
+            source: "Esoteric Legacy of Seš'qa"
+        },
         buffs: [
             {
                 id: "hypothermic_perfusion",
@@ -65,7 +70,8 @@ lastrite.skills = [
                 appliesEffect: "hypothermic_perfusion",
                 persistsForCombo: true,
                 visible: true,
-                consumeOnSkillType: "final_strike"
+                consumeOnSkillType: "final_strike",
+                consumeStacks: 1
             }
         ]
     },

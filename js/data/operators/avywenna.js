@@ -14,8 +14,10 @@ avywenna.skills = [
         icon: avywenna.icon,
         iconSmall: "assets/operators/skills/avywenna/fs_small.png",
         type: "Final Strike",
+        shortType: "FS",
         cooldown: 20,
         energy: 60,
+        description: "Physical Final Strike.",
         debuffs: [
             {
                 id: "final_strike",
@@ -33,22 +35,12 @@ avywenna.skills = [
         icon: avywenna.icon,
         iconSmall: "assets/operators/skills/avywenna/bs_small.png",
         type: "Battle Skill",
+        shortType: "BS",
         cooldown: 20,
         energy: 100,
+        sp_cost: 100,
         elementType: "electric",
-        description: "Deals Electric DMG and applies Electric Infliction via Thunderlance EX.",
-        debuffs: [
-            {
-                id: "electric_infliction",
-                name: "Electric Infliction",
-                appliesEffect: "electric_infliction",
-                persistsForCombo: true,
-                visible: true,
-                stackable: true,
-                stacksApplied: 1,
-                maxStacks: 4
-            }
-        ]
+        description: "Returns all deployed Thunderlances to Avywenna and strikes enemies in front. A returning Thunderlance EX can apply Electric Infliction."
     },
     {
         id: (avywenna.id * 100) + 3,
@@ -56,9 +48,11 @@ avywenna.skills = [
         icon: avywenna.icon,
         iconSmall: "assets/operators/skills/avywenna/cs_small.png",
         type: "Combo Skill",
+        shortType: "CS",
         cooldown: 13,
         energy: 0,
         elementType: "electric",
+        description: "Triggers when a Final Strike hits an enemy with Electric Infliction or Electrification. Deploys Thunderlances.",
         comboTriggerMode: "all",
         comboTriggers: [
             { effect: "final_strike", minStacks: 1 },
@@ -76,8 +70,10 @@ avywenna.skills = [
         icon: avywenna.icon,
         iconSmall: "assets/operators/skills/avywenna/ult_small.png",
         type: "Ultimate",
-        cooldown: 20,
-        energy: 60,
-        elementType: "electric"
+        shortType: "Ult",
+        cooldown: 10,
+        energy: 100,
+        elementType: "electric",
+        description: "Deploys one Thunderlance EX."
     }
 ];

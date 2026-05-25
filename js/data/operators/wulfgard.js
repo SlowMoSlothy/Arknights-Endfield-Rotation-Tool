@@ -47,23 +47,32 @@ wulfgard.skills = [
         shortType: "BS",
         cooldown: 20,
         energy: 100,
+        sp_cost: 100,
         elementType: "heat",
         description: "Applies Heat Infliction. If Combustion or Electrification is active, consumes it instead for extra Heat DMG.",
-        consumesEffects: [
-            { effect: "combustion", amount: "all" },
-            { effect: "electrification", amount: "all" }
+        consumeDebuffs: [
+            "combustion",
+            "electrification"
         ],
-        debuffs: [
+        conditionalDebuffs: [
             {
-                id: "heat_infliction",
-                name: "Heat Infliction",
-                appliesEffect: "heat_infliction",
-                persistsForCombo: true,
-                visible: true,
-                stackable: true,
-                stacksApplied: 1,
-                maxStacks: 4,
-                iconBase: "assets/debuffs/heat_infliction"
+                noneOf: [
+                    "combustion",
+                    "electrification"
+                ],
+                debuffs: [
+                    {
+                        id: "heat_infliction",
+                        name: "Heat Infliction",
+                        appliesEffect: "heat_infliction",
+                        persistsForCombo: true,
+                        visible: true,
+                        stackable: true,
+                        stacksApplied: 1,
+                        maxStacks: 4,
+                        iconBase: "assets/debuffs/heat_infliction"
+                    }
+                ]
             }
         ]
     },

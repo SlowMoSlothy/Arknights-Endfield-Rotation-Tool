@@ -46,7 +46,8 @@ const laevatain = {
             shortType: "BS",
             elementType: "heat",
             cooldown: 20,
-            energy: 60,
+            energy: 100,
+            sp_cost: 100,
             description: "Applies Heat Infliction and grants Melting Flame. At 4 Melting Flame, consumes all stacks and applies Combustion instead of the normal Heat Infliction.",
             buffs: [
                 {
@@ -109,7 +110,7 @@ const laevatain = {
             shortType: "CS",
             elementType: "heat",
             cooldown: 10,
-            energy: 60,
+            energy: 0,
             description: "Triggers on Combustion or Corrosion.",
             comboTriggerMode: "all",
             comboTriggers: [
@@ -143,8 +144,8 @@ const laevatain = {
             shortType: "Ult",
             elementType: "heat",
             cooldown: 20,
-            energy: 60,
-            description: "Ultimate"
+            energy: 300,
+            description: "Enters Twilight, transforming Laevatain's basic attacks into enhanced wide-range Heat slashes."
         }
     ]
 };

@@ -18,6 +18,7 @@ gilberta.skills = [
         cooldown: 20,
         energy: 60,
         elementType: "nature",
+        description: "Nature Final Strike.",
         debuffs: [
             {
                 id: "final_strike",
@@ -36,9 +37,10 @@ gilberta.skills = [
         type: "Battle Skill",
         shortType: "BS",
         cooldown: 20,
-        energy: 60,
+        energy: 100,
+        sp_cost: 100,
         elementType: "nature",
-        description: "Applies Nature Infliction.",
+        description: "Channels a gravity well that pulls nearby enemies, then implodes to apply Nature Infliction.",
         debuffs: [
             {
                 id: "nature_infliction",
@@ -98,10 +100,29 @@ gilberta.skills = [
         type: "Ultimate",
         shortType: "Ult",
         cooldown: 20,
-        energy: 60,
+        energy: 90,
         elementType: "nature",
-        description: "Applies Arts Susceptibility.",
+        description: "Applies Nature Infliction, Slow, and Arts Susceptibility. Lifted targets remain airborne while the field persists.",
         debuffs: [
+            {
+                id: "nature_infliction",
+                name: "Nature Infliction",
+                appliesEffect: "nature_infliction",
+                persistsForCombo: true,
+                visible: true,
+                stackable: true,
+                stacksApplied: 1,
+                maxStacks: 4,
+                iconBase: "assets/debuffs/nature_infliction"
+            },
+            {
+                id: "slow",
+                name: "Slow",
+                appliesEffect: "slow",
+                persistsForCombo: true,
+                visible: true,
+                stackable: false
+            },
             {
                 id: "arts_susceptibility",
                 name: "Arts Susceptibility",

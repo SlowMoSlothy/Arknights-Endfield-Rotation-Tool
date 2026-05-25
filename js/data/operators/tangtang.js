@@ -37,9 +37,10 @@ tangtang.skills = [
         type: "Battle Skill",
         shortType: "BS",
         cooldown: 20,
-        energy: 60,
+        energy: 100,
+        sp_cost: 100,
         elementType: "cryo",
-        description: "Applies Cryo Infliction.",
+        description: "Shoots Cryo waves that apply Cryo Infliction and can trigger Waterspouts from existing Whirlpools.",
         debuffs: [
             {
                 id: "cryo_infliction",
@@ -60,20 +61,15 @@ tangtang.skills = [
         iconSmall: "assets/operators/skills/tangtang/65px-Combo-Tangtang.webp",
         type: "Combo Skill",
         shortType: "CS",
-        cooldown: 13,
+        cooldown: 12,
         energy: 0,
         elementType: "cryo",
-        description: "Triggers on Final Strike against an enemy with Cryo Infliction or Cryo Burst. Adds Arts Susceptibility.",
-        comboTriggerMode: "all",
+        description: "Triggers when applying Cryo Infliction or dealing Arts Burst DMG. Creates a Whirlpool.",
+        comboTriggerMode: "any",
         allowSelfTrigger: true,
         comboTriggers: [
-            { effect: "final_strike", minStacks: 1 },
-            {
-                anyOf: [
-                    { effect: "cryo_infliction", minStacks: 1 },
-                    { effect: "cryo_burst", minStacks: 1 }
-                ]
-            }
+            { effect: "cryo_infliction", minStacks: 1 },
+            { effect: "cryo_burst", minStacks: 1 }
         ],
         buffs: [
             {
@@ -89,28 +85,25 @@ tangtang.skills = [
         ],
         debuffs: [
             {
-                id: "arts_susceptibility",
-                name: "Arts Susceptibility",
-                appliesEffect: "arts_susceptibility",
+                id: "slow",
+                name: "Slow",
+                appliesEffect: "slow",
                 persistsForCombo: true,
-                visible: true,
-                stackable: true,
-                stacksApplied: 1,
-                maxStacks: 4
+                visible: true
             }
         ]
     },
     {
         id: (tangtang.id * 100) + 4,
-        name: "Ultimate",
+        name: "DA CHIEF SEES YOU!",
         icon: tangtang.icon,
         iconSmall: "assets/operators/skills/tangtang/65px-Ult-Tangtang.webp",
         type: "Ultimate",
         shortType: "Ult",
         cooldown: 20,
-        energy: 100,
+        energy: 90,
         elementType: "cryo",
-        description: "Cryo Ultimate.",
+        description: "Creates OLDEN STARE, dealing Cryo DMG over time before a rogue wave crashes down for massive Cryo DMG.",
         debuffs: [
             {
                 id: "cryo_infliction",

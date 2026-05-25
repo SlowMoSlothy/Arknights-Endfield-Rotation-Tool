@@ -47,16 +47,17 @@ snowshine.skills = [
         shortType: "BS",
         cooldown: 20,
         energy: 100,
+        sp_cost: 100,
         elementType: "cryo",
         description: "Grants Protection. Retaliation applies Cryo Infliction.",
         buffs: [
             {
-                id: "protect",
-                name: "Protect",
-                appliesEffect: "protect",
+                id: "protection",
+                name: "Protection",
+                appliesEffect: "protection",
                 persistsForCombo: true,
                 visible: true,
-                iconBase: "assets/buffs/protect"
+                iconBase: "assets/buffs/protection"
             }
         ],
         debuffs: [

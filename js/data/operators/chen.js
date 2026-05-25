@@ -18,6 +18,7 @@ chen.skills = [
         cooldown: 20,
         energy: 60,
         elementType: "physical",
+        description: "Physical Final Strike.",
         debuffs: [
             {
                 id: "final_strike",
@@ -37,9 +38,10 @@ chen.skills = [
         type: "Battle Skill",
         shortType: "BS",
         cooldown: 20,
-        energy: 60,
+        energy: 100,
+        sp_cost: 100,
         elementType: "physical",
-        description: "Applies Lift.",
+        description: "Deals Physical DMG, applies Lift, and contributes Vulnerable pressure.",
         debuffs: [
             {
                 id: "lift",
@@ -47,6 +49,16 @@ chen.skills = [
                 appliesEffect: "lift",
                 persistsForCombo: false,
                 visible: true
+            },
+            {
+                id: "vulnerable",
+                name: "Vulnerable",
+                appliesEffect: "vulnerable",
+                persistsForCombo: true,
+                visible: true,
+                stackable: true,
+                stacksApplied: 1,
+                maxStacks: 4
             }
         ]
     },
@@ -63,7 +75,7 @@ chen.skills = [
     energy: 0,
     elementType: "physical",
     comboTriggerMode: "all",
-    description: "Triggers when enemy becomes Vulnerable.",
+    description: "Triggers when an enemy becomes Vulnerable. Dashes through the enemy, deals Physical DMG, and applies Lift.",
     comboTriggers: [
         {
             effect: "vulnerable",
@@ -89,7 +101,8 @@ chen.skills = [
         type: "Ultimate",
         shortType: "Ult",
         cooldown: 20,
-        energy: 60,
-        elementType: "physical"
+        energy: 70,
+        elementType: "physical",
+        description: "Performs a 7-sequence Physical slash attack. The final slash deals increased damage."
     }
 ];

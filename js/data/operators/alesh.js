@@ -106,7 +106,10 @@ const alesh = {
             comboTriggers: [
                 {
                     anyOf: [
-                        { effect: "arts_reaction", minStacks: 1 },
+                        { effect: "arts_reaction_consumed", minStacks: 1 },
+                        { effect: "combustion_consumed", minStacks: 1 },
+                        { effect: "corrosion_consumed", minStacks: 1 },
+                        { effect: "solidification_consumed", minStacks: 1 },
                         { effect: "originium_crystal_consumed", minStacks: 1 }
                     ]
                 }

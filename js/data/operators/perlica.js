@@ -44,6 +44,7 @@ const perlica = {
             shortType: "BS",
             cooldown: 20,
             energy: 100,
+            sp_cost: 100,
             elementType: "electric",
             description: "Deals Electric DMG and applies Electric Infliction.",
             debuffs: [

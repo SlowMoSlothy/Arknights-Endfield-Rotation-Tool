@@ -49,7 +49,7 @@ pogranichnik.skills = [
         energy: 100,
         sp_cost: 100,
         elementType: "physical",
-        description: "Deals Physical DMG, applies Breach, and consumes Vulnerability stacks for SP recovery.",
+        description: "Performs 2 slashes, deals Physical DMG, applies Breach, and consumes Vulnerable stacks for SP recovery.",
         spRecovery: {
             effects: [
                 "vulnerable"
@@ -64,8 +64,8 @@ pogranichnik.skills = [
             source: "The Pulverizing Front"
         },
         consumeDebuffs: [
-    "vulnerable"
-],
+            "vulnerable"
+        ],
         debuffs: [
             {
                 id: "breach",
@@ -73,7 +73,7 @@ pogranichnik.skills = [
                 appliesEffect: "breach",
                 persistsForCombo: false,
                 visible: true,
-                iconBase: "assets/debuffs/breach"
+                icon: "assets/ui/debuffs/breach.svg"
             }
         ]
     },
@@ -88,7 +88,7 @@ pogranichnik.skills = [
         cooldown: 18,
         energy: 0,
         elementType: "physical",
-        description: "Triggers when Breach or Crush consumes Vulnerability stacks. Deals Physical DMG and recovers SP.",
+        description: "Triggers when Breach or Crush consumes Vulnerable stacks. Deals Physical DMG and recovers SP.",
         spRecovery: {
             effects: [
                 "vulnerable"
@@ -103,11 +103,16 @@ pogranichnik.skills = [
             fallbackStacks: 1,
             source: "Full Moon Slash"
         },
-        comboTriggerMode: "any",
+        comboTriggerMode: "all",
         allowSelfTrigger: true, 
         comboTriggers: [
-            { effect: "breach", minStacks: 1 },
-            { effect: "crush", minStacks: 1 }
+            { effect: "vulnerable_consumed", minStacks: 1 },
+            {
+                anyOf: [
+                    { effect: "breach", minStacks: 1 },
+                    { effect: "crush", minStacks: 1 }
+                ]
+            }
         ]
     },
 

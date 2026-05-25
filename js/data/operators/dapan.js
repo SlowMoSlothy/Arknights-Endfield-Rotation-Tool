@@ -38,6 +38,7 @@ dapan.skills = [
         shortType: "BS",
         cooldown: 20,
         energy: 100,
+        sp_cost: 100,
         elementType: "physical",
         description: "Deals Physical DMG and applies Lift plus 1 Vulnerable stack.",
         debuffs: [
