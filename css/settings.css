@@ -1,8 +1,11 @@
 .settings-modal {
     position: fixed;
     inset: 0;
-    background: rgba(8, 10, 12, 0.78);
-    backdrop-filter: blur(4px);
+    background:
+        radial-gradient(circle at 50% 8%, rgba(248,245,70,0.05), transparent 34%),
+        rgba(8, 10, 12, 0.72);
+    backdrop-filter: blur(10px) saturate(1.08);
+    -webkit-backdrop-filter: blur(10px) saturate(1.08);
     display: none;
     align-items: center;
     justify-content: center;
@@ -16,12 +19,18 @@
 
 .settings-dialog {
     width: min(460px, 100%);
-    background: linear-gradient(180deg, #313739, #23282a);
-    border: 1px solid rgba(160,170,169,0.25);
+    background:
+        radial-gradient(circle at 14% 0%, rgba(255,255,255,0.10), transparent 28%),
+        radial-gradient(circle at 88% 8%, rgba(248,245,70,0.07), transparent 32%),
+        linear-gradient(180deg, rgba(49,55,57,0.76), rgba(24,28,30,0.86));
+    border: 1px solid rgba(255,255,255,0.14);
     border-radius: 18px;
+    backdrop-filter: blur(18px) saturate(1.12);
+    -webkit-backdrop-filter: blur(18px) saturate(1.12);
     box-shadow:
-        0 18px 42px rgba(0,0,0,0.50),
-        inset 0 0 0 1px rgba(255,255,255,0.03);
+        0 22px 48px rgba(0,0,0,0.48),
+        inset 0 1px 0 rgba(255,255,255,0.12),
+        inset 0 0 0 1px rgba(255,255,255,0.035);
     padding: 20px;
     color: #fff;
 }

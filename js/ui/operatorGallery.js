@@ -3,8 +3,11 @@ const operatorGalleryState = {
     star: "all",
     operatorClass: "all",
     element: "all",
+    role: "all",
     detailOperatorId: null
 };
+
+const OPERATOR_GALLERY_ROLE_FILTERS = ["Damage", "Buffer", "Enabler", "Control", "Sustain"];
 
 function getOperatorGallerySlug(operator) {
     return String(operator?.slug || operator?.name || operator?.id || "")
@@ -48,10 +51,199 @@ function getOperatorGalleryBySlug(slug) {
     return getOperatorGalleryItems().find(operator => getOperatorGallerySlug(operator) === normalizedSlug) || null;
 }
 
+function normalizeOperatorGalleryEffectKey(value) {
+    return String(value || "").trim().toLowerCase().replace(/\s+/g, "_");
+}
+
+function getOperatorGalleryEffectLabel(effect, type = "effect") {
+    if (effect && typeof effect === "object") {
+        if (type === "buff" && typeof getBuffDisplayName === "function") {
+            return getBuffDisplayName(effect);
+        }
+        if (type === "debuff" && typeof getDebuffDisplayName === "function") {
+            return getDebuffDisplayName(effect);
+        }
+        return String(effect.name || effect.id || effect.appliesEffect || effect.buffName || "").trim();
+    }
+
+    return String(effect || "").trim();
+}
+
+function getOperatorGallerySkillEffectEntries(skill) {
+    const entries = [];
+
+    const addEntries = (items, type) => {
+        if (!Array.isArray(items)) return;
+        items.forEach(effect => {
+            const label = getOperatorGalleryEffectLabel(effect, type);
+            const key = normalizeOperatorGalleryEffectKey(
+                typeof effect === "object" ? (effect.id || effect.appliesEffect || effect.name) : effect
+            );
+            if (!label && !key) return;
+            entries.push({ type, label: label || key, key });
+        });
+    };
+
+    addEntries(skill.debuffs, "debuff");
+    addEntries(skill.buffs, "buff");
+
+    if (Array.isArray(skill.conditionalDebuffs)) {
+        skill.conditionalDebuffs.forEach(condition => addEntries(condition.debuffs, "debuff"));
+    }
+
+    if (Array.isArray(skill.consumeDebuffs)) {
+        skill.consumeDebuffs.forEach(effect => {
+            const label = getOperatorGalleryEffectLabel(effect);
+            const key = normalizeOperatorGalleryEffectKey(label);
+            if (label) entries.push({ type: "consume", label: `${label} consumed`, key });
+        });
+    }
+
+    return entries;
+}
+
+function getOperatorGalleryRoleProfile(operator) {
+    const skills = Array.isArray(operator.skills) ? operator.skills : [];
+    const entries = skills.flatMap(getOperatorGallerySkillEffectEntries);
+    const text = [
+        operator.operatorClass,
+        operator.elementType,
+        ...skills.flatMap(skill => [skill.name, skill.type, skill.description])
+    ].filter(Boolean).join(" ").toLowerCase();
+    const effectText = entries.map(entry => `${entry.key} ${entry.label}`).join(" ").toLowerCase();
+    const allText = `${text} ${effectText}`;
+
+    const hasAny = terms => terms.some(term => allText.includes(term));
+    const roleScores = {
+        Damage: 0,
+        Buffer: 0,
+        Enabler: 0,
+        Control: 0,
+        Sustain: 0
+    };
+
+    const className = normalizeOperatorGalleryValue(operator.operatorClass);
+    if (["striker", "caster", "guard", "vanguard"].includes(className)) roleScores.Damage += 1;
+    if (hasAny([" dmg", "damage", "deals", "ultimate", "follow-up", "follow up"])) roleScores.Damage += 2;
+
+    const buffCount = entries.filter(entry => entry.type === "buff").length;
+    if (buffCount) roleScores.Buffer += buffCount + 1;
+    if (hasAny([" amp", "atk up", "crit", "buff", "link", "melting flames"])) roleScores.Buffer += 2;
+
+    const enablerKeys = ["infliction", "susceptibility", "vulnerable", "breach", "arts reaction", "auxiliary crystal", "electrification", "combustion", "corrosion", "crush"];
+    if (entries.some(entry => enablerKeys.some(key => entry.key.includes(normalizeOperatorGalleryEffectKey(key)) || entry.label.toLowerCase().includes(key)))) {
+        roleScores.Enabler += 3;
+    }
+    if (skills.some(skill => skill.comboTrigger || Array.isArray(skill.comboTriggers) || Array.isArray(skill.consumeDebuffs))) {
+        roleScores.Enabler += 2;
+    }
+
+    const controlKeys = ["lift", "stagger", "pull", "push", "knock", "slow", "solidification"];
+    if (hasAny(controlKeys)) roleScores.Control += 3;
+
+    const sustainKeys = ["shield", "hp treatment", "protect", "heal", "treatment"];
+    if (hasAny(sustainKeys)) roleScores.Sustain += 3;
+    if (className === "defender") roleScores.Sustain += 1;
+
+    const roles = Object.entries(roleScores)
+        .filter(([, score]) => score > 0)
+        .sort((a, b) => b[1] - a[1])
+        .map(([role]) => role);
+
+    const effectLabels = [];
+    entries.forEach(entry => {
+        if (!entry.label || effectLabels.includes(entry.label)) return;
+        effectLabels.push(entry.label);
+    });
+
+    const comboSkills = skills.filter(skill => skill.type === "Combo Skill" || skill.shortType === "CS" || skill.comboTrigger || Array.isArray(skill.comboTriggers));
+    const consumedEffects = entries.filter(entry => entry.type === "consume").map(entry => entry.label);
+
+    return {
+        primaryRole: roles[0] || "Damage",
+        roles: roles.length ? roles.slice(0, 4) : ["Damage"],
+        effectLabels,
+        buffCount,
+        debuffCount: entries.filter(entry => entry.type === "debuff").length,
+        comboCount: comboSkills.length,
+        consumedEffects,
+        skillCount: skills.length,
+        note: createOperatorGalleryRoleNote(roles[0] || "Damage", operator, effectLabels, comboSkills, consumedEffects)
+    };
+}
+
+function createOperatorGalleryRoleNote(primaryRole, operator, effectLabels, comboSkills, consumedEffects) {
+    const classLabel = operator.operatorClass || "operator";
+    const elementLabel = operator.elementType && typeof formatElementLabel === "function"
+        ? formatElementLabel(operator.elementType)
+        : operator.elementType;
+    const effects = effectLabels.slice(0, 3).join(", ");
+
+    const roleLead = {
+        Damage: `${operator.name} is mainly a damage pick`,
+        Buffer: `${operator.name} works well as a buffer`,
+        Enabler: `${operator.name} is useful as a rotation enabler`,
+        Control: `${operator.name} brings control tools`,
+        Sustain: `${operator.name} adds sustain or protection`
+    }[primaryRole] || `${operator.name} is a flexible ${classLabel}`;
+
+    const parts = [
+        `${roleLead}${elementLabel ? ` for ${elementLabel} teams` : ""}.`,
+        effects ? `Key tracked effects: ${effects}.` : "",
+        comboSkills.length ? `${comboSkills.length} combo skill${comboSkills.length === 1 ? "" : "s"} can be checked for trigger planning.` : "",
+        consumedEffects.length ? `Consumes: ${consumedEffects.slice(0, 2).join(", ")}.` : ""
+    ];
+
+    return parts.filter(Boolean).join(" ");
+}
+
+function createOperatorGalleryRoleChips(profile, compact = false, featuredRole = "") {
+    const chips = document.createElement("div");
+    chips.className = compact ? "operator-gallery-role-chips is-compact" : "operator-gallery-role-chips";
+    let roles = compact ? profile.roles.slice(0, 2) : profile.roles;
+    const normalizedFeaturedRole = normalizeOperatorGalleryValue(featuredRole);
+    if (
+        compact &&
+        normalizedFeaturedRole &&
+        normalizedFeaturedRole !== "all" &&
+        !roles.some(role => normalizeOperatorGalleryValue(role) === normalizedFeaturedRole)
+    ) {
+        const matchingRole = profile.roles.find(role => normalizeOperatorGalleryValue(role) === normalizedFeaturedRole);
+        if (matchingRole) {
+            roles = [roles[0], matchingRole].filter(Boolean);
+        }
+    }
+    chips.replaceChildren(...roles.map(role => {
+        const chip = document.createElement("span");
+        chip.textContent = role;
+        return chip;
+    }));
+    return chips;
+}
+
+function createOperatorGalleryCardMeta(operator) {
+    const elementType = normalizeOperatorGalleryValue(operator.elementType) || "neutral";
+    if (typeof createOperatorCardMeta === "function") {
+        return createOperatorCardMeta(operator, elementType);
+    }
+
+    const meta = document.createElement("div");
+    meta.className = "operator-card-meta";
+
+    const star = document.createElement("span");
+    star.className = "operator-card-star";
+    star.textContent = `${operator.star || "-"} ★`;
+    meta.appendChild(star);
+
+    return meta;
+}
+
 function createOperatorGalleryCard(operator, variant = "seo") {
     const article = document.createElement("article");
-    article.className = variant === "modal" ? "operator-gallery-card" : "";
-    if (variant === "modal") {
+    const elementClass = `operator-element-${normalizeOperatorGalleryValue(operator.elementType) || "neutral"}`;
+    const isEnhancedCard = variant === "modal" || variant === "seo";
+    article.className = isEnhancedCard ? `operator-gallery-card ${elementClass}${variant === "seo" ? " seo-operator-card" : ""}` : "";
+    if (variant === "modal" || variant === "seo") {
         article.tabIndex = 0;
         article.setAttribute("role", "button");
         article.setAttribute("aria-label", `Open ${operator.name} details`);
@@ -73,13 +265,24 @@ function createOperatorGalleryCard(operator, variant = "seo") {
 
     const name = document.createElement("strong");
     name.textContent = operator.name;
-    if (variant === "modal") {
+    if (isEnhancedCard) {
         name.className = "operator-gallery-card-name";
         name.addEventListener("click", event => {
             event.stopPropagation();
             openOperatorGalleryDetail(operator.id);
         });
     }
+
+    const infoButton = document.createElement("button");
+    infoButton.type = "button";
+    infoButton.className = "operator-gallery-info-button";
+    infoButton.setAttribute("aria-label", `Open ${operator.name} details`);
+    infoButton.addEventListener("click", event => {
+        event.stopPropagation();
+        openOperatorGalleryDetail(operator.id);
+    });
+
+    const profile = getOperatorGalleryRoleProfile(operator);
 
     const meta = document.createElement("span");
     meta.textContent = [
@@ -88,6 +291,8 @@ function createOperatorGalleryCard(operator, variant = "seo") {
             ? formatElementLabel(operator.elementType)
             : operator.elementType
     ].filter(Boolean).join(" - ");
+
+    const roleChips = createOperatorGalleryRoleChips(profile, true, operatorGalleryState.role);
 
     const link = document.createElement("a");
     link.href = "#community-rotations";
@@ -113,10 +318,18 @@ function createOperatorGalleryCard(operator, variant = "seo") {
     });
 
     const actions = document.createElement("div");
-    actions.className = variant === "modal" ? "operator-gallery-actions" : "seo-operator-actions";
+    actions.className = isEnhancedCard ? "operator-gallery-actions" : "seo-operator-actions";
     actions.append(link, createButton);
 
-    article.append(image, name, meta, actions);
+    if (isEnhancedCard) {
+        const titleRow = document.createElement("div");
+        titleRow.className = "operator-gallery-card-title";
+        titleRow.append(name, infoButton);
+
+        article.append(createOperatorGalleryCardMeta(operator), image, titleRow, meta, roleChips, actions);
+    } else {
+        article.append(image, name, meta, actions);
+    }
     return article;
 }
 
@@ -161,7 +374,18 @@ function getOperatorGalleryStarValues() {
         .filter(Number.isFinite)
         .filter((value, index, values) => values.indexOf(value) === index)
         .sort((a, b) => b - a)
-        .map(value => ({ value: String(value), label: `${value} Star` }));
+        .map(value => ({ value: String(value), label: `${value} ★` }));
+}
+
+function getOperatorGalleryRoleValues() {
+    const availableRoles = new Set();
+    getOperatorGalleryItems().forEach(operator => {
+        getOperatorGalleryRoleProfile(operator).roles.forEach(role => availableRoles.add(role));
+    });
+
+    return OPERATOR_GALLERY_ROLE_FILTERS
+        .filter(role => availableRoles.has(role))
+        .map(role => ({ value: normalizeOperatorGalleryValue(role), label: role }));
 }
 
 function createOperatorGalleryFilterButton(filterKey, value, label) {
@@ -169,7 +393,24 @@ function createOperatorGalleryFilterButton(filterKey, value, label) {
     button.type = "button";
     button.className = `operator-gallery-filter-chip${operatorGalleryState[filterKey] === value ? " is-active" : ""}`;
     button.setAttribute("aria-pressed", String(operatorGalleryState[filterKey] === value));
-    button.textContent = label;
+
+    const iconPath = value !== "all" && typeof getFilterIconPath === "function"
+        ? getFilterIconPath(filterKey, value)
+        : "";
+
+    if (iconPath) {
+        const icon = document.createElement("img");
+        icon.className = "operator-gallery-filter-icon";
+        icon.src = iconPath;
+        icon.alt = "";
+        icon.setAttribute("aria-hidden", "true");
+        button.appendChild(icon);
+    }
+
+    const text = document.createElement("span");
+    text.textContent = label;
+    button.appendChild(text);
+
     button.addEventListener("click", () => {
         operatorGalleryState[filterKey] = value;
         renderOperatorGalleryModal();
@@ -193,6 +434,7 @@ function renderOperatorGalleryFilters() {
     renderOperatorGalleryFilterGroup("operatorGalleryElementFilters", "element", getOperatorGalleryFilterValues(operator => (
         typeof formatElementLabel === "function" ? formatElementLabel(operator.elementType) : operator.elementType
     )));
+    renderOperatorGalleryFilterGroup("operatorGalleryRoleFilters", "role", getOperatorGalleryRoleValues());
 }
 
 function getFilteredOperatorGalleryItems() {
@@ -200,13 +442,17 @@ function getFilteredOperatorGalleryItems() {
     const starFilter = operatorGalleryState.star;
     const classFilter = operatorGalleryState.operatorClass;
     const elementFilter = operatorGalleryState.element;
+    const roleFilter = operatorGalleryState.role;
 
     return getOperatorGalleryItems().filter(operator => {
+        const profile = getOperatorGalleryRoleProfile(operator);
         const searchText = [
-        operator.name,
-        operator.operatorClass,
+            operator.name,
+            operator.operatorClass,
             operator.elementType,
-            typeof formatElementLabel === "function" ? formatElementLabel(operator.elementType) : ""
+            typeof formatElementLabel === "function" ? formatElementLabel(operator.elementType) : "",
+            ...profile.roles,
+            ...profile.effectLabels
         ].join(" ").toLowerCase();
 
         const matchesSearch = !query || searchText.includes(query);
@@ -215,8 +461,10 @@ function getFilteredOperatorGalleryItems() {
         const matchesElement = elementFilter === "all"
             || normalizeOperatorGalleryValue(operator.elementType) === elementFilter
             || normalizeOperatorGalleryValue(typeof formatElementLabel === "function" ? formatElementLabel(operator.elementType) : "") === elementFilter;
+        const matchesRole = roleFilter === "all"
+            || profile.roles.some(role => normalizeOperatorGalleryValue(role) === roleFilter);
 
-        return matchesSearch && matchesStar && matchesClass && matchesElement;
+        return matchesSearch && matchesStar && matchesClass && matchesElement && matchesRole;
     });
 }
 
@@ -256,31 +504,88 @@ function createOperatorGalleryDetailMeta(label, value) {
     return item;
 }
 
-function getOperatorGallerySkillEffects(skill) {
-    const effects = [];
+function createOperatorGallerySummaryItem(label, value) {
+    const item = document.createElement("div");
+    item.className = "operator-gallery-summary-item";
 
-    [
-        ...(Array.isArray(skill.debuffs) ? skill.debuffs : []),
-        ...(Array.isArray(skill.buffs) ? skill.buffs : [])
-    ].forEach(effect => {
-        const label = String(effect.name || effect.id || effect.appliesEffect || effect.buffName || "").trim();
-        if (label && !effects.includes(label)) effects.push(label);
-    });
+    const labelElement = document.createElement("span");
+    labelElement.textContent = label;
 
-    if (Array.isArray(skill.consumeDebuffs)) {
-        skill.consumeDebuffs.forEach(effect => {
-            const label = `${String(effect || "").trim()} consumed`;
-            if (label.trim() && !effects.includes(label)) effects.push(label);
+    const valueElement = document.createElement("strong");
+    valueElement.textContent = value || "-";
+
+    item.append(labelElement, valueElement);
+    return item;
+}
+
+function getOperatorGalleryBestUse(profile, operator) {
+    const elementLabel = operator.elementType && typeof formatElementLabel === "function"
+        ? formatElementLabel(operator.elementType)
+        : operator.elementType;
+    const roleText = profile.roles.slice(0, 2).join(" / ");
+
+    return [roleText, elementLabel ? `${elementLabel} setup` : ""].filter(Boolean).join(" - ");
+}
+
+function formatOperatorGalleryEffectName(value) {
+    return String(value || "")
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, letter => letter.toUpperCase());
+}
+
+function getOperatorGalleryTriggerLabels(skill) {
+    const labels = [];
+    const addLabel = value => {
+        const label = formatOperatorGalleryEffectName(value);
+        if (label && !labels.includes(label)) labels.push(label);
+    };
+
+    if (skill.comboTrigger) addLabel(skill.comboTrigger);
+
+    if (Array.isArray(skill.comboTriggers)) {
+        skill.comboTriggers.forEach(trigger => {
+            if (trigger?.effect) addLabel(trigger.effect);
+            if (Array.isArray(trigger?.anyOf)) {
+                trigger.anyOf.forEach(option => addLabel(option?.effect));
+            }
         });
     }
+
+    return labels;
+}
+
+function getOperatorGallerySkillEffects(skill) {
+    const effects = [];
+    getOperatorGallerySkillEffectEntries(skill).forEach(effect => {
+        if (!effect.label) return;
+        const key = `${effect.type}:${effect.label}`;
+        if (effects.some(item => item.key === key)) return;
+        effects.push({ ...effect, key });
+    });
+
+    getOperatorGalleryTriggerLabels(skill).forEach(label => {
+        const key = `trigger:${label}`;
+        if (!effects.some(item => item.key === key)) {
+            effects.push({ type: "trigger", label, key });
+        }
+    });
 
     return effects;
 }
 
-function createOperatorGallerySkillChip(label) {
+function createOperatorGallerySkillChip(effect) {
     const chip = document.createElement("span");
-    chip.className = "operator-gallery-detail-skill-chip";
-    chip.textContent = label;
+    chip.className = `operator-gallery-detail-skill-chip is-${effect.type || "effect"}`;
+    const type = document.createElement("small");
+    type.textContent = {
+        buff: "Buff",
+        debuff: "Debuff",
+        consume: "Consumes",
+        trigger: "Trigger"
+    }[effect.type] || "Effect";
+    const label = document.createElement("span");
+    label.textContent = effect.label;
+    chip.append(type, label);
     return chip;
 }
 
@@ -323,26 +628,19 @@ function createOperatorGalleryDetailSkill(skill) {
         hasOperatorGalleryNumber(skill.energy) ? `${skill.energy} SP` : ""
     ].filter(Boolean).join(" - ");
 
-    const trigger = document.createElement("span");
-    trigger.className = "operator-gallery-detail-skill-trigger";
-    trigger.textContent = skill.comboTrigger
-        ? `Trigger: ${skill.comboTrigger}`
-        : "";
-
     const description = document.createElement("p");
     description.textContent = skill.description || "No skill description available.";
 
     const chips = document.createElement("div");
     chips.className = "operator-gallery-detail-skill-chips";
-    const effectLabels = getOperatorGallerySkillEffects(skill);
-    if (effectLabels.length) {
-        chips.replaceChildren(...effectLabels.slice(0, 8).map(createOperatorGallerySkillChip));
+    const effects = getOperatorGallerySkillEffects(skill);
+    if (effects.length) {
+        chips.replaceChildren(...effects.slice(0, 10).map(createOperatorGallerySkillChip));
     }
 
     copy.append(title, meta);
-    if (trigger.textContent) copy.appendChild(trigger);
     copy.appendChild(description);
-    if (effectLabels.length) copy.appendChild(chips);
+    if (effects.length) copy.appendChild(chips);
     item.append(icon, copy);
     return item;
 }
@@ -417,9 +715,14 @@ function openOperatorGalleryDetail(operatorId) {
     const actions = document.createElement("div");
     actions.className = "operator-gallery-actions operator-gallery-detail-actions";
 
+    const useLeaderButton = document.createElement("button");
+    useLeaderButton.type = "button";
+    useLeaderButton.textContent = "Use as leader";
+    useLeaderButton.addEventListener("click", () => startOperatorGalleryLeaderRotation(operator.id));
+
     const showLink = document.createElement("a");
     showLink.href = "#community-rotations";
-    showLink.textContent = "Show rotation";
+    showLink.textContent = "Show rotations";
     showLink.addEventListener("click", event => {
         event.preventDefault();
         closeOperatorGalleryDetail();
@@ -431,28 +734,56 @@ function openOperatorGalleryDetail(operatorId) {
     const createButton = document.createElement("button");
     createButton.type = "button";
     createButton.textContent = "Create rotation";
-    createButton.addEventListener("click", () => {
-        closeOperatorGalleryDetail();
-        if (typeof createRotationWithCommunityOperator === "function") {
-            createRotationWithCommunityOperator(operator.id);
-        }
-    });
+    createButton.addEventListener("click", () => startOperatorGalleryLeaderRotation(operator.id));
 
     const copyLinkButton = document.createElement("button");
     copyLinkButton.type = "button";
     copyLinkButton.textContent = "Copy operator link";
     copyLinkButton.addEventListener("click", () => copyOperatorGalleryDeepLink(operator, copyLinkButton));
 
-    actions.append(showLink, createButton, copyLinkButton);
+    actions.append(useLeaderButton, showLink, createButton, copyLinkButton);
     copy.append(title, subtitle, actions);
     header.append(image, copy);
 
     const metaGrid = document.createElement("div");
     metaGrid.className = "operator-gallery-detail-meta";
+    const profile = getOperatorGalleryRoleProfile(operator);
+
+    const summaryPanel = document.createElement("section");
+    summaryPanel.className = "operator-gallery-summary-panel";
+    summaryPanel.append(
+        createOperatorGallerySummaryItem("Main role", profile.primaryRole),
+        createOperatorGallerySummaryItem("Element", operator.elementType && typeof formatElementLabel === "function" ? formatElementLabel(operator.elementType) : operator.elementType),
+        createOperatorGallerySummaryItem("Best use", getOperatorGalleryBestUse(profile, operator)),
+        createOperatorGallerySummaryItem("Key effects", profile.effectLabels.length ? profile.effectLabels.slice(0, 3).join(", ") : "-")
+    );
+
     metaGrid.append(
         createOperatorGalleryDetailMeta("Stars", operator.star ? `${operator.star}` : ""),
         createOperatorGalleryDetailMeta("Class", operator.operatorClass),
-        createOperatorGalleryDetailMeta("Element", operator.elementType && typeof formatElementLabel === "function" ? formatElementLabel(operator.elementType) : operator.elementType)
+        createOperatorGalleryDetailMeta("Element", operator.elementType && typeof formatElementLabel === "function" ? formatElementLabel(operator.elementType) : operator.elementType),
+        createOperatorGalleryDetailMeta("Main role", profile.primaryRole),
+        createOperatorGalleryDetailMeta("Skills", profile.skillCount ? `${profile.skillCount}` : ""),
+        createOperatorGalleryDetailMeta("Combo skills", profile.comboCount ? `${profile.comboCount}` : "0")
+    );
+
+    const roleTitle = document.createElement("h4");
+    roleTitle.className = "operator-gallery-detail-section-title";
+    roleTitle.textContent = "Role overview";
+
+    const rolePanel = document.createElement("section");
+    rolePanel.className = "operator-gallery-role-panel";
+    const roleChips = createOperatorGalleryRoleChips(profile);
+    const roleNote = document.createElement("p");
+    roleNote.textContent = profile.note;
+    rolePanel.append(roleChips, roleNote);
+
+    const infoGrid = document.createElement("div");
+    infoGrid.className = "operator-gallery-info-grid";
+    infoGrid.append(
+        createOperatorGalleryDetailMeta("Buff effects", profile.buffCount ? `${profile.buffCount}` : "0"),
+        createOperatorGalleryDetailMeta("Debuff effects", profile.debuffCount ? `${profile.debuffCount}` : "0"),
+        createOperatorGalleryDetailMeta("Tracked effects", profile.effectLabels.length ? profile.effectLabels.slice(0, 4).join(", ") : "-")
     );
 
     const skillTitle = document.createElement("h4");
@@ -471,8 +802,18 @@ function openOperatorGalleryDetail(operatorId) {
         skillList.appendChild(empty);
     }
 
-    detail.replaceChildren(backButton, header, metaGrid, skillTitle, skillList);
+    detail.replaceChildren(backButton, header, summaryPanel, metaGrid, roleTitle, rolePanel, infoGrid, skillTitle, skillList);
     detail.scrollTop = 0;
+}
+
+function startOperatorGalleryLeaderRotation(operatorId) {
+    closeOperatorGalleryDetail();
+    if (getOperatorGallerySlugFromHash()) {
+        history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+    }
+    if (typeof createRotationWithCommunityOperator === "function") {
+        createRotationWithCommunityOperator(operatorId);
+    }
 }
 
 function closeOperatorGalleryDetail() {

@@ -192,10 +192,14 @@
     z-index: 2;
 }
 
-.swap-operator-btn {
+.operator-row {
+    position: relative;
+}
+
+.swap-operator-btn,
+.operator-skill-detail-btn {
     position: absolute;
     top: 50%;
-    right: 8px;
     width: 34px;
     height: 30px;
     min-width: 34px;
@@ -214,6 +218,18 @@
     box-shadow: none;
 }
 
+.swap-operator-btn {
+    right: 8px;
+}
+
+.operator-skill-detail-btn {
+    left: 8px;
+}
+
+.operator-skill-card.leader .operator-skill-detail-btn {
+    left: 28px;
+}
+
 .swap-operator-btn svg {
     width: 16px;
     height: 16px;
@@ -224,7 +240,16 @@
     stroke-linejoin: round;
 }
 
-.swap-operator-btn:hover {
+.operator-skill-detail-btn::before {
+    content: "i";
+    font-size: 15px;
+    font-weight: 900;
+    font-family: Arial, sans-serif;
+    line-height: 1;
+}
+
+.swap-operator-btn:hover,
+.operator-skill-detail-btn:hover {
     transform: translateY(-50%);
     border-color: rgba(248,245,70,0.42);
     color: #fff;
@@ -233,9 +258,9 @@
 }
 
 .swap-operator-btn[data-button-tooltip]::before,
-.swap-operator-btn[data-button-tooltip]::after {
+.swap-operator-btn[data-button-tooltip]::after,
+.operator-skill-detail-btn[data-button-tooltip]::after {
     position: absolute;
-    right: 0;
     opacity: 0;
     pointer-events: none;
     transform: translateY(4px);
@@ -251,7 +276,16 @@
     border-bottom-color: rgba(30,34,36,0.98);
 }
 
+.operator-skill-detail-btn[data-button-tooltip]::after {
+    left: 0;
+}
+
 .swap-operator-btn[data-button-tooltip]::after {
+    right: 0;
+}
+
+.swap-operator-btn[data-button-tooltip]::after,
+.operator-skill-detail-btn[data-button-tooltip]::after {
     content: attr(data-button-tooltip);
     top: calc(100% + 15px);
     width: max-content;
@@ -276,7 +310,9 @@
 .swap-operator-btn[data-button-tooltip]:hover::before,
 .swap-operator-btn[data-button-tooltip]:hover::after,
 .swap-operator-btn[data-button-tooltip]:focus-visible::before,
-.swap-operator-btn[data-button-tooltip]:focus-visible::after {
+.swap-operator-btn[data-button-tooltip]:focus-visible::after,
+.operator-skill-detail-btn[data-button-tooltip]:hover::after,
+.operator-skill-detail-btn[data-button-tooltip]:focus-visible::after {
     opacity: 1;
     transform: translateY(0);
 }
@@ -311,7 +347,8 @@
     align-items: center;
     justify-content: center;
     padding: 0 12px 0 12px;
-    padding-right: 42px;
+    padding-left: 48px;
+    padding-right: 48px;
     font-size: 17px;
     font-weight: 800;
     color: #ffffff;
@@ -330,6 +367,10 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.operator-skill-card.leader .operator-skill-name {
+    padding-left: 68px;
 }
 
 .skill-row {
@@ -571,17 +612,28 @@
         padding: 3px 12px;
     }
 
-    .swap-operator-btn {
+    .swap-operator-btn,
+    .operator-skill-detail-btn {
         top: 40px;
     }
 
     .operator-skill-name {
         height: 32px;
         font-size: 15px;
+        padding-left: 46px;
+        padding-right: 46px;
         background:
             linear-gradient(180deg, rgba(8,10,12,0.92), rgba(0,0,0,0.68));
         backdrop-filter: blur(3px);
         -webkit-backdrop-filter: blur(3px);
+    }
+
+    .operator-skill-card.leader .operator-skill-detail-btn {
+        left: 30px;
+    }
+
+    .operator-skill-card.leader .operator-skill-name {
+        padding-left: 66px;
     }
 
     .operator-skill-card.leader .skill-row {

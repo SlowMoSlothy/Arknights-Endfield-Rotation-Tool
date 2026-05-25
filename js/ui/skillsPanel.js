@@ -454,6 +454,25 @@ function createSwapOperatorButton(op, index) {
     return button;
 }
 
+function createSkillOperatorDetailButton(op) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "operator-skill-detail-btn";
+    button.dataset.buttonTooltip = "Operator details";
+    button.setAttribute("aria-label", `${op.name} details anzeigen`);
+
+    button.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (typeof openOperatorGalleryDetail === "function") {
+            openOperatorGalleryDetail(op.id);
+        }
+    });
+
+    return button;
+}
+
 function createAddOperatorCard(index) {
     const button = document.createElement("button");
     button.type = "button";
@@ -494,11 +513,15 @@ function renderSkills() {
         if (index === 0) card.classList.add("leader");
 
         const swapBtn = createSwapOperatorButton(op, index);
+        const detailBtn = createSkillOperatorDetailButton(op);
         
 
         const opRow = document.createElement("div");
         opRow.className = "operator-row";
-        opRow.innerHTML = `<div class="operator-skill-name">${op.name}</div>`;
+        const opName = document.createElement("div");
+        opName.className = "operator-skill-name";
+        opName.textContent = op.name;
+        opRow.appendChild(opName);
         if (index === 0) {
             const leaderBadge = document.createElement("div");
             leaderBadge.className = "leader-badge";
@@ -523,6 +546,7 @@ function renderSkills() {
             skillRow.appendChild(div);
             attachSkillTooltipEvents(div, skillData);
         });
+        opRow.appendChild(detailBtn);
         opRow.appendChild(swapBtn);
         card.appendChild(opRow);
         operatorWrapper.appendChild(card);

@@ -245,16 +245,33 @@
     .operator-skill-name {
         height: 30px;
         font-size: 13px;
+        padding-left: 36px;
         padding-right: 36px;
     }
 
-    .swap-operator-btn {
+    .swap-operator-btn,
+    .operator-skill-detail-btn {
         top: 15px;
-        right: 7px;
         width: 32px;
         height: 28px;
         min-width: 32px;
         min-height: 28px;
+    }
+
+    .swap-operator-btn {
+        right: 7px;
+    }
+
+    .operator-skill-detail-btn {
+        left: 7px;
+    }
+
+    .operator-skill-card.leader .operator-skill-detail-btn {
+        left: 27px;
+    }
+
+    .operator-skill-card.leader .operator-skill-name {
+        padding-left: 62px;
     }
 
     .swap-operator-btn svg {
