@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/sitemap.xml
+Sitemap: https://rotationforge.gg/sitemap.xml

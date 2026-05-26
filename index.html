@@ -1,831 +1,409 @@
-<!DOCTYPE html>
-<html lang="de">
-
+<!doctype html>
+<html lang="en">
 <head>
-  <link rel="icon" type="image/png" href="./assets/favicon.png"
-  <meta name="google-site-verification" content="3HTRnl53o187nzooCTo5wvQL0SCGiNXD-183J0SOC1o" />
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- SEO -->
-    <title>Arknights: Endfield Rotation Builder [Open Beta]</title>
-
-    <meta name="description"
-      content="Arknights: Endfield Rotation Builder for planning teams, operator skills, combo rotations, reactions, buffs, debuffs and shared combat timelines.">
-    <meta name="keywords"
-          content="Arknights Endfield, Rotation Builder, Combo Planner, Team Builder">
-    <link rel="canonical" href="https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/">
-
-   <meta property="og:title"
-      content="Arknights: Endfield Rotation Builder [Open Beta]">
-   
-   <meta property="og:description"
-      content="Interactive combo planner for Arknights: Endfield with reactions, buffs, debuffs and rotation tracking.">
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RotationForge</title>
+  <meta name="description" content="RotationForge is a home for fan-made combat rotation tools. The first available planner is built for Arknights: Endfield.">
+  <link rel="canonical" href="https://rotationforge.gg/">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <meta property="og:title" content="RotationForge">
+  <meta property="og:description" content="Launch the Arknights: Endfield rotation tool from RotationForge.">
   <meta property="og:type" content="website">
-
-  <meta property="og:url" content="https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/">
-  <meta property="og:image" content="https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/assets/banner.png">
-  <meta property="og:image:width" content="1128">
-  <meta property="og:image:height" content="449">
+  <meta property="og:url" content="https://rotationforge.gg/">
+  <meta property="og:image" content="https://rotationforge.gg/endfield/assets/banner.png">
   <meta name="twitter:card" content="summary_large_image">
-  <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "Arknights: Endfield Rotation Builder",
-      "url": "https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/",
-      "applicationCategory": "GameApplication",
-      "operatingSystem": "Any",
-      "description": "Interactive rotation builder for Arknights: Endfield teams, operator skills, reactions, buffs, debuffs and shared combat timelines.",
-      "isAccessibleForFree": true
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #070b10;
+      --text: #edf6ff;
+      --muted: #a9b9c8;
+      --line: rgba(157, 183, 204, 0.2);
+      --panel: rgba(12, 18, 26, 0.84);
+      --accent: #7ce0ff;
+      --accent-strong: #f2c86b;
     }
-  </script>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/mobile.css">
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        linear-gradient(90deg, rgba(5, 9, 14, 0.96) 0%, rgba(5, 9, 14, 0.82) 42%, rgba(5, 9, 14, 0.44) 100%),
+        url("endfield/assets/banner.png") center / cover no-repeat,
+        var(--bg);
+    }
+
+    .page {
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      min-height: 100vh;
+      padding: 28px clamp(20px, 5vw, 72px);
+    }
+
+    .nav,
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 800;
+    }
+
+    .brand img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+      filter: drop-shadow(0 10px 22px rgba(124, 224, 255, 0.25));
+    }
+
+    .nav a:not(.brand),
+    .footer a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+
+    .hero {
+      display: grid;
+      align-items: center;
+      max-width: 780px;
+      min-height: 62vh;
+      padding: clamp(52px, 9vh, 104px) 0 42px;
+    }
+
+    .kicker {
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 18px 0;
+      max-width: 720px;
+      font-size: 6.4rem;
+      line-height: 0.92;
+    }
+
+    .copy {
+      max-width: 600px;
+      margin: 0 0 34px;
+      color: var(--muted);
+      font-size: 1.15rem;
+      line-height: 1.7;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .primary,
+    .secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 20px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 800;
+    }
+
+    .primary {
+      color: #071017;
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      box-shadow: 0 18px 50px rgba(124, 224, 255, 0.2);
+    }
+
+    .secondary {
+      color: var(--text);
+      border: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1px;
+      max-width: 620px;
+      margin-top: 44px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--line);
+    }
+
+    .games {
+      padding: 0 0 46px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 22px;
+      margin-bottom: 18px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: 1.55rem;
+      line-height: 1.1;
+    }
+
+    .section-heading p {
+      max-width: 420px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .game-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) repeat(2, minmax(220px, 0.72fr));
+      gap: 14px;
+      max-width: 1040px;
+    }
+
+    .game-card {
+      position: relative;
+      min-height: 190px;
+      padding: 20px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(9, 15, 22, 0.82);
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .game-card.active {
+      min-height: 240px;
+      background:
+        linear-gradient(115deg, rgba(9, 15, 22, 0.92), rgba(9, 15, 22, 0.44)),
+        url("endfield/assets/banner.png") center / cover no-repeat;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.26);
+    }
+
+    .game-card.soon {
+      display: grid;
+      align-content: space-between;
+    }
+
+    .game-status {
+      display: inline-flex;
+      width: fit-content;
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--accent);
+      background: rgba(7, 11, 16, 0.62);
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .game-card h3 {
+      max-width: 420px;
+      margin: 54px 0 8px;
+      font-size: 1.6rem;
+      line-height: 1.15;
+    }
+
+    .game-card.active h3 {
+      font-size: 2rem;
+    }
+
+    .game-card p {
+      max-width: 460px;
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .game-action {
+      display: inline-flex;
+      margin-top: 22px;
+      color: var(--accent-strong);
+      font-weight: 800;
+    }
+
+    .stat {
+      padding: 18px;
+      background: rgba(8, 13, 19, 0.78);
+    }
+
+    .stat strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 1.35rem;
+    }
+
+    .stat span,
+    .footer {
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    @media (max-width: 1000px) {
+      h1 {
+        font-size: 4.8rem;
+      }
+    }
+
+    @media (max-width: 720px) {
+      body {
+        background:
+          linear-gradient(180deg, rgba(5, 9, 14, 0.78) 0%, rgba(5, 9, 14, 0.96) 38%, rgba(5, 9, 14, 1) 100%),
+          url("endfield/assets/banner.png") top center / auto 42vh no-repeat,
+          var(--bg);
+      }
+
+      .page {
+        padding: 20px;
+      }
+
+      .nav {
+        align-items: flex-start;
+      }
+
+      .nav a:not(.brand) {
+        display: none;
+      }
+
+      .hero {
+        min-height: auto;
+        padding-top: 34vh;
+      }
+
+      h1 {
+        font-size: 3.2rem;
+      }
+
+      .copy {
+        font-size: 1rem;
+      }
+
+      .actions,
+      .primary,
+      .secondary {
+        width: 100%;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .game-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
 </head>
+<body>
+  <div class="page">
+    <nav class="nav" aria-label="Primary">
+      <a class="brand" href="./">
+        <img src="favicon.png" alt="">
+        <span>RotationForge</span>
+      </a>
+      <a href="endfield/">Tools</a>
+    </nav>
 
-<body class="app-loading">
-  <link rel="stylesheet" href="css/settings.css?v=3">
-  <div id="globalTooltip" class="global-tooltip"></div>
-
-  <div id="appLoadingScreen" class="app-loading-screen" role="status" aria-live="polite" aria-busy="true">
-    <div class="app-loading-card">
-      <img class="app-loading-logo" src="assets/header.png" alt="Arknights Endfield Rotation Builder">
-      <div class="app-loading-orbit" aria-hidden="true">
-        <span></span>
-      </div>
-      <div class="app-loading-copy">
-        <strong>Loading database</strong>
-        <span>Preparing operators and rotation data</span>
-      </div>
-    </div>
-  </div>
-
-  <div id="selectionScreen" style="display:none;">
-    <button id="closeTeamModalBtn" class="close-team-modal-btn" onclick="closeTeamSelectionModal()">
-      ×
-    </button>
-    <div class="selection-hero">
-      <div class="selection-brand">
-        <span>TEAM BUILDER FOR</span>
-        <strong>Arknights: ENDFIELD</strong>
+    <main class="hero">
+      <span class="kicker">Rotation tool hub</span>
+      <h1>Rotation planning for more games.</h1>
+      <p class="copy">
+        RotationForge starts with Arknights: Endfield and grows into a home for fan-made planners, team timelines, and shareable combat routes.
+      </p>
+      <div class="actions">
+        <a class="primary" href="endfield/">Launch Arknights: Endfield Tool</a>
+        <a class="secondary" href="#games">Browse Tools</a>
       </div>
 
-      <button class="selection-confirm-btn" onclick="confirmTeam()">
-        <span class="confirm-check">✓</span>
-        <span>Confirm team</span>
-      </button>
-      <button class="mobile-confirm-fab" onclick="confirmTeam()">
-        ✓
-      </button>
-    </div>
-
-    <div class="selection-divider"></div>
-
-    <div class="selection-title-row">
-      <h2 class="selection-section-title">Choose your team</h2>
-      <span class="selection-max-label">// MAX. 4</span>
-    </div>
-
-    <div id="teamSlots" class="team-slots"></div>
-
-    <div class="selection-title-row operator-title-row">
-      <h3 class="selection-section-title">Select operator</h3>
-    </div>
-
-    <div id="operatorFilters" class="operator-filter-panel"></div>
-
-    <div id="operatorList" class="operator-grid"></div>
-  </div>
-
-  <div id="builderScreen" style="display:none;">
-    <header class="app-brand">
-      <img class="app-logo" src="assets/header.png" alt="Arknights Endfield Rotation Builder">
-      <div class="account-bar" aria-label="Account actions">
-        <img id="accountAvatar" class="account-avatar" alt="" hidden>
-        <span id="accountUserLabel" class="account-user-label" hidden></span>
-        <button id="accountSignInBtn" class="account-action-btn" type="button">Sign In</button>
-        <button id="accountCreateBtn" class="account-action-btn account-action-primary" type="button">Create
-          Account</button>
-        <button id="accountSignOutBtn" class="account-action-btn" type="button" hidden>Sign Out</button>
-      </div>
-    </header>
-
-    <div class="builder-shell">
-      <div class="builder-top">
-        <h3>Selected Team</h3>
-        <div id="selectedOperators" class="team-top-panel"></div>
-      </div>
-
-      <div class="builder-divider"></div>
-
-      <div class="builder-content">
-        <aside class="builder-sidebar">
-          <h3>Menu</h3>
-          <button id="openMyRotationsBtn" class="sidebar-command" type="button" hidden>
-            <span class="sidebar-command-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" focusable="false">
-                <path d="M6 3h9l3 3v15H6z"></path>
-                <path d="M14 3v4h4"></path>
-                <path d="M9 12h6"></path>
-                <path d="M9 16h6"></path>
-              </svg>
-            </span>
-            <span class="sidebar-command-label">My Rotations</span>
-            <span class="sidebar-command-signal"></span>
-          </button>
-          <button id="openProfileBtn" class="sidebar-command" type="button" hidden>
-            <span class="sidebar-command-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" focusable="false">
-                <circle cx="12" cy="8" r="4"></circle>
-                <path d="M5 20c1.2-4 3.6-6 7-6s5.8 2 7 6"></path>
-              </svg>
-            </span>
-            <span class="sidebar-command-label">Profile</span>
-            <span class="sidebar-command-signal"></span>
-          </button>
-          <button id="openCommunityRotationsBtn" class="sidebar-command" type="button">
-            <span class="sidebar-command-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" focusable="false">
-                <circle cx="9" cy="8" r="3"></circle>
-                <circle cx="17" cy="10" r="2.5"></circle>
-                <path d="M3.5 20c.9-4 2.7-6 5.5-6s4.6 2 5.5 6"></path>
-                <path d="M14.5 15c2.8.2 4.8 1.9 6 5"></path>
-              </svg>
-            </span>
-            <span class="sidebar-command-label">Community</span>
-            <span class="sidebar-command-signal"></span>
-          </button>
-          <button id="openOperatorGalleryBtn" class="sidebar-command" type="button">
-            <span class="sidebar-command-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" focusable="false">
-                <rect x="4" y="5" width="6" height="6" rx="1"></rect>
-                <rect x="14" y="5" width="6" height="6" rx="1"></rect>
-                <rect x="4" y="15" width="6" height="6" rx="1"></rect>
-                <rect x="14" y="15" width="6" height="6" rx="1"></rect>
-              </svg>
-            </span>
-            <span class="sidebar-command-label">Operator Gallery</span>
-            <span class="sidebar-command-signal"></span>
-          </button>
-          <button id="openAdminPanelBtn" class="sidebar-command" type="button" hidden>
-            <span class="sidebar-command-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" focusable="false">
-                <path d="M12 3l7 3v5c0 4.5-2.5 7.8-7 10-4.5-2.2-7-5.5-7-10V6z"></path>
-                <path d="M9 12l2 2 4-5"></path>
-              </svg>
-            </span>
-            <span class="sidebar-command-label">Admin</span>
-            <span class="sidebar-command-signal"></span>
-          </button>
-          <button id="openSettingsBtn" class="sidebar-command" type="button">
-            <span class="sidebar-command-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" focusable="false">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path
-                  d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.08V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.08-.4H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.08V3a2 2 0 0 1 4 0v.09A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 .6 1 1.7 1.7 0 0 0 1.08.4H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.51.6z">
-                </path>
-              </svg>
-            </span>
-            <span class="sidebar-command-label">Settings</span>
-            <span class="sidebar-command-signal"></span>
-          </button>
-        </aside>
-
-        <main class="builder-main">
-          <section class="builder-panel">
-            <div class="rotation-actions" aria-label="Rotation actions">
-                <span class="rotation-action-tooltip-host" data-action-tooltip="Export rotation as PNG image">
-                  <button id="exportRotationBtn" class="rotation-action-btn rotation-action-primary" type="button"
-                    onclick="exportImage()" aria-label="Export rotation as PNG image" disabled>
-                    <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <rect x="4" y="5" width="16" height="14" rx="2"></rect>
-                      <circle cx="9" cy="10" r="1.5"></circle>
-                      <path d="M6.5 17l4.2-4.2 2.8 2.8 1.7-1.7 2.3 3.1"></path>
-                    </svg>
-                  </button>
-                </span>
-                <span class="rotation-action-tooltip-host" data-action-tooltip="Copy share code">
-                  <button id="copyShareCodeBtn" class="rotation-action-btn" type="button" onclick="copyBuildShareCode()"
-                    aria-label="Copy share code" disabled>
-                    <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <rect x="8" y="8" width="11" height="11" rx="2"></rect>
-                      <path d="M5 15V7a2 2 0 0 1 2-2h8"></path>
-                    </svg>
-                  </button>
-                </span>
-                <span class="rotation-action-tooltip-host" data-action-tooltip="Copy share link">
-                  <button id="copyShareLinkBtn" class="rotation-action-btn" type="button" onclick="copyBuildShareLink()"
-                    aria-label="Copy share link" disabled>
-                    <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <circle class="rotation-action-icon-dot" cx="18" cy="5" r="2.5"></circle>
-                      <circle class="rotation-action-icon-dot" cx="6" cy="12" r="2.5"></circle>
-                      <circle class="rotation-action-icon-dot" cx="18" cy="19" r="2.5"></circle>
-                      <path d="M8.3 10.8l7.4-4.4"></path>
-                      <path d="M8.3 13.2l7.4 4.4"></path>
-                    </svg>
-                  </button>
-                </span>
-                <span id="saveRotationMenuHost" class="rotation-action-tooltip-host rotation-save-menu-host"
-                  data-action-tooltip="Save Rotation in...">
-                  <button id="saveRotationMenuBtn" class="rotation-action-btn" type="button"
-                    onclick="toggleRotationSaveMenu(event)" aria-label="Save Rotation in..." aria-haspopup="menu"
-                    aria-expanded="false" disabled>
-                    <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M5 4h12l2 2v14H5z"></path>
-                      <path d="M8 4v6h8V4"></path>
-                      <path d="M8 17h8"></path>
-                      <path d="M9 10h6"></path>
-                    </svg>
-                  </button>
-                  <div id="rotationSaveMenu" class="rotation-save-menu" role="menu" hidden>
-                    <button type="button" role="menuitem" onclick="saveRotationInMyRotations()">My rotations</button>
-                    <button type="button" role="menuitem" onclick="saveRotationInCommunity()">Community
-                      Rotations</button>
-                  </div>
-                </span>
-                <span class="rotation-action-tooltip-host" data-action-tooltip="Import share code or share link">
-                  <button class="rotation-action-btn" type="button" onclick="loadBuildShareCode()"
-                    aria-label="Import share code or share link">
-                    <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M3.5 8.5h6l2 2h9v7a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"></path>
-                      <path d="M3.5 8.5V6a2 2 0 0 1 2-2h4l2 2h4"></path>
-                      <path d="M12 13v5"></path>
-                      <path d="M9.8 15.8 12 18l2.2-2.2"></path>
-                    </svg>
-                  </button>
-                </span>
-                <span class="rotation-action-tooltip-host" data-action-tooltip="Create new rotation">
-                  <button class="rotation-action-btn rotation-action-danger" type="button" onclick="createNewRotation()"
-                    aria-label="Create new rotation">
-                    <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M12 5v14"></path>
-                      <path d="M5 12h14"></path>
-                    </svg>
-                  </button>
-                </span>
-              </div>
-              <div class="rotation-skills-dock">
-                <h3>Skills</h3>
-                <div id="skillList" class="skills-panel"></div>
-              </div>
-              <h3 class="rotation-panel-title">Rotation</h3>
-              <div id="rotation" class="rotation-panel">
-                <div id="rotationDropZone"></div>
-              </div>
-          </section>
-          <section id="enemyPanel" class="builder-panel">
-            <h3>Enemy</h3>
-            <button id="selectEnemyBtn" type="button">Select Enemy</button>
-            <div id="enemySkillBar" class="skills-panel"></div>
-          </section>
-        </main>
-      </div>
-    </div>
-  </div>
-
-  <div id="settingsModal" class="settings-modal">
-    <div class="settings-dialog">
-      <div class="settings-header">
-        <h2 class="settings-title">Settings</h2>
-        <button id="closeSettingsBtn" class="settings-close" type="button">×</button>
-      </div>
-      <div class="settings-section">
-        <span class="settings-label">Rotation Mode</span>
-        <div class="settings-option-row settings-mode-row">
-          <button class="settings-option-btn settings-mode-btn" data-setting="timelineMode" data-value="slot">
-            <div class="settings-option-title">Slot Mode</div>
-            <div class="settings-size-label">Fixed order</div>
-          </button>
-          <button class="settings-option-btn settings-mode-btn" data-setting="timelineMode" data-value="simulation">
-            <div class="settings-option-title">Simulation Mode</div>
-            <div class="settings-size-label">0.1s free placement</div>
-          </button>
+      <section class="stats" aria-label="Tool highlights">
+        <div class="stat">
+          <strong>Teams</strong>
+          <span>Plan 4-operator setups</span>
         </div>
-      </div>
-      <div class="settings-section">
-        <label class="settings-label" for="simulationSpPerSecondInput">SP per second</label>
-        <input id="simulationSpPerSecondInput" class="settings-number-input" type="number" min="0" max="200" step="0.1" value="8">
-      </div>
-      <div class="settings-section">
-        <span class="settings-label">Rotation Skill Size</span>
-        <div class="settings-option-row">
-          <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="medium">
-            <div class="settings-option-title">Medium</div>
-            <div class="settings-preview">
-              <div class="settings-preview-box" style="width: 52px; height: 52px;"></div>
-            </div>
-            <div class="settings-size-label">72px</div>
-          </button>
-          <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="large">
-            <div class="settings-option-title">Large</div>
-            <div class="settings-preview">
-              <div class="settings-preview-box" style="width: 66px; height: 66px;"></div>
-            </div>
-            <div class="settings-size-label">88px</div>
-          </button>
-          <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="xl">
-            <div class="settings-option-title">XL</div>
-            <div class="settings-preview">
-              <div class="settings-preview-box" style="width: 78px; height: 78px;"></div>
-            </div>
-            <div class="settings-size-label">104px</div>
-          </button>
-          <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="xxl">
-            <div class="settings-option-title">XXL</div>
-            <div class="settings-preview">
-              <div class="settings-preview-box" style="width: 92px; height: 92px;"></div>
-            </div>
-            <div class="settings-size-label">120px</div>
-          </button>
+        <div class="stat">
+          <strong>Timeline</strong>
+          <span>Map skills and combos</span>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="myRotationsModal" class="settings-modal my-rotations-modal">
-    <div class="settings-dialog my-rotations-dialog">
-      <div class="settings-header">
-        <h2 id="myRotationsTitle" class="settings-title">My Rotations</h2>
-        <button id="closeMyRotationsModalBtn" class="settings-close" type="button">&times;</button>
-      </div>
-
-      <section id="myRotationsAuthPanel" class="my-rotations-auth-panel">
-        <p id="myRotationsIntro" class="my-rotations-intro">Create an account or sign in to save private rotations and
-          submit them for Community review later.</p>
-        <form id="myRotationsAuthForm" class="my-rotations-form">
-          <label class="my-rotations-field">
-            <span>Email</span>
-            <input id="myRotationsEmailInput" type="email" autocomplete="email" required placeholder="you@example.com">
-          </label>
-          <label id="myRotationsUsernameField" class="my-rotations-field" hidden>
-            <span>Username</span>
-            <input id="myRotationsUsernameInput" type="text" autocomplete="username" minlength="3" maxlength="24"
-              pattern="[A-Za-z0-9_]{3,24}" placeholder="Endministrator">
-          </label>
-          <label class="my-rotations-field">
-            <span>Password</span>
-            <input id="myRotationsPasswordInput" type="password" autocomplete="current-password" minlength="6" required
-              placeholder="Password">
-          </label>
-          <div id="myRotationsAuthStatus" class="my-rotations-status"></div>
-          <div class="my-rotations-actions">
-            <button id="myRotationsForgotPasswordButton" class="my-link-btn" type="button">Forgot password?</button>
-            <button id="myRotationsRegisterButton" class="my-secondary-btn" type="button">Create Account</button>
-            <button id="myRotationsSignInButton" class="my-primary-btn" type="submit">Sign In</button>
-          </div>
-        </form>
+        <div class="stat">
+          <strong>Share</strong>
+          <span>Publish rotation codes</span>
+        </div>
       </section>
+    </main>
 
-      <section id="myRotationsContentPanel" class="my-rotations-content-panel" hidden>
-        <div class="my-rotations-session-bar">
-          <div class="my-rotations-session-copy">
-            <span>Signed in as</span>
-            <strong id="myRotationsUserName">Account</strong>
-          </div>
-          <div class="my-rotations-session-actions">
-            <button id="myRotationsRefreshButton" class="my-secondary-btn" type="button">Refresh</button>
-            <button id="myRotationsSignOutButton" class="my-secondary-btn" type="button">Sign Out</button>
-          </div>
-        </div>
-
-        <div id="myRotationsListStatus" class="my-rotations-status"></div>
-        <div id="myRotationDetailPanel" class="my-rotation-detail-panel" hidden></div>
-        <div id="myRotationsList" class="my-rotations-list"></div>
-      </section>
-    </div>
-  </div>
-
-  <div id="profileModal" class="settings-modal my-rotations-modal">
-    <div class="settings-dialog my-profile-dialog">
-      <div class="settings-header">
-        <h2 class="settings-title">Profile</h2>
-        <button id="closeProfileModalBtn" class="settings-close" type="button">&times;</button>
+    <section id="games" class="games" aria-labelledby="gamesTitle">
+      <div class="section-heading">
+        <h2 id="gamesTitle">Available tools</h2>
+        <p>One game is live right now. More rotation planners can be added here as new projects are built.</p>
       </div>
 
-      <section class="my-account-panel">
-        <div class="my-account-header">
+      <div class="game-grid">
+        <a class="game-card active" href="endfield/">
+          <span class="game-status">Live</span>
+          <h3>Arknights: Endfield</h3>
+          <p>Build Arknights: Endfield teams, compare skill orders, track reactions, and share combat timelines.</p>
+          <span class="game-action">Open planner</span>
+        </a>
+
+        <article class="game-card soon">
+          <span class="game-status">Coming soon</span>
           <div>
-            <h3>Account</h3>
-            <p>Change your public username and avatar.</p>
+            <h3>Next game</h3>
+            <p>A new rotation planner slot for the next combat system.</p>
           </div>
-          <img id="myProfileAvatarPreview" class="my-profile-avatar" alt="" hidden>
-        </div>
-        <form id="myProfileForm" class="my-profile-form">
-          <label class="my-rotations-field">
-            <span>Username</span>
-            <input id="myProfileUsernameInput" type="text" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}"
-              required placeholder="Endministrator">
-          </label>
-          <label class="my-rotations-field">
-            <span>Avatar</span>
-            <input id="myProfileAvatarInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
-          </label>
-          <div id="myProfileStatus" class="my-rotations-status"></div>
-          <div class="my-rotations-actions">
-            <button id="myProfileRemoveAvatarButton" class="my-secondary-btn" type="button">Remove Avatar</button>
-            <button id="myProfileSaveButton" class="my-secondary-btn" type="submit">Save Account</button>
+        </article>
+
+        <article class="game-card soon">
+          <span class="game-status">Coming soon</span>
+          <div>
+            <h3>Future tool</h3>
+            <p>Another game can join the hub without changing the domain structure.</p>
           </div>
-        </form>
-      </section>
-    </div>
-  </div>
-
-  <div id="passwordResetModal" class="settings-modal my-rotations-modal">
-    <div class="settings-dialog my-profile-dialog">
-      <div class="settings-header">
-        <h2 class="settings-title">Reset Password</h2>
-        <button id="closePasswordResetModalBtn" class="settings-close" type="button">&times;</button>
-      </div>
-
-      <p class="my-rotations-intro">Enter a new password for your account.</p>
-      <form id="myPasswordResetForm" class="my-profile-form">
-        <label class="my-rotations-field">
-          <span>New Password</span>
-          <input id="myPasswordResetInput" type="password" autocomplete="new-password" minlength="6" required
-            placeholder="New password">
-        </label>
-        <label class="my-rotations-field">
-          <span>Confirm Password</span>
-          <input id="myPasswordResetConfirmInput" type="password" autocomplete="new-password" minlength="6" required
-            placeholder="Repeat password">
-        </label>
-        <div id="myPasswordResetStatus" class="my-rotations-status"></div>
-        <div class="my-rotations-actions">
-          <button id="myPasswordResetSaveButton" class="my-primary-btn" type="submit">Save Password</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div id="rotationQuickSaveModal" class="settings-modal my-rotations-modal">
-    <div class="settings-dialog rotation-quick-save-dialog">
-      <div class="settings-header">
-        <h2 id="rotationQuickSaveTitle" class="settings-title">Save Rotation</h2>
-        <button id="closeRotationQuickSaveModalBtn" class="settings-close" type="button">&times;</button>
-      </div>
-
-      <p id="rotationQuickSaveIntro" class="my-rotations-intro">Save this rotation.</p>
-      <form id="rotationQuickSaveForm" class="rotation-quick-save-form">
-        <label class="my-rotations-field">
-          <span>Title</span>
-          <input id="rotationQuickSaveTitleInput" type="text" minlength="3" maxlength="80" required
-            placeholder="Electric opener">
-        </label>
-        <label class="my-rotations-field">
-          <span>Description</span>
-          <textarea id="rotationQuickSaveDescriptionInput" maxlength="600" rows="3"
-            placeholder="Short notes for this rotation"></textarea>
-        </label>
-        <div id="rotationQuickSaveStatus" class="my-rotations-status"></div>
-        <div class="my-rotations-actions">
-          <button id="cancelRotationQuickSaveBtn" class="my-secondary-btn" type="button">Cancel</button>
-          <button id="submitRotationQuickSaveBtn" class="my-primary-btn" type="submit">Save Rotation</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div id="communityModal" class="settings-modal community-modal">
-    <div class="settings-dialog community-dialog">
-      <div class="settings-header">
-        <h2 class="settings-title">Community Rotations</h2>
-        <button id="closeCommunityModalBtn" class="settings-close" type="button">&times;</button>
-      </div>
-
-      <div class="community-toolbar">
-        <label class="community-search-wrap">
-          <span>Search</span>
-          <input id="communitySearchInput" class="community-search-input" type="search"
-            placeholder="Rotation, author, operator">
-        </label>
-        <div class="community-toolbar-actions">
-          <button id="refreshCommunityRotationsBtn" class="community-refresh-btn" type="button">Refresh</button>
-          <button id="openCommunitySubmitFormBtn" class="community-submit-toggle" type="button">Submit Current</button>
-        </div>
-      </div>
-
-      <div class="community-filter-panel" aria-label="Community rotation filters">
-        <div class="community-filter-group">
-          <span class="community-filter-label">Element</span>
-          <div id="communityElementFilters" class="community-filter-options"></div>
-        </div>
-        <div class="community-filter-group">
-          <span class="community-filter-label">Class</span>
-          <div id="communityClassFilters" class="community-filter-options"></div>
-        </div>
-        <div class="community-filter-group community-sort-group">
-          <label class="community-sort-wrap">
-            <span class="community-filter-label">Sort</span>
-            <select id="communitySortSelect" class="community-sort-select">
-              <option value="newest">Newest</option>
-              <option value="oldest">Oldest</option>
-              <option value="views">Most viewed</option>
-              <option value="likes">Most liked</option>
-              <option value="skills">Most skills</option>
-            </select>
-          </label>
-          <button id="clearCommunityFiltersBtn" class="community-clear-filters-btn" type="button">Reset</button>
-        </div>
-      </div>
-
-      <form id="communitySubmitForm" class="community-submit-form" hidden>
-        <div class="community-form-grid">
-          <label class="community-field">
-            <span>Title</span>
-            <input id="communitySubmitTitle" type="text" minlength="3" maxlength="80" required
-              placeholder="Electric burst opener">
-          </label>
-          <label class="community-field">
-            <span>Author</span>
-            <input id="communitySubmitAuthor" type="text" maxlength="40" placeholder="Account username" readonly>
-          </label>
-        </div>
-        <label class="community-field">
-          <span>Description</span>
-          <textarea id="communitySubmitDescription" maxlength="600" rows="3"
-            placeholder="Short notes for this rotation"></textarea>
-        </label>
-        <div id="communitySubmitStatus" class="community-submit-status"></div>
-        <div class="community-submit-actions">
-          <button id="cancelCommunitySubmitBtn" class="community-secondary-btn" type="button">Cancel</button>
-          <button id="communitySubmitButton" class="community-submit-btn" type="submit">Submit for review</button>
-        </div>
-      </form>
-
-      <div id="communityDetailPanel" class="community-detail-panel" hidden></div>
-      <div id="communityRotationStatus" class="community-status"></div>
-      <div id="communityRotationList" class="community-rotation-list"></div>
-    </div>
-  </div>
-
-  <div id="operatorGalleryModal" class="settings-modal operator-gallery-modal">
-    <div class="settings-dialog operator-gallery-dialog">
-      <div class="settings-header">
-        <h2 class="settings-title">Operator Gallery</h2>
-        <button id="closeOperatorGalleryBtn" class="settings-close" type="button">&times;</button>
-      </div>
-
-      <div class="operator-gallery-toolbar">
-        <label class="operator-gallery-search-wrap">
-          <span>Search</span>
-          <input id="operatorGallerySearchInput" class="operator-gallery-search-input" type="search"
-            placeholder="Operator name">
-        </label>
-        <div class="operator-gallery-count" id="operatorGalleryCount"></div>
-      </div>
-
-      <div class="operator-gallery-filter-panel" aria-label="Operator gallery filters">
-        <div class="operator-gallery-filter-group">
-          <span class="operator-gallery-filter-label">Stars</span>
-          <div id="operatorGalleryStarFilters" class="operator-gallery-filter-options"></div>
-        </div>
-        <div class="operator-gallery-filter-group">
-          <span class="operator-gallery-filter-label">Class</span>
-          <div id="operatorGalleryClassFilters" class="operator-gallery-filter-options"></div>
-        </div>
-        <div class="operator-gallery-filter-group">
-          <span class="operator-gallery-filter-label">Element</span>
-          <div id="operatorGalleryElementFilters" class="operator-gallery-filter-options"></div>
-        </div>
-        <div class="operator-gallery-filter-group">
-          <span class="operator-gallery-filter-label">Role</span>
-          <div id="operatorGalleryRoleFilters" class="operator-gallery-filter-options"></div>
-        </div>
-      </div>
-
-      <div id="operatorGalleryList" class="operator-gallery-list"></div>
-    </div>
-  </div>
-
-  <div id="operatorDetailModal" class="settings-modal operator-detail-modal">
-    <div class="settings-dialog operator-gallery-dialog">
-      <div class="settings-header">
-        <h2 class="settings-title">Operator Details</h2>
-        <button id="closeOperatorDetailBtn" class="settings-close" type="button">&times;</button>
-      </div>
-
-      <section id="operatorGalleryDetail" class="operator-gallery-detail"></section>
-    </div>
-  </div>
-
-  <div id="adminModal" class="settings-modal admin-modal">
-    <div class="settings-dialog admin-dialog">
-      <div class="settings-header">
-        <h2 class="settings-title">Admin Review</h2>
-        <button id="closeAdminPanelBtn" class="settings-close" type="button">&times;</button>
-      </div>
-
-      <section id="adminLoginPanel" class="admin-login-panel">
-        <p class="admin-intro">Sign in with your Supabase admin account to review submitted rotations.</p>
-        <form id="adminLoginForm" class="admin-login-form">
-          <label class="admin-field">
-            <span>Email</span>
-            <input id="adminEmailInput" type="email" autocomplete="email" required placeholder="admin@example.com">
-          </label>
-          <label class="admin-field">
-            <span>Password</span>
-            <input id="adminPasswordInput" type="password" autocomplete="current-password" required
-              placeholder="Password">
-          </label>
-          <div id="adminLoginStatus" class="admin-status"></div>
-          <div class="admin-login-actions">
-            <button id="adminLoginSignOutBtn" class="admin-secondary-btn" type="button" hidden>Sign out</button>
-            <button id="adminLoginButton" class="admin-primary-btn" type="submit">Sign in</button>
-          </div>
-        </form>
-      </section>
-
-      <section id="adminReviewPanel" class="admin-review-panel" hidden>
-        <div class="admin-session-bar">
-          <div class="admin-session-copy">
-            <span>Signed in as</span>
-            <strong id="adminUserEmail">Admin</strong>
-          </div>
-          <div class="admin-session-actions">
-            <button id="adminRefreshBtn" class="admin-secondary-btn" type="button">Refresh</button>
-            <button id="adminSignOutBtn" class="admin-secondary-btn" type="button">Sign out</button>
-          </div>
-        </div>
-        <div id="adminReviewTabs" class="admin-review-tabs" role="tablist" aria-label="Review status"></div>
-        <div id="adminReviewStatus" class="admin-status"></div>
-        <div id="adminDetailPanel" class="admin-detail-panel" hidden></div>
-        <div id="adminReviewList" class="admin-review-list"></div>
-      </section>
-    </div>
-  </div>
-
-  <div id="enemyModal" class="settings-modal">
-    <div class="settings-dialog">
-      <div class="settings-header">
-        <h2 class="settings-title">Select Enemy</h2>
-        <button id="closeEnemyModalBtn" class="settings-close" type="button">×</button>
-      </div>
-      <div id="enemyModalList" class="settings-section"></div>
-    </div>
-  </div>
-  <section class="seo-description" aria-labelledby="seoTitle">
-    <div class="seo-intro">
-      <p class="seo-kicker">Open Beta Combat Planner</p>
-      <h1 id="seoTitle">Arknights: Endfield Rotation Builder</h1>
-
-      <p>
-        Plan Arknights: Endfield team rotations with operator skills, combo triggers, elemental reactions,
-        buffs, debuffs, cooldowns and stack interactions. The tool is built for testing combat timelines,
-        comparing team ideas and sharing repeatable rotations with other players.
-      </p>
-
-      <p>
-        Use the planner to build a four-operator team, arrange the skill order, inspect reaction outcomes and
-        track important effects such as Vulnerable, Stagger, Combustion, Solidification, Electrification,
-        Corrosion and Arts Susceptibility.
-      </p>
-
-    </div>
-
-    <div class="seo-feature-grid">
-      <article>
-        <h3>Rotation planning</h3>
-        <p>Create skill timelines for Final Strikes, Battle Skills, Combo Skills and Ultimates.</p>
-      </article>
-      <article>
-        <h3>Reaction tracking</h3>
-        <p>Review elemental interactions for heat, cryo, electric, nature and physical damage setups.</p>
-      </article>
-      <article>
-        <h3>Team sharing</h3>
-        <p>Save, export and share rotation ideas for testing community team compositions.</p>
-      </article>
-    </div>
-
-    <section class="seo-operator-section" aria-labelledby="operatorGalleryTitle">
-      <h3 id="operatorGalleryTitle">Operator gallery</h3>
-      <p>
-        The builder currently includes playable planning data for these Arknights: Endfield operators,
-        including their class, element and rotation-ready skill entries.
-      </p>
-      <div id="seoOperatorGallery" class="seo-operator-gallery">
-        <article><img src="assets/operators/avatars/Ardelia.png" alt="Ardelia operator avatar"><strong>Ardelia</strong><span>Supporter - Nature</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="12">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Antal.png" alt="Antal operator avatar"><strong>Antal</strong><span>Supporter - Electric</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="8">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Alesh.png" alt="Alesh operator avatar"><strong>Alesh</strong><span>Vanguard - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="10">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Chen.png" alt="Chen Qianyu operator avatar"><strong>Chen Qianyu</strong><span>Guard - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="14">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Catcher.png" alt="Catcher operator avatar"><strong>Catcher</strong><span>Defender - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="13">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Dapan.png" alt="Da Pan operator avatar"><strong>Da Pan</strong><span>Striker - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="16">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Ember.png" alt="Ember operator avatar"><strong>Ember</strong><span>Defender - Heat</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="17">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Estella.png" alt="Estella operator avatar"><strong>Estella</strong><span>Guard - Cryo</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="18">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Fluorite.png" alt="Fluorite operator avatar"><strong>Fluorite</strong><span>Caster - Nature</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="19">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Last_Rite.png" alt="Last Rite operator avatar"><strong>Last Rite</strong><span>Striker - Cryo</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="20">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Lifeng.png" alt="Lifeng operator avatar"><strong>Lifeng</strong><span>Guard - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="21">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Snowshine.png" alt="Snowshine operator avatar"><strong>Snowshine</strong><span>Defender - Cryo</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="23">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Wulfgard.png" alt="Wulfgard operator avatar"><strong>Wulfgard</strong><span>Caster - Heat</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="24">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Xaihi.png" alt="Xaihi operator avatar"><strong>Xaihi</strong><span>Supporter - Cryo</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="25">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Pogranichnik.png" alt="Pogranichnik operator avatar"><strong>Pogranichnik</strong><span>Vanguard - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="22">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Zhuang.png" alt="Zhuang operator avatar"><strong>Zhuang</strong><span>Striker - Electric</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="9">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Avywenna.png" alt="Avywenna operator avatar"><strong>Avywenna</strong><span>Striker - Electric</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="7">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Arclight.png" alt="Arclight operator avatar"><strong>Arclight</strong><span>Vanguard - Electric</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="6">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Laevatain.png" alt="Laevatain operator avatar"><strong>Laevatain</strong><span>Striker - Heat</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="1">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Akekuri.png" alt="Akekuri operator avatar"><strong>Akekuri</strong><span>Vanguard - Heat</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="2">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Endmin.png" alt="Endministrator operator avatar"><strong>Endministrator</strong><span>Guard - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="3">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Perlica.png" alt="Perlica operator avatar"><strong>Perlica</strong><span>Caster - Electric</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="4">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Rossi.png" alt="Rossi operator avatar"><strong>Rossi</strong><span>Guard - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="5">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Tangtang.png" alt="Tangtang operator avatar"><strong>Tangtang</strong><span>Caster - Cryo</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="15">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Gilberta.png" alt="Gilberta operator avatar"><strong>Gilberta</strong><span>Supporter - Nature</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="11">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Yvonne.png" alt="Yvonne operator avatar"><strong>Yvonne</strong><span>Caster - Cryo</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="26">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Mi_Fu.png" alt="Mi Fu operator avatar"><strong>Mi Fu</strong><span>Guard - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="27">Show rotation</a></article>
+        </article>
       </div>
     </section>
 
-    <section class="seo-faq" aria-labelledby="seoFaqTitle">
-      <h3 id="seoFaqTitle">Arknights: Endfield rotation planner FAQ</h3>
-      <details>
-        <summary>What is this rotation builder for?</summary>
-        <p>It helps players test Endfield team rotations, skill timing, combo conditions and reaction chains before sharing or refining a setup.</p>
-      </details>
-      <details>
-        <summary>Which combat details can be tracked?</summary>
-        <p>The planner tracks operator skills, cooldowns, energy, buffs, debuffs, stacks, elemental reactions and selected enemy targets.</p>
-      </details>
-      <details>
-        <summary>Can rotations be shared?</summary>
-        <p>Yes. The tool supports shareable rotation data and community rotation workflows for comparing team ideas.</p>
-      </details>
-    </section>
-  </section>
-  <footer class="site-footer">
-    <span>&copy; 2026 Arknights Endfield Rotation Builder</span>
-    <span>App Version 2.14.3</span>
-    <span>Fan-made tool, not affiliated with Gryphline or Hypergryph.</span>
-  </footer>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabaseClient.js"></script>
-
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="js/utils/tooltipFormatter.js"></script>
-  <script src="js/data/debuffRegistry.js"></script>
-  <script src="js/data/buffRegistry.js"></script>
-  <script src="js/data/effectGroups.js"></script>
-  <script src="js/data/reactionRules.js"></script>
-  <script src="js/data/enemies/trainingDummy.js"></script>
-  <script src="js/data/enemies/heatAttacker.js"></script>
-  <script src="js/data/enemies/frostAttacker.js"></script>
-  <script src="js/data/enemies/electricAttacker.js"></script>
-  <script src="js/data/enemies/physicalAttacker.js"></script>
-  <script src="js/data/enemies/bossDummy.js"></script>
-  <script src="js/data/enemySkills.js"></script>
-  <script src="js/data/operators/alesh.js"></script>
-  <script src="js/data/operators/antal.js"></script>
-  <script src="js/data/operators/akekuri.js"></script>
-  <script src="js/data/operators/arclight.js"></script>
-  <script src="js/data/operators/ardelia.js"></script>
-  <script src="js/data/operators/avywenna.js"></script>
-  <script src="js/data/operators/catcher.js"></script>
-  <script src="js/data/operators/chen.js"></script>
-  <script src="js/data/operators/dapan.js"></script>
-  <script src="js/data/operators/estella.js"></script>
-  <script src="js/data/operators/ember.js"></script>
-  <script src="js/data/operators/fluorite.js"></script>
-  <script src="js/data/operators/gilberta.js"></script>
-  <script src="js/data/operators/laevatain.js"></script>
-  <script src="js/data/operators/lifeng.js"></script>
-  <script src="js/data/operators/wulfgard.js"></script>
-  <script src="js/data/operators/pogranichnik.js"></script>
-  <script src="js/data/operators/xaihi.js"></script>
-  <script src="js/data/operators/snowshine.js"></script>
-  <script src="js/data/operators/lastrite.js"></script>
-  <script src="js/data/operators/rossi.js"></script>
-  <script src="js/data/operators/perlica.js"></script>
-  <script src="js/data/operators/endministrator.js"></script>
-  <script src="js/data/operators/tangtang.js"></script>
-  <script src="js/data/operators/zhuang.js"></script>
-  <script src="js/data/operators/yvonne.js"></script>
-  <script src="js/data/operators.js"></script>
-  <script src="js/state/appState.js"></script>
-  <script src="js/logic/operatorStateEngine.js"></script>
-  <script src="js/logic/basicAttack.js"></script>
-  <script src="js/logic/storage.js"></script>
-  <script src="js/logic/shareCode.js"></script>
-  <script src="js/logic/export.js"></script>
-  <script src="js/logic/snakeLayout.js"></script>
-  <script src="js/logic/reactionEngine.js"></script>
-  <script src="js/logic/comboEngine.js"></script>
-  <script src="js/logic/dragDrop.js"></script>
-  <script src="js/logic/uiSettings.js"></script>
-  <script src="js/logic/tapInput.js"></script>
-  <script src="js/ui/enemyPanel.js"></script>
-  <script src="js/ui/teamPreview.js"></script>
-  <script src="js/ui/skillIconRenderer.js"></script>
-  <script src="js/ui/skillsPanel.js"></script>
-  <script src="js/ui/operatorBuffs.js"></script>
-  <script src="js/ui/rotationGrid.js"></script>
-  <script src="js/ui/teamSelection.js"></script>
-  <script src="js/ui/communityRotations.js"></script>
-  <script src="js/ui/operatorGallery.js"></script>
-  <script src="js/ui/myRotations.js"></script>
-  <script src="js/ui/adminPanel.js"></script>
-  <script src="js/main.js"></script>
+    <footer class="footer">
+      <span>Fan-made rotation tools. Arknights: Endfield is the first live planner.</span>
+      <a href="endfield/">rotationforge.gg/endfield</a>
+    </footer>
+  </div>
 </body>
-
 </html>
