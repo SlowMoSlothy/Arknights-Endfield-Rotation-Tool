@@ -11,12 +11,20 @@ function cleanupDragArtifacts() {
         slot.classList.remove("drag-hover");
     });
 
+    document.querySelectorAll(".rotation-sim-skill-drop-track").forEach(track => {
+        track.classList.remove("is-drop-target");
+    });
+
+    cleanupSimulationDropGuide();
+    removeSimulationDropGuideListeners();
+    stopSimulationDragAutoScroll();
     document.body.classList.remove("drag-in-progress");
 }
 
 function beginDrag() {
     isDraggingSkill = true;
     document.body.classList.add("drag-in-progress");
+    addSimulationDropGuideListeners();
 }
 
 function endDrag() {
@@ -57,8 +65,14 @@ function hydrateDragPreview(previewEl, sourceEl) {
 
     previewEl.innerHTML = "";
     previewEl.dataset.id = String(skillId);
+    previewEl.dataset.skillType = skillData.shortType || getShortSkillType(skillData.type);
+    previewEl.dataset.skillName = skillData.name || "Skill";
     if (sourceEl?.dataset?.uid) previewEl.dataset.uid = sourceEl.dataset.uid;
     previewEl.appendChild(createSkillIcon(skillData, { size: "small", useSmallIcon: true }));
+    const typeLabel = document.createElement("span");
+    typeLabel.className = "neutral-drag-preview-type";
+    typeLabel.textContent = previewEl.dataset.skillType;
+    previewEl.appendChild(typeLabel);
 }
 
 function scheduleDragPreviewHydration(sourceEl, attempts = 8) {
@@ -84,6 +98,155 @@ function handleDragStart(evt) {
 
 function getDraggedActionLane(item) {
     return item?.dataset?.actionType === BASIC_ATTACK_ACTION_TYPE ? "batk" : "skill";
+}
+
+function getSimulationDropTime(track, event) {
+    const rect = track.getBoundingClientRect();
+    const clientX = event?.clientX ?? rect.left;
+    const rawSeconds = (clientX - rect.left + track.scrollLeft) / SIMULATION_PIXELS_PER_SECOND;
+    return typeof roundSimulationTime === "function"
+        ? roundSimulationTime(rawSeconds)
+        : Math.max(0, Math.round(rawSeconds * 10) / 10);
+}
+
+function cleanupSimulationDropGuide() {
+    document.querySelectorAll(".rotation-sim-drop-guide").forEach(guide => guide.remove());
+    document.querySelectorAll(".rotation-sim-skill-drop-track").forEach(track => {
+        track.classList.remove("is-drop-target");
+    });
+}
+
+let simulationDragAutoScrollState = null;
+
+function stopSimulationDragAutoScroll() {
+    if (simulationDragAutoScrollState?.frameId) {
+        cancelAnimationFrame(simulationDragAutoScrollState.frameId);
+    }
+    simulationDragAutoScrollState = null;
+}
+
+function updateSimulationDragAutoScroll(event) {
+    const scrollArea = document.querySelector(".rotation-sim-track-scroll");
+    if (!scrollArea || !isDraggingSkill) {
+        stopSimulationDragAutoScroll();
+        return;
+    }
+
+    const rect = scrollArea.getBoundingClientRect();
+    const edgeSize = Math.min(96, Math.max(48, rect.width * 0.12));
+    const maxSpeed = 18;
+    let velocity = 0;
+
+    if (event.clientX < rect.left + edgeSize) {
+        velocity = -maxSpeed * (1 - Math.max(0, event.clientX - rect.left) / edgeSize);
+    } else if (event.clientX > rect.right - edgeSize) {
+        velocity = maxSpeed * (1 - Math.max(0, rect.right - event.clientX) / edgeSize);
+    }
+
+    if (Math.abs(velocity) < 0.2) {
+        stopSimulationDragAutoScroll();
+        return;
+    }
+
+    if (!simulationDragAutoScrollState) {
+        simulationDragAutoScrollState = {
+            scrollArea,
+            velocity,
+            frameId: null
+        };
+    } else {
+        simulationDragAutoScrollState.scrollArea = scrollArea;
+        simulationDragAutoScrollState.velocity = velocity;
+    }
+
+    const tick = () => {
+        if (!simulationDragAutoScrollState || !isDraggingSkill) {
+            stopSimulationDragAutoScroll();
+            return;
+        }
+
+        const { scrollArea: activeScrollArea, velocity: activeVelocity } = simulationDragAutoScrollState;
+        const before = activeScrollArea.scrollLeft;
+        activeScrollArea.scrollLeft = Math.max(0, before + activeVelocity);
+
+        if (activeScrollArea.scrollLeft === before) {
+            stopSimulationDragAutoScroll();
+            return;
+        }
+
+        simulationDragAutoScrollState.frameId = requestAnimationFrame(tick);
+    };
+
+    if (!simulationDragAutoScrollState.frameId) {
+        simulationDragAutoScrollState.frameId = requestAnimationFrame(tick);
+    }
+}
+
+function getSimulationDropTrackFromPoint(event) {
+    const clientX = event?.clientX;
+    const clientY = event?.clientY;
+    if (!Number.isFinite(clientX) || !Number.isFinite(clientY)) return null;
+
+    const elements = typeof document.elementsFromPoint === "function"
+        ? document.elementsFromPoint(clientX, clientY)
+        : [document.elementFromPoint(clientX, clientY)].filter(Boolean);
+
+    return elements
+        .map(element => element.closest?.(".rotation-sim-skill-drop-track"))
+        .find(Boolean) || null;
+}
+
+function updateSimulationDropGuide(track, event) {
+    if (track?.dataset?.skillLane !== "battle") {
+        cleanupSimulationDropGuide();
+        return;
+    }
+
+    const body = track.closest(".rotation-sim-body");
+    if (!body) return;
+
+    document.querySelectorAll(".rotation-sim-skill-drop-track").forEach(candidate => {
+        candidate.classList.toggle("is-drop-target", candidate === track);
+    });
+
+    let guide = body.querySelector(".rotation-sim-drop-guide");
+    if (!guide) {
+        guide = document.createElement("div");
+        guide.className = "rotation-sim-drag-guide rotation-sim-drop-guide";
+        body.appendChild(guide);
+    }
+
+    const time = getSimulationDropTime(track, event);
+    if (typeof updateSimulationDragGuide === "function") {
+        updateSimulationDragGuide(guide, time, SIMULATION_PIXELS_PER_SECOND);
+    } else {
+        guide.style.left = `${time * SIMULATION_PIXELS_PER_SECOND}px`;
+        guide.dataset.time = `${time}s`;
+    }
+}
+
+function updateSimulationDropGuideFromEvent(event) {
+    if (!isDraggingSkill) return;
+    updateSimulationDragAutoScroll(event);
+    const track = getSimulationDropTrackFromPoint(event);
+    if (!track) {
+        cleanupSimulationDropGuide();
+        return;
+    }
+    updateSimulationDropGuide(track, event);
+}
+
+function addSimulationDropGuideListeners() {
+    removeSimulationDropGuideListeners();
+    document.addEventListener("pointermove", updateSimulationDropGuideFromEvent, true);
+    document.addEventListener("mousemove", updateSimulationDropGuideFromEvent, true);
+    document.addEventListener("dragover", updateSimulationDropGuideFromEvent, true);
+}
+
+function removeSimulationDropGuideListeners() {
+    document.removeEventListener("pointermove", updateSimulationDropGuideFromEvent, true);
+    document.removeEventListener("mousemove", updateSimulationDropGuideFromEvent, true);
+    document.removeEventListener("dragover", updateSimulationDropGuideFromEvent, true);
 }
 
 function canPlaceDraggedActionInSlot(item, slot) {
@@ -174,6 +337,10 @@ function initRotationDragDrop() {
                 },
                 onEnd: endDrag,
                 onUnchoose: cleanupDragArtifacts,
+                onMove: (evt) => {
+                    updateSimulationDropGuide(evt.to || simulationTrack, evt.originalEvent);
+                    return true;
+                },
                 onAdd: (evt) => {
                     const draggedId = parseInt(evt.item.dataset.id, 10);
                     evt.item.remove();
@@ -185,12 +352,7 @@ function initRotationDragDrop() {
                         finalSkillId = getMappedSkillIdForOperatorState(draggedId);
                     }
 
-                    const rect = simulationTrack.getBoundingClientRect();
-                    const clientX = evt.originalEvent?.clientX ?? rect.left;
-                    const rawSeconds = (clientX - rect.left + simulationTrack.scrollLeft) / SIMULATION_PIXELS_PER_SECOND;
-                    const time = typeof roundSimulationTime === "function"
-                        ? roundSimulationTime(rawSeconds)
-                        : Math.max(0, Math.round(rawSeconds * 10) / 10);
+                    const time = getSimulationDropTime(simulationTrack, evt.originalEvent);
 
                     rotation.push({
                         uid: crypto.randomUUID(),

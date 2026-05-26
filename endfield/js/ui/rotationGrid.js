@@ -763,6 +763,8 @@ function isSimulationTimelineMode() {
 
 const SIMULATION_PIXELS_PER_SECOND = 120;
 const SIMULATION_TIME_STEP = 0.1;
+const SIMULATION_RULER_MINOR_STEP = 0.1;
+const SIMULATION_RULER_HALF_STEP = 0.5;
 const SIMULATION_COOLDOWN_COLORS = [
     "#56d8ff",
     "#f8f546",
@@ -1292,6 +1294,24 @@ function createSimulationTimeRuler(durationSeconds, pixelsPerSecond) {
     const ruler = document.createElement("div");
     ruler.className = "rotation-sim-ruler";
     ruler.style.width = `${durationSeconds * pixelsPerSecond}px`;
+
+    const baseline = document.createElement("div");
+    baseline.className = "rotation-sim-ruler-line";
+    ruler.appendChild(baseline);
+
+    const minorTickCount = Math.round(durationSeconds / SIMULATION_RULER_MINOR_STEP);
+    for (let tickIndex = 0; tickIndex <= minorTickCount; tickIndex++) {
+        const time = Math.round(tickIndex * SIMULATION_RULER_MINOR_STEP * 10) / 10;
+        if (time > durationSeconds) continue;
+
+        const mark = document.createElement("div");
+        const isWholeSecond = Math.abs(time - Math.round(time)) < 0.001;
+        const halfRemainder = time % SIMULATION_RULER_HALF_STEP;
+        const isHalfSecond = !isWholeSecond && (halfRemainder < 0.001 || Math.abs(halfRemainder - SIMULATION_RULER_HALF_STEP) < 0.001);
+        mark.className = `rotation-sim-ruler-mark${isHalfSecond ? " is-half-second" : ""}${isWholeSecond ? " is-whole-second" : ""}`;
+        mark.style.left = `${time * pixelsPerSecond}px`;
+        ruler.appendChild(mark);
+    }
 
     for (let second = 0; second <= Math.ceil(durationSeconds); second++) {
         const tick = document.createElement("div");
@@ -2370,7 +2390,7 @@ function attachSimulationInspector(host, panel, label = "Inspect simulation even
         }
     });
     host.addEventListener("pointerup", event => {
-        if (event.target.closest("button") || event.target.closest(".rotation-sim-inspector")) return;
+        if (event.target.closest("button, input") || event.target.closest(".rotation-sim-inspector")) return;
         if (host.__rotationWasDraggedForInspector) return;
         event.stopPropagation();
         host.__rotationSuppressNextInspectorClick = true;
@@ -2380,7 +2400,7 @@ function attachSimulationInspector(host, panel, label = "Inspect simulation even
         toggleSimulationInspector(host);
     });
     host.addEventListener("click", event => {
-        if (event.target.closest("button")) return;
+        if (event.target.closest("button, input")) return;
         if (host.__rotationSuppressNextInspectorClick) {
             host.__rotationSuppressNextInspectorClick = false;
             return;
@@ -2795,6 +2815,7 @@ function createSimulationSkillElement(entry, index, skillData, secondsPerSlot, p
     item.dataset.index = String(index);
     item.dataset.id = String(entry.id);
     item.dataset.uid = entry.uid;
+    item.dataset.skillLane = getSimulationSkillLane(skillData);
     item.draggable = false;
     const entryTime = getRotationEntryTime(entry, index, secondsPerSlot);
     item.style.left = `${entryTime * pixelsPerSecond}px`;
@@ -2829,8 +2850,10 @@ function createSimulationSkillElement(entry, index, skillData, secondsPerSlot, p
     inner.append(portrait, typeBadge, glyphBadge);
     item.appendChild(inner);
 
-    const timeBadge = document.createElement("div");
+    const timeBadge = document.createElement("button");
     timeBadge.className = "rotation-sim-time-badge";
+    timeBadge.type = "button";
+    timeBadge.setAttribute("aria-label", "Edit skill time");
     timeBadge.textContent = formatBasicAttackSeconds(entryTime);
     item.appendChild(timeBadge);
 
@@ -2919,18 +2942,109 @@ function createSimulationSkillElement(entry, index, skillData, secondsPerSlot, p
     });
 
     if (!options.readOnly) {
+        attachSimulationTimeEditor(timeBadge, item, index, secondsPerSlot, pixelsPerSecond);
         item.append(nudgeLeft, nudgeRight, removeBtn);
         attachSimulationDrag(item, index, secondsPerSlot, pixelsPerSecond);
     }
     return item;
 }
 
+function attachSimulationTimeEditor(timeBadge, item, index, secondsPerSlot, pixelsPerSecond) {
+    if (!timeBadge || !item) return;
+
+    const restoreLabel = () => {
+        timeBadge.textContent = formatBasicAttackSeconds(getRotationEntryTime(rotation[index], index, secondsPerSlot));
+        item.classList.remove("is-time-editing");
+    };
+
+    timeBadge.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (timeBadge.querySelector("input")) return;
+
+        const currentTime = getRotationEntryTime(rotation[index], index, secondsPerSlot);
+        item.classList.add("is-time-editing");
+
+        const input = document.createElement("input");
+        input.className = "rotation-sim-time-input";
+        input.type = "text";
+        input.inputMode = "decimal";
+        input.value = String(Math.round(currentTime * 10) / 10);
+        input.setAttribute("aria-label", "Skill time in seconds");
+        let editorClosed = false;
+
+        const commit = () => {
+            if (editorClosed) return;
+            editorClosed = true;
+            const value = Number(String(input.value || "").replace(",", ".").replace(/s$/i, "").trim());
+            if (!Number.isFinite(value)) {
+                restoreLabel();
+                return;
+            }
+
+            setRotationEntryTime(index, value, {
+                snapBattleSkill: item.dataset.skillLane === "battle",
+                secondsPerSlot
+            });
+            renderRotation();
+        };
+
+        const cancel = () => {
+            if (editorClosed) return;
+            editorClosed = true;
+            restoreLabel();
+        };
+
+        input.addEventListener("pointerdown", inputEvent => inputEvent.stopPropagation());
+        input.addEventListener("click", inputEvent => inputEvent.stopPropagation());
+        input.addEventListener("keydown", inputEvent => {
+            if (inputEvent.key === "Enter") {
+                inputEvent.preventDefault();
+                commit();
+            } else if (inputEvent.key === "Escape") {
+                inputEvent.preventDefault();
+                cancel();
+                timeBadge.focus();
+            }
+        });
+        input.addEventListener("blur", commit);
+
+        timeBadge.replaceChildren(input);
+        window.setTimeout(() => {
+            input.focus();
+            input.select();
+        }, 0);
+    });
+}
+
+function createSimulationDragGuide(body) {
+    const guide = document.createElement("div");
+    guide.className = "rotation-sim-drag-guide";
+    body.appendChild(guide);
+    return guide;
+}
+
+function updateSimulationDragGuide(guide, time, pixelsPerSecond) {
+    if (!guide) return;
+    guide.style.left = `${time * pixelsPerSecond}px`;
+    guide.dataset.time = typeof formatBasicAttackSeconds === "function"
+        ? formatBasicAttackSeconds(time)
+        : `${time}s`;
+}
+
+function removeSimulationDragGuide(guide) {
+    if (guide?.parentNode) guide.parentNode.removeChild(guide);
+}
+
 function attachSimulationDrag(item, index, secondsPerSlot, pixelsPerSecond) {
     item.addEventListener("pointerdown", (event) => {
-        if (event.target.closest("button")) return;
+        if (event.target.closest("button, input")) return;
         event.preventDefault();
         const startX = event.clientX;
         const startTime = getRotationEntryTime(rotation[index], index, secondsPerSlot);
+        const body = item.closest(".rotation-sim-body");
+        const showDragGuide = item.dataset.skillLane === "battle" && body;
+        let dragGuide = null;
         let hasDragged = false;
         item.__rotationWasDraggedForInspector = false;
 
@@ -2938,6 +3052,8 @@ function attachSimulationDrag(item, index, secondsPerSlot, pixelsPerSecond) {
             document.removeEventListener("pointermove", move, true);
             document.removeEventListener("pointerup", up, true);
             document.removeEventListener("pointercancel", cancel, true);
+            removeSimulationDragGuide(dragGuide);
+            dragGuide = null;
         };
 
         const move = (moveEvent) => {
@@ -2950,6 +3066,10 @@ function attachSimulationDrag(item, index, secondsPerSlot, pixelsPerSecond) {
             const deltaSeconds = (moveEvent.clientX - startX) / pixelsPerSecond;
             const nextTime = roundSimulationTime(startTime + deltaSeconds);
             item.style.left = `${nextTime * pixelsPerSecond}px`;
+            if (showDragGuide) {
+                if (!dragGuide) dragGuide = createSimulationDragGuide(body);
+                updateSimulationDragGuide(dragGuide, nextTime, pixelsPerSecond);
+            }
             const timeBadge = item.querySelector(".rotation-sim-time-badge");
             if (timeBadge) timeBadge.textContent = formatBasicAttackSeconds(nextTime);
         };

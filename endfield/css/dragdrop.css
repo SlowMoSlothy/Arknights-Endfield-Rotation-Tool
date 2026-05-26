@@ -16,23 +16,28 @@
 }
 
 .neutral-drag-preview {
-    width: 42px !important;
-    height: 42px !important;
-    min-width: 42px !important;
-    min-height: 42px !important;
-    border-radius: 50% !important;
+    width: 68px !important;
+    height: 58px !important;
+    min-width: 68px !important;
+    min-height: 58px !important;
+    border-radius: 10px !important;
     box-sizing: border-box !important;
-    padding: 3px !important;
+    padding: 5px !important;
 
-    background: #111 !important;
-    border: 2px solid rgba(255, 255, 255, 0.75) !important;
+    background:
+        radial-gradient(circle at 50% 0%, rgba(248,245,70,0.18), transparent 62%),
+        linear-gradient(180deg, rgba(33,37,37,0.96), rgba(8,10,11,0.98)) !important;
+    border: 1px solid rgba(248,245,70,0.76) !important;
     box-shadow:
-        0 0 14px rgba(248, 245, 70, 0.35),
-        0 6px 16px rgba(0, 0, 0, 0.45) !important;
+        inset 0 0 0 1px rgba(255,255,255,0.055),
+        0 0 18px rgba(248,245,70,0.34),
+        0 8px 20px rgba(0,0,0,0.48) !important;
 
     display: flex !important;
+    flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
+    gap: 2px !important;
     overflow: hidden !important;
     opacity: 1 !important;
     visibility: visible !important;
@@ -47,9 +52,9 @@
 }
 
 .neutral-drag-preview .ef-skill-icon {
-    --ef-size: 100%;
-    width: 100% !important;
-    height: 100% !important;
+    --ef-size: 36px;
+    width: 36px !important;
+    height: 36px !important;
     flex: 0 0 auto !important;
 }
 
@@ -60,6 +65,25 @@
     object-fit: contain !important;
     opacity: 1 !important;
     filter: none !important;
+}
+
+.neutral-drag-preview-type {
+    display: block !important;
+    min-width: 25px !important;
+    max-width: 54px !important;
+    height: 14px !important;
+    padding: 0 5px !important;
+    border-radius: 999px !important;
+    background: #F8F546 !important;
+    color: #111 !important;
+    font-size: 10px !important;
+    font-weight: 1000 !important;
+    line-height: 14px !important;
+    text-align: center !important;
+    text-transform: uppercase !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
 
 .skill-small,
