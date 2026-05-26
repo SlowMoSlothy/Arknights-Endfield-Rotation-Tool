@@ -10,7 +10,7 @@ let operatorUltimateStates = {};
 
 let showEnemyPanel = false;
 let useSupabaseOperators = true;
-let builderWatermarkUrl = "https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/";
+let builderWatermarkUrl = "https://rotationforge.gg/endfield";
 
 let operatorFilterState = {
     search: "",

@@ -81,7 +81,7 @@ Useful options:
 ```js
 let showEnemyPanel = false;
 let useSupabaseOperators = true;
-let builderWatermarkUrl = "https://slowmoslothy.github.io/Arknights-Endfield-Rotation-Tool/";
+let builderWatermarkUrl = "https://rotationforge.gg/endfield";
 ```
 
 Set `showEnemyPanel` to `true` to show the Enemy section again.
