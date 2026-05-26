@@ -173,6 +173,12 @@ It creates `user_profiles`, the public `avatars` storage bucket, and `user_rotat
 - saved rotations can be submitted to Community review later.
 - Community submissions still require Admin approval before becoming public.
 
+For production account emails, configure Supabase Auth with a custom SMTP sender, verified DNS records, and custom email templates:
+
+```text
+supabase/auth_email_setup.md
+```
+
 To review submissions, open:
 
 ```text
