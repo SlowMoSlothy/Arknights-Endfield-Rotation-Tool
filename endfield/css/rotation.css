@@ -305,6 +305,11 @@
     display: none;
 }
 
+.rotation-timeline-slot-mode.is-empty {
+    width: 360px;
+    min-width: min(100%, 360px);
+}
+
 .rotation-timeline-labels,
 .rotation-timeline-step {
     display: grid;
@@ -382,6 +387,58 @@
 
 .rotation-timeline-connector.is-unused {
     opacity: 0.35;
+}
+
+.rotation-empty-drop-hint {
+    position: absolute;
+    left: calc(var(--rotation-slot-size) + 22px);
+    top: 50%;
+    z-index: 9;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transform: translateY(-50%);
+    color: rgba(244,245,242,0.74);
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    pointer-events: none;
+    filter: drop-shadow(0 0 10px rgba(248,245,70,0.12));
+}
+
+.rotation-empty-drop-hint-arrow {
+    position: relative;
+    width: 52px;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(248,245,70,0.92), rgba(248,245,70,0.18));
+    box-shadow: 0 0 10px rgba(248,245,70,0.22);
+}
+
+.rotation-empty-drop-hint-arrow::before {
+    content: "";
+    position: absolute;
+    left: -1px;
+    top: 50%;
+    width: 9px;
+    height: 9px;
+    border-left: 2px solid rgba(248,245,70,0.92);
+    border-bottom: 2px solid rgba(248,245,70,0.92);
+    transform: translateY(-50%) rotate(45deg);
+    box-shadow: -2px 2px 7px rgba(248,245,70,0.16);
+}
+
+.rotation-empty-drop-hint-text {
+    padding: 6px 10px;
+    border: 1px solid rgba(248,245,70,0.18);
+    border-radius: 999px;
+    background: rgba(10,12,14,0.58);
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.035),
+        0 6px 16px rgba(0,0,0,0.22);
+    white-space: nowrap;
 }
 
 .rotation-slot {
@@ -960,6 +1017,76 @@
     top: 50%;
     height: 1px;
     background: rgba(160,170,169,0.12);
+}
+
+.rotation-sim-lane-hint {
+    position: absolute;
+    left: 24px;
+    top: 50%;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transform: translateY(-50%);
+    color: rgba(244,245,242,0.70);
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    pointer-events: none;
+    filter: drop-shadow(0 0 10px rgba(248,245,70,0.10));
+}
+
+.rotation-sim-lane-hint-arrow {
+    position: relative;
+    width: 54px;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(248,245,70,0.92), rgba(248,245,70,0.18));
+    box-shadow: 0 0 10px rgba(248,245,70,0.18);
+}
+
+.rotation-sim-lane-hint-arrow::before {
+    content: "";
+    position: absolute;
+    left: -1px;
+    top: 50%;
+    width: 9px;
+    height: 9px;
+    border-left: 2px solid rgba(248,245,70,0.92);
+    border-bottom: 2px solid rgba(248,245,70,0.92);
+    transform: translateY(-50%) rotate(45deg);
+}
+
+.rotation-sim-lane-hint-text {
+    padding: 7px 11px;
+    border: 1px solid rgba(248,245,70,0.16);
+    border-radius: 999px;
+    background: rgba(10,12,14,0.60);
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.035),
+        0 7px 18px rgba(0,0,0,0.22);
+    white-space: nowrap;
+}
+
+.rotation-sim-lane-hint.is-combo {
+    color: rgba(160,170,169,0.70);
+    filter: drop-shadow(0 0 10px rgba(86,216,255,0.10));
+}
+
+.rotation-sim-lane-hint.is-combo .rotation-sim-lane-hint-arrow {
+    background: linear-gradient(90deg, rgba(86,216,255,0.70), rgba(86,216,255,0.14));
+    box-shadow: 0 0 10px rgba(86,216,255,0.14);
+}
+
+.rotation-sim-lane-hint.is-combo .rotation-sim-lane-hint-arrow::before {
+    border-color: rgba(86,216,255,0.70);
+}
+
+.rotation-sim-lane-hint.is-combo .rotation-sim-lane-hint-text {
+    border-color: rgba(86,216,255,0.14);
+    background: rgba(7,16,20,0.56);
 }
 
 .rotation-sim-sp-track {

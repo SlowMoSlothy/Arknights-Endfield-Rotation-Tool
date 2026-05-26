@@ -694,6 +694,22 @@ function createRotationTimelineConnector(index) {
     return connector;
 }
 
+function createRotationEmptyDropHint() {
+    const hint = document.createElement("div");
+    hint.className = "rotation-empty-drop-hint";
+    hint.setAttribute("aria-hidden", "true");
+
+    const arrow = document.createElement("span");
+    arrow.className = "rotation-empty-drop-hint-arrow";
+
+    const text = document.createElement("span");
+    text.className = "rotation-empty-drop-hint-text";
+    text.textContent = "Drag a skill here to start";
+
+    hint.append(arrow, text);
+    return hint;
+}
+
 function createRotationTimelineLabel(text) {
     const label = document.createElement("div");
     label.className = "rotation-timeline-label";
@@ -3352,7 +3368,8 @@ function getRenderedSimulationSkillEvents(events) {
 
 function renderSimulationSkillEvents(skillTrack, events, secondsPerSlot, pixelsPerSecond, lane) {
     const laneEvents = events.filter(event => getSimulationSkillLane(event.skillData) === lane);
-    getRenderedSimulationSkillEvents(laneEvents).forEach(event => {
+    const renderedEvents = getRenderedSimulationSkillEvents(laneEvents);
+    renderedEvents.forEach(event => {
         const entry = event.entry || {
             uid: `auto-final-strike-${event.skillData.id}-${event.time}`,
             id: event.skillData.id,
@@ -3376,6 +3393,26 @@ function renderSimulationSkillEvents(skillTrack, events, secondsPerSlot, pixelsP
 
         skillTrack.appendChild(element);
     });
+
+    return renderedEvents.length;
+}
+
+function createSimulationLaneHint(type) {
+    const hint = document.createElement("div");
+    hint.className = `rotation-sim-lane-hint is-${type}`;
+    hint.setAttribute("aria-hidden", "true");
+
+    const arrow = document.createElement("span");
+    arrow.className = "rotation-sim-lane-hint-arrow";
+
+    const text = document.createElement("span");
+    text.className = "rotation-sim-lane-hint-text";
+    text.textContent = type === "battle"
+        ? "Drop BS / Ult here"
+        : "Combo Skills appear here automatically";
+
+    hint.append(arrow, text);
+    return hint;
 }
 
 function renderSimulationCooldownTrack(track, events, pixelsPerSecond, lane) {
@@ -3759,26 +3796,32 @@ function renderSimulationRotation() {
     comboSkillTrack.dataset.skillLane = "combo";
     comboSkillTrack.style.width = `${trackWidth}px`;
 
-    renderSimulationSkillEvents(
+    const battleSkillEventCount = renderSimulationSkillEvents(
         battleSkillTrack,
         skillEvents,
         secondsPerSlot,
         SIMULATION_PIXELS_PER_SECOND,
         "battle"
     );
+    if (battleSkillEventCount === 0) {
+        battleSkillTrack.appendChild(createSimulationLaneHint("battle"));
+    }
 
     const spTrack = document.createElement("div");
     spTrack.className = "rotation-sim-sp-track";
     spTrack.style.width = `${trackWidth}px`;
     renderSimulationSpTrack(spTrack, skillEvents, durationSeconds, SIMULATION_PIXELS_PER_SECOND);
 
-    renderSimulationSkillEvents(
+    const comboSkillEventCount = renderSimulationSkillEvents(
         comboSkillTrack,
         skillEvents,
         secondsPerSlot,
         SIMULATION_PIXELS_PER_SECOND,
         "combo"
     );
+    if (comboSkillEventCount === 0) {
+        comboSkillTrack.appendChild(createSimulationLaneHint("combo"));
+    }
 
     const comboCooldownTrack = document.createElement("div");
     comboCooldownTrack.className = "rotation-sim-cooldown-track is-combo-skill";
@@ -3833,6 +3876,10 @@ function renderRotation() {
 
     const timeline = document.createElement("div");
     timeline.className = "rotation-timeline rotation-timeline-slot-mode";
+    const hasManualRotationEntry = Array.isArray(rotation) && rotation.some(Boolean);
+    if (!hasManualRotationEntry) {
+        timeline.classList.add("is-empty");
+    }
 
     const rotationDebuffStackState = {};
     const rotationDebuffMetaState = {};
@@ -3913,6 +3960,10 @@ function renderRotation() {
             timeline.appendChild(connector);
         }
     });
+
+    if (!hasManualRotationEntry) {
+        timeline.appendChild(createRotationEmptyDropHint());
+    }
 
     container.appendChild(timeline);
     initRotationDragDrop();

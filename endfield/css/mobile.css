@@ -348,6 +348,28 @@
         row-gap: 0;
     }
 
+    .rotation-timeline-slot-mode.is-empty {
+        width: 270px;
+        min-width: 270px;
+    }
+
+    .rotation-empty-drop-hint {
+        left: 74px;
+        gap: 7px;
+        font-size: 9px;
+    }
+
+    .rotation-empty-drop-hint-arrow {
+        width: 32px;
+    }
+
+    .rotation-empty-drop-hint-text {
+        padding: 5px 8px;
+        max-width: 155px;
+        white-space: normal;
+        line-height: 1.2;
+    }
+
     .rotation-timeline::before {
         left: 50px;
         top: 139px;
@@ -422,6 +444,23 @@
 
     .rotation-sim-skill-track.is-combo-skill {
         min-height: 122px;
+    }
+
+    .rotation-sim-lane-hint {
+        left: 12px;
+        gap: 7px;
+        font-size: 9px;
+    }
+
+    .rotation-sim-lane-hint-arrow {
+        width: 32px;
+    }
+
+    .rotation-sim-lane-hint-text {
+        max-width: 150px;
+        padding: 5px 8px;
+        white-space: normal;
+        line-height: 1.2;
     }
 
     .rotation-sim .rotation-sim-skill.rotation-skill {
