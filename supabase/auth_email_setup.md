@@ -44,35 +44,35 @@ Confirm your Rotation Forge account
 Body:
 
 ```html
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0;padding:0;background:#0f1117;">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0;padding:0;background:#11100f;">
   <tr>
-    <td align="center" style="padding:32px 16px;font-family:Inter,Segoe UI,Arial,sans-serif;color:#f6f7fb;">
-      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#171a23;border:1px solid #2a2f3d;border-radius:16px;overflow:hidden;">
+    <td align="center" style="padding:32px 16px;font-family:Inter,Segoe UI,Arial,sans-serif;color:#f8f5ef;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#191816;border:1px solid #3a3129;border-radius:16px;overflow:hidden;">
         <tr>
-          <td>
-            <img src="https://rotationforge.gg/endfield/assets/header.png" alt="Rotation Forge" width="560" style="display:block;width:100%;max-width:560px;height:auto;border:0;">
+          <td style="background:#0f0e0d;border-bottom:1px solid #3a3129;">
+            <img src="https://rotationforge.gg/endfield/assets/email-header.png" alt="Rotation Forge Account Center" width="560" style="display:block;width:100%;max-width:560px;height:auto;border:0;">
           </td>
         </tr>
         <tr>
           <td style="padding:32px 28px 12px;">
-            <p style="margin:0 0 10px;color:#8bd3ff;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">Account confirmation</p>
-            <h1 style="margin:0;color:#ffffff;font-size:28px;line-height:1.2;font-weight:800;">Welcome to Rotation Forge</h1>
+            <p style="margin:0 0 10px;color:#ff9c38;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">Account confirmation</p>
+            <h1 style="margin:0;color:#fffaf2;font-size:28px;line-height:1.2;font-weight:800;">Welcome to Rotation Forge</h1>
           </td>
         </tr>
         <tr>
-          <td style="padding:0 28px 24px;color:#cfd5e3;font-size:16px;line-height:1.6;">
+          <td style="padding:0 28px 24px;color:#d6d0c7;font-size:16px;line-height:1.6;">
             <p style="margin:0 0 16px;">Confirm your email address to save private rotations, keep your setups synced, and submit rotations for Community review.</p>
             <p style="margin:26px 0;">
-              <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#4cc9f0;color:#071018;text-decoration:none;font-weight:800;border-radius:10px;padding:14px 22px;">Confirm email address</a>
+              <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#f27b19;color:#130c06;text-decoration:none;font-weight:800;border-radius:10px;padding:14px 22px;">Confirm email address</a>
             </p>
-            <p style="margin:0 0 8px;color:#9aa3b8;font-size:13px;">If the button does not work, copy this link into your browser:</p>
+            <p style="margin:0 0 8px;color:#9c968f;font-size:13px;">If the button does not work, copy this link into your browser:</p>
             <p style="margin:0;word-break:break-all;font-size:13px;">
-              <a href="{{ .ConfirmationURL }}" style="color:#8bd3ff;">{{ .ConfirmationURL }}</a>
+              <a href="{{ .ConfirmationURL }}" style="color:#ffad5c;">{{ .ConfirmationURL }}</a>
             </p>
           </td>
         </tr>
         <tr>
-          <td style="padding:20px 28px 28px;border-top:1px solid #2a2f3d;color:#8c95aa;font-size:12px;line-height:1.5;">
+          <td style="padding:20px 28px 28px;border-top:1px solid #3a3129;color:#8f8982;font-size:12px;line-height:1.5;">
             If you did not create this account, you can ignore this email.
           </td>
         </tr>
@@ -95,35 +95,35 @@ Reset your Rotation Forge password
 Body:
 
 ```html
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0;padding:0;background:#0f1117;">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0;padding:0;background:#11100f;">
   <tr>
-    <td align="center" style="padding:32px 16px;font-family:Inter,Segoe UI,Arial,sans-serif;color:#f6f7fb;">
-      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#171a23;border:1px solid #2a2f3d;border-radius:16px;overflow:hidden;">
+    <td align="center" style="padding:32px 16px;font-family:Inter,Segoe UI,Arial,sans-serif;color:#f8f5ef;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#191816;border:1px solid #3a3129;border-radius:16px;overflow:hidden;">
         <tr>
-          <td>
-            <img src="https://rotationforge.gg/endfield/assets/header.png" alt="Rotation Forge" width="560" style="display:block;width:100%;max-width:560px;height:auto;border:0;">
+          <td style="background:#0f0e0d;border-bottom:1px solid #3a3129;">
+            <img src="https://rotationforge.gg/endfield/assets/email-header.png" alt="Rotation Forge Account Center" width="560" style="display:block;width:100%;max-width:560px;height:auto;border:0;">
           </td>
         </tr>
         <tr>
           <td style="padding:32px 28px 12px;">
-            <p style="margin:0 0 10px;color:#8bd3ff;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">Password reset</p>
-            <h1 style="margin:0;color:#ffffff;font-size:28px;line-height:1.2;font-weight:800;">Reset your password</h1>
+            <p style="margin:0 0 10px;color:#ff9c38;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">Password reset</p>
+            <h1 style="margin:0;color:#fffaf2;font-size:28px;line-height:1.2;font-weight:800;">Reset your password</h1>
           </td>
         </tr>
         <tr>
-          <td style="padding:0 28px 24px;color:#cfd5e3;font-size:16px;line-height:1.6;">
+          <td style="padding:0 28px 24px;color:#d6d0c7;font-size:16px;line-height:1.6;">
             <p style="margin:0 0 16px;">Use this link to choose a new password for your Rotation Forge account.</p>
             <p style="margin:26px 0;">
-              <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#4cc9f0;color:#071018;text-decoration:none;font-weight:800;border-radius:10px;padding:14px 22px;">Reset password</a>
+              <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#f27b19;color:#130c06;text-decoration:none;font-weight:800;border-radius:10px;padding:14px 22px;">Reset password</a>
             </p>
-            <p style="margin:0 0 8px;color:#9aa3b8;font-size:13px;">If the button does not work, copy this link into your browser:</p>
+            <p style="margin:0 0 8px;color:#9c968f;font-size:13px;">If the button does not work, copy this link into your browser:</p>
             <p style="margin:0;word-break:break-all;font-size:13px;">
-              <a href="{{ .ConfirmationURL }}" style="color:#8bd3ff;">{{ .ConfirmationURL }}</a>
+              <a href="{{ .ConfirmationURL }}" style="color:#ffad5c;">{{ .ConfirmationURL }}</a>
             </p>
           </td>
         </tr>
         <tr>
-          <td style="padding:20px 28px 28px;border-top:1px solid #2a2f3d;color:#8c95aa;font-size:12px;line-height:1.5;">
+          <td style="padding:20px 28px 28px;border-top:1px solid #3a3129;color:#8f8982;font-size:12px;line-height:1.5;">
             If you did not request this, you can ignore this email.
           </td>
         </tr>
