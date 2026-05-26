@@ -174,7 +174,17 @@ function isValidUsername(value) {
 
 function getFriendlyMyAccountError(error, fallbackMessage = "Account action failed.") {
     const message = String(error?.message || error || "").trim();
+    const errorName = String(error?.name || "").trim();
     const lowerMessage = message.toLowerCase();
+
+    if (
+        errorName === "AuthRetryableFetchError"
+        || lowerMessage.includes("gateway timeout")
+        || lowerMessage.includes("504")
+        || lowerMessage.includes("failed to fetch")
+    ) {
+        return "Account creation timed out. Please try again in a moment. If this keeps happening, the email sender or Supabase Auth needs attention.";
+    }
 
     if (lowerMessage.includes("duplicate") || lowerMessage.includes("23505") || lowerMessage.includes("idx_user_profiles_username")) {
         return "This username is already taken.";
@@ -1084,6 +1094,7 @@ async function registerMyAccount() {
             email,
             password,
             options: {
+                emailRedirectTo: getAuthRedirectUrl(),
                 data: {
                     username
                 }
