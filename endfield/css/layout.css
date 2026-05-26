@@ -6,35 +6,72 @@
 .app-brand {
     position: relative;
     max-width: 1600px;
-    margin: 0 auto 10px;
-    padding: 4px 18px 0;
+    margin: 0 auto 14px;
+    padding: 10px 18px 12px;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
+    gap: 18px;
     box-sizing: border-box;
+    border-bottom: 1px solid rgba(248,245,70,0.55);
 }
 
-.app-logo {
-    display: block;
-    width: min(280px, 28vw);
-    max-width: 100%;
-    height: auto;
-    object-fit: contain;
-    filter:
-        drop-shadow(0 0 18px rgba(248,245,70,0.10))
-        drop-shadow(0 12px 24px rgba(0,0,0,0.28));
+.app-brand-copy {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.app-brand-title {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+.app-brand-kicker {
+    color: rgba(242,242,242,0.82);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+}
+
+.app-brand-title strong {
+    color: #F8F546;
+    font-size: clamp(24px, 2.2vw, 36px);
+    font-weight: 1000;
+    letter-spacing: 0.02em;
+    text-shadow: 0 0 18px rgba(248,245,70,0.12);
+    white-space: nowrap;
+}
+
+.app-beta-chip {
+    flex: 0 0 auto;
+    border: 1px solid rgba(248,245,70,0.52);
+    border-radius: 999px;
+    background: rgba(248,245,70,0.1);
+    color: #F8F546;
+    padding: 5px 9px;
+    font-size: 10px;
+    font-weight: 1000;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.035),
+        0 0 14px rgba(248,245,70,0.10);
 }
 
 .account-bar {
-    position: absolute;
-    right: 18px;
-    top: 8px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
     flex-wrap: wrap;
     gap: 8px;
-    max-width: min(520px, 42vw);
+    min-width: 0;
+    max-width: min(560px, 48vw);
 }
 
 .account-user-label {
@@ -302,19 +339,27 @@
 
 @media (max-width: 900px) {
     .app-brand {
+        align-items: flex-start;
         flex-direction: column;
-        gap: 10px;
+        gap: 12px;
         margin: 0 auto 14px;
-        padding: 2px 6px 0;
+        padding: 10px 10px 12px;
     }
 
-    .app-logo {
-        width: min(360px, 96vw);
+    .app-brand-copy {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .app-brand-title strong {
+        font-size: clamp(23px, 8vw, 34px);
+        white-space: normal;
     }
 
     .account-bar {
-        position: static;
-        justify-content: center;
+        justify-content: flex-start;
         max-width: 100%;
         width: 100%;
     }
@@ -328,7 +373,7 @@
     .account-user-label {
         max-width: 100%;
         flex-basis: 100%;
-        text-align: center;
+        text-align: left;
     }
 
     .builder-shell {
