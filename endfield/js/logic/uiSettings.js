@@ -10,12 +10,19 @@ const TIMELINE_MODE_OPTIONS = {
     simulation: "simulation"
 };
 
+const SIMULATION_TIMELINE_DENSITY_OPTIONS = {
+    compact: "compact",
+    normal: "normal",
+    detailed: "detailed"
+};
+
 const DEFAULT_SIMULATION_SP_PER_SECOND = 8;
 
 let uiSettings = {
     rotationSkillSize: UI_SIZE_OPTIONS.medium,
     timelineMode: TIMELINE_MODE_OPTIONS.slot,
     simulationSpPerSecond: DEFAULT_SIMULATION_SP_PER_SECOND,
+    simulationTimelineDensity: SIMULATION_TIMELINE_DENSITY_OPTIONS.normal,
     simulationDurationSeconds: null
 };
 
@@ -65,6 +72,11 @@ function applyUiSettings() {
     uiSettings.simulationSpPerSecond = Number.isFinite(spPerSecond) && spPerSecond >= 0
         ? spPerSecond
         : DEFAULT_SIMULATION_SP_PER_SECOND;
+
+    const timelineDensity = Object.values(SIMULATION_TIMELINE_DENSITY_OPTIONS).includes(uiSettings.simulationTimelineDensity)
+        ? uiSettings.simulationTimelineDensity
+        : SIMULATION_TIMELINE_DENSITY_OPTIONS.normal;
+    uiSettings.simulationTimelineDensity = timelineDensity;
 
     const simulationDurationSeconds = Number(uiSettings.simulationDurationSeconds);
     uiSettings.simulationDurationSeconds = Number.isFinite(simulationDurationSeconds) && simulationDurationSeconds > 0
@@ -119,6 +131,18 @@ function setSimulationSpPerSecond(value) {
     }
 }
 
+function setSimulationTimelineDensity(value) {
+    if (!Object.values(SIMULATION_TIMELINE_DENSITY_OPTIONS).includes(value)) return;
+
+    uiSettings.simulationTimelineDensity = value;
+    saveUiSettings();
+    applyUiSettings();
+
+    if (typeof renderRotation === "function") {
+        renderRotation();
+    }
+}
+
 function openSettingsModal() {
     const modal = document.getElementById("settingsModal");
     if (!modal) return;
@@ -143,6 +167,11 @@ function updateSettingsUi() {
     document.querySelectorAll("[data-setting='timelineMode']").forEach(btn => {
         const value = btn.dataset.value;
         btn.classList.toggle("active", value === uiSettings.timelineMode);
+    });
+
+    document.querySelectorAll("[data-setting='simulationTimelineDensity']").forEach(btn => {
+        const value = btn.dataset.value;
+        btn.classList.toggle("active", value === uiSettings.simulationTimelineDensity);
     });
 
     const spPerSecondInput = document.getElementById("simulationSpPerSecondInput");
@@ -185,6 +214,13 @@ function initUiSettings() {
         btn.addEventListener("click", () => {
             const value = btn.dataset.value;
             setTimelineMode(value);
+        });
+    });
+
+    document.querySelectorAll("[data-setting='simulationTimelineDensity']").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const value = btn.dataset.value;
+            setSimulationTimelineDensity(value);
         });
     });
 

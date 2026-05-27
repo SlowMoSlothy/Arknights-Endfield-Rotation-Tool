@@ -762,6 +762,11 @@ function isSimulationTimelineMode() {
 }
 
 const SIMULATION_PIXELS_PER_SECOND = 120;
+const SIMULATION_PIXELS_PER_SECOND_BY_DENSITY = {
+    compact: 80,
+    normal: 120,
+    detailed: 160
+};
 const SIMULATION_TIME_STEP = 0.1;
 const SIMULATION_RULER_MINOR_STEP = 0.1;
 const SIMULATION_RULER_HALF_STEP = 0.5;
@@ -797,6 +802,11 @@ const SIMULATION_PROBLEM_CHIPS = [
 let simulationCursorTime = 0;
 let simulationCursorPlaybackTimer = null;
 let simulationCursorKeyboardHandler = null;
+
+function getSimulationPixelsPerSecond() {
+    const density = uiSettings?.simulationTimelineDensity || "normal";
+    return SIMULATION_PIXELS_PER_SECOND_BY_DENSITY[density] || SIMULATION_PIXELS_PER_SECOND;
+}
 
 function roundSimulationTime(value) {
     const number = Number(value);
@@ -3841,7 +3851,8 @@ function renderSimulationRotation() {
     const simulationProblemEvents = autoComboEvents.filter(event => isSimulationProblemEvent(event));
     const cooldownEndTime = getSimulationCooldownEndTime(entries, secondsPerSlot, autoSkillEvents);
     const durationSeconds = Math.max(initialDurationSeconds, Math.ceil(cooldownEndTime + 1));
-    const trackWidth = durationSeconds * SIMULATION_PIXELS_PER_SECOND;
+    const pixelsPerSecond = getSimulationPixelsPerSecond();
+    const trackWidth = durationSeconds * pixelsPerSecond;
     const skillEvents = enrichSimulationSkillEventsWithSp(assignSimulationCooldownDisplay(enrichSimulationSkillEventsWithEffects([
         ...manualSkillEvents,
         ...autoSkillEvents
@@ -3871,7 +3882,7 @@ function renderSimulationRotation() {
         }
 
         if (options.scrollTrack !== false) {
-            scrollSimulationTrackToTime(eventTime, SIMULATION_PIXELS_PER_SECOND, {
+            scrollSimulationTrackToTime(eventTime, pixelsPerSecond, {
                 scrollArea: trackScroll
             });
         }
@@ -3903,7 +3914,7 @@ function renderSimulationRotation() {
 
     const body = document.createElement("div");
     body.className = "rotation-sim-body";
-    body.appendChild(createSimulationTimeRuler(durationSeconds, SIMULATION_PIXELS_PER_SECOND));
+    body.appendChild(createSimulationTimeRuler(durationSeconds, pixelsPerSecond));
 
     const battleSkillTrack = document.createElement("div");
     battleSkillTrack.id = "rotationSimulationSkillTrack";
@@ -3920,7 +3931,7 @@ function renderSimulationRotation() {
         battleSkillTrack,
         skillEvents,
         secondsPerSlot,
-        SIMULATION_PIXELS_PER_SECOND,
+        pixelsPerSecond,
         "battle"
     );
     if (battleSkillEventCount === 0) {
@@ -3930,13 +3941,13 @@ function renderSimulationRotation() {
     const spTrack = document.createElement("div");
     spTrack.className = "rotation-sim-sp-track";
     spTrack.style.width = `${trackWidth}px`;
-    renderSimulationSpTrack(spTrack, skillEvents, durationSeconds, SIMULATION_PIXELS_PER_SECOND);
+    renderSimulationSpTrack(spTrack, skillEvents, durationSeconds, pixelsPerSecond);
 
     const comboSkillEventCount = renderSimulationSkillEvents(
         comboSkillTrack,
         skillEvents,
         secondsPerSlot,
-        SIMULATION_PIXELS_PER_SECOND,
+        pixelsPerSecond,
         "combo"
     );
     if (comboSkillEventCount === 0) {
@@ -3946,12 +3957,12 @@ function renderSimulationRotation() {
     const comboCooldownTrack = document.createElement("div");
     comboCooldownTrack.className = "rotation-sim-cooldown-track is-combo-skill";
     comboCooldownTrack.style.width = `${trackWidth}px`;
-    renderSimulationCooldownTrack(comboCooldownTrack, skillEvents, SIMULATION_PIXELS_PER_SECOND, "combo");
+    renderSimulationCooldownTrack(comboCooldownTrack, skillEvents, pixelsPerSecond, "combo");
 
     const batkTrack = document.createElement("div");
     batkTrack.className = "rotation-sim-batk-track";
     batkTrack.style.width = `${trackWidth}px`;
-    renderSimulationBasicAttack(batkTrack, timelineBasicAttackData, durationSeconds, SIMULATION_PIXELS_PER_SECOND);
+    renderSimulationBasicAttack(batkTrack, timelineBasicAttackData, durationSeconds, pixelsPerSecond);
 
     body.append(battleSkillTrack, spTrack, comboSkillTrack, comboCooldownTrack, batkTrack);
     attachSimulationTimelineNavigation(body, skillEvents, navigateToSimulationEvent);
@@ -3959,7 +3970,7 @@ function renderSimulationRotation() {
         body,
         skillEvents,
         durationSeconds,
-        SIMULATION_PIXELS_PER_SECOND
+        pixelsPerSecond
     );
     root.append(labels, body);
 

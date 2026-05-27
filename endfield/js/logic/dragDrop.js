@@ -103,7 +103,10 @@ function getDraggedActionLane(item) {
 function getSimulationDropTime(track, event) {
     const rect = track.getBoundingClientRect();
     const clientX = event?.clientX ?? rect.left;
-    const rawSeconds = (clientX - rect.left + track.scrollLeft) / SIMULATION_PIXELS_PER_SECOND;
+    const pixelsPerSecond = typeof getSimulationPixelsPerSecond === "function"
+        ? getSimulationPixelsPerSecond()
+        : SIMULATION_PIXELS_PER_SECOND;
+    const rawSeconds = (clientX - rect.left + track.scrollLeft) / pixelsPerSecond;
     return typeof roundSimulationTime === "function"
         ? roundSimulationTime(rawSeconds)
         : Math.max(0, Math.round(rawSeconds * 10) / 10);
@@ -217,10 +220,13 @@ function updateSimulationDropGuide(track, event) {
     }
 
     const time = getSimulationDropTime(track, event);
+    const pixelsPerSecond = typeof getSimulationPixelsPerSecond === "function"
+        ? getSimulationPixelsPerSecond()
+        : SIMULATION_PIXELS_PER_SECOND;
     if (typeof updateSimulationDragGuide === "function") {
-        updateSimulationDragGuide(guide, time, SIMULATION_PIXELS_PER_SECOND);
+        updateSimulationDragGuide(guide, time, pixelsPerSecond);
     } else {
-        guide.style.left = `${time * SIMULATION_PIXELS_PER_SECOND}px`;
+        guide.style.left = `${time * pixelsPerSecond}px`;
         guide.dataset.time = `${time}s`;
     }
 }
