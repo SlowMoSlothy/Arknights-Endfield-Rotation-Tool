@@ -537,6 +537,9 @@ function renderSkills() {
             div.dataset.id = String(skill.id);
             div.dataset.largeIcon = skill.icon;
             const skillData = { ...skill, operator: op.name };
+            if (typeof getSimulationSkillLane === "function") {
+                div.dataset.skillLane = getSimulationSkillLane(skillData);
+            }
             div.appendChild(createSkillIcon(skillData, { size: "small", useSmallIcon: true }));
             if (Array.isArray(switchGroup) && switchGroup.length > 1) {
                 div.classList.add("qingbo-switch");

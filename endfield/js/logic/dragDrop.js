@@ -12,18 +12,47 @@ function cleanupDragArtifacts() {
     });
 
     document.querySelectorAll(".rotation-sim-skill-drop-track").forEach(track => {
-        track.classList.remove("is-drop-target");
+        track.classList.remove("is-drop-target", "is-invalid-drop-target");
+        track.style.removeProperty("--drop-guide-x");
     });
 
     cleanupSimulationDropGuide();
     removeSimulationDropGuideListeners();
     stopSimulationDragAutoScroll();
-    document.body.classList.remove("drag-in-progress");
+    document.body.classList.remove(
+        "drag-in-progress",
+        "simulation-drop-active",
+        "simulation-drop-lane-battle",
+        "simulation-drop-lane-combo"
+    );
+    currentSimulationDropLane = null;
 }
 
-function beginDrag() {
+let currentSimulationDropLane = null;
+
+function getDraggedSimulationLane(item) {
+    const existingLane = item?.dataset?.skillLane;
+    if (existingLane === "battle" || existingLane === "combo") return existingLane;
+
+    const skillId = parseInt(item?.dataset?.id, 10);
+    const skillData = Number.isNaN(skillId) ? null : getSkillById(skillId);
+    if (!skillData) return "battle";
+
+    if (typeof getSimulationSkillLane === "function") {
+        return getSimulationSkillLane(skillData);
+    }
+
+    const type = String(skillData.type || "").toLowerCase();
+    const shortType = String(skillData.shortType || "").toLowerCase();
+    return type === "combo skill" || shortType === "cs" ? "combo" : "battle";
+}
+
+function beginDrag(item) {
     isDraggingSkill = true;
-    document.body.classList.add("drag-in-progress");
+    currentSimulationDropLane = getDraggedSimulationLane(item);
+    document.body.classList.add("drag-in-progress", "simulation-drop-active");
+    document.body.classList.toggle("simulation-drop-lane-battle", currentSimulationDropLane === "battle");
+    document.body.classList.toggle("simulation-drop-lane-combo", currentSimulationDropLane === "combo");
     addSimulationDropGuideListeners();
 }
 
@@ -92,7 +121,7 @@ function scheduleDragPreviewHydration(sourceEl, attempts = 8) {
 }
 
 function handleDragStart(evt) {
-    beginDrag();
+    beginDrag(evt.item);
     scheduleDragPreviewHydration(evt.item);
 }
 
@@ -115,7 +144,8 @@ function getSimulationDropTime(track, event) {
 function cleanupSimulationDropGuide() {
     document.querySelectorAll(".rotation-sim-drop-guide").forEach(guide => guide.remove());
     document.querySelectorAll(".rotation-sim-skill-drop-track").forEach(track => {
-        track.classList.remove("is-drop-target");
+        track.classList.remove("is-drop-target", "is-invalid-drop-target");
+        track.style.removeProperty("--drop-guide-x");
     });
 }
 
@@ -200,7 +230,7 @@ function getSimulationDropTrackFromPoint(event) {
 }
 
 function updateSimulationDropGuide(track, event) {
-    if (track?.dataset?.skillLane !== "battle") {
+    if (!canDropOnSimulationTrack(track)) {
         cleanupSimulationDropGuide();
         return;
     }
@@ -210,6 +240,7 @@ function updateSimulationDropGuide(track, event) {
 
     document.querySelectorAll(".rotation-sim-skill-drop-track").forEach(candidate => {
         candidate.classList.toggle("is-drop-target", candidate === track);
+        candidate.classList.toggle("is-invalid-drop-target", candidate !== track);
     });
 
     let guide = body.querySelector(".rotation-sim-drop-guide");
@@ -218,11 +249,13 @@ function updateSimulationDropGuide(track, event) {
         guide.className = "rotation-sim-drag-guide rotation-sim-drop-guide";
         body.appendChild(guide);
     }
+    guide.classList.toggle("is-combo", track.dataset.skillLane === "combo");
 
     const time = getSimulationDropTime(track, event);
     const pixelsPerSecond = typeof getSimulationPixelsPerSecond === "function"
         ? getSimulationPixelsPerSecond()
         : SIMULATION_PIXELS_PER_SECOND;
+    track.style.setProperty("--drop-guide-x", `${time * pixelsPerSecond}px`);
     if (typeof updateSimulationDragGuide === "function") {
         updateSimulationDragGuide(guide, time, pixelsPerSecond);
     } else {
@@ -240,6 +273,12 @@ function updateSimulationDropGuideFromEvent(event) {
         return;
     }
     updateSimulationDropGuide(track, event);
+}
+
+function canDropOnSimulationTrack(track, item = null) {
+    const targetTrack = track?.el || track;
+    const dropLane = currentSimulationDropLane || getDraggedSimulationLane(item);
+    return targetTrack?.dataset?.skillLane === dropLane;
 }
 
 function addSimulationDropGuideListeners() {
@@ -323,7 +362,7 @@ function initRotationDragDrop() {
                 group: {
                     name: "skills",
                     pull: false,
-                    put: true
+                    put: (to, from, dragEl) => canDropOnSimulationTrack(to, dragEl)
                 },
                 sort: false,
                 draggable: ".rotation-sim-sortable-source-only",
@@ -344,10 +383,17 @@ function initRotationDragDrop() {
                 onEnd: endDrag,
                 onUnchoose: cleanupDragArtifacts,
                 onMove: (evt) => {
-                    updateSimulationDropGuide(evt.to || simulationTrack, evt.originalEvent);
-                    return true;
+                    const targetTrack = evt.to || simulationTrack;
+                    updateSimulationDropGuide(targetTrack, evt.originalEvent);
+                    return canDropOnSimulationTrack(targetTrack, evt.dragged);
                 },
                 onAdd: (evt) => {
+                    if (!canDropOnSimulationTrack(simulationTrack, evt.item)) {
+                        evt.item.remove();
+                        cleanupSimulationDropGuide();
+                        return;
+                    }
+
                     const draggedId = parseInt(evt.item.dataset.id, 10);
                     evt.item.remove();
                     if (!draggedId) return;

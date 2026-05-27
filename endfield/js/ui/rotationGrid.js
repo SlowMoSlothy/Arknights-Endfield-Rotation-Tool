@@ -3053,7 +3053,7 @@ function attachSimulationDrag(item, index, secondsPerSlot, pixelsPerSecond) {
         const startX = event.clientX;
         const startTime = getRotationEntryTime(rotation[index], index, secondsPerSlot);
         const body = item.closest(".rotation-sim-body");
-        const showDragGuide = item.dataset.skillLane === "battle" && body;
+        const showDragGuide = (item.dataset.skillLane === "battle" || item.dataset.skillLane === "combo") && body;
         let dragGuide = null;
         let hasDragged = false;
         item.__rotationWasDraggedForInspector = false;
@@ -3078,6 +3078,7 @@ function attachSimulationDrag(item, index, secondsPerSlot, pixelsPerSecond) {
             item.style.left = `${nextTime * pixelsPerSecond}px`;
             if (showDragGuide) {
                 if (!dragGuide) dragGuide = createSimulationDragGuide(body);
+                dragGuide.classList.toggle("is-combo", item.dataset.skillLane === "combo");
                 updateSimulationDragGuide(dragGuide, nextTime, pixelsPerSecond);
             }
             const timeBadge = item.querySelector(".rotation-sim-time-badge");
@@ -3091,7 +3092,7 @@ function attachSimulationDrag(item, index, secondsPerSlot, pixelsPerSecond) {
 
             const deltaSeconds = (upEvent.clientX - startX) / pixelsPerSecond;
             setRotationEntryTime(index, startTime + deltaSeconds, {
-                snapBattleSkill: true,
+                snapBattleSkill: item.dataset.skillLane === "battle",
                 secondsPerSlot
             });
             renderRotation();
@@ -3539,7 +3540,7 @@ function createSimulationLaneHint(type) {
     text.className = "rotation-sim-lane-hint-text";
     text.textContent = type === "battle"
         ? "Drop BS / Ult here"
-        : "Combo Skills appear here automatically";
+        : "Drop CS here";
 
     hint.append(arrow, text);
     return hint;

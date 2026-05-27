@@ -1037,15 +1037,53 @@
 }
 
 .rotation-sim-skill-drop-track {
-    transition: background 0.14s ease, box-shadow 0.14s ease;
+    border-radius: 8px;
+    transition: background 0.14s ease, box-shadow 0.14s ease, opacity 0.14s ease;
+}
+
+.simulation-drop-active.simulation-drop-lane-battle .rotation-sim-skill-drop-track.is-battle-skill {
+    background:
+        linear-gradient(90deg, rgba(248,245,70,0.08), rgba(248,245,70,0.025) 46%, rgba(248,245,70,0.01));
+    box-shadow:
+        inset 0 0 0 1px rgba(248,245,70,0.10),
+        inset 0 0 24px rgba(248,245,70,0.045);
+}
+
+.simulation-drop-active.simulation-drop-lane-combo .rotation-sim-skill-drop-track.is-combo-skill {
+    background:
+        linear-gradient(90deg, rgba(86,216,255,0.09), rgba(86,216,255,0.028) 46%, rgba(86,216,255,0.01));
+    box-shadow:
+        inset 0 0 0 1px rgba(86,216,255,0.12),
+        inset 0 0 24px rgba(86,216,255,0.055);
+}
+
+.simulation-drop-active.simulation-drop-lane-battle .rotation-sim-skill-drop-track.is-combo-skill,
+.simulation-drop-active.simulation-drop-lane-combo .rotation-sim-skill-drop-track.is-battle-skill {
+    opacity: 0.72;
 }
 
 .rotation-sim-skill-drop-track.is-drop-target {
     background:
-        linear-gradient(90deg, rgba(248,245,70,0.16), rgba(248,245,70,0.045) 40%, rgba(248,245,70,0.015));
+        radial-gradient(circle at var(--drop-guide-x, 0px) 50%, rgba(248,245,70,0.20), transparent 128px),
+        linear-gradient(90deg, rgba(248,245,70,0.18), rgba(248,245,70,0.052) 44%, rgba(248,245,70,0.016));
     box-shadow:
-        inset 0 0 0 1px rgba(248,245,70,0.20),
-        inset 0 0 28px rgba(248,245,70,0.08);
+        inset 0 0 0 1px rgba(248,245,70,0.30),
+        inset 0 0 34px rgba(248,245,70,0.12),
+        0 0 20px rgba(248,245,70,0.08);
+}
+
+.rotation-sim-skill-drop-track.is-combo-skill.is-drop-target {
+    background:
+        radial-gradient(circle at var(--drop-guide-x, 0px) 50%, rgba(86,216,255,0.20), transparent 128px),
+        linear-gradient(90deg, rgba(86,216,255,0.16), rgba(86,216,255,0.052) 44%, rgba(86,216,255,0.016));
+    box-shadow:
+        inset 0 0 0 1px rgba(86,216,255,0.30),
+        inset 0 0 34px rgba(86,216,255,0.12),
+        0 0 20px rgba(86,216,255,0.08);
+}
+
+.rotation-sim-skill-drop-track.is-invalid-drop-target {
+    box-shadow: inset 0 0 0 1px rgba(160,170,169,0.045);
 }
 
 .rotation-sim-skill-track.is-combo-skill {
@@ -1474,47 +1512,74 @@
 
 .rotation-sim-drag-guide {
     position: absolute;
-    top: 26px;
+    top: 22px;
     bottom: 0;
     width: 0;
     transform: translateX(-50%);
-    border-left: 1px solid rgba(248,245,70,0.72);
+    border-left: 1px solid rgba(248,245,70,0.84);
     pointer-events: none;
-    z-index: 22;
-    filter: drop-shadow(0 0 8px rgba(248,245,70,0.32));
+    z-index: 24;
+    filter: drop-shadow(0 0 7px rgba(248,245,70,0.30));
 }
 
 .rotation-sim-drag-guide::before {
     content: "";
     position: absolute;
-    top: -7px;
+    top: -5px;
     left: 50%;
-    width: 9px;
-    height: 9px;
-    transform: translateX(-50%) rotate(45deg);
-    border-left: 1px solid rgba(248,245,70,0.88);
-    border-top: 1px solid rgba(248,245,70,0.88);
-    background: rgba(18,20,13,0.96);
-    box-shadow: 0 0 10px rgba(248,245,70,0.28);
+    width: 0;
+    height: 0;
+    transform: translateX(-50%);
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid rgba(248,245,70,0.94);
+    background: transparent;
+    box-shadow: 0 -3px 12px rgba(248,245,70,0.24);
 }
 
 .rotation-sim-drag-guide::after {
     content: attr(data-time);
     position: absolute;
-    top: -30px;
+    top: -34px;
     left: 50%;
-    min-width: 34px;
-    padding: 2px 7px;
+    min-width: 38px;
+    padding: 3px 8px;
     transform: translateX(-50%);
-    border: 1px solid rgba(248,245,70,0.58);
+    border: 1px solid rgba(248,245,70,0.72);
     border-radius: 999px;
-    background: rgba(10,12,14,0.92);
+    background:
+        linear-gradient(180deg, rgba(38,40,24,0.98), rgba(10,12,14,0.96));
     color: #F8F546;
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 1000;
     line-height: 14px;
     text-align: center;
     white-space: nowrap;
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.04),
+        0 6px 14px rgba(0,0,0,0.30),
+        0 0 16px rgba(248,245,70,0.18);
+}
+
+.rotation-sim-drag-guide.is-combo {
+    border-left-color: rgba(86,216,255,0.84);
+    filter: drop-shadow(0 0 7px rgba(86,216,255,0.30));
+}
+
+.rotation-sim-drag-guide.is-combo::before {
+    border-top-color: rgba(86,216,255,0.94);
+    box-shadow: 0 -3px 12px rgba(86,216,255,0.24);
+}
+
+.rotation-sim-drag-guide.is-combo::after {
+    border-color: rgba(86,216,255,0.72);
+    background:
+        linear-gradient(180deg, rgba(20,39,45,0.98), rgba(10,12,14,0.96));
+    color: #56d8ff;
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.04),
+        0 6px 14px rgba(0,0,0,0.30),
+        0 0 16px rgba(86,216,255,0.18);
 }
 
 .rotation-sim .rotation-sim-skill.is-auto-event {
