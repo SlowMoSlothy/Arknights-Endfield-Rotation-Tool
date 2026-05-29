@@ -43,8 +43,25 @@ function mapDatabaseOperator(row, skillRows) {
         sortOrder: row.sort_order ?? raw.sortOrder,
         icon: row.icon_path || raw.icon,
         canEnterUltimateState: row.can_enter_ultimate_state ?? raw.canEnterUltimateState,
+        weaponType: row.weapon_type || raw.weaponType,
         elementType: row.element_type || raw.elementType,
         skills: skillRows.map(mapDatabaseSkill)
+    };
+}
+
+function mapDatabaseWeapon(row) {
+    const raw = isPlainObject(row.raw_data) ? row.raw_data : {};
+
+    return {
+        ...raw,
+        id: row.weapon_key || raw.id,
+        name: row.name || raw.name,
+        weaponType: row.weapon_type || raw.weaponType,
+        rarity: row.rarity ?? raw.rarity,
+        iconPath: row.icon_path || raw.iconPath || raw.icon,
+        mainAttribute: row.main_attribute || raw.mainAttribute,
+        secondaryAttribute: row.secondary_attribute || raw.secondaryAttribute,
+        passiveName: row.passive_name || raw.passiveName
     };
 }
 
@@ -299,6 +316,49 @@ async function loadOperatorsFromSupabase() {
     });
 
     return operatorRows.map(row => mapDatabaseOperator(row, skillsByOperatorId.get(row.id) || []));
+}
+
+async function loadWeaponsFromSupabase() {
+    if (!supabaseClient) {
+        console.warn("Supabase client is not available. Using local weapon data.");
+        return [];
+    }
+
+    const { data, error } = await supabaseClient
+        .from("weapons")
+        .select("*")
+        .eq("game", "arknights_endfield")
+        .order("weapon_type", { ascending: true })
+        .order("rarity", { ascending: false })
+        .order("name", { ascending: true });
+
+    if (error) {
+        console.error("Weapons could not be loaded from Supabase:", error);
+        return [];
+    }
+
+    return Array.isArray(data) ? data.map(mapDatabaseWeapon) : [];
+}
+
+async function hydrateWeaponsFromSupabase() {
+    if (typeof ENDFIELD_WEAPONS === "undefined" || !Array.isArray(ENDFIELD_WEAPONS)) {
+        return false;
+    }
+
+    let databaseWeapons = [];
+    try {
+        databaseWeapons = await loadWeaponsFromSupabase();
+        if (!databaseWeapons.length) {
+            return false;
+        }
+    } catch (error) {
+        console.error("Weapon loading failed. Using local weapon data.", error);
+        return false;
+    }
+
+    ENDFIELD_WEAPONS.splice(0, ENDFIELD_WEAPONS.length, ...databaseWeapons);
+    console.info(`Weapons loaded from Supabase: ${ENDFIELD_WEAPONS.length}`);
+    return true;
 }
 
 async function hydrateOperatorsFromSupabase() {

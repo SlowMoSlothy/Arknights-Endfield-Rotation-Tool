@@ -1,0 +1,584 @@
+.settings-modal .settings-dialog.equipment-editor-dialog {
+    width: min(1320px, calc(100vw - 48px));
+    max-width: calc(100vw - 48px);
+    max-height: min(860px, calc(100vh - 32px));
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.equipment-editor-shell {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 300px minmax(720px, 1fr);
+    gap: 20px;
+}
+
+.equipment-operator-list {
+    min-height: 0;
+    max-height: min(640px, calc(100vh - 170px));
+    overflow: auto;
+    display: grid;
+    align-content: start;
+    gap: 8px;
+    padding-right: 4px;
+}
+
+.equipment-operator-btn {
+    width: 100%;
+    min-width: 0;
+    min-height: 54px;
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 9px;
+    border: 1px solid rgba(160,170,169,0.22);
+    border-radius: 8px;
+    background: linear-gradient(180deg, rgba(49,55,57,0.68), rgba(16,18,20,0.96));
+    color: rgba(244,245,242,0.88);
+    padding: 7px;
+    font: inherit;
+    cursor: pointer;
+    text-align: left;
+}
+
+.equipment-operator-btn:hover,
+.equipment-operator-btn.is-active {
+    border-color: rgba(248,245,70,0.82);
+    color: #F8F546;
+    box-shadow: 0 0 12px rgba(248,245,70,0.14);
+}
+
+.equipment-operator-btn img {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.equipment-operator-btn span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.equipment-operator-btn small {
+    border: 1px solid rgba(160,170,169,0.20);
+    border-radius: 999px;
+    color: rgba(160,170,169,0.9);
+    padding: 3px 6px;
+    font-size: 9px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.equipment-operator-btn.is-active small {
+    border-color: rgba(248,245,70,0.38);
+    color: rgba(248,245,70,0.92);
+}
+
+.equipment-editor-main {
+    min-width: 0;
+    min-height: 0;
+    max-height: min(680px, calc(100vh - 170px));
+    overflow: auto;
+    display: grid;
+    gap: 14px;
+    padding: 1px 2px 8px;
+}
+
+.equipment-editor-operator {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 13px;
+    align-items: center;
+    border: 1px solid rgba(255,255,255,0.10);
+    background:
+        radial-gradient(circle at 12% 0%, rgba(248,245,70,0.08), transparent 36%),
+        linear-gradient(180deg, rgba(28,34,36,0.58), rgba(8,12,14,0.70));
+    padding: 12px;
+}
+
+.equipment-editor-avatar {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border: 1px solid rgba(248,245,70,0.28);
+    background: rgba(255,255,255,0.04);
+}
+
+.equipment-editor-copy {
+    min-width: 0;
+    display: grid;
+    gap: 5px;
+}
+
+.equipment-editor-copy h3 {
+    margin: 0;
+    color: #fff;
+    font-size: 24px;
+    line-height: 1;
+}
+
+.equipment-editor-copy p {
+    margin: 0;
+    color: rgba(160,170,169,0.88);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.equipment-editor-form {
+    display: grid;
+    gap: 14px;
+}
+
+.equipment-editor-section {
+    display: grid;
+    gap: 12px;
+    border: 1px solid rgba(255,255,255,0.10);
+    background:
+        radial-gradient(circle at 12% 0%, rgba(255,255,255,0.06), transparent 32%),
+        linear-gradient(180deg, rgba(20,25,27,0.54), rgba(6,9,10,0.62));
+    padding: 13px;
+}
+
+.equipment-editor-section h4 {
+    margin: 0;
+    color: #F8F546;
+    font-size: 14px;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.equipment-editor-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.equipment-editor-field {
+    min-width: 0;
+    display: grid;
+    gap: 5px;
+    color: #A0AAA9;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.equipment-editor-field.is-wide {
+    grid-column: 1 / -1;
+}
+
+.equipment-editor-field input,
+.equipment-editor-field select,
+.equipment-editor-field textarea {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    background:
+        radial-gradient(circle at 12% 50%, rgba(248,245,70,0.06), transparent 38%),
+        linear-gradient(180deg, rgba(14,17,18,0.82), rgba(5,7,8,0.88));
+    color: #f2f2f2;
+    padding: 0 10px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: none;
+}
+
+.equipment-editor-field input,
+.equipment-editor-field select {
+    min-height: 36px;
+}
+
+.equipment-editor-field textarea {
+    min-height: 74px;
+    padding-top: 9px;
+    resize: vertical;
+}
+
+.equipment-editor-field input:focus,
+.equipment-editor-field select:focus,
+.equipment-editor-field textarea:focus {
+    border-color: rgba(248,245,70,0.68);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(248,245,70,0.08);
+}
+
+.equipment-editor-hint {
+    align-self: end;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    border: 1px solid rgba(248,245,70,0.18);
+    border-radius: 8px;
+    background: rgba(248,245,70,0.07);
+    color: rgba(248,245,70,0.88);
+    padding: 0 10px;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.equipment-weapon-select {
+    position: relative;
+    min-width: 0;
+}
+
+.equipment-weapon-dropdown {
+    position: relative;
+    min-width: 0;
+}
+
+.equipment-weapon-trigger,
+.equipment-weapon-option {
+    width: 100%;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: 46px minmax(0, 1fr) 18px;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    background:
+        radial-gradient(circle at 12% 50%, rgba(248,245,70,0.06), transparent 38%),
+        linear-gradient(180deg, rgba(14,17,18,0.92), rgba(5,7,8,0.96));
+    color: #f2f2f2;
+    padding: 7px 10px;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.equipment-weapon-trigger {
+    min-height: 58px;
+}
+
+.equipment-weapon-trigger:hover,
+.equipment-weapon-trigger:focus-visible,
+.equipment-weapon-dropdown.is-open .equipment-weapon-trigger {
+    border-color: rgba(248,245,70,0.68);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(248,245,70,0.08);
+}
+
+.equipment-weapon-trigger:disabled {
+    cursor: default;
+    opacity: 0.58;
+}
+
+.equipment-weapon-image {
+    width: 42px;
+    height: 42px;
+    box-sizing: border-box;
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 8px;
+    object-fit: cover;
+    background: rgba(0,0,0,0.28);
+    box-shadow: 0 0 12px rgba(0,0,0,0.32);
+}
+
+.equipment-weapon-image.rarity-6 {
+    border-color: rgba(255,226,107,0.82);
+    box-shadow: 0 0 14px rgba(255,226,107,0.18);
+}
+
+.equipment-weapon-image.rarity-5 {
+    border-color: rgba(220,168,255,0.78);
+    box-shadow: 0 0 14px rgba(220,168,255,0.16);
+}
+
+.equipment-weapon-image.rarity-4 {
+    border-color: rgba(130,189,255,0.78);
+    box-shadow: 0 0 14px rgba(130,189,255,0.14);
+}
+
+.equipment-weapon-image.rarity-3 {
+    border-color: rgba(184,192,199,0.58);
+}
+
+.equipment-weapon-image.is-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(160,170,169,0.82);
+    font-size: 20px;
+    font-weight: 900;
+}
+
+.equipment-weapon-text {
+    min-width: 0;
+    display: grid;
+    gap: 4px;
+}
+
+.equipment-weapon-text strong {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: rgba(242,242,242,0.94);
+    font-size: 13px;
+    font-weight: 1000;
+    line-height: 1.05;
+}
+
+.equipment-weapon-text strong.rarity-6 {
+    color: #ffe26b;
+}
+
+.equipment-weapon-text strong.rarity-5 {
+    color: #dca8ff;
+}
+
+.equipment-weapon-text strong.rarity-4 {
+    color: #82bdff;
+}
+
+.equipment-weapon-text strong.rarity-3 {
+    color: #d6dde2;
+}
+
+.equipment-weapon-text small {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: rgba(160,170,169,0.86);
+    font-size: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.equipment-weapon-chevron {
+    justify-self: end;
+    color: rgba(248,245,70,0.82);
+    font-size: 16px;
+    font-weight: 900;
+}
+
+.equipment-weapon-menu {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 6px);
+    z-index: 40;
+    max-height: 280px;
+    overflow: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 8px;
+    border: 1px solid rgba(160,170,169,0.24);
+    border-radius: 10px;
+    background:
+        linear-gradient(180deg, rgba(28,31,33,0.98), rgba(8,10,12,0.99));
+    padding: 8px;
+    box-shadow:
+        0 18px 34px rgba(0,0,0,0.42),
+        inset 0 0 0 1px rgba(255,255,255,0.035);
+}
+
+.equipment-weapon-menu[hidden] {
+    display: none;
+}
+
+.equipment-weapon-option {
+    min-height: 132px;
+    grid-template-columns: 1fr;
+    grid-template-rows: 52px minmax(0, 1fr);
+    justify-items: center;
+    border-color: rgba(160,170,169,0.16);
+    border-left-width: 3px;
+    padding: 10px 8px;
+    text-align: center;
+}
+
+.equipment-weapon-option .equipment-weapon-image {
+    width: 52px;
+    height: 52px;
+}
+
+.equipment-weapon-option .equipment-weapon-text {
+    justify-items: center;
+}
+
+.equipment-weapon-option .equipment-weapon-text strong,
+.equipment-weapon-option .equipment-weapon-text small {
+    white-space: normal;
+    text-align: center;
+}
+
+.equipment-weapon-option.rarity-6 {
+    border-left-color: #ffe26b;
+}
+
+.equipment-weapon-option.rarity-5 {
+    border-left-color: #dca8ff;
+}
+
+.equipment-weapon-option.rarity-4 {
+    border-left-color: #82bdff;
+}
+
+.equipment-weapon-option.rarity-3 {
+    border-left-color: #b8c0c7;
+}
+
+.equipment-weapon-option:hover,
+.equipment-weapon-option:focus-visible,
+.equipment-weapon-option[aria-selected="true"] {
+    border-color: rgba(248,245,70,0.58);
+    background:
+        radial-gradient(circle at 12% 50%, rgba(248,245,70,0.12), transparent 42%),
+        linear-gradient(180deg, rgba(49,55,57,0.92), rgba(16,18,20,0.98));
+    outline: none;
+}
+
+.equipment-weapon-empty {
+    grid-column: 1 / -1;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    border: 1px dashed rgba(160,170,169,0.24);
+    border-radius: 8px;
+    color: rgba(160,170,169,0.78);
+    padding: 0 10px;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: none;
+}
+
+.equipment-gear-select {
+    min-width: 0;
+}
+
+.equipment-gear-trigger {
+    min-height: 68px;
+}
+
+.equipment-piece-card .equipment-weapon-menu {
+    min-width: min(520px, calc(100vw - 72px));
+}
+
+.equipment-piece-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.equipment-piece-card {
+    min-width: 0;
+    display: grid;
+    gap: 9px;
+    border: 1px solid rgba(160,170,169,0.14);
+    background: rgba(7,9,10,0.28);
+    padding: 10px;
+}
+
+.equipment-piece-card h5 {
+    margin: 0;
+    color: rgba(242,242,242,0.92);
+    font-size: 12px;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.equipment-editor-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.equipment-editor-actions button {
+    min-height: 34px;
+    border: 1px solid rgba(160,170,169,0.24);
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(49,55,57,0.68), rgba(16,18,20,0.96));
+    color: rgba(244,245,242,0.88);
+    padding: 0 13px;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.equipment-editor-actions .equipment-editor-primary {
+    border-color: rgba(248,245,70,0.54);
+    background: linear-gradient(180deg, #F8F546, #d6d336);
+    color: #111;
+}
+
+.equipment-editor-actions .equipment-editor-danger {
+    border-color: rgba(255,125,115,0.32);
+    color: rgba(255,165,155,0.94);
+}
+
+.equipment-editor-status {
+    min-height: 18px;
+    color: rgba(160,170,169,0.86);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.equipment-editor-status.is-success {
+    color: #F8F546;
+}
+
+.team-equipment-summary {
+    width: 100%;
+    display: grid;
+    gap: 3px;
+}
+
+.team-equipment-summary span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border: 1px solid rgba(248,245,70,0.18);
+    border-radius: 999px;
+    background: rgba(248,245,70,0.08);
+    color: rgba(248,245,70,0.88);
+    padding: 3px 6px;
+    font-size: 9px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+@media (max-width: 760px) {
+    .settings-modal .settings-dialog.equipment-editor-dialog {
+        width: min(100vw - 24px, 720px);
+        max-width: calc(100vw - 24px);
+    }
+
+    .equipment-editor-shell,
+    .equipment-editor-grid,
+    .equipment-piece-grid,
+    .equipment-editor-operator {
+        grid-template-columns: 1fr;
+    }
+
+    .equipment-operator-list {
+        max-height: 180px;
+    }
+
+    .equipment-editor-main {
+        max-height: calc(100vh - 340px);
+    }
+
+    .equipment-editor-actions {
+        justify-content: stretch;
+    }
+
+    .equipment-editor-actions button {
+        flex: 1 1 130px;
+    }
+}

@@ -306,6 +306,10 @@ async function initApp() {
             await hydrateEffectGroupsFromSupabase();
         }
 
+        if (typeof hydrateWeaponsFromSupabase === "function") {
+            await hydrateWeaponsFromSupabase();
+        }
+
         if (typeof hydrateOperatorsFromSupabase === "function") {
             await hydrateOperatorsFromSupabase();
         }
@@ -323,6 +327,7 @@ async function initApp() {
         initRotationSaveMenu();
         if (typeof initCommunityRotations === "function") initCommunityRotations();
         if (typeof initOperatorGallery === "function") initOperatorGallery();
+        if (typeof initEquipmentEditor === "function") initEquipmentEditor();
         if (typeof initMyRotations === "function") initMyRotations();
         if (typeof initAdminPanel === "function") initAdminPanel();
 

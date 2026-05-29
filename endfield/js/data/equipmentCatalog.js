@@ -1,0 +1,70 @@
+const ENDFIELD_WEAPON_TYPES = [
+    { id: "sword", name: "Sword" },
+    { id: "great_sword", name: "Great Sword" },
+    { id: "polearm", name: "Polearm" },
+    { id: "arts_unit", name: "Arts Unit" },
+    { id: "handcannon", name: "Handcannon" }
+];
+
+const ENDFIELD_WEAPONS = [
+    { id: "tarr_11", name: "Tarr 11", weaponType: "sword", rarity: 3 },
+    { id: "wave_tide", name: "Wave Tide", weaponType: "sword", rarity: 4 },
+    { id: "obj_edge_of_lightness", name: "OBJ Edge of Lightness", weaponType: "sword", rarity: 5 },
+    { id: "aspirant", name: "Aspirant", weaponType: "sword", rarity: 5 },
+    { id: "fortmaker", name: "Fortmaker", weaponType: "sword", rarity: 5 },
+    { id: "forgeborn_scathe", name: "Forgeborn Scathe", weaponType: "sword", rarity: 6 },
+    { id: "glorious_memory", name: "Glorious Memory", weaponType: "sword", rarity: 6 },
+    { id: "grand_vision", name: "Grand Vision", weaponType: "sword", rarity: 6 },
+    { id: "rapid_ascent", name: "Rapid Ascent", weaponType: "sword", rarity: 6 },
+    { id: "thermite_cutter", name: "Thermite Cutter", weaponType: "sword", rarity: 6 },
+    { id: "umbral_torch", name: "Umbral Torch", weaponType: "sword", rarity: 6 },
+    { id: "darhoff_7", name: "Darhoff 7", weaponType: "great_sword", rarity: 3 },
+    { id: "industry_01", name: "Industry 0.1", weaponType: "great_sword", rarity: 4 },
+    { id: "obj_heavy_burden", name: "OBJ Heavy Burden", weaponType: "great_sword", rarity: 5 },
+    { id: "exemplar", name: "Exemplar", weaponType: "great_sword", rarity: 6 },
+    { id: "former_finery", name: "Former Finery", weaponType: "great_sword", rarity: 6 },
+    { id: "sundered_prince", name: "Sundered Prince", weaponType: "great_sword", rarity: 6 },
+    { id: "thunderberge", name: "Thunderberge", weaponType: "great_sword", rarity: 6 },
+    { id: "opero_77", name: "Opero 77", weaponType: "polearm", rarity: 3 },
+    { id: "obj_razorhorn", name: "OBJ Razorhorn", weaponType: "polearm", rarity: 5 },
+    { id: "valiant", name: "Valiant", weaponType: "polearm", rarity: 6 },
+    { id: "jiminy_12", name: "Jiminy 12", weaponType: "arts_unit", rarity: 3 },
+    { id: "obj_arts_identifier", name: "OBJ Arts Identifier", weaponType: "arts_unit", rarity: 5 },
+    { id: "flickers_in_the_mist", name: "Flickers in the Mist", weaponType: "arts_unit", rarity: 6 },
+    { id: "peco_5", name: "Peco 5", weaponType: "handcannon", rarity: 3 },
+    { id: "howling_guard", name: "Howling Guard", weaponType: "handcannon", rarity: 4 },
+    { id: "artzy_tyrannical", name: "Artzy Tyrannical", weaponType: "handcannon", rarity: 6 },
+    { id: "brigands_calling", name: "Brigand's Calling", weaponType: "handcannon", rarity: 6 }
+];
+
+const ENDFIELD_GEAR_PIECES = [];
+
+const OPERATOR_WEAPON_TYPES = {
+    1: "sword",
+    2: "sword",
+    3: "sword",
+    4: "arts_unit",
+    5: "sword",
+    6: "sword",
+    7: "polearm",
+    8: "arts_unit",
+    9: "arts_unit",
+    10: "sword",
+    11: "arts_unit",
+    12: "arts_unit",
+    13: "great_sword",
+    14: "sword",
+    15: "handcannon",
+    16: "great_sword",
+    17: "great_sword",
+    18: "polearm",
+    19: "handcannon",
+    20: "great_sword",
+    21: "polearm",
+    22: "sword",
+    23: "great_sword",
+    24: "handcannon",
+    25: "arts_unit",
+    26: "handcannon",
+    27: "great_sword"
+};

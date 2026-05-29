@@ -51,6 +51,11 @@ function renderSelectedOperators() {
         item.appendChild(header);
         item.appendChild(buffContainer);
 
+        if (typeof createOperatorEquipmentSummary === "function") {
+            const equipmentSummary = createOperatorEquipmentSummary(op.id);
+            if (equipmentSummary) item.appendChild(equipmentSummary);
+        }
+
         container.appendChild(item);
     });
 }

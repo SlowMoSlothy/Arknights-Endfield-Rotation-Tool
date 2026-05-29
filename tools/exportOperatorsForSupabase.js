@@ -3,7 +3,8 @@ const path = require("path");
 const vm = require("vm");
 
 const rootDir = path.resolve(__dirname, "..");
-const operatorsDir = path.join(rootDir, "js", "data", "operators");
+const appDir = path.join(rootDir, "endfield");
+const operatorsDir = path.join(appDir, "js", "data", "operators");
 const outputDir = path.join(rootDir, "supabase");
 const seedPath = path.join(outputDir, "seed_operators.sql");
 const jsonPath = path.join(outputDir, "operators.json");
@@ -39,9 +40,39 @@ const operatorFiles = [
     "yvonne.js"
 ];
 
+const operatorWeaponTypes = {
+    1: "sword",
+    2: "sword",
+    3: "sword",
+    4: "arts_unit",
+    5: "sword",
+    6: "sword",
+    7: "polearm",
+    8: "arts_unit",
+    9: "arts_unit",
+    10: "sword",
+    11: "arts_unit",
+    12: "arts_unit",
+    13: "great_sword",
+    14: "sword",
+    15: "handcannon",
+    16: "great_sword",
+    17: "great_sword",
+    18: "polearm",
+    19: "handcannon",
+    20: "great_sword",
+    21: "polearm",
+    22: "sword",
+    23: "great_sword",
+    24: "handcannon",
+    25: "arts_unit",
+    26: "handcannon",
+    27: "great_sword"
+};
+
 function readSource() {
     const pieces = operatorFiles.map(file => fs.readFileSync(path.join(operatorsDir, file), "utf8"));
-    pieces.push(fs.readFileSync(path.join(rootDir, "js", "data", "operators.js"), "utf8"));
+    pieces.push(fs.readFileSync(path.join(appDir, "js", "data", "operators.js"), "utf8"));
     pieces.push("operators;");
     return pieces.join("\n\n");
 }
@@ -90,6 +121,7 @@ function buildOperatorRows(operators) {
             sqlNumber(operator.star),
             sqlString(operator.operatorClass),
             sqlString(operator.elementType || "neutral"),
+            sqlString(operator.weaponType || operatorWeaponTypes[operator.id] || null),
             sqlString(operator.icon),
             sqlBoolean(operator.canEnterUltimateState),
             sqlNumber(index + 1),
@@ -148,6 +180,7 @@ insert into public.operators (
     operator_class,
     element_type,
     icon_path,
+    weapon_type,
     can_enter_ultimate_state,
     sort_order,
     raw_data
@@ -161,6 +194,7 @@ on conflict (id) do update set
     operator_class = excluded.operator_class,
     element_type = excluded.element_type,
     icon_path = excluded.icon_path,
+    weapon_type = excluded.weapon_type,
     can_enter_ultimate_state = excluded.can_enter_ultimate_state,
     sort_order = excluded.sort_order,
     raw_data = excluded.raw_data,
