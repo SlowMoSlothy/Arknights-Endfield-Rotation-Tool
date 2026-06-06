@@ -7,6 +7,7 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANO
 const SITE_URL = "https://rotationforge.gg";
 const BASE_PATH = "/endfield";
 const OUTPUT_DIR = path.join(process.cwd(), "endfield", "operators");
+const SITEMAP_PATH = path.join(process.cwd(), "sitemap.xml");
 
 function escapeHtml(input) {
   return String(input ?? "")
@@ -80,6 +81,10 @@ function elementClass(elementType) {
   return ["heat", "cryo", "electric", "nature", "physical"].includes(element)
     ? `element-${element}`
     : "element-default";
+}
+
+function escapeXml(input) {
+  return escapeHtml(input);
 }
 
 function skillElementKey(elementType) {
@@ -279,8 +284,8 @@ function createOperatorPage(operator, allOperators, skillsByOperator) {
   const skills = skillsByOperator.get(operator.id) || [];
   const relatedOperators = getRelatedOperators(operator, allOperators);
 
-  const title = `${name} - Arknights Endfield Operator | RotationForge`;
-  const description = `${name} is a ${operator.star}-star ${operatorClass} operator with ${elementType} element in Arknights: Endfield. View stats, skills, attributes and open the RotationForge rotation tool.`;
+  const title = `${name} Skills, Stats & Rotation | Arknights: Endfield`;
+  const description = `Explore ${name}, a ${operator.star}-star ${elementType} ${operatorClass} in Arknights: Endfield. View skills, stats, ${weaponType}, attributes and plan a rotation.`;
 
   const baseStatsHtml = [
     stat("HP", operator.base_hp, "♥"),
@@ -349,7 +354,7 @@ function createOperatorPage(operator, allOperators, skillsByOperator) {
         <div class="eyebrow">Arknights: Endfield Operator</div>
         <h1 class="operator-name">${escapeHtml(name)}</h1>
         <div class="stars" aria-label="${operator.star} star operator">${stars(operator.star)}</div>
-        <p class="subtitle">${escapeHtml(name)} is listed in the RotationForge operator database for Arknights: Endfield. Open the rotation tool to plan skills, compare operators, and build your rotation setup.</p>
+        <p class="subtitle">${escapeHtml(name)} is a ${operator.star}-star ${escapeHtml(elementType)} ${escapeHtml(operatorClass)} operator using ${escapeHtml(weaponType)}. Review skills, level ${escapeHtml(numberValue(operator.base_stats_level))} stats and attributes, then open the rotation tool to plan a team setup.</p>
         <div class="actions">
           <a class="button primary" href="${toolUrl}">Open in Rotation Tool ↗</a>
           <a class="button secondary" href="${SITE_URL}${BASE_PATH}/operators/">Back to Operator Database</a>
@@ -382,7 +387,7 @@ function createOperatorPage(operator, allOperators, skillsByOperator) {
 
       <article class="panel about">
         <h2>About ${escapeHtml(name)}</h2>
-        <p>${escapeHtml(name)} is a ${operator.star}-star ${escapeHtml(operatorClass)} operator using ${escapeHtml(weaponType)}. The current database entry lists ${escapeHtml(mainAttribute)} as main attribute and ${escapeHtml(secondaryAttribute)} as secondary attribute.</p>
+        <p>${escapeHtml(name)} is a ${operator.star}-star ${escapeHtml(elementType)} ${escapeHtml(operatorClass)} operator using ${escapeHtml(weaponType)}. The current database entry lists ${escapeHtml(mainAttribute)} as the main attribute and ${escapeHtml(secondaryAttribute)} as the secondary attribute. The skill section below contains cooldown, energy and element data for planning rotations.</p>
       </article>
     </section>
 
@@ -450,6 +455,35 @@ function createIndexPage(operators) {
   </div>
 </body>
 </html>`;
+}
+
+function createSitemap(operators) {
+  const staticUrls = [
+    `${SITE_URL}/`,
+    `${SITE_URL}${BASE_PATH}/`,
+    `${SITE_URL}${BASE_PATH}/operators/`
+  ];
+  const staticEntries = staticUrls
+    .map((url) => `  <url><loc>${escapeXml(url)}</loc></url>`)
+    .join("\n");
+  const operatorEntries = operators
+    .map((operator) => {
+      const pageUrl = pageUrlFor(operator);
+      const imageEntry = operator.icon_path
+        ? `\n    <image:image><image:loc>${escapeXml(`${SITE_URL}${normalizeAssetPath(operator.icon_path)}`)}</image:loc></image:image>`
+        : "";
+      return `  <url>
+    <loc>${escapeXml(pageUrl)}</loc>${imageEntry}
+  </url>`;
+    })
+    .join("\n");
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+${staticEntries}
+${operatorEntries}
+</urlset>
+`;
 }
 
 async function build() {
@@ -527,6 +561,8 @@ async function build() {
 
   fs.writeFileSync(path.join(OUTPUT_DIR, "index.html"), createIndexPage(operators), "utf8");
   console.log(`Erstellt: ${BASE_PATH}/operators/`);
+  fs.writeFileSync(SITEMAP_PATH, createSitemap(operators), "utf8");
+  console.log("Erstellt: /sitemap.xml");
 
   for (const operator of operators) {
     const folder = path.join(OUTPUT_DIR, operator.slug);
