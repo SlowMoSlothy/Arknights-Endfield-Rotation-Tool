@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  pages: write
 
 jobs:
   build:
@@ -35,3 +36,13 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Build operator SEO pages"
+
+      - name: GitHub Pages mit dem neuen Stand bauen
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            await github.request("POST /repos/{owner}/{repo}/pages/builds", {
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
