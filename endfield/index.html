@@ -41,8 +41,8 @@
       "isAccessibleForFree": true
     }
   </script>
-  <link rel="stylesheet" href="css/style.css?v=16">
-  <link rel="stylesheet" href="css/mobile.css?v=16">
+  <link rel="stylesheet" href="css/style.css?v=178">
+  <link rel="stylesheet" href="css/mobile.css?v=178">
 </head>
 
 <body class="app-loading">
@@ -655,100 +655,104 @@
         <div id="equipmentOperatorList" class="equipment-operator-list" aria-label="Operators"></div>
 
         <div class="equipment-editor-main">
-          <section class="equipment-editor-operator">
-            <img id="equipmentEditorAvatar" class="equipment-editor-avatar" alt="">
-            <div class="equipment-editor-copy">
-              <h3 id="equipmentEditorName">No operator selected</h3>
-              <p id="equipmentEditorMeta">Choose an operator to edit equipment.</p>
-            </div>
-          </section>
-
           <form id="equipmentEditorForm" class="equipment-editor-form">
             <section class="equipment-editor-section">
-              <h4>Weapon</h4>
-              <div class="equipment-editor-grid">
-                <label class="equipment-editor-field is-wide">
-                  <span>Weapon</span>
-                  <input data-equipment-field="weapon.weaponId" type="hidden">
-                  <div id="equipmentWeaponSelect" class="equipment-weapon-select"></div>
-                </label>
-                <div id="equipmentEditorWeaponType" class="equipment-editor-hint">Weapon type</div>
-                <label class="equipment-editor-field">
-                  <span>Level</span>
-                  <input data-equipment-field="weapon.level" type="text" maxlength="20" placeholder="Lv. 80">
-                </label>
-                <label class="equipment-editor-field">
-                  <span>Custom name</span>
-                  <input data-equipment-field="weapon.customName" type="text" maxlength="80" placeholder="Manual weapon name">
-                </label>
-                <label class="equipment-editor-field is-wide">
-                  <span>Notes</span>
-                  <textarea data-equipment-field="weapon.notes" maxlength="500" placeholder="Weapon effects, refinements or planned upgrades"></textarea>
-                </label>
-              </div>
-            </section>
-
-            <section class="equipment-editor-section">
-              <h4>Operator Stats</h4>
-              <div class="equipment-editor-grid">
-                <label class="equipment-editor-field is-wide">
-                  <span>Main stat</span>
-                  <input data-equipment-field="stats.mainStat" type="text" maxlength="90" placeholder="STR, AGI, INT, WILL, HP">
-                </label>
-                <label class="equipment-editor-field is-wide">
-                  <span>Sub stats</span>
-                  <textarea data-equipment-field="stats.subStats" maxlength="500" placeholder="ATK %, CRIT %, CRIT DMG, Arts Intensity, Elemental DMG"></textarea>
-                </label>
-              </div>
-            </section>
-
-            <section class="equipment-editor-section">
               <h4>Gear</h4>
-              <div class="equipment-piece-grid">
-                <article class="equipment-piece-card">
+              <div class="equipment-gear-layout">
+                <aside class="equipment-gear-preview">
+                  <span id="equipmentGearPreviewLabel" class="equipment-gear-preview-title">Operator/Gear</span>
+                  <img id="equipmentGearPreviewAvatar" alt="">
+                  <label class="equipment-operator-level-field">
+                    <span>Operator Level</span>
+                    <div class="equipment-level-control">
+                      <input data-equipment-field="operator.level" type="number" min="1" max="90" step="1" value="90" aria-label="Operator level">
+                      <input id="equipmentOperatorLevelSlider" class="equipment-level-slider" type="range" min="1" max="90" step="1" value="90" aria-label="Operator level">
+                    </div>
+                  </label>
+                  <div id="equipmentAttributeChips" class="equipment-attribute-chips" aria-label="Attributes"></div>
+                </aside>
+                <div class="equipment-piece-grid">
+                <article class="equipment-piece-card equipment-slot-weapon">
+                  <button class="equipment-slot-clear" data-equipment-clear-slot="weapon" type="button" aria-label="Clear weapon" hidden>x</button>
+                  <h5>Weapon</h5>
+                  <input data-equipment-field="weapon.weaponId" type="hidden">
+                  <input data-equipment-field="weapon.essencePrimary" type="hidden">
+                  <input data-equipment-field="weapon.essenceSecondary" type="hidden">
+                  <input data-equipment-field="weapon.essenceSkill" type="hidden">
+                  <div id="equipmentWeaponSelect" class="equipment-weapon-select"></div>
+                  <div id="equipmentEditorWeaponType" class="equipment-editor-hint">Weapon type</div>
+                  <div id="equipmentWeaponEssenceSummary" class="equipment-weapon-essence-summary" hidden></div>
+                  <label class="equipment-editor-field equipment-level-field">
+                    <span>Level</span>
+                    <div class="equipment-level-control">
+                      <input data-equipment-field="weapon.level" type="number" min="1" max="90" step="1" placeholder="80">
+                      <input id="equipmentWeaponLevelSlider" class="equipment-level-slider" type="range" min="1" max="90" step="1" value="80" aria-label="Weapon level">
+                    </div>
+                  </label>
+                </article>
+                <article class="equipment-piece-card equipment-slot-body">
+                  <button class="equipment-slot-clear" data-equipment-clear-slot="armor" type="button" aria-label="Clear armor" hidden>x</button>
                   <h5>Armor</h5>
                   <input data-equipment-field="gear.armor.pieceId" type="hidden">
+                  <input data-equipment-field="gear.armor.name" type="hidden">
+                  <input data-equipment-field="gear.armor.setName" type="hidden">
+                  <input data-equipment-field="gear.armor.rarity" type="hidden">
+                  <input data-equipment-field="gear.armor.mainStat" type="hidden">
+                  <input data-equipment-field="gear.armor.subStats" type="hidden">
+                  <input data-equipment-field="gear.armor.refinementMain" type="hidden">
+                  <input data-equipment-field="gear.armor.refinementSecond" type="hidden">
+                  <input data-equipment-field="gear.armor.refinementSpecial" type="hidden">
                   <div id="equipmentGearSelectArmor" class="equipment-gear-select" data-gear-slot="armor"></div>
-                  <label class="equipment-editor-field"><span>Name</span><input data-equipment-field="gear.armor.name" type="text" maxlength="80" placeholder="Armor piece"></label>
-                  <label class="equipment-editor-field"><span>Set</span><input data-equipment-field="gear.armor.setName" type="text" maxlength="90" placeholder="Set name"></label>
-                  <label class="equipment-editor-field"><span>Rarity</span><input data-equipment-field="gear.armor.rarity" type="text" maxlength="20" placeholder="6 Star"></label>
-                  <label class="equipment-editor-field"><span>Main stat</span><input data-equipment-field="gear.armor.mainStat" type="text" maxlength="90" placeholder="Main stat"></label>
-                  <label class="equipment-editor-field"><span>Sub stats</span><textarea data-equipment-field="gear.armor.subStats" maxlength="400" placeholder="Sub stats"></textarea></label>
-                  <label class="equipment-editor-field"><span>Notes</span><textarea data-equipment-field="gear.armor.notes" maxlength="400" placeholder="Notes"></textarea></label>
                 </article>
-                <article class="equipment-piece-card">
+                <article class="equipment-piece-card equipment-slot-hands">
+                  <button class="equipment-slot-clear" data-equipment-clear-slot="gloves" type="button" aria-label="Clear gloves" hidden>x</button>
                   <h5>Gloves</h5>
                   <input data-equipment-field="gear.gloves.pieceId" type="hidden">
+                  <input data-equipment-field="gear.gloves.name" type="hidden">
+                  <input data-equipment-field="gear.gloves.setName" type="hidden">
+                  <input data-equipment-field="gear.gloves.rarity" type="hidden">
+                  <input data-equipment-field="gear.gloves.mainStat" type="hidden">
+                  <input data-equipment-field="gear.gloves.subStats" type="hidden">
+                  <input data-equipment-field="gear.gloves.refinementMain" type="hidden">
+                  <input data-equipment-field="gear.gloves.refinementSecond" type="hidden">
+                  <input data-equipment-field="gear.gloves.refinementSpecial" type="hidden">
                   <div id="equipmentGearSelectGloves" class="equipment-gear-select" data-gear-slot="gloves"></div>
-                  <label class="equipment-editor-field"><span>Name</span><input data-equipment-field="gear.gloves.name" type="text" maxlength="80" placeholder="Gloves"></label>
-                  <label class="equipment-editor-field"><span>Set</span><input data-equipment-field="gear.gloves.setName" type="text" maxlength="90" placeholder="Set name"></label>
-                  <label class="equipment-editor-field"><span>Rarity</span><input data-equipment-field="gear.gloves.rarity" type="text" maxlength="20" placeholder="6 Star"></label>
-                  <label class="equipment-editor-field"><span>Main stat</span><input data-equipment-field="gear.gloves.mainStat" type="text" maxlength="90" placeholder="Main stat"></label>
-                  <label class="equipment-editor-field"><span>Sub stats</span><textarea data-equipment-field="gear.gloves.subStats" maxlength="400" placeholder="Sub stats"></textarea></label>
-                  <label class="equipment-editor-field"><span>Notes</span><textarea data-equipment-field="gear.gloves.notes" maxlength="400" placeholder="Notes"></textarea></label>
                 </article>
-                <article class="equipment-piece-card">
+                <article class="equipment-piece-card equipment-slot-kit1">
+                  <button class="equipment-slot-clear" data-equipment-clear-slot="kit1" type="button" aria-label="Clear kit 1" hidden>x</button>
                   <h5>Kit 1</h5>
                   <input data-equipment-field="gear.kit1.pieceId" type="hidden">
+                  <input data-equipment-field="gear.kit1.name" type="hidden">
+                  <input data-equipment-field="gear.kit1.setName" type="hidden">
+                  <input data-equipment-field="gear.kit1.rarity" type="hidden">
+                  <input data-equipment-field="gear.kit1.mainStat" type="hidden">
+                  <input data-equipment-field="gear.kit1.subStats" type="hidden">
+                  <input data-equipment-field="gear.kit1.refinementMain" type="hidden">
+                  <input data-equipment-field="gear.kit1.refinementSecond" type="hidden">
+                  <input data-equipment-field="gear.kit1.refinementSpecial" type="hidden">
                   <div id="equipmentGearSelectKit1" class="equipment-gear-select" data-gear-slot="kit1"></div>
-                  <label class="equipment-editor-field"><span>Name</span><input data-equipment-field="gear.kit1.name" type="text" maxlength="80" placeholder="Kit"></label>
-                  <label class="equipment-editor-field"><span>Set</span><input data-equipment-field="gear.kit1.setName" type="text" maxlength="90" placeholder="Set name"></label>
-                  <label class="equipment-editor-field"><span>Rarity</span><input data-equipment-field="gear.kit1.rarity" type="text" maxlength="20" placeholder="6 Star"></label>
-                  <label class="equipment-editor-field"><span>Main stat</span><input data-equipment-field="gear.kit1.mainStat" type="text" maxlength="90" placeholder="Main stat"></label>
-                  <label class="equipment-editor-field"><span>Sub stats</span><textarea data-equipment-field="gear.kit1.subStats" maxlength="400" placeholder="Sub stats"></textarea></label>
-                  <label class="equipment-editor-field"><span>Notes</span><textarea data-equipment-field="gear.kit1.notes" maxlength="400" placeholder="Notes"></textarea></label>
                 </article>
-                <article class="equipment-piece-card">
+                <article class="equipment-piece-card equipment-slot-kit2">
+                  <button class="equipment-slot-clear" data-equipment-clear-slot="kit2" type="button" aria-label="Clear kit 2" hidden>x</button>
                   <h5>Kit 2</h5>
                   <input data-equipment-field="gear.kit2.pieceId" type="hidden">
+                  <input data-equipment-field="gear.kit2.name" type="hidden">
+                  <input data-equipment-field="gear.kit2.setName" type="hidden">
+                  <input data-equipment-field="gear.kit2.rarity" type="hidden">
+                  <input data-equipment-field="gear.kit2.mainStat" type="hidden">
+                  <input data-equipment-field="gear.kit2.subStats" type="hidden">
+                  <input data-equipment-field="gear.kit2.refinementMain" type="hidden">
+                  <input data-equipment-field="gear.kit2.refinementSecond" type="hidden">
+                  <input data-equipment-field="gear.kit2.refinementSpecial" type="hidden">
                   <div id="equipmentGearSelectKit2" class="equipment-gear-select" data-gear-slot="kit2"></div>
-                  <label class="equipment-editor-field"><span>Name</span><input data-equipment-field="gear.kit2.name" type="text" maxlength="80" placeholder="Kit"></label>
-                  <label class="equipment-editor-field"><span>Set</span><input data-equipment-field="gear.kit2.setName" type="text" maxlength="90" placeholder="Set name"></label>
-                  <label class="equipment-editor-field"><span>Rarity</span><input data-equipment-field="gear.kit2.rarity" type="text" maxlength="20" placeholder="6 Star"></label>
-                  <label class="equipment-editor-field"><span>Main stat</span><input data-equipment-field="gear.kit2.mainStat" type="text" maxlength="90" placeholder="Main stat"></label>
-                  <label class="equipment-editor-field"><span>Sub stats</span><textarea data-equipment-field="gear.kit2.subStats" maxlength="400" placeholder="Sub stats"></textarea></label>
-                  <label class="equipment-editor-field"><span>Notes</span><textarea data-equipment-field="gear.kit2.notes" maxlength="400" placeholder="Notes"></textarea></label>
                 </article>
+                </div>
+                <aside class="equipment-bonus-panel">
+                  <h5>Gear Bonus</h5>
+                  <div id="equipmentGearBonusList" class="equipment-bonus-list"></div>
+                  <h5>Set Effects</h5>
+                  <div id="equipmentSetEffectsList" class="equipment-set-list"></div>
+                </aside>
               </div>
             </section>
 
@@ -908,7 +912,7 @@
   </section>
   <footer class="site-footer">
     <span>&copy; 2026 Arknights Endfield Rotation Builder</span>
-    <span>App Version 2.15.16</span>
+    <span>App Version 2.20.0</span>
     <span>Fan-made tool, not affiliated with Gryphline or Hypergryph.</span>
   </footer>
 

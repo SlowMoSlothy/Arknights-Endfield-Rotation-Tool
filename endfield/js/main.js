@@ -310,6 +310,10 @@ async function initApp() {
             await hydrateWeaponsFromSupabase();
         }
 
+        if (typeof hydrateGearPiecesFromSupabase === "function") {
+            await hydrateGearPiecesFromSupabase();
+        }
+
         if (typeof hydrateOperatorsFromSupabase === "function") {
             await hydrateOperatorsFromSupabase();
         }

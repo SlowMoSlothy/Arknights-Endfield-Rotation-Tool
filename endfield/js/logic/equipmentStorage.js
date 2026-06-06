@@ -10,16 +10,25 @@ function createEmptyGearPiece() {
         rarity: "",
         mainStat: "",
         subStats: "",
+        refinementMain: "",
+        refinementSecond: "",
+        refinementSpecial: "",
         notes: ""
     };
 }
 
 function createEmptyOperatorEquipmentSet() {
     return {
+        operator: {
+            level: 90
+        },
         weapon: {
             weaponId: "",
             customName: "",
             level: "",
+            essencePrimary: "",
+            essenceSecondary: "",
+            essenceSkill: "",
             notes: ""
         },
         stats: {
@@ -74,8 +83,19 @@ function normalizeEquipmentWeapon(weapon) {
         weaponId: source.weaponId || source.id || "",
         customName: source.customName || source.name || "",
         level: source.level || "",
+        essencePrimary: source.essencePrimary || source.essence?.primary || "",
+        essenceSecondary: source.essenceSecondary || source.essence?.secondary || "",
+        essenceSkill: source.essenceSkill || source.essence?.skill || "",
         notes: source.notes || ""
     };
+}
+
+function normalizeEquipmentOperator(operator, source) {
+    const operatorSource = operator && typeof operator === "object" ? operator : {};
+    const rawLevel = Number(operatorSource.level ?? source?.operatorLevel ?? 90);
+    const level = Number.isFinite(rawLevel) ? Math.max(1, Math.min(90, Math.round(rawLevel))) : 90;
+
+    return { level };
 }
 
 function normalizeEquipmentStats(stats, source) {
@@ -102,6 +122,7 @@ function normalizeOperatorEquipmentSet(set) {
     const source = set && typeof set === "object" ? set : {};
 
     return {
+        operator: normalizeEquipmentOperator(source.operator, source),
         weapon: normalizeEquipmentWeapon(source.weapon),
         stats: normalizeEquipmentStats(source.stats, source),
         gear: normalizeEquipmentGear(source)
@@ -140,17 +161,14 @@ function hasOperatorEquipmentSet(operatorId) {
     const set = getOperatorEquipmentSet(operatorId);
     return Boolean(
         set.weapon.weaponId ||
-        set.weapon.customName ||
         set.weapon.level ||
-        set.weapon.notes ||
         set.stats.mainStat ||
         set.stats.subStats ||
         Object.values(set.gear).some(piece => (
             piece.name ||
             piece.setName ||
             piece.mainStat ||
-            piece.subStats ||
-            piece.notes
+            piece.subStats
         ))
     );
 }
