@@ -1,0 +1,37 @@
+name: Build Operator SEO Pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Repository laden
+        uses: actions/checkout@v4
+
+      - name: Node installieren
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Pakete installieren
+        run: npm install
+
+      - name: Operator-Seiten bauen
+        run: npm run build:operators
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+      - name: Änderungen speichern
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Build operator SEO pages"
