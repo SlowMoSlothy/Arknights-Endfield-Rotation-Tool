@@ -3,443 +3,123 @@
 <head>
   <meta charset="utf-8">
   <title>Xaihi - Arknights Endfield Operator | RotationForge</title>
-  <meta name="description" content="Xaihi is a 5-star Supporter operator with Cryo element in Arknights: Endfield. View operator details and open the RotationForge rotation tool.">
+  <meta name="description" content="Xaihi is a 5-star Supporter operator with Cryo element in Arknights: Endfield. View stats, attributes and open the RotationForge rotation tool.">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b1020">
+  <meta name="theme-color" content="#070a12">
   <link rel="canonical" href="https://rotationforge.gg/endfield/operators/xaihi/">
-
   <meta property="og:title" content="Xaihi - Arknights Endfield Operator | RotationForge">
-  <meta property="og:description" content="Xaihi is a 5-star Supporter operator with Cryo element in Arknights: Endfield. View operator details and open the RotationForge rotation tool.">
+  <meta property="og:description" content="Xaihi is a 5-star Supporter operator with Cryo element in Arknights: Endfield. View stats, attributes and open the RotationForge rotation tool.">
   <meta property="og:url" content="https://rotationforge.gg/endfield/operators/xaihi/">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="https://rotationforge.gg/assets/operators/avatars/Xaihi.png">
-
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Xaihi - Arknights Endfield Operator | RotationForge","description":"Xaihi is a 5-star Supporter operator with Cryo element in Arknights: Endfield. View operator details and open the RotationForge rotation tool.","url":"https://rotationforge.gg/endfield/operators/xaihi/","image":"https://rotationforge.gg/assets/operators/avatars/Xaihi.png","isPartOf":{"@type":"WebSite","name":"RotationForge","url":"https://rotationforge.gg"},"about":{"@type":"Thing","name":"Xaihi - Arknights: Endfield Operator"}}</script>
-
+  <meta property="og:image" content="https://rotationforge.gg/endfield/assets/operators/avatars/Xaihi.png">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Xaihi - Arknights Endfield Operator | RotationForge","description":"Xaihi is a 5-star Supporter operator with Cryo element in Arknights: Endfield. View stats, attributes and open the RotationForge rotation tool.","url":"https://rotationforge.gg/endfield/operators/xaihi/","image":"https://rotationforge.gg/endfield/assets/operators/avatars/Xaihi.png","isPartOf":{"@type":"WebSite","name":"RotationForge","url":"https://rotationforge.gg"},"about":{"@type":"Thing","name":"Xaihi - Arknights: Endfield Operator"}}</script>
   <style>
-    :root {
-      color-scheme: dark;
-      --bg: #070a12;
-      --bg-soft: #0d1224;
-      --card: rgba(17, 24, 45, 0.86);
-      --card-strong: rgba(24, 34, 63, 0.94);
-      --border: rgba(148, 163, 184, 0.22);
-      --text: #f8fafc;
-      --muted: #a8b3cf;
-      --accent: #f5c76b;
-      --accent-strong: #ffd166;
-      --blue: #7dd3fc;
-      --shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(125, 211, 252, 0.15), transparent 34rem),
-        radial-gradient(circle at top right, rgba(245, 199, 107, 0.12), transparent 30rem),
-        linear-gradient(135deg, #070a12 0%, #0b1020 48%, #070a12 100%);
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .page {
-      width: min(1120px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 28px 0 56px;
-    }
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      color: var(--text);
-      font-weight: 800;
-      letter-spacing: 0.02em;
-    }
-
-    .brand-mark {
-      display: grid;
-      width: 38px;
-      height: 38px;
-      place-items: center;
-      border: 1px solid rgba(245, 199, 107, 0.45);
-      border-radius: 12px;
-      background: linear-gradient(135deg, rgba(245, 199, 107, 0.25), rgba(125, 211, 252, 0.12));
-      box-shadow: 0 0 34px rgba(245, 199, 107, 0.16);
-    }
-
-    .toplink {
-      color: var(--muted);
-      font-size: 0.95rem;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 10px 14px;
-      background: rgba(255, 255, 255, 0.035);
-    }
-
-    .toplink:hover {
-      color: var(--text);
-      border-color: rgba(245, 199, 107, 0.5);
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
-      gap: 24px;
-      align-items: stretch;
-    }
-
-    .panel {
-      position: relative;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      border-radius: 28px;
-      background: var(--card);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(18px);
-    }
-
-    .panel::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 42%);
-    }
-
-    .hero-main {
-      padding: clamp(28px, 5vw, 54px);
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 18px;
-      color: var(--accent-strong);
-      font-size: 0.82rem;
-      font-weight: 800;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
-
-    .eyebrow::before {
-      content: "";
-      width: 9px;
-      height: 9px;
-      border-radius: 999px;
-      background: var(--accent-strong);
-      box-shadow: 0 0 18px rgba(255, 209, 102, 0.85);
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(2.6rem, 7vw, 5.4rem);
-      line-height: 0.95;
-      letter-spacing: -0.07em;
-    }
-
-    .subtitle {
-      max-width: 620px;
-      margin: 22px 0 0;
-      color: var(--muted);
-      font-size: clamp(1rem, 2vw, 1.15rem);
-      line-height: 1.75;
-    }
-
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 32px;
-    }
-
-    .button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      min-height: 48px;
-      padding: 0 18px;
-      border-radius: 14px;
-      font-weight: 800;
-      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
-    }
-
-    .button:hover {
-      transform: translateY(-1px);
-    }
-
-    .button-primary {
-      color: #15100a;
-      background: linear-gradient(135deg, #ffe08a, #f3b33d);
-      box-shadow: 0 16px 36px rgba(245, 199, 107, 0.22);
-    }
-
-    .button-secondary {
-      color: var(--text);
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.045);
-    }
-
-    .operator-card {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      min-height: 100%;
-      padding: 26px;
-      background:
-        radial-gradient(circle at 50% 0%, rgba(245, 199, 107, 0.18), transparent 18rem),
-        var(--card-strong);
-    }
-
-    .portrait-wrap {
-      display: grid;
-      place-items: center;
-      min-height: 240px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 24px;
-      background:
-        linear-gradient(135deg, rgba(255,255,255,0.055), rgba(255,255,255,0.015)),
-        radial-gradient(circle, rgba(125, 211, 252, 0.13), transparent 12rem);
-    }
-
-    .portrait {
-      width: min(190px, 70%);
-      max-height: 190px;
-      object-fit: contain;
-      filter: drop-shadow(0 22px 28px rgba(0, 0, 0, 0.45));
-    }
-
-    .stars {
-      margin-top: 20px;
-      color: var(--accent-strong);
-      font-size: 1.4rem;
-      letter-spacing: 0.05em;
-      text-align: center;
-      text-shadow: 0 0 24px rgba(255, 209, 102, 0.35);
-    }
-
-    .badge-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 24px;
-    }
-
-    .badge {
-      min-width: 0;
-      padding: 14px;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.04);
-    }
-
-    .badge span {
-      display: block;
-      color: var(--muted);
-      font-size: 0.76rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .badge strong {
-      display: block;
-      overflow: hidden;
-      margin-top: 6px;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-size: 1rem;
-    }
-
-    .element-heat {
-      border-color: rgba(248, 113, 113, 0.5);
-      background: rgba(248, 113, 113, 0.12);
-    }
-
-    .element-cryo {
-      border-color: rgba(125, 211, 252, 0.5);
-      background: rgba(125, 211, 252, 0.12);
-    }
-
-    .element-electric {
-      border-color: rgba(192, 132, 252, 0.5);
-      background: rgba(192, 132, 252, 0.12);
-    }
-
-    .element-nature {
-      border-color: rgba(74, 222, 128, 0.5);
-      background: rgba(74, 222, 128, 0.12);
-    }
-
-    .element-physical {
-      border-color: rgba(226, 232, 240, 0.35);
-      background: rgba(226, 232, 240, 0.08);
-    }
-
-    .info-section {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
-      margin-top: 24px;
-    }
-
-    .info-card {
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      padding: 20px;
-      background: rgba(255, 255, 255, 0.035);
-    }
-
-    .info-card h2 {
-      margin: 0 0 10px;
-      font-size: 0.95rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--accent-strong);
-    }
-
-    .info-card p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.65;
-    }
-
-    footer {
-      margin-top: 28px;
-      color: rgba(168, 179, 207, 0.78);
-      font-size: 0.9rem;
-      text-align: center;
-    }
-
-    @media (max-width: 850px) {
-      .hero {
-        grid-template-columns: 1fr;
-      }
-
-      .topbar {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .info-section {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 520px) {
-      .page {
-        width: min(100% - 20px, 1120px);
-        padding-top: 16px;
-      }
-
-      .hero-main,
-      .operator-card {
-        padding: 22px;
-        border-radius: 22px;
-      }
-
-      .badge-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .button {
-        width: 100%;
-      }
-    }
+    :root { color-scheme: dark; --bg:#070a12; --panel:#11182d; --panel2:#19223f; --border:rgba(148,163,184,.24); --text:#f8fafc; --muted:#a8b3cf; --gold:#ffd166; --gold2:#f5b942; }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:var(--text); background: radial-gradient(circle at 15% 0%,rgba(125,211,252,.14),transparent 32rem), radial-gradient(circle at 85% 10%,rgba(255,209,102,.11),transparent 34rem), linear-gradient(135deg,#070a12,#0b1020 52%,#05070d); }
+    a { color:inherit; text-decoration:none; }
+    .page { width:min(1120px,calc(100% - 32px)); margin:0 auto; padding:28px 0 56px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:28px; }
+    .brand { display:flex; align-items:center; gap:12px; font-weight:900; letter-spacing:.02em; }
+    .mark { display:grid; place-items:center; width:38px; height:38px; border:1px solid rgba(255,209,102,.48); border-radius:12px; background:linear-gradient(135deg,rgba(255,209,102,.24),rgba(125,211,252,.12)); }
+    .pill-link { color:var(--muted); border:1px solid var(--border); border-radius:999px; padding:10px 14px; background:rgba(255,255,255,.04); }
+    .hero { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr); gap:24px; }
+    .panel { border:1px solid var(--border); border-radius:28px; background:rgba(17,24,45,.88); box-shadow:0 24px 70px rgba(0,0,0,.42); overflow:hidden; }
+    .hero-main { padding:clamp(28px,5vw,54px); }
+    .eyebrow { display:flex; align-items:center; gap:9px; color:var(--gold); font-size:.82rem; font-weight:900; letter-spacing:.14em; text-transform:uppercase; margin-bottom:18px; }
+    .eyebrow:before { content:""; width:9px; height:9px; border-radius:50%; background:var(--gold); box-shadow:0 0 18px rgba(255,209,102,.85); }
+    h1 { margin:0; font-size:clamp(2.8rem,7vw,5.4rem); line-height:.95; letter-spacing:-.07em; }
+    .subtitle { max-width:640px; margin:22px 0 0; color:var(--muted); font-size:1.08rem; line-height:1.75; }
+    .actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:32px; }
+    .button { display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:0 18px; border-radius:14px; font-weight:900; }
+    .primary { color:#15100a; background:linear-gradient(135deg,#ffe08a,#f3b33d); box-shadow:0 16px 36px rgba(245,199,107,.22); }
+    .secondary { border:1px solid var(--border); background:rgba(255,255,255,.045); }
+    .operator-card { padding:26px; background:radial-gradient(circle at 50% 0%,rgba(255,209,102,.17),transparent 18rem),rgba(25,34,63,.94); }
+    .portrait-wrap { display:grid; place-items:center; min-height:240px; border:1px solid rgba(255,255,255,.09); border-radius:24px; background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); }
+    .portrait { width:min(190px,72%); max-height:190px; object-fit:contain; filter:drop-shadow(0 22px 28px rgba(0,0,0,.45)); }
+    .stars { margin:20px 0 0; color:var(--gold); font-size:1.45rem; text-align:center; letter-spacing:.05em; }
+    .badge-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:24px; }
+    .badge,.stat { min-width:0; padding:14px; border:1px solid var(--border); border-radius:16px; background:rgba(255,255,255,.04); }
+    .badge span,.stat span { display:block; color:var(--muted); font-size:.74rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+    .badge strong,.stat strong { display:block; margin-top:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:1rem; }
+    .element-heat { border-color:rgba(248,113,113,.55); background:rgba(248,113,113,.12); }
+    .element-cryo { border-color:rgba(125,211,252,.55); background:rgba(125,211,252,.12); }
+    .element-electric { border-color:rgba(192,132,252,.55); background:rgba(192,132,252,.12); }
+    .element-nature { border-color:rgba(74,222,128,.55); background:rgba(74,222,128,.12); }
+    .element-physical { border-color:rgba(226,232,240,.38); background:rgba(226,232,240,.08); }
+    .section { margin-top:24px; padding:24px; }
+    .section-title { margin:0 0 16px; color:var(--gold); font-size:1rem; letter-spacing:.12em; text-transform:uppercase; }
+    .stats-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+    .note-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin-top:24px; }
+    .note { border:1px solid var(--border); border-radius:22px; padding:20px; background:rgba(255,255,255,.035); }
+    .note h2 { margin:0 0 10px; color:var(--gold); font-size:.95rem; letter-spacing:.08em; text-transform:uppercase; }
+    .note p { margin:0; color:var(--muted); line-height:1.65; }
+    footer { margin-top:28px; color:rgba(168,179,207,.78); text-align:center; font-size:.9rem; }
+    @media (max-width:850px) { .hero,.note-grid { grid-template-columns:1fr; } .stats-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .topbar { align-items:flex-start; flex-direction:column; } }
+    @media (max-width:520px) { .page { width:min(100% - 20px,1120px); padding-top:16px; } .hero-main,.operator-card,.section { padding:22px; border-radius:22px; } .badge-grid,.stats-grid { grid-template-columns:1fr; } .button { width:100%; } }
   </style>
 </head>
 <body>
   <div class="page">
     <header class="topbar">
-      <a class="brand" href="https://rotationforge.gg/">
-        <span class="brand-mark">RF</span>
-        <span>RotationForge</span>
-      </a>
-      <a class="toplink" href="https://rotationforge.gg/endfield/">Arknights Endfield Rotation Tool</a>
+      <a class="brand" href="https://rotationforge.gg/"><span class="mark">RF</span><span>RotationForge</span></a>
+      <a class="pill-link" href="https://rotationforge.gg/endfield/">Arknights Endfield Rotation Tool</a>
     </header>
 
     <main class="hero">
       <section class="panel hero-main">
         <div class="eyebrow">Arknights: Endfield Operator</div>
         <h1>Xaihi</h1>
-        <p class="subtitle">
-          Xaihi is listed in the RotationForge operator database for Arknights: Endfield.
-          Open the rotation tool to plan skills, compare operators, and build your rotation setup.
-        </p>
-
+        <p class="subtitle">Xaihi is listed in the RotationForge operator database for Arknights: Endfield. Open the rotation tool to plan skills, compare operators, and build your rotation setup.</p>
         <div class="actions">
-          <a class="button button-primary" href="https://rotationforge.gg/endfield/#operator-xaihi">Open in Rotation Tool →</a>
-          <a class="button button-secondary" href="https://rotationforge.gg/endfield/">Back to Endfield Tool</a>
+          <a class="button primary" href="https://rotationforge.gg/endfield/#operator-xaihi">Open in Rotation Tool →</a>
+          <a class="button secondary" href="https://rotationforge.gg/endfield/">Back to Endfield Tool</a>
         </div>
       </section>
 
       <aside class="panel operator-card">
-        <div>
-          <div class="portrait-wrap">
-            <img class="portrait" src="/assets/operators/avatars/Xaihi.png" alt="Xaihi icon" width="190" height="190">
-          </div>
-          <div class="stars" aria-label="5 star operator">★★★★★</div>
+        <div class="portrait-wrap">
+          <img class="portrait" src="/endfield/assets/operators/avatars/Xaihi.png" alt="Xaihi icon" width="190" height="190">
         </div>
-
+        <div class="stars" aria-label="5 star operator">★★★★★</div>
         <div class="badge-grid">
-          <div class="badge">
-            <span>Class</span>
-            <strong>Supporter</strong>
-          </div>
-          <div class="badge element-cryo">
-            <span>Element</span>
-            <strong>Cryo</strong>
-          </div>
-          <div class="badge">
-            <span>Weapon</span>
-            <strong>Arts Unit</strong>
-          </div>
-          <div class="badge">
-            <span>Role Attribute</span>
-            <strong>Will</strong>
-          </div>
+          <div class="badge"><span>Class</span><strong>Supporter</strong></div>
+          <div class="badge element-cryo"><span>Element</span><strong>Cryo</strong></div>
+          <div class="badge"><span>Weapon</span><strong>Arts Unit</strong></div>
+          <div class="badge"><span>Main Attribute</span><strong>Will</strong></div>
         </div>
       </aside>
     </main>
 
-    <section class="info-section" aria-label="Operator details">
-      <article class="info-card">
-        <h2>Main Attribute</h2>
-        <p>Will is the main attribute currently stored for Xaihi in the RotationForge database.</p>
-      </article>
-      <article class="info-card">
-        <h2>Secondary Attribute</h2>
-        <p>Intellect is listed as the secondary attribute for this operator.</p>
-      </article>
-      <article class="info-card">
-        <h2>Rotation Planner</h2>
-        <p>Use the RotationForge tool to open Xaihi directly and work with the interactive Endfield rotation interface.</p>
-      </article>
+    <section class="panel section">
+      <h2 class="section-title">Operator Database</h2>
+      <div class="stats-grid"><div class="stat"><span>HP</span><strong>5495</strong></div>
+<div class="stat"><span>ATK</span><strong>291</strong></div>
+<div class="stat"><span>Level</span><strong>90</strong></div>
+<div class="stat"><span>Strength</span><strong>89.8</strong></div>
+<div class="stat"><span>Agility</span><strong>91.9</strong></div>
+<div class="stat"><span>Intellect</span><strong>127.1</strong></div>
+<div class="stat"><span>Will</span><strong>150</strong></div>
+<div class="stat"><span>Ultimate State</span><strong>No</strong></div></div>
     </section>
 
-    <footer>
-      RotationForge is an unofficial fan-made tool for Arknights: Endfield.
-    </footer>
+    <section class="panel section">
+      <h2 class="section-title">Level 1 Values</h2>
+      <div class="stats-grid"><div class="stat"><span>HP Lv. 1</span><strong>500</strong></div>
+<div class="stat"><span>ATK Lv. 1</span><strong>30</strong></div>
+<div class="stat"><span>STR Lv. 1</span><strong>9.3</strong></div>
+<div class="stat"><span>AGI Lv. 1</span><strong>9.4</strong></div>
+<div class="stat"><span>INT Lv. 1</span><strong>15.9</strong></div>
+<div class="stat"><span>WILL Lv. 1</span><strong>15.2</strong></div></div>
+    </section>
+
+    <section class="note-grid">
+      <article class="note"><h2>Main Attribute</h2><p>Will is the main attribute currently stored for Xaihi in the RotationForge database.</p></article>
+      <article class="note"><h2>Secondary Attribute</h2><p>Intellect is listed as the secondary attribute for this operator.</p></article>
+      <article class="note"><h2>Rotation Planner</h2><p>Use the RotationForge tool to open Xaihi directly and work with the interactive Endfield rotation interface.</p></article>
+    </section>
+
+    <footer>RotationForge is an unofficial fan-made tool for Arknights: Endfield.</footer>
   </div>
 </body>
 </html>
