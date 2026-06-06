@@ -15,48 +15,516 @@ function escapeHtml(value) {
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;");
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function formatValue(value, fallback = "Unknown") {
+  if (value === null || value === undefined || value === "") return fallback;
+  return String(value);
+}
+
+function formatLabel(value) {
+  return formatValue(value)
+    .replaceAll("_", " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function getElementClass(elementType) {
+  const element = String(elementType || "").toLowerCase();
+
+  if (element === "heat") return "element-heat";
+  if (element === "cryo") return "element-cryo";
+  if (element === "electric") return "element-electric";
+  if (element === "nature") return "element-nature";
+  if (element === "physical") return "element-physical";
+
+  return "element-default";
+}
+
+function createStars(count) {
+  const starCount = Number(count) || 0;
+  return "★".repeat(starCount);
 }
 
 function createPage(operator) {
   const url = `${SITE_URL}/endfield/operators/${operator.slug}/`;
   const toolUrl = `${SITE_URL}/endfield/#operator-${operator.slug}`;
+  const iconUrl = `${SITE_URL}/${operator.icon_path}`;
+  const elementClass = getElementClass(operator.element_type);
 
-  const title = `${operator.name} - Arknights Endfield Operator | RotationForge`;
-  const description = `${operator.name} ist ein ${operator.star}-★ ${operator.operator_class} Operator mit ${operator.element_type}-Element in Arknights: Endfield.`;
+  const name = formatValue(operator.name);
+  const stars = createStars(operator.star);
+  const operatorClass = formatLabel(operator.operator_class);
+  const elementType = formatLabel(operator.element_type);
+  const weaponType = formatLabel(operator.weapon_type);
+  const mainAttribute = formatLabel(operator.main_attribute);
+  const secondaryAttribute = formatLabel(operator.secondary_attribute);
+
+  const title = `${name} - Arknights Endfield Operator | RotationForge`;
+  const description = `${name} is a ${operator.star}-star ${operatorClass} operator with ${elementType} element in Arknights: Endfield. View operator details and open the RotationForge rotation tool.`;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: title,
+    description,
+    url,
+    image: iconUrl,
+    isPartOf: {
+      "@type": "WebSite",
+      name: "RotationForge",
+      url: SITE_URL
+    },
+    about: {
+      "@type": "Thing",
+      name: `${name} - Arknights: Endfield Operator`
+    }
+  };
 
   return `<!doctype html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <title>${escapeHtml(title)}</title>
   <meta name="description" content="${escapeHtml(description)}">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1020">
   <link rel="canonical" href="${url}">
+
+  <meta property="og:title" content="${escapeHtml(title)}">
+  <meta property="og:description" content="${escapeHtml(description)}">
+  <meta property="og:url" content="${url}">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="${iconUrl}">
+
+  <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #070a12;
+      --bg-soft: #0d1224;
+      --card: rgba(17, 24, 45, 0.86);
+      --card-strong: rgba(24, 34, 63, 0.94);
+      --border: rgba(148, 163, 184, 0.22);
+      --text: #f8fafc;
+      --muted: #a8b3cf;
+      --accent: #f5c76b;
+      --accent-strong: #ffd166;
+      --blue: #7dd3fc;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(125, 211, 252, 0.15), transparent 34rem),
+        radial-gradient(circle at top right, rgba(245, 199, 107, 0.12), transparent 30rem),
+        linear-gradient(135deg, #070a12 0%, #0b1020 48%, #070a12 100%);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text);
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border: 1px solid rgba(245, 199, 107, 0.45);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(245, 199, 107, 0.25), rgba(125, 211, 252, 0.12));
+      box-shadow: 0 0 34px rgba(245, 199, 107, 0.16);
+    }
+
+    .toplink {
+      color: var(--muted);
+      font-size: 0.95rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .toplink:hover {
+      color: var(--text);
+      border-color: rgba(245, 199, 107, 0.5);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .panel {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 42%);
+    }
+
+    .hero-main {
+      padding: clamp(28px, 5vw, 54px);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+      color: var(--accent-strong);
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--accent-strong);
+      box-shadow: 0 0 18px rgba(255, 209, 102, 0.85);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.6rem, 7vw, 5.4rem);
+      line-height: 0.95;
+      letter-spacing: -0.07em;
+    }
+
+    .subtitle {
+      max-width: 620px;
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      line-height: 1.75;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 14px;
+      font-weight: 800;
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+    }
+
+    .button-primary {
+      color: #15100a;
+      background: linear-gradient(135deg, #ffe08a, #f3b33d);
+      box-shadow: 0 16px 36px rgba(245, 199, 107, 0.22);
+    }
+
+    .button-secondary {
+      color: var(--text);
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.045);
+    }
+
+    .operator-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 100%;
+      padding: 26px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(245, 199, 107, 0.18), transparent 18rem),
+        var(--card-strong);
+    }
+
+    .portrait-wrap {
+      display: grid;
+      place-items: center;
+      min-height: 240px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.055), rgba(255,255,255,0.015)),
+        radial-gradient(circle, rgba(125, 211, 252, 0.13), transparent 12rem);
+    }
+
+    .portrait {
+      width: min(190px, 70%);
+      max-height: 190px;
+      object-fit: contain;
+      filter: drop-shadow(0 22px 28px rgba(0, 0, 0, 0.45));
+    }
+
+    .stars {
+      margin-top: 20px;
+      color: var(--accent-strong);
+      font-size: 1.4rem;
+      letter-spacing: 0.05em;
+      text-align: center;
+      text-shadow: 0 0 24px rgba(255, 209, 102, 0.35);
+    }
+
+    .badge-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .badge {
+      min-width: 0;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .badge span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .badge strong {
+      display: block;
+      overflow: hidden;
+      margin-top: 6px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 1rem;
+    }
+
+    .element-heat {
+      border-color: rgba(248, 113, 113, 0.5);
+      background: rgba(248, 113, 113, 0.12);
+    }
+
+    .element-cryo {
+      border-color: rgba(125, 211, 252, 0.5);
+      background: rgba(125, 211, 252, 0.12);
+    }
+
+    .element-electric {
+      border-color: rgba(192, 132, 252, 0.5);
+      background: rgba(192, 132, 252, 0.12);
+    }
+
+    .element-nature {
+      border-color: rgba(74, 222, 128, 0.5);
+      background: rgba(74, 222, 128, 0.12);
+    }
+
+    .element-physical {
+      border-color: rgba(226, 232, 240, 0.35);
+      background: rgba(226, 232, 240, 0.08);
+    }
+
+    .info-section {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .info-card {
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .info-card h2 {
+      margin: 0 0 10px;
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent-strong);
+    }
+
+    .info-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    footer {
+      margin-top: 28px;
+      color: rgba(168, 179, 207, 0.78);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    @media (max-width: 850px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .info-section {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .page {
+        width: min(100% - 20px, 1120px);
+        padding-top: 16px;
+      }
+
+      .hero-main,
+      .operator-card {
+        padding: 22px;
+        border-radius: 22px;
+      }
+
+      .badge-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .button {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
-  <main>
-    <h1>${escapeHtml(operator.name)}</h1>
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="${SITE_URL}/">
+        <span class="brand-mark">RF</span>
+        <span>RotationForge</span>
+      </a>
+      <a class="toplink" href="${SITE_URL}/endfield/">Arknights Endfield Rotation Tool</a>
+    </header>
 
-    <img src="/${escapeHtml(operator.icon_path)}" alt="${escapeHtml(operator.name)} Icon" width="128" height="128">
+    <main class="hero">
+      <section class="panel hero-main">
+        <div class="eyebrow">Arknights: Endfield Operator</div>
+        <h1>${escapeHtml(name)}</h1>
+        <p class="subtitle">
+          ${escapeHtml(name)} is listed in the RotationForge operator database for Arknights: Endfield.
+          Open the rotation tool to plan skills, compare operators, and build your rotation setup.
+        </p>
 
-    <ul>
-      <li>Sterne: ${operator.star}★</li>
-      <li>Klasse: ${escapeHtml(operator.operator_class)}</li>
-      <li>Element: ${escapeHtml(operator.element_type)}</li>
-      <li>Waffe: ${escapeHtml(operator.weapon_type)}</li>
-      <li>Hauptattribut: ${escapeHtml(operator.main_attribute)}</li>
-      <li>Nebenattribut: ${escapeHtml(operator.secondary_attribute || "Unbekannt")}</li>
-    </ul>
+        <div class="actions">
+          <a class="button button-primary" href="${toolUrl}">Open in Rotation Tool →</a>
+          <a class="button button-secondary" href="${SITE_URL}/endfield/">Back to Endfield Tool</a>
+        </div>
+      </section>
 
-    <p>
-      <a href="${toolUrl}">Im Rotation Tool öffnen</a>
-    </p>
+      <aside class="panel operator-card">
+        <div>
+          <div class="portrait-wrap">
+            <img class="portrait" src="/${escapeHtml(operator.icon_path)}" alt="${escapeHtml(name)} icon" width="190" height="190">
+          </div>
+          <div class="stars" aria-label="${operator.star} star operator">${stars}</div>
+        </div>
 
-    <p>
-      <a href="/endfield/">Zurück zum Rotation Tool</a>
-    </p>
-  </main>
+        <div class="badge-grid">
+          <div class="badge">
+            <span>Class</span>
+            <strong>${escapeHtml(operatorClass)}</strong>
+          </div>
+          <div class="badge ${elementClass}">
+            <span>Element</span>
+            <strong>${escapeHtml(elementType)}</strong>
+          </div>
+          <div class="badge">
+            <span>Weapon</span>
+            <strong>${escapeHtml(weaponType)}</strong>
+          </div>
+          <div class="badge">
+            <span>Role Attribute</span>
+            <strong>${escapeHtml(mainAttribute)}</strong>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <section class="info-section" aria-label="Operator details">
+      <article class="info-card">
+        <h2>Main Attribute</h2>
+        <p>${escapeHtml(mainAttribute)} is the main attribute currently stored for ${escapeHtml(name)} in the RotationForge database.</p>
+      </article>
+      <article class="info-card">
+        <h2>Secondary Attribute</h2>
+        <p>${escapeHtml(secondaryAttribute)} is listed as the secondary attribute for this operator.</p>
+      </article>
+      <article class="info-card">
+        <h2>Rotation Planner</h2>
+        <p>Use the RotationForge tool to open ${escapeHtml(name)} directly and work with the interactive Endfield rotation interface.</p>
+      </article>
+    </section>
+
+    <footer>
+      RotationForge is an unofficial fan-made tool for Arknights: Endfield.
+    </footer>
+  </div>
 </body>
 </html>`;
 }
@@ -83,6 +551,11 @@ async function build() {
 
   if (error) {
     console.error("Supabase Fehler:", error.message);
+    process.exit(1);
+  }
+
+  if (!data || data.length === 0) {
+    console.error("Keine Operatoren gefunden.");
     process.exit(1);
   }
 
