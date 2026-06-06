@@ -55,7 +55,6 @@ function classIconPath(operatorClass) {
     supporter: "supporter.webp",
     vanguard: "vanguard.webp"
   };
-
   return fileMap[key] ? `${BASE_PATH}/assets/ui/classes/${fileMap[key]}` : "";
 }
 
@@ -68,7 +67,6 @@ function elementIconPath(elementType) {
     nature: "nature.webp",
     physical: "physical.webp"
   };
-
   return fileMap[key] ? `${BASE_PATH}/assets/ui/elements/${fileMap[key]}` : "";
 }
 
@@ -96,8 +94,111 @@ function info(labelText, valueText, iconHtml, extraClass = "") {
   return `<div class="info-card ${extraClass}">${iconHtml}<span class="info-label">${escapeHtml(labelText)}</span><strong>${escapeHtml(valueText)}</strong></div>`;
 }
 
-function createPage(operator) {
-  const pageUrl = `${SITE_URL}${BASE_PATH}/operators/${operator.slug}/`;
+function pageUrlFor(operator) {
+  return `${SITE_URL}${BASE_PATH}/operators/${operator.slug}/`;
+}
+
+function localPageUrlFor(operator) {
+  return `${BASE_PATH}/operators/${operator.slug}/`;
+}
+
+function getRelatedOperators(current, allOperators) {
+  return allOperators
+    .filter((operator) => operator.id !== current.id)
+    .map((operator) => {
+      let score = 0;
+      if (operator.operator_class === current.operator_class) score += 3;
+      if (operator.element_type === current.element_type) score += 2;
+      if (operator.weapon_type === current.weapon_type) score += 1;
+      if (operator.main_attribute === current.main_attribute) score += 1;
+      return { operator, score };
+    })
+    .filter((entry) => entry.score > 0)
+    .sort((a, b) => b.score - a.score || (a.operator.sort_order ?? 999) - (b.operator.sort_order ?? 999))
+    .slice(0, 4)
+    .map((entry) => entry.operator);
+}
+
+function skillCard(skill) {
+  const icon = skill.icon_path ? normalizeAssetPath(skill.icon_path) : "";
+  const elementIcon = elementIconPath(skill.element_type);
+  const skillType = formatLabel(skill.skill_type || skill.short_type || "Skill");
+  const description = formatValue(skill.description, "No description available yet.");
+
+  return `<article class="skill-card">
+    <div class="skill-head">
+      <div class="skill-icon-wrap">${icon ? `<img class="skill-icon" src="${escapeHtml(icon)}" alt="${escapeHtml(skill.name)} icon" loading="lazy">` : `<span class="skill-placeholder">${escapeHtml(String(skill.slot_index ?? "?"))}</span>`}</div>
+      <div>
+        <span class="skill-type">${escapeHtml(skillType)}</span>
+        <h3>${escapeHtml(skill.name)}</h3>
+      </div>
+    </div>
+    <div class="skill-meta">
+      ${skill.cooldown !== null && skill.cooldown !== undefined ? `<span>Cooldown: <strong>${escapeHtml(skill.cooldown)}s</strong></span>` : ""}
+      ${skill.energy !== null && skill.energy !== undefined ? `<span>Energy: <strong>${escapeHtml(skill.energy)}</strong></span>` : ""}
+      ${skill.element_type ? `<span>${elementIcon ? `<img src="${escapeHtml(elementIcon)}" alt="" loading="lazy">` : ""}${escapeHtml(formatLabel(skill.element_type))}</span>` : ""}
+    </div>
+    <p>${escapeHtml(description)}</p>
+  </article>`;
+}
+
+function relatedCard(operator) {
+  const avatar = normalizeAssetPath(operator.icon_path);
+  const classIcon = classIconPath(operator.operator_class);
+  const elementIcon = elementIconPath(operator.element_type);
+
+  return `<a class="related-card" href="${localPageUrlFor(operator)}">
+    <img class="related-avatar" src="${escapeHtml(avatar)}" alt="${escapeHtml(operator.name)}" loading="lazy">
+    <div>
+      <strong>${escapeHtml(operator.name)}</strong>
+      <span>${escapeHtml(formatLabel(operator.operator_class))} · ${escapeHtml(formatLabel(operator.element_type))}</span>
+      <span class="related-icons">${classIcon ? `<img src="${escapeHtml(classIcon)}" alt="" loading="lazy">` : ""}${elementIcon ? `<img src="${escapeHtml(elementIcon)}" alt="" loading="lazy">` : ""}</span>
+    </div>
+  </a>`;
+}
+
+function indexCard(operator) {
+  const avatar = normalizeAssetPath(operator.icon_path);
+  const classIcon = classIconPath(operator.operator_class);
+  const elementIcon = elementIconPath(operator.element_type);
+
+  return `<a class="operator-tile" href="${localPageUrlFor(operator)}">
+    <img class="tile-avatar" src="${escapeHtml(avatar)}" alt="${escapeHtml(operator.name)}" loading="lazy">
+    <div class="tile-body">
+      <span class="tile-stars">${stars(operator.star)}</span>
+      <h2>${escapeHtml(operator.name)}</h2>
+      <p>${escapeHtml(formatLabel(operator.operator_class))} · ${escapeHtml(formatLabel(operator.element_type))}</p>
+      <div class="tile-icons">${classIcon ? `<img src="${escapeHtml(classIcon)}" alt="" loading="lazy">` : ""}${elementIcon ? `<img src="${escapeHtml(elementIcon)}" alt="" loading="lazy">` : ""}</div>
+    </div>
+  </a>`;
+}
+
+function baseStyles() {
+  return `<style>
+    :root{color-scheme:dark;--stone:#7E807C;--olive:#657136;--yellow:#F8F546;--silver:#A0AAA9;--charcoal:#313739;--charcoal-2:#252c2e;--charcoal-3:#1d2325;--text:#f6f7f0;--muted:#A0AAA9;--border:rgba(160,170,169,.28);--panel:rgba(49,55,57,.86);--panel-soft:rgba(126,128,124,.14);--shadow:0 28px 90px rgba(0,0,0,.42)}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:radial-gradient(circle at 18% 0%,rgba(160,170,169,.22),transparent 32rem),radial-gradient(circle at 82% 8%,rgba(248,245,70,.14),transparent 34rem),linear-gradient(135deg,#313739,#252c2e 52%,#181d1f)}body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.15;background-image:linear-gradient(rgba(160,170,169,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(160,170,169,.18) 1px,transparent 1px);background-size:34px 34px;mask-image:linear-gradient(to bottom,#000,transparent 75%)}a{color:inherit;text-decoration:none}.top{position:sticky;top:0;z-index:5;border-bottom:1px solid rgba(160,170,169,.20);background:rgba(37,44,46,.82);backdrop-filter:blur(14px)}.nav{width:min(1280px,calc(100% - 32px));height:66px;margin:0 auto;display:flex;align-items:center;gap:24px}.brand{display:flex;align-items:center;gap:12px;font-weight:950;font-size:1.08rem}.mark{display:grid;place-items:center;width:36px;height:36px;border-radius:8px;color:#313739;background:var(--yellow);box-shadow:0 0 24px rgba(248,245,70,.22)}.tool-name{color:var(--text);padding-left:20px;border-left:1px solid rgba(160,170,169,.25)}.nav-links{margin-left:auto;display:flex;align-items:center;gap:28px;color:var(--text);font-weight:800;font-size:.92rem}.nav-cta{color:#313739;background:var(--yellow);border-radius:10px;padding:12px 18px;box-shadow:0 14px 30px rgba(248,245,70,.16)}.page{width:min(1280px,calc(100% - 32px));margin:0 auto;padding:28px 0 64px}.breadcrumbs{display:flex;gap:10px;align-items:center;color:var(--muted);font-weight:700;font-size:.92rem;margin:0 0 28px}.breadcrumbs strong{color:var(--text)}.button{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 20px;border-radius:10px;font-weight:950}.primary{color:#313739;background:var(--yellow);box-shadow:0 16px 34px rgba(248,245,70,.18)}.secondary{background:rgba(126,128,124,.18);border:1px solid rgba(160,170,169,.25)}.panel{border:1px solid var(--border);border-radius:12px;background:rgba(49,55,57,.84);box-shadow:var(--shadow);padding:24px}.panel h2{margin:0 0 18px;font-size:1.35rem}.panel h2 span{color:var(--silver)}footer{margin-top:30px;text-align:center;color:rgba(160,170,169,.82);font-size:.9rem}
+    .hero{display:grid;grid-template-columns:420px minmax(0,1fr) 410px;gap:34px;align-items:center}.portrait-card{position:relative;min-height:430px;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:linear-gradient(135deg,rgba(126,128,124,.32),rgba(49,55,57,.92));box-shadow:var(--shadow)}.portrait-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:18px;background:var(--yellow)}.portrait-card:after{content:"ENDFIELD";position:absolute;left:34px;top:24px;color:#fff;font-size:.8rem;font-weight:950;letter-spacing:.18em}.portrait{position:absolute;left:50%;top:50%;width:min(330px,82%);max-height:330px;object-fit:contain;transform:translate(-50%,-45%);filter:drop-shadow(0 28px 26px rgba(0,0,0,.42))}.barcode{position:absolute;left:30px;bottom:22px;color:#313739;background:var(--yellow);writing-mode:vertical-rl;font-size:.58rem;font-weight:900;letter-spacing:.1em;padding:8px 4px;border-radius:3px}.hero-copy{padding:8px 0}.eyebrow{color:var(--yellow);font-size:.8rem;font-weight:950;letter-spacing:.44em;text-transform:uppercase;margin-bottom:24px}h1{margin:0;font-size:clamp(4rem,7vw,6.2rem);line-height:.9;letter-spacing:-.08em;text-shadow:0 18px 45px rgba(0,0,0,.32)}.stars{margin-top:18px;color:var(--yellow);font-size:2rem;letter-spacing:.08em}.subtitle{max-width:560px;margin:22px 0 0;color:#d7ddd9;line-height:1.8;font-size:1.05rem}.actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:34px}.info-panel{border:1px solid var(--border);border-radius:14px;background:rgba(49,55,57,.82);box-shadow:var(--shadow);padding:22px}.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.info-card{position:relative;min-height:104px;padding:22px 18px 18px 64px;border-radius:9px;background:linear-gradient(135deg,rgba(160,170,169,.14),rgba(126,128,124,.12));border:1px solid rgba(160,170,169,.14)}.info-icon{position:absolute;left:18px;top:28px;width:34px;height:34px;object-fit:contain;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35))}.text-icon{display:grid;place-items:center;color:var(--silver);font-size:1.35rem}.info-label{display:block;color:var(--silver);font-size:.75rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.info-card strong{display:block;margin-top:9px;font-size:1.12rem}.element-heat,.element-cryo,.element-electric,.element-nature,.element-physical{background:linear-gradient(135deg,rgba(101,113,54,.32),rgba(248,245,70,.10));border-color:rgba(248,245,70,.28)}.rarity{grid-column:1/-1;background:linear-gradient(135deg,rgba(101,113,54,.48),rgba(248,245,70,.12));border-color:rgba(248,245,70,.25);padding-left:22px}.rarity .star-line{color:var(--yellow);font-size:1.65rem;letter-spacing:.08em;margin-top:10px}.meta-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:30px;border:1px solid var(--border);border-radius:10px;background:linear-gradient(135deg,rgba(126,128,124,.30),rgba(49,55,57,.82));overflow:hidden}.meta-item{padding:28px 34px;display:grid;grid-template-columns:42px 1fr;gap:14px;align-items:center}.meta-item+.meta-item{border-left:1px solid rgba(160,170,169,.24)}.meta-icon{font-size:1.65rem;color:var(--silver)}.meta-label{display:block;color:var(--yellow);font-size:.78rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.meta-value{display:block;margin-top:6px;font-weight:900}.lower{display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-top:24px}.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.stat{position:relative;min-height:78px;border:1px solid rgba(160,170,169,.20);border-radius:7px;background:rgba(126,128,124,.10);padding:16px 14px 12px 54px}.stat-icon{position:absolute;left:18px;top:27px;color:#e5e9e4;font-size:1.3rem}.stat-label{display:block;color:var(--silver);font-size:.76rem;font-weight:850;text-transform:uppercase}.stat strong{display:block;margin-top:4px;font-size:1.35rem}.attribute-title{margin:24px 0 14px;font-size:1.25rem;font-weight:950}.highlight{margin-top:16px;border:1px solid rgba(248,245,70,.22);border-radius:8px;background:linear-gradient(135deg,rgba(101,113,54,.48),rgba(248,245,70,.10));padding:18px;color:#eef1e8}.about{position:relative;overflow:hidden}.about:after{content:"A";position:absolute;right:26px;bottom:-38px;color:rgba(160,170,169,.06);font-size:12rem;font-weight:950}.about p{position:relative;margin:0;color:#d7ddd9;line-height:1.75}
+    .skills-section,.related-section{margin-top:24px}.skills-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.skill-card{border:1px solid rgba(160,170,169,.20);border-radius:12px;background:linear-gradient(135deg,rgba(126,128,124,.13),rgba(49,55,57,.70));padding:18px}.skill-head{display:grid;grid-template-columns:58px 1fr;gap:14px;align-items:center}.skill-icon-wrap{width:58px;height:58px;border-radius:10px;border:1px solid rgba(160,170,169,.22);background:rgba(0,0,0,.18);display:grid;place-items:center}.skill-icon{width:52px;height:52px;object-fit:contain}.skill-placeholder{color:var(--yellow);font-weight:950}.skill-type{color:var(--yellow);font-size:.72rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.skill-card h3{margin:4px 0 0}.skill-meta{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}.skill-meta span{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(160,170,169,.18);border-radius:999px;padding:6px 9px;color:#dfe4df;background:rgba(126,128,124,.10);font-size:.82rem}.skill-meta img{width:18px;height:18px}.skill-card p{margin:0;color:#d7ddd9;line-height:1.65}.related-grid,.operator-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.related-card,.operator-tile{border:1px solid rgba(160,170,169,.20);border-radius:12px;background:linear-gradient(135deg,rgba(126,128,124,.14),rgba(49,55,57,.78));padding:14px;transition:transform .16s ease,border-color .16s ease}.related-card:hover,.operator-tile:hover{transform:translateY(-2px);border-color:rgba(248,245,70,.42)}.related-card{display:grid;grid-template-columns:58px 1fr;gap:13px;align-items:center}.related-avatar{width:58px;height:58px;object-fit:contain}.related-card strong,.operator-tile h2{display:block}.related-card span,.operator-tile p{display:block;color:var(--muted);font-size:.9rem;margin-top:4px}.related-icons,.tile-icons{display:flex;gap:8px;margin-top:8px}.related-icons img,.tile-icons img{width:22px;height:22px;object-fit:contain}.index-hero{padding:54px;border:1px solid var(--border);border-radius:16px;background:linear-gradient(135deg,rgba(101,113,54,.40),rgba(49,55,57,.90));box-shadow:var(--shadow);margin-bottom:24px}.index-hero h1{font-size:clamp(3rem,6vw,5rem)}.index-hero p{max-width:760px;color:#d7ddd9;line-height:1.75}.operator-grid{grid-template-columns:repeat(5,minmax(0,1fr))}.operator-tile{min-height:260px}.tile-avatar{width:100%;height:132px;object-fit:contain;filter:drop-shadow(0 16px 18px rgba(0,0,0,.35))}.tile-stars{display:block;color:var(--yellow);margin-top:8px}.tile-body h2{margin:6px 0 0;font-size:1.05rem}.tile-body p{margin:5px 0 0;color:var(--muted)}
+    @media(max-width:1120px){.hero{grid-template-columns:1fr 1fr}.portrait-card{grid-row:1}.hero-copy{grid-column:1/-1;grid-row:2}.info-panel{grid-column:2;grid-row:1}.lower{grid-template-columns:1fr}.meta-strip{grid-template-columns:1fr}.meta-item+.meta-item{border-left:0;border-top:1px solid rgba(160,170,169,.24)}.operator-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:760px){.nav{height:auto;align-items:flex-start;flex-direction:column;padding:16px 0}.tool-name{border-left:0;padding-left:0}.nav-links{margin-left:0;gap:14px;flex-wrap:wrap}.hero{grid-template-columns:1fr}.info-panel,.portrait-card,.hero-copy{grid-column:auto;grid-row:auto}.stats-grid,.info-grid,.skills-grid,.related-grid{grid-template-columns:1fr 1fr}h1{font-size:3.5rem}.operator-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.page,.nav{width:min(100% - 20px,1280px)}.stats-grid,.info-grid,.skills-grid,.related-grid,.operator-grid{grid-template-columns:1fr}.portrait-card{min-height:340px}.button{width:100%}.meta-item{padding:22px}.panel,.index-hero{padding:18px}.nav-links{width:100%}.nav-cta{width:100%;text-align:center}}
+  </style>`;
+}
+
+function siteHeader() {
+  return `<header class="top">
+    <nav class="nav">
+      <a class="brand" href="${SITE_URL}/"><span class="mark">RF</span><span>RotationForge</span></a>
+      <span class="tool-name">▱ Arknights: Endfield Rotation Tool</span>
+      <div class="nav-links">
+        <a href="${SITE_URL}${BASE_PATH}/operators/">Operators</a>
+        <a href="${SITE_URL}${BASE_PATH}/">Tool</a>
+        <a class="nav-cta" href="${SITE_URL}${BASE_PATH}/">Open Rotation Tool ↗</a>
+      </div>
+    </nav>
+  </header>`;
+}
+
+function createOperatorPage(operator, allOperators, skillsByOperator) {
+  const pageUrl = pageUrlFor(operator);
   const toolUrl = `${SITE_URL}${BASE_PATH}/#operator-${operator.slug}`;
   const avatarPath = normalizeAssetPath(operator.icon_path);
   const avatarUrl = `${SITE_URL}${avatarPath}`;
@@ -112,9 +213,11 @@ function createPage(operator) {
 
   const classIcon = classIconPath(operator.operator_class);
   const elementIcon = elementIconPath(operator.element_type);
+  const skills = skillsByOperator.get(operator.id) || [];
+  const relatedOperators = getRelatedOperators(operator, allOperators);
 
   const title = `${name} - Arknights Endfield Operator | RotationForge`;
-  const description = `${name} is a ${operator.star}-star ${operatorClass} operator with ${elementType} element in Arknights: Endfield. View stats, attributes and open the RotationForge rotation tool.`;
+  const description = `${name} is a ${operator.star}-star ${operatorClass} operator with ${elementType} element in Arknights: Endfield. View stats, skills, attributes and open the RotationForge rotation tool.`;
 
   const baseStatsHtml = [
     stat("HP", operator.base_hp, "♥"),
@@ -139,15 +242,24 @@ function createPage(operator) {
     stat("WILL Lv. 1", operator.base_will_level_1, "◉")
   ].join("\n");
 
-  const jsonLd = {
+  const breadcrumbSchema = {
     "@context": "https://schema.org",
-    "@type": "WebPage",
-    name: title,
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Endfield Operators", item: `${SITE_URL}${BASE_PATH}/operators/` },
+      { "@type": "ListItem", position: 3, name, item: pageUrl }
+    ]
+  };
+
+  const characterSchema = {
+    "@context": "https://schema.org",
+    "@type": "Character",
+    name,
     description,
-    url: pageUrl,
     image: avatarUrl,
-    isPartOf: { "@type": "WebSite", name: "RotationForge", url: SITE_URL },
-    about: { "@type": "Thing", name: `${name} - Arknights: Endfield Operator` }
+    url: pageUrl,
+    isPartOf: { "@type": "VideoGame", name: "Arknights: Endfield" }
   };
 
   return `<!doctype html>
@@ -164,52 +276,18 @@ function createPage(operator) {
   <meta property="og:url" content="${pageUrl}">
   <meta property="og:type" content="website">
   <meta property="og:image" content="${avatarUrl}">
-  <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
-  <style>
-    :root {
-      color-scheme: dark;
-      --stone:#7E807C;
-      --olive:#657136;
-      --yellow:#F8F546;
-      --silver:#A0AAA9;
-      --charcoal:#313739;
-      --charcoal-2:#252c2e;
-      --charcoal-3:#1d2325;
-      --text:#f6f7f0;
-      --muted:#A0AAA9;
-      --border:rgba(160,170,169,.28);
-      --panel:rgba(49,55,57,.86);
-      --panel-soft:rgba(126,128,124,.14);
-      --shadow:0 28px 90px rgba(0,0,0,.42);
-    }
-    *{box-sizing:border-box} body{margin:0;min-height:100vh;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:radial-gradient(circle at 18% 0%,rgba(160,170,169,.22),transparent 32rem),radial-gradient(circle at 82% 8%,rgba(248,245,70,.14),transparent 34rem),linear-gradient(135deg,#313739,#252c2e 52%,#181d1f)}
-    body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.15;background-image:linear-gradient(rgba(160,170,169,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(160,170,169,.18) 1px,transparent 1px);background-size:34px 34px;mask-image:linear-gradient(to bottom,#000,transparent 75%)}
-    a{color:inherit;text-decoration:none}.top{position:sticky;top:0;z-index:5;border-bottom:1px solid rgba(160,170,169,.20);background:rgba(37,44,46,.82);backdrop-filter:blur(14px)}.nav{width:min(1280px,calc(100% - 32px));height:66px;margin:0 auto;display:flex;align-items:center;gap:24px}.brand{display:flex;align-items:center;gap:12px;font-weight:950;font-size:1.08rem}.mark{display:grid;place-items:center;width:36px;height:36px;border-radius:8px;color:#313739;background:var(--yellow);box-shadow:0 0 24px rgba(248,245,70,.22)}.tool-name{color:var(--text);padding-left:20px;border-left:1px solid rgba(160,170,169,.25)}.nav-links{margin-left:auto;display:flex;align-items:center;gap:28px;color:var(--text);font-weight:800;font-size:.92rem}.nav-cta{color:#313739;background:var(--yellow);border-radius:10px;padding:12px 18px;box-shadow:0 14px 30px rgba(248,245,70,.16)}
-    .page{width:min(1280px,calc(100% - 32px));margin:0 auto;padding:28px 0 64px}.breadcrumbs{display:flex;gap:10px;align-items:center;color:var(--muted);font-weight:700;font-size:.92rem;margin:0 0 28px}.breadcrumbs strong{color:var(--text)}.hero{display:grid;grid-template-columns:400px minmax(0,1fr) 410px;gap:34px;align-items:center}.portrait-card{position:relative;min-height:395px;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:linear-gradient(135deg,rgba(126,128,124,.32),rgba(49,55,57,.92));box-shadow:var(--shadow)}.portrait-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:18px;background:var(--yellow)}.portrait-card:after{content:"ENDFIELD";position:absolute;left:34px;top:24px;color:#fff;font-size:.8rem;font-weight:950;letter-spacing:.18em}.portrait{position:absolute;left:50%;top:50%;width:min(260px,74%);max-height:260px;object-fit:contain;transform:translate(-50%,-45%);filter:drop-shadow(0 28px 26px rgba(0,0,0,.42))}.barcode{position:absolute;left:30px;bottom:22px;color:#313739;background:var(--yellow);writing-mode:vertical-rl;font-size:.58rem;font-weight:900;letter-spacing:.1em;padding:8px 4px;border-radius:3px}.hero-copy{padding:8px 0}.eyebrow{color:var(--yellow);font-size:.8rem;font-weight:950;letter-spacing:.44em;text-transform:uppercase;margin-bottom:24px}h1{margin:0;font-size:clamp(4rem,7vw,6.2rem);line-height:.9;letter-spacing:-.08em;text-shadow:0 18px 45px rgba(0,0,0,.32)}.stars{margin-top:18px;color:var(--yellow);font-size:2rem;letter-spacing:.08em}.subtitle{max-width:560px;margin:22px 0 0;color:#d7ddd9;line-height:1.8;font-size:1.05rem}.actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:34px}.button{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 20px;border-radius:10px;font-weight:950}.primary{color:#313739;background:var(--yellow);box-shadow:0 16px 34px rgba(248,245,70,.18)}.secondary{background:rgba(126,128,124,.18);border:1px solid rgba(160,170,169,.25)}
-    .info-panel{border:1px solid var(--border);border-radius:14px;background:rgba(49,55,57,.82);box-shadow:var(--shadow);padding:22px}.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.info-card{position:relative;min-height:104px;padding:22px 18px 18px 64px;border-radius:9px;background:linear-gradient(135deg,rgba(160,170,169,.14),rgba(126,128,124,.12));border:1px solid rgba(160,170,169,.14)}.info-icon{position:absolute;left:18px;top:28px;width:34px;height:34px;object-fit:contain;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35))}.text-icon{display:grid;place-items:center;color:var(--silver);font-size:1.35rem}.asset-icon{image-rendering:auto}.info-label{display:block;color:var(--silver);font-size:.75rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.info-card strong{display:block;margin-top:9px;font-size:1.12rem}.element-heat,.element-cryo,.element-electric,.element-nature,.element-physical{background:linear-gradient(135deg,rgba(101,113,54,.32),rgba(248,245,70,.10));border-color:rgba(248,245,70,.28)}.rarity{grid-column:1/-1;background:linear-gradient(135deg,rgba(101,113,54,.48),rgba(248,245,70,.12));border-color:rgba(248,245,70,.25);padding-left:22px}.rarity .star-line{color:var(--yellow);font-size:1.65rem;letter-spacing:.08em;margin-top:10px}.meta-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:30px;border:1px solid var(--border);border-radius:10px;background:linear-gradient(135deg,rgba(126,128,124,.30),rgba(49,55,57,.82));overflow:hidden}.meta-item{padding:28px 34px;display:grid;grid-template-columns:42px 1fr;gap:14px;align-items:center}.meta-item+.meta-item{border-left:1px solid rgba(160,170,169,.24)}.meta-icon{font-size:1.65rem;color:var(--silver)}.meta-label{display:block;color:var(--yellow);font-size:.78rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.meta-value{display:block;margin-top:6px;font-weight:900}.lower{display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-top:24px}.panel{border:1px solid var(--border);border-radius:12px;background:rgba(49,55,57,.84);box-shadow:var(--shadow);padding:24px}.panel h2{margin:0 0 18px;font-size:1.35rem}.panel h2 span{color:var(--silver)}.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.stat{position:relative;min-height:78px;border:1px solid rgba(160,170,169,.20);border-radius:7px;background:rgba(126,128,124,.10);padding:16px 14px 12px 54px}.stat-icon{position:absolute;left:18px;top:27px;color:#e5e9e4;font-size:1.3rem}.stat-label{display:block;color:var(--silver);font-size:.76rem;font-weight:850;text-transform:uppercase}.stat strong{display:block;margin-top:4px;font-size:1.35rem}.attribute-title{margin:24px 0 14px;font-size:1.25rem;font-weight:950}.highlight{margin-top:16px;border:1px solid rgba(248,245,70,.22);border-radius:8px;background:linear-gradient(135deg,rgba(101,113,54,.48),rgba(248,245,70,.10));padding:18px;color:#eef1e8}.about{position:relative;overflow:hidden}.about:after{content:"A";position:absolute;right:26px;bottom:-38px;color:rgba(160,170,169,.06);font-size:12rem;font-weight:950}.about p{position:relative;margin:0;color:#d7ddd9;line-height:1.75}footer{margin-top:30px;text-align:center;color:rgba(160,170,169,.82);font-size:.9rem}
-    @media(max-width:1120px){.hero{grid-template-columns:1fr 1fr}.portrait-card{grid-row:1}.hero-copy{grid-column:1/-1;grid-row:2}.info-panel{grid-column:2;grid-row:1}.lower{grid-template-columns:1fr}.meta-strip{grid-template-columns:1fr}.meta-item+.meta-item{border-left:0;border-top:1px solid rgba(160,170,169,.24)}}@media(max-width:760px){.nav{height:auto;align-items:flex-start;flex-direction:column;padding:16px 0}.tool-name{border-left:0;padding-left:0}.nav-links{margin-left:0;gap:14px;flex-wrap:wrap}.hero{grid-template-columns:1fr}.info-panel,.portrait-card,.hero-copy{grid-column:auto;grid-row:auto}.stats-grid,.info-grid{grid-template-columns:1fr 1fr}h1{font-size:3.5rem}}@media(max-width:520px){.page,.nav{width:min(100% - 20px,1280px)}.stats-grid,.info-grid{grid-template-columns:1fr}.portrait-card{min-height:320px}.button{width:100%}.meta-item{padding:22px}.panel{padding:18px}}
-  </style>
+  <script type="application/ld+json">${JSON.stringify(characterSchema)}</script>
+  <script type="application/ld+json">${JSON.stringify(breadcrumbSchema)}</script>
+  ${baseStyles()}
 </head>
 <body>
-  <header class="top">
-    <nav class="nav">
-      <a class="brand" href="${SITE_URL}/"><span class="mark">RF</span><span>RotationForge</span></a>
-      <span class="tool-name">▱ Arknights: Endfield Rotation Tool</span>
-      <div class="nav-links">
-        <a href="${SITE_URL}${BASE_PATH}/">Operators</a>
-        <a href="${SITE_URL}${BASE_PATH}/">Guides</a>
-        <a href="${SITE_URL}${BASE_PATH}/">Database</a>
-        <a class="nav-cta" href="${toolUrl}">Open Rotation Tool ↗</a>
-      </div>
-    </nav>
-  </header>
-
+  ${siteHeader()}
   <div class="page">
-    <div class="breadcrumbs"><a href="${SITE_URL}/">Home</a><span>›</span><a href="${SITE_URL}${BASE_PATH}/">Operators</a><span>›</span><strong>${escapeHtml(name)}</strong></div>
+    <div class="breadcrumbs"><a href="${SITE_URL}/">Home</a><span>›</span><a href="${SITE_URL}${BASE_PATH}/operators/">Operators</a><span>›</span><strong>${escapeHtml(name)}</strong></div>
 
     <main class="hero">
       <section class="portrait-card">
-        <img class="portrait" src="${avatarPath}" alt="${escapeHtml(name)} icon" width="260" height="260">
+        <img class="portrait" src="${avatarPath}" alt="${escapeHtml(name)} icon" width="330" height="330">
         <span class="barcode">ROTATIONFORGE DATABASE</span>
       </section>
 
@@ -220,7 +298,7 @@ function createPage(operator) {
         <p class="subtitle">${escapeHtml(name)} is listed in the RotationForge operator database for Arknights: Endfield. Open the rotation tool to plan skills, compare operators, and build your rotation setup.</p>
         <div class="actions">
           <a class="button primary" href="${toolUrl}">Open in Rotation Tool ↗</a>
-          <a class="button secondary" href="${SITE_URL}${BASE_PATH}/">Back to Endfield Tool</a>
+          <a class="button secondary" href="${SITE_URL}${BASE_PATH}/operators/">Back to Operator Database</a>
         </div>
       </section>
 
@@ -256,6 +334,65 @@ function createPage(operator) {
       </article>
     </section>
 
+    <section class="panel skills-section">
+      <h2>${escapeHtml(name)} Skills</h2>
+      <div class="skills-grid">${skills.length > 0 ? skills.map(skillCard).join("\n") : "<p>No skills are available in the database yet.</p>"}</div>
+    </section>
+
+    <section class="panel related-section">
+      <h2>Related Operators</h2>
+      <div class="related-grid">${relatedOperators.length > 0 ? relatedOperators.map(relatedCard).join("\n") : "<p>No related operators found yet.</p>"}</div>
+    </section>
+
+    <footer>RotationForge is an unofficial fan-made tool for Arknights: Endfield.</footer>
+  </div>
+</body>
+</html>`;
+}
+
+function createIndexPage(operators) {
+  const pageUrl = `${SITE_URL}${BASE_PATH}/operators/`;
+  const title = "Arknights Endfield Operator Database | RotationForge";
+  const description = "Browse all Arknights: Endfield operators available in the RotationForge database with classes, elements, attributes and direct rotation tool links.";
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Arknights: Endfield Operators",
+    itemListElement: operators.map((operator, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: pageUrlFor(operator),
+      name: operator.name
+    }))
+  };
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>${escapeHtml(title)}</title>
+  <meta name="description" content="${escapeHtml(description)}">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#313739">
+  <link rel="canonical" href="${pageUrl}">
+  <meta property="og:title" content="${escapeHtml(title)}">
+  <meta property="og:description" content="${escapeHtml(description)}">
+  <meta property="og:url" content="${pageUrl}">
+  <meta property="og:type" content="website">
+  <script type="application/ld+json">${JSON.stringify(itemListSchema)}</script>
+  ${baseStyles()}
+</head>
+<body>
+  ${siteHeader()}
+  <div class="page">
+    <div class="breadcrumbs"><a href="${SITE_URL}/">Home</a><span>›</span><strong>Operators</strong></div>
+    <section class="index-hero">
+      <div class="eyebrow">RotationForge Database</div>
+      <h1>Arknights: Endfield Operators</h1>
+      <p>Browse all operators stored in the RotationForge database. Each page includes operator stats, class and element icons, skills, related operators and a direct link into the rotation planner.</p>
+      <div class="actions"><a class="button primary" href="${SITE_URL}${BASE_PATH}/">Open Rotation Tool ↗</a></div>
+    </section>
+    <section class="operator-grid">${operators.map(indexCard).join("\n")}</section>
     <footer>RotationForge is an unofficial fan-made tool for Arknights: Endfield.</footer>
   </div>
 </body>
@@ -263,7 +400,7 @@ function createPage(operator) {
 }
 
 async function build() {
-  const { data, error } = await supabase
+  const { data: operators, error: operatorError } = await supabase
     .from("operators")
     .select(`
       id,
@@ -296,27 +433,62 @@ async function build() {
     .eq("game", "arknights_endfield")
     .order("sort_order", { ascending: true });
 
-  if (error) {
-    console.error("Supabase Fehler:", error.message);
+  if (operatorError) {
+    console.error("Supabase Fehler bei operators:", operatorError.message);
     process.exit(1);
   }
 
-  if (!data || data.length === 0) {
+  if (!operators || operators.length === 0) {
     console.error("Keine Operatoren gefunden.");
     process.exit(1);
+  }
+
+  const { data: skills, error: skillError } = await supabase
+    .from("operator_skills")
+    .select(`
+      id,
+      operator_id,
+      slot_index,
+      name,
+      skill_type,
+      short_type,
+      cooldown,
+      energy,
+      element_type,
+      icon_path,
+      icon_small_path,
+      description,
+      combo_trigger,
+      combo_trigger_mode
+    `)
+    .order("operator_id", { ascending: true })
+    .order("slot_index", { ascending: true });
+
+  if (skillError) {
+    console.error("Supabase Fehler bei operator_skills:", skillError.message);
+    process.exit(1);
+  }
+
+  const skillsByOperator = new Map();
+  for (const skill of skills || []) {
+    if (!skillsByOperator.has(skill.operator_id)) skillsByOperator.set(skill.operator_id, []);
+    skillsByOperator.get(skill.operator_id).push(skill);
   }
 
   fs.rmSync(OUTPUT_DIR, { recursive: true, force: true });
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
-  for (const operator of data) {
+  fs.writeFileSync(path.join(OUTPUT_DIR, "index.html"), createIndexPage(operators), "utf8");
+  console.log(`Erstellt: ${BASE_PATH}/operators/`);
+
+  for (const operator of operators) {
     const folder = path.join(OUTPUT_DIR, operator.slug);
     fs.mkdirSync(folder, { recursive: true });
-    fs.writeFileSync(path.join(folder, "index.html"), createPage(operator), "utf8");
+    fs.writeFileSync(path.join(folder, "index.html"), createOperatorPage(operator, operators, skillsByOperator), "utf8");
     console.log(`Erstellt: ${BASE_PATH}/operators/${operator.slug}/`);
   }
 
-  console.log(`Fertig: ${data.length} Operator-Seiten erstellt.`);
+  console.log(`Fertig: ${operators.length} Operator-Seiten erstellt.`);
 }
 
 build();
