@@ -8,8 +8,8 @@ const SITE_URL = "https://rotationforge.gg";
 const BASE_PATH = "/endfield";
 const OUTPUT_DIR = path.join(process.cwd(), "endfield", "operators");
 
-function escapeHtml(value) {
-  return String(value ?? "")
+function escapeHtml(input) {
+  return String(input ?? "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
@@ -17,19 +17,19 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function value(value, fallback = "Unknown") {
-  if (value === null || value === undefined || value === "") return fallback;
-  return String(value);
+function formatValue(input, fallback = "Unknown") {
+  if (input === null || input === undefined || input === "") return fallback;
+  return String(input);
 }
 
-function label(value) {
-  return value(value)
+function formatLabel(input) {
+  return formatValue(input)
     .replaceAll("_", " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
-function numberValue(value) {
-  return value === null || value === undefined || value === "" ? "—" : String(value);
+function numberValue(input) {
+  return input === null || input === undefined || input === "" ? "—" : String(input);
 }
 
 function normalizeAssetPath(assetPath) {
@@ -58,12 +58,12 @@ function createPage(operator) {
   const avatarPath = normalizeAssetPath(operator.icon_path);
   const avatarUrl = `${SITE_URL}${avatarPath}`;
 
-  const name = value(operator.name);
-  const operatorClass = label(operator.operator_class);
-  const elementType = label(operator.element_type);
-  const weaponType = label(operator.weapon_type);
-  const mainAttribute = label(operator.main_attribute);
-  const secondaryAttribute = label(operator.secondary_attribute);
+  const name = formatValue(operator.name);
+  const operatorClass = formatLabel(operator.operator_class);
+  const elementType = formatLabel(operator.element_type);
+  const weaponType = formatLabel(operator.weapon_type);
+  const mainAttribute = formatLabel(operator.main_attribute);
+  const secondaryAttribute = formatLabel(operator.secondary_attribute);
   const title = `${name} - Arknights Endfield Operator | RotationForge`;
   const description = `${name} is a ${operator.star}-star ${operatorClass} operator with ${elementType} element in Arknights: Endfield. View stats, attributes and open the RotationForge rotation tool.`;
 
