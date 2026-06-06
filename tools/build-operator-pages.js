@@ -28,6 +28,14 @@ function formatLabel(input) {
     .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
+function normalizeKey(input) {
+  return String(input || "")
+    .trim()
+    .toLowerCase()
+    .replaceAll(" ", "_")
+    .replaceAll("-", "_");
+}
+
 function numberValue(input) {
   return input === null || input === undefined || input === "" ? "—" : String(input);
 }
@@ -35,6 +43,38 @@ function numberValue(input) {
 function normalizeAssetPath(assetPath) {
   const cleaned = String(assetPath || "").replace(/^\/+/, "");
   return `${BASE_PATH}/${cleaned}`;
+}
+
+function classIconPath(operatorClass) {
+  const key = normalizeKey(operatorClass);
+  const fileMap = {
+    caster: "caster.webp",
+    defender: "defender.webp",
+    guard: "guard.webp",
+    striker: "striker.webp",
+    supporter: "supporter.webp",
+    vanguard: "vanguard.webp"
+  };
+
+  return fileMap[key] ? `${BASE_PATH}/assets/ui/classes/${fileMap[key]}` : "";
+}
+
+function elementIconPath(elementType) {
+  const key = normalizeKey(elementType);
+  const fileMap = {
+    cryo: "cryo.webp",
+    electric: "electric.webp",
+    heat: "heat.webp",
+    nature: "nature.webp",
+    physical: "physical.webp"
+  };
+
+  return fileMap[key] ? `${BASE_PATH}/assets/ui/elements/${fileMap[key]}` : "";
+}
+
+function iconMarkup(src, alt, fallback = "◆") {
+  if (!src) return `<span class="info-icon text-icon">${escapeHtml(fallback)}</span>`;
+  return `<img class="info-icon asset-icon" src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" width="34" height="34">`;
 }
 
 function elementClass(elementType) {
@@ -52,8 +92,8 @@ function stat(labelText, valueText, icon = "◆") {
   return `<div class="stat"><span class="stat-icon">${escapeHtml(icon)}</span><span class="stat-label">${escapeHtml(labelText)}</span><strong>${escapeHtml(numberValue(valueText))}</strong></div>`;
 }
 
-function info(labelText, valueText, icon = "◆", extraClass = "") {
-  return `<div class="info-card ${extraClass}"><span class="info-icon">${escapeHtml(icon)}</span><span class="info-label">${escapeHtml(labelText)}</span><strong>${escapeHtml(valueText)}</strong></div>`;
+function info(labelText, valueText, iconHtml, extraClass = "") {
+  return `<div class="info-card ${extraClass}">${iconHtml}<span class="info-label">${escapeHtml(labelText)}</span><strong>${escapeHtml(valueText)}</strong></div>`;
 }
 
 function createPage(operator) {
@@ -69,6 +109,9 @@ function createPage(operator) {
   const mainAttribute = formatLabel(operator.main_attribute);
   const secondaryAttribute = formatLabel(operator.secondary_attribute);
   const databaseId = `OPERATOR_${String(operator.slug || "unknown").toUpperCase().replaceAll("-", "_")}`;
+
+  const classIcon = classIconPath(operator.operator_class);
+  const elementIcon = elementIconPath(operator.element_type);
 
   const title = `${name} - Arknights Endfield Operator | RotationForge`;
   const description = `${name} is a ${operator.star}-star ${operatorClass} operator with ${elementType} element in Arknights: Endfield. View stats, attributes and open the RotationForge rotation tool.`;
@@ -143,7 +186,7 @@ function createPage(operator) {
     body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.15;background-image:linear-gradient(rgba(160,170,169,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(160,170,169,.18) 1px,transparent 1px);background-size:34px 34px;mask-image:linear-gradient(to bottom,#000,transparent 75%)}
     a{color:inherit;text-decoration:none}.top{position:sticky;top:0;z-index:5;border-bottom:1px solid rgba(160,170,169,.20);background:rgba(37,44,46,.82);backdrop-filter:blur(14px)}.nav{width:min(1280px,calc(100% - 32px));height:66px;margin:0 auto;display:flex;align-items:center;gap:24px}.brand{display:flex;align-items:center;gap:12px;font-weight:950;font-size:1.08rem}.mark{display:grid;place-items:center;width:36px;height:36px;border-radius:8px;color:#313739;background:var(--yellow);box-shadow:0 0 24px rgba(248,245,70,.22)}.tool-name{color:var(--text);padding-left:20px;border-left:1px solid rgba(160,170,169,.25)}.nav-links{margin-left:auto;display:flex;align-items:center;gap:28px;color:var(--text);font-weight:800;font-size:.92rem}.nav-cta{color:#313739;background:var(--yellow);border-radius:10px;padding:12px 18px;box-shadow:0 14px 30px rgba(248,245,70,.16)}
     .page{width:min(1280px,calc(100% - 32px));margin:0 auto;padding:28px 0 64px}.breadcrumbs{display:flex;gap:10px;align-items:center;color:var(--muted);font-weight:700;font-size:.92rem;margin:0 0 28px}.breadcrumbs strong{color:var(--text)}.hero{display:grid;grid-template-columns:400px minmax(0,1fr) 410px;gap:34px;align-items:center}.portrait-card{position:relative;min-height:395px;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:linear-gradient(135deg,rgba(126,128,124,.32),rgba(49,55,57,.92));box-shadow:var(--shadow)}.portrait-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:18px;background:var(--yellow)}.portrait-card:after{content:"ENDFIELD";position:absolute;left:34px;top:24px;color:#fff;font-size:.8rem;font-weight:950;letter-spacing:.18em}.portrait{position:absolute;left:50%;top:50%;width:min(260px,74%);max-height:260px;object-fit:contain;transform:translate(-50%,-45%);filter:drop-shadow(0 28px 26px rgba(0,0,0,.42))}.barcode{position:absolute;left:30px;bottom:22px;color:#313739;background:var(--yellow);writing-mode:vertical-rl;font-size:.58rem;font-weight:900;letter-spacing:.1em;padding:8px 4px;border-radius:3px}.hero-copy{padding:8px 0}.eyebrow{color:var(--yellow);font-size:.8rem;font-weight:950;letter-spacing:.44em;text-transform:uppercase;margin-bottom:24px}h1{margin:0;font-size:clamp(4rem,7vw,6.2rem);line-height:.9;letter-spacing:-.08em;text-shadow:0 18px 45px rgba(0,0,0,.32)}.stars{margin-top:18px;color:var(--yellow);font-size:2rem;letter-spacing:.08em}.subtitle{max-width:560px;margin:22px 0 0;color:#d7ddd9;line-height:1.8;font-size:1.05rem}.actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:34px}.button{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 20px;border-radius:10px;font-weight:950}.primary{color:#313739;background:var(--yellow);box-shadow:0 16px 34px rgba(248,245,70,.18)}.secondary{background:rgba(126,128,124,.18);border:1px solid rgba(160,170,169,.25)}
-    .info-panel{border:1px solid var(--border);border-radius:14px;background:rgba(49,55,57,.82);box-shadow:var(--shadow);padding:22px}.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.info-card{position:relative;min-height:104px;padding:22px 18px 18px 52px;border-radius:9px;background:linear-gradient(135deg,rgba(160,170,169,.14),rgba(126,128,124,.12));border:1px solid rgba(160,170,169,.14)}.info-icon{position:absolute;left:20px;top:31px;color:var(--silver);font-size:1.3rem}.info-label{display:block;color:var(--silver);font-size:.75rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.info-card strong{display:block;margin-top:9px;font-size:1.12rem}.element-heat,.element-cryo,.element-electric,.element-nature,.element-physical{background:linear-gradient(135deg,rgba(101,113,54,.32),rgba(248,245,70,.10));border-color:rgba(248,245,70,.28)}.rarity{grid-column:1/-1;background:linear-gradient(135deg,rgba(101,113,54,.48),rgba(248,245,70,.12));border-color:rgba(248,245,70,.25)}.rarity .star-line{color:var(--yellow);font-size:1.65rem;letter-spacing:.08em;margin-top:10px}.meta-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:30px;border:1px solid var(--border);border-radius:10px;background:linear-gradient(135deg,rgba(126,128,124,.30),rgba(49,55,57,.82));overflow:hidden}.meta-item{padding:28px 34px;display:grid;grid-template-columns:42px 1fr;gap:14px;align-items:center}.meta-item+.meta-item{border-left:1px solid rgba(160,170,169,.24)}.meta-icon{font-size:1.65rem;color:var(--silver)}.meta-label{display:block;color:var(--yellow);font-size:.78rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.meta-value{display:block;margin-top:6px;font-weight:900}.lower{display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-top:24px}.panel{border:1px solid var(--border);border-radius:12px;background:rgba(49,55,57,.84);box-shadow:var(--shadow);padding:24px}.panel h2{margin:0 0 18px;font-size:1.35rem}.panel h2 span{color:var(--silver)}.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.stat{position:relative;min-height:78px;border:1px solid rgba(160,170,169,.20);border-radius:7px;background:rgba(126,128,124,.10);padding:16px 14px 12px 54px}.stat-icon{position:absolute;left:18px;top:27px;color:#e5e9e4;font-size:1.3rem}.stat-label{display:block;color:var(--silver);font-size:.76rem;font-weight:850;text-transform:uppercase}.stat strong{display:block;margin-top:4px;font-size:1.35rem}.attribute-title{margin:24px 0 14px;font-size:1.25rem;font-weight:950}.highlight{margin-top:16px;border:1px solid rgba(248,245,70,.22);border-radius:8px;background:linear-gradient(135deg,rgba(101,113,54,.48),rgba(248,245,70,.10));padding:18px;color:#eef1e8}.about{position:relative;overflow:hidden}.about:after{content:"A";position:absolute;right:26px;bottom:-38px;color:rgba(160,170,169,.06);font-size:12rem;font-weight:950}.about p{position:relative;margin:0;color:#d7ddd9;line-height:1.75}footer{margin-top:30px;text-align:center;color:rgba(160,170,169,.82);font-size:.9rem}
+    .info-panel{border:1px solid var(--border);border-radius:14px;background:rgba(49,55,57,.82);box-shadow:var(--shadow);padding:22px}.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.info-card{position:relative;min-height:104px;padding:22px 18px 18px 64px;border-radius:9px;background:linear-gradient(135deg,rgba(160,170,169,.14),rgba(126,128,124,.12));border:1px solid rgba(160,170,169,.14)}.info-icon{position:absolute;left:18px;top:28px;width:34px;height:34px;object-fit:contain;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35))}.text-icon{display:grid;place-items:center;color:var(--silver);font-size:1.35rem}.asset-icon{image-rendering:auto}.info-label{display:block;color:var(--silver);font-size:.75rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.info-card strong{display:block;margin-top:9px;font-size:1.12rem}.element-heat,.element-cryo,.element-electric,.element-nature,.element-physical{background:linear-gradient(135deg,rgba(101,113,54,.32),rgba(248,245,70,.10));border-color:rgba(248,245,70,.28)}.rarity{grid-column:1/-1;background:linear-gradient(135deg,rgba(101,113,54,.48),rgba(248,245,70,.12));border-color:rgba(248,245,70,.25);padding-left:22px}.rarity .star-line{color:var(--yellow);font-size:1.65rem;letter-spacing:.08em;margin-top:10px}.meta-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:30px;border:1px solid var(--border);border-radius:10px;background:linear-gradient(135deg,rgba(126,128,124,.30),rgba(49,55,57,.82));overflow:hidden}.meta-item{padding:28px 34px;display:grid;grid-template-columns:42px 1fr;gap:14px;align-items:center}.meta-item+.meta-item{border-left:1px solid rgba(160,170,169,.24)}.meta-icon{font-size:1.65rem;color:var(--silver)}.meta-label{display:block;color:var(--yellow);font-size:.78rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.meta-value{display:block;margin-top:6px;font-weight:900}.lower{display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-top:24px}.panel{border:1px solid var(--border);border-radius:12px;background:rgba(49,55,57,.84);box-shadow:var(--shadow);padding:24px}.panel h2{margin:0 0 18px;font-size:1.35rem}.panel h2 span{color:var(--silver)}.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.stat{position:relative;min-height:78px;border:1px solid rgba(160,170,169,.20);border-radius:7px;background:rgba(126,128,124,.10);padding:16px 14px 12px 54px}.stat-icon{position:absolute;left:18px;top:27px;color:#e5e9e4;font-size:1.3rem}.stat-label{display:block;color:var(--silver);font-size:.76rem;font-weight:850;text-transform:uppercase}.stat strong{display:block;margin-top:4px;font-size:1.35rem}.attribute-title{margin:24px 0 14px;font-size:1.25rem;font-weight:950}.highlight{margin-top:16px;border:1px solid rgba(248,245,70,.22);border-radius:8px;background:linear-gradient(135deg,rgba(101,113,54,.48),rgba(248,245,70,.10));padding:18px;color:#eef1e8}.about{position:relative;overflow:hidden}.about:after{content:"A";position:absolute;right:26px;bottom:-38px;color:rgba(160,170,169,.06);font-size:12rem;font-weight:950}.about p{position:relative;margin:0;color:#d7ddd9;line-height:1.75}footer{margin-top:30px;text-align:center;color:rgba(160,170,169,.82);font-size:.9rem}
     @media(max-width:1120px){.hero{grid-template-columns:1fr 1fr}.portrait-card{grid-row:1}.hero-copy{grid-column:1/-1;grid-row:2}.info-panel{grid-column:2;grid-row:1}.lower{grid-template-columns:1fr}.meta-strip{grid-template-columns:1fr}.meta-item+.meta-item{border-left:0;border-top:1px solid rgba(160,170,169,.24)}}@media(max-width:760px){.nav{height:auto;align-items:flex-start;flex-direction:column;padding:16px 0}.tool-name{border-left:0;padding-left:0}.nav-links{margin-left:0;gap:14px;flex-wrap:wrap}.hero{grid-template-columns:1fr}.info-panel,.portrait-card,.hero-copy{grid-column:auto;grid-row:auto}.stats-grid,.info-grid{grid-template-columns:1fr 1fr}h1{font-size:3.5rem}}@media(max-width:520px){.page,.nav{width:min(100% - 20px,1280px)}.stats-grid,.info-grid{grid-template-columns:1fr}.portrait-card{min-height:320px}.button{width:100%}.meta-item{padding:22px}.panel{padding:18px}}
   </style>
 </head>
@@ -183,10 +226,10 @@ function createPage(operator) {
 
       <aside class="info-panel">
         <div class="info-grid">
-          ${info("Class", operatorClass, "➤")}
-          ${info("Element", elementType, "◆", elementClass(operator.element_type))}
-          ${info("Weapon", weaponType, "⚔")}
-          ${info("Role Attribute", mainAttribute, "✣")}
+          ${info("Class", operatorClass, iconMarkup(classIcon, `${operatorClass} class icon`, "➤"))}
+          ${info("Element", elementType, iconMarkup(elementIcon, `${elementType} element icon`, "◆"), elementClass(operator.element_type))}
+          ${info("Weapon", weaponType, `<span class="info-icon text-icon">⚔</span>`)}
+          ${info("Role Attribute", mainAttribute, `<span class="info-icon text-icon">✣</span>`)}
           <div class="info-card rarity"><span class="info-label">Rarity</span><div class="star-line">${stars(operator.star)}</div></div>
         </div>
       </aside>
