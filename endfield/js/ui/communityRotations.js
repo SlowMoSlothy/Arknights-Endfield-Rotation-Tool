@@ -277,10 +277,18 @@ function createCommunityTextElement(tagName, className, text) {
 }
 
 function getFocusedCommunityOperator() {
-    const operatorId = Number(communityRotationState.focusedOperatorId);
-    if (!Number.isFinite(operatorId)) return null;
+    const operatorId = getFocusedCommunityOperatorId();
+    if (operatorId === null) return null;
 
     return getCommunityOperatorById(operatorId);
+}
+
+function getFocusedCommunityOperatorId() {
+    const value = communityRotationState.focusedOperatorId;
+    if (value === null || value === undefined || value === "") return null;
+
+    const operatorId = Number(value);
+    return Number.isFinite(operatorId) ? operatorId : null;
 }
 
 function createCommunityStateCard({ type = "", title, message, actionLabel = "", action = null, loading = false }) {
@@ -531,11 +539,11 @@ function getFilteredCommunityRotations() {
     const query = communityRotationState.search.trim().toLowerCase();
     const elementFilter = normalizeCommunityFilterValue(communityRotationState.elementFilter);
     const classFilter = normalizeCommunityFilterValue(communityRotationState.classFilter);
-    const focusedOperatorId = Number(communityRotationState.focusedOperatorId);
+    const focusedOperatorId = getFocusedCommunityOperatorId();
 
     const filteredRotations = communityRotationState.rotations.filter(row => {
         const matchesSearch = !query || getCommunitySearchText(row).includes(query);
-        const matchesFocusedOperator = !Number.isFinite(focusedOperatorId)
+        const matchesFocusedOperator = focusedOperatorId === null
             || normalizeCommunityList(row.team_operator_ids).some(operatorId => Number(operatorId) === focusedOperatorId);
         const matchesElement = elementFilter === "all" || getCommunityElements(row)
             .map(normalizeCommunityFilterValue)
@@ -587,7 +595,7 @@ function sortCommunityRotations(rotations) {
 
 function hasActiveCommunityFilters() {
     return Boolean(communityRotationState.search.trim())
-        || Number.isFinite(Number(communityRotationState.focusedOperatorId))
+        || getFocusedCommunityOperatorId() !== null
         || communityRotationState.elementFilter !== "all"
         || communityRotationState.classFilter !== "all";
 }
