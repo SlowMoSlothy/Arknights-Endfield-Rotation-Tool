@@ -4,6 +4,7 @@ const communityRotationState = {
     elementFilter: "all",
     classFilter: "all",
     sort: "newest",
+    filtersOpen: false,
     detailRotationId: "",
     deepLinkRotationId: "",
     focusedOperatorId: null,
@@ -600,6 +601,34 @@ function hasActiveCommunityFilters() {
         || communityRotationState.classFilter !== "all";
 }
 
+function getActiveCommunityFilterCount() {
+    let count = 0;
+    if (getFocusedCommunityOperatorId() !== null) count += 1;
+    if (communityRotationState.elementFilter !== "all") count += 1;
+    if (communityRotationState.classFilter !== "all") count += 1;
+    if (communityRotationState.sort !== "newest") count += 1;
+    return count;
+}
+
+function renderCommunityFilterPanel() {
+    const panel = document.getElementById("communityFilterPanel");
+    const toggleButton = document.getElementById("toggleCommunityFiltersBtn");
+    const activeFilterCount = getActiveCommunityFilterCount();
+
+    if (panel) panel.hidden = !communityRotationState.filtersOpen;
+    if (!toggleButton) return;
+
+    toggleButton.textContent = activeFilterCount ? `Filters (${activeFilterCount})` : "Filters";
+    toggleButton.setAttribute("aria-expanded", String(communityRotationState.filtersOpen));
+    toggleButton.classList.toggle("is-open", communityRotationState.filtersOpen);
+    toggleButton.classList.toggle("is-active", activeFilterCount > 0);
+}
+
+function toggleCommunityFilters() {
+    communityRotationState.filtersOpen = !communityRotationState.filtersOpen;
+    renderCommunityFilterPanel();
+}
+
 function getCommunityFilterIconPath(filterKey, value) {
     if (value === "all") return "";
     if (typeof getFilterIconPath === "function") return getFilterIconPath(filterKey, value);
@@ -683,6 +712,7 @@ function renderCommunityFilters() {
 
     const sortSelect = document.getElementById("communitySortSelect");
     if (sortSelect) sortSelect.value = communityRotationState.sort;
+    renderCommunityFilterPanel();
 }
 
 function getActiveCommunityDetailRow() {
@@ -1177,17 +1207,10 @@ function createCommunityRotationCard(row) {
 
     const rotationPreview = createCommunityRotationPreview(row);
 
-    const description = createCommunityTextElement(
-        "p",
-        "community-description",
-        row.description || "No description added."
-    );
-
-    const chipRow = document.createElement("div");
-    chipRow.className = "community-chip-row";
-    [...getCommunityElements(row), ...getCommunityClasses(row)].slice(0, 8).forEach(label => {
-        chipRow.appendChild(createCommunityTextElement("span", "community-chip", formatCommunityLabel(label)));
-    });
+    const descriptionText = String(row.description || "").trim();
+    const description = descriptionText
+        ? createCommunityTextElement("p", "community-description", descriptionText)
+        : null;
 
     const footer = document.createElement("div");
     footer.className = "community-card-footer";
@@ -1202,7 +1225,9 @@ function createCommunityRotationCard(row) {
     actions.append(createCommunityDetailButton(row), createCommunityCopyLinkButton(row, "Link"), createCommunityLikeButton(row));
     footer.appendChild(actions);
 
-    card.append(header, team, rotationPreview, description, chipRow, footer);
+    card.append(header, team, rotationPreview);
+    if (description) card.appendChild(description);
+    card.appendChild(footer);
     return card;
 }
 
@@ -1454,6 +1479,7 @@ function closeCommunityRotationsModal() {
     if (!modal) return;
 
     setCommunitySubmitFormOpen(false);
+    communityRotationState.filtersOpen = false;
     communityRotationState.detailRotationId = "";
     renderCommunityDetailPanel();
     modal.classList.remove("open");
@@ -1512,6 +1538,7 @@ function initCommunityRotations() {
     const openButton = document.getElementById("openCommunityRotationsBtn");
     const closeButton = document.getElementById("closeCommunityModalBtn");
     const refreshButton = document.getElementById("refreshCommunityRotationsBtn");
+    const filterToggle = document.getElementById("toggleCommunityFiltersBtn");
     const submitToggle = document.getElementById("openCommunitySubmitFormBtn");
     const submitForm = document.getElementById("communitySubmitForm");
     const cancelSubmitButton = document.getElementById("cancelCommunitySubmitBtn");
@@ -1526,6 +1553,7 @@ function initCommunityRotations() {
         link.addEventListener("click", openCommunityRotationsFromLink);
     });
     if (closeButton) closeButton.addEventListener("click", closeCommunityRotationsModal);
+    if (filterToggle) filterToggle.addEventListener("click", toggleCommunityFilters);
     if (refreshButton) refreshButton.addEventListener("click", () => fetchCommunityRotations(true));
     if (submitToggle) submitToggle.addEventListener("click", () => setCommunitySubmitFormOpen(true));
     if (submitForm) submitForm.addEventListener("submit", submitCommunityRotation);

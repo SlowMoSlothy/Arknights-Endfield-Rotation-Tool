@@ -524,12 +524,14 @@
             placeholder="Rotation, author, operator">
         </label>
         <div class="community-toolbar-actions">
+          <button id="toggleCommunityFiltersBtn" class="community-filter-toggle" type="button"
+            aria-expanded="false" aria-controls="communityFilterPanel">Filters</button>
           <button id="refreshCommunityRotationsBtn" class="community-refresh-btn" type="button">Refresh</button>
           <button id="openCommunitySubmitFormBtn" class="community-submit-toggle" type="button">Submit Current</button>
         </div>
       </div>
 
-      <div class="community-filter-panel" aria-label="Community rotation filters">
+      <div id="communityFilterPanel" class="community-filter-panel" aria-label="Community rotation filters" hidden>
         <div class="community-filter-group">
           <span class="community-filter-label">Element</span>
           <div id="communityElementFilters" class="community-filter-options"></div>
