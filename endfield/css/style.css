@@ -1,6 +1,6 @@
 @import url("base.css");
 @import url("loading.css");
-@import url("layout.css");
+@import url("layout.css?v=2");
 @import url("team.css");
 @import url("community.css");
 @import url("my-rotations.css");
@@ -575,6 +575,17 @@
 .operator-gallery-detail-actions {
     max-width: 560px;
     grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.operator-gallery-detail-actions .operator-gallery-landing-link {
+    grid-column: 1 / -1;
+    min-height: 36px;
+    border-color: rgba(248,245,70,0.62);
+    background:
+        radial-gradient(circle at 50% 0%, rgba(248,245,70,0.20), transparent 64%),
+        linear-gradient(180deg, rgba(73,77,43,0.82), rgba(18,20,13,0.98));
+    color: #F8F546;
+    font-weight: 900;
 }
 
 .operator-gallery-summary-panel {

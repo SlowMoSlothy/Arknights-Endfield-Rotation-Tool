@@ -37,6 +37,7 @@ function mapDatabaseOperator(row, skillRows) {
     return {
         ...raw,
         id: row.id,
+        slug: row.slug || raw.slug,
         name: row.name || raw.name,
         star: row.star ?? raw.star,
         operatorClass: row.operator_class || raw.operatorClass,
