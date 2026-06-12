@@ -1,6 +1,6 @@
 @import url("base.css");
 @import url("loading.css");
-@import url("layout.css?v=2");
+@import url("layout.css?v=3");
 @import url("team.css");
 @import url("community.css");
 @import url("my-rotations.css");
@@ -10,7 +10,7 @@
 @import url("dragdrop.css");
 @import url("effects.css");
 @import url("enemy.css");
-@import url("mobile.css");
+@import url("mobile.css?v=12");
 @import url("tooltip.css");
 @import url("skill-elements.css");
 .seo-description {
