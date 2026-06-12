@@ -46,7 +46,7 @@
 </head>
 
 <body class="app-loading">
-  <link rel="stylesheet" href="css/settings.css?v=6">
+  <link rel="stylesheet" href="css/settings.css?v=7">
   <div id="globalTooltip" class="global-tooltip"></div>
 
   <div id="appLoadingScreen" class="app-loading-screen" role="status" aria-live="polite" aria-busy="true">
@@ -307,7 +307,7 @@
     <div class="settings-dialog">
       <div class="settings-header">
         <h2 class="settings-title">Settings</h2>
-        <button id="closeSettingsBtn" class="settings-close" type="button">×</button>
+        <button id="closeSettingsBtn" class="settings-close" type="button" aria-label="Close settings">×</button>
       </div>
       <div class="settings-section">
         <span class="settings-label">Rotation Mode</span>
@@ -383,7 +383,7 @@
     <div class="settings-dialog my-rotations-dialog">
       <div class="settings-header">
         <h2 id="myRotationsTitle" class="settings-title">My Rotations</h2>
-        <button id="closeMyRotationsModalBtn" class="settings-close" type="button">&times;</button>
+        <button id="closeMyRotationsModalBtn" class="settings-close" type="button" aria-label="Close my rotations">&times;</button>
       </div>
 
       <section id="myRotationsAuthPanel" class="my-rotations-auth-panel">
@@ -436,7 +436,7 @@
     <div class="settings-dialog my-profile-dialog">
       <div class="settings-header">
         <h2 class="settings-title">Profile</h2>
-        <button id="closeProfileModalBtn" class="settings-close" type="button">&times;</button>
+        <button id="closeProfileModalBtn" class="settings-close" type="button" aria-label="Close profile">&times;</button>
       </div>
 
       <section class="my-account-panel">
@@ -471,7 +471,7 @@
     <div class="settings-dialog my-profile-dialog">
       <div class="settings-header">
         <h2 class="settings-title">Reset Password</h2>
-        <button id="closePasswordResetModalBtn" class="settings-close" type="button">&times;</button>
+        <button id="closePasswordResetModalBtn" class="settings-close" type="button" aria-label="Close password reset">&times;</button>
       </div>
 
       <p class="my-rotations-intro">Enter a new password for your account.</p>
@@ -498,7 +498,7 @@
     <div class="settings-dialog rotation-quick-save-dialog">
       <div class="settings-header">
         <h2 id="rotationQuickSaveTitle" class="settings-title">Save Rotation</h2>
-        <button id="closeRotationQuickSaveModalBtn" class="settings-close" type="button">&times;</button>
+        <button id="closeRotationQuickSaveModalBtn" class="settings-close" type="button" aria-label="Close save rotation">&times;</button>
       </div>
 
       <p id="rotationQuickSaveIntro" class="my-rotations-intro">Save this rotation.</p>
@@ -526,7 +526,7 @@
     <div class="settings-dialog community-dialog">
       <div class="settings-header">
         <h2 class="settings-title">Community Rotations</h2>
-        <button id="closeCommunityModalBtn" class="settings-close" type="button">&times;</button>
+        <button id="closeCommunityModalBtn" class="settings-close" type="button" aria-label="Close community rotations">&times;</button>
       </div>
 
       <div class="community-toolbar">
@@ -601,7 +601,7 @@
     <div class="settings-dialog operator-gallery-dialog">
       <div class="settings-header">
         <h2 class="settings-title">Operator Gallery</h2>
-        <button id="closeOperatorGalleryBtn" class="settings-close" type="button">&times;</button>
+        <button id="closeOperatorGalleryBtn" class="settings-close" type="button" aria-label="Close operator gallery">&times;</button>
       </div>
 
       <div class="operator-gallery-toolbar">
@@ -640,7 +640,7 @@
     <div class="settings-dialog operator-gallery-dialog">
       <div class="settings-header">
         <h2 class="settings-title">Operator Details</h2>
-        <button id="closeOperatorDetailBtn" class="settings-close" type="button">&times;</button>
+        <button id="closeOperatorDetailBtn" class="settings-close" type="button" aria-label="Close operator details">&times;</button>
       </div>
 
       <section id="operatorGalleryDetail" class="operator-gallery-detail"></section>
@@ -651,7 +651,7 @@
     <div class="settings-dialog admin-dialog">
       <div class="settings-header">
         <h2 class="settings-title">Admin Review</h2>
-        <button id="closeAdminPanelBtn" class="settings-close" type="button">&times;</button>
+        <button id="closeAdminPanelBtn" class="settings-close" type="button" aria-label="Close admin review">&times;</button>
       </div>
 
       <section id="adminLoginPanel" class="admin-login-panel">
@@ -697,7 +697,7 @@
     <div class="settings-dialog">
       <div class="settings-header">
         <h2 class="settings-title">Select Enemy</h2>
-        <button id="closeEnemyModalBtn" class="settings-close" type="button">×</button>
+        <button id="closeEnemyModalBtn" class="settings-close" type="button" aria-label="Close enemy selection">×</button>
       </div>
       <div id="enemyModalList" class="settings-section"></div>
     </div>
