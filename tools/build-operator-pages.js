@@ -502,7 +502,7 @@ function siteHeader() {
 
 function createOperatorPage(operator, allOperators, skillsByOperator) {
   const pageUrl = pageUrlFor(operator);
-  const toolUrl = `${SITE_URL}${BASE_PATH}/#operator-${operator.slug}`;
+  const toolUrl = `${SITE_URL}${BASE_PATH}/?leader=${encodeURIComponent(operator.slug)}`;
   const avatarPath = normalizeAssetPath(operator.icon_path);
   const avatarUrl = `${SITE_URL}${avatarPath}`;
 

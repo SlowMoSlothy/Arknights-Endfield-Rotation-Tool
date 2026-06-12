@@ -230,6 +230,44 @@ function setAppLoading(isLoading) {
     }, 260);
 }
 
+function normalizeLeaderOperatorKey(value) {
+    return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "");
+}
+
+function consumeLeaderOperatorFromUrl() {
+    const url = new URL(window.location.href);
+    const leaderKey = url.searchParams.get("leader");
+    if (!leaderKey || typeof operators === "undefined" || !Array.isArray(operators)) {
+        return false;
+    }
+
+    const normalizedLeaderKey = normalizeLeaderOperatorKey(leaderKey);
+    const operator = operators.find(item => {
+        return [
+            item?.slug,
+            item?.name,
+            item?.id
+        ].some(value => normalizeLeaderOperatorKey(value) === normalizedLeaderKey);
+    });
+
+    url.searchParams.delete("leader");
+    history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+
+    if (!operator) {
+        console.warn(`Leader operator could not be found: ${leaderKey}`);
+        return false;
+    }
+
+    selectedTeam = [operator.id, null, null, null];
+    activeSlotIndex = 1;
+    saveTeam();
+    clearRotation();
+    return true;
+}
+
 function getVisibleTransientDebuffsForCurrentSkill(skillData) {
     return (skillData?.debuffs || [])
         .filter(effect => effect.visible !== false && effect.persistsForCombo === false)
@@ -313,7 +351,10 @@ async function initApp() {
         loadOperatorUltimateStates();
         loadTeam();
         loadRotation();
-        loadBuildShareCodeFromUrl();
+        const loadedSharedBuild = loadBuildShareCodeFromUrl();
+        if (!loadedSharedBuild) {
+            consumeLeaderOperatorFromUrl();
+        }
 
         renderTeamSlots();
         renderOperatorList();
