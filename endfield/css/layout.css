@@ -145,7 +145,7 @@
 
 .builder-content {
     display: grid;
-    grid-template-columns: 240px 1fr;
+    grid-template-columns: 280px minmax(0, 1fr);
     gap: 24px;
 }
 
@@ -181,11 +181,11 @@
     width: 100%;
     min-height: 52px;
     display: grid;
-    grid-template-columns: 36px minmax(0, 1fr) 14px;
+    grid-template-columns: 34px minmax(0, 1fr) 12px;
     align-items: center;
-    gap: 11px;
+    gap: 9px;
     box-sizing: border-box;
-    padding: 8px 12px 8px 9px;
+    padding: 8px 10px 8px 9px;
     border-radius: 9px;
     border: 1px solid rgba(160,170,169,0.24);
     border-left: 3px solid rgba(101,113,54,0.9);
@@ -265,9 +265,10 @@
 
 .sidebar-command-label {
     min-width: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    overflow: visible;
+    overflow-wrap: break-word;
+    text-overflow: clip;
 }
 
 .sidebar-command-signal {
