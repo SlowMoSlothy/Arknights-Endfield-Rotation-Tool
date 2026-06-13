@@ -481,7 +481,7 @@ function relatedCard(operator) {
     : `<span class="related-avatar avatar-placeholder" role="img" aria-label="No image available for ${escapeHtml(operator.name)}">RF</span>`;
 
   return `<a class="related-card" href="${localPageUrlFor(operator)}">
-    ${avatarMarkup}
+    <span class="related-avatar-frame">${avatarMarkup}</span>
     <div>
       <strong>${escapeHtml(operator.name)}</strong>
       <span>${escapeHtml(formatLabel(operator.operator_class))} · ${escapeHtml(formatLabel(operator.element_type))}</span>
@@ -533,6 +533,7 @@ function baseStyles() {
     @media(min-width:1001px){.operator-page .portrait-media{left:16px;right:8px;border-radius:10px}}
     @media(min-width:761px) and (max-width:1000px){.operator-page .portrait-media{left:16px;right:8px;border-radius:10px}}
     @media(max-width:760px){.operator-page .portrait-media{left:50%;right:auto;width:min(calc(100% - 32px),270px);transform:translate(-50%,-43%)}}
+    .operator-page .related-card{grid-template-columns:62px minmax(0,1fr)}.operator-page .related-avatar-frame{display:grid;place-items:center;width:62px;aspect-ratio:1;overflow:hidden;padding:3px;border:1px solid rgba(216,224,220,.3);border-radius:11px;background:radial-gradient(circle at 50% 22%,rgba(248,245,70,.09),transparent 52%),linear-gradient(145deg,rgba(25,31,32,.18),rgba(15,19,20,.68));box-shadow:inset 0 0 0 1px rgba(255,255,255,.03),0 8px 18px rgba(0,0,0,.22);transition:border-color .16s ease,box-shadow .16s ease}.operator-page .related-avatar{display:block;width:100%;height:100%;object-fit:contain;border-radius:8px}.operator-page .related-avatar-frame .avatar-placeholder{border:0;background:transparent}.operator-page .related-card:hover .related-avatar-frame{border-color:rgba(248,245,70,.55);box-shadow:inset 0 0 0 1px rgba(248,245,70,.08),0 8px 20px rgba(0,0,0,.28)}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.related-card,.operator-tile{transition:none}}
   </style>`;
 }

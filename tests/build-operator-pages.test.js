@@ -185,7 +185,14 @@ test("operator pages render the compact rotation overview without redundant fiel
     ]
   ]);
 
-  const page = createOperatorPage(entry, [entry], skills);
+  const relatedEntry = operator({
+    id: 2,
+    slug: "antal",
+    name: "Antal",
+    icon_path: "assets/operators/antal.webp",
+    sort_order: 2
+  });
+  const page = createOperatorPage(entry, [entry, relatedEntry], skills);
 
   assert.match(page, /<span class="operator-name">Mi Fu<\/span><span class="rotation-guide-label">Rotation Guide<\/span>/);
   assert.match(page, /class="hero-stats"/);
@@ -202,6 +209,8 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /href="#rotation-profile">Overview/);
   assert.match(page, /href="#related">Related/);
   assert.match(page, /id="related"/);
+  assert.match(page, /class="related-avatar-frame"/);
+  assert.match(page, /\.operator-page \.related-avatar-frame/);
   assert.match(page, /name="twitter:card" content="summary_large_image"/);
   assert.match(page, /property="og:image:alt"/);
   assert.match(page, /"@type":"WebPage"/);
