@@ -121,6 +121,9 @@ test("generated pages use placeholders when an operator image is missing", () =>
   assert.match(index, /avatar-placeholder/);
   assert.doesNotMatch(index, /Arknights: Endfield Rotation Tool/);
   assert.doesNotMatch(index, /class="tool-name"/);
+  assert.doesNotMatch(index, /<a href="https:\/\/rotationforge\.gg\/endfield\/operators\/">Operators<\/a>/);
+  assert.match(index, /class="nav-cta"/);
+  assert.match(index, /\.operator-index \.nav,\.operator-index \.page\{width:min\(1120px/);
   assert.doesNotMatch(index, /src="\/endfield\/"/);
 });
 
