@@ -24,7 +24,6 @@ function operator(overrides = {}) {
     operator_class: "supporter",
     element_type: "nature",
     icon_path: "assets/operators/mi_fu.webp",
-    can_enter_ultimate_state: false,
     weapon_type: "arts_unit",
     main_attribute: "intellect",
     secondary_attribute: "will",
@@ -120,6 +119,42 @@ test("generated pages use placeholders when an operator image is missing", () =>
   assert.doesNotMatch(page, /src="\/endfield\/"/);
   assert.match(index, /avatar-placeholder/);
   assert.doesNotMatch(index, /src="\/endfield\/"/);
+});
+
+test("operator pages render the compact rotation overview without redundant fields", () => {
+  const entry = operator();
+  const skills = new Map([
+    [
+      entry.id,
+      [
+        {
+          id: 1,
+          operator_id: entry.id,
+          slot_index: 1,
+          name: "Opening Move",
+          skill_type: "battle_skill",
+          short_type: "bs",
+          cooldown: 12,
+          energy: null,
+          element_type: "nature",
+          description: "Starts the rotation.",
+          raw_data: { sp_cost: 100 }
+        }
+      ]
+    ]
+  ]);
+
+  const page = createOperatorPage(entry, [entry], skills);
+
+  assert.match(page, /<span class="operator-name">Mi Fu<\/span><span class="rotation-guide-label">Rotation Guide<\/span>/);
+  assert.match(page, /class="hero-stats"/);
+  assert.match(page, /Mi Fu Rotation Overview/);
+  assert.match(page, /fetchpriority="high"/);
+  assert.match(page, /Database ID: OPERATOR_MI_FU/);
+  assert.doesNotMatch(page, /Back to Operator Database/);
+  assert.doesNotMatch(page, /Open Rotation Tool/);
+  assert.doesNotMatch(page, /<section class="meta-strip">/);
+  assert.doesNotMatch(page, />Ultimate</);
 });
 
 test("writeGeneratedOutput replaces output and sitemap without leaving temporary files", () => {
