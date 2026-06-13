@@ -421,8 +421,7 @@ function buildRotationProfile(operator, skills) {
     aboutText: aboutParts.join(" "),
     timingText,
     interactionText,
-    skillNames,
-    featuredSkills: signatureSkills
+    skillNames
   };
 }
 
@@ -598,8 +597,6 @@ export function createOperatorPage(operator, allOperators, skillsByOperator) {
 
   const title = `${name} Rotation Guide, Skills & Stats | Arknights Endfield`;
   const description = metaDescriptionFor(operator);
-  const featuredSkills = profile.featuredSkills;
-  const heroDescription = `${name} is a ${operator.star}-star ${elementType} ${operatorClass} using ${weaponType}.${featuredSkills.length > 0 ? ` Key skills include ${englishList(featuredSkills)}.` : ""} Review skill order, combo triggers, cooldowns and resource costs before opening the planner.`;
   const skillOrderText = profile.skillNames.length > 0
     ? `${profile.skillNames.slice(0, 4).join(" → ")}${profile.skillNames.length > 4 ? ` → +${profile.skillNames.length - 4} more` : ""}`
     : `No skill order is stored for ${name} yet.`;
@@ -715,7 +712,6 @@ export function createOperatorPage(operator, allOperators, skillsByOperator) {
         <div class="eyebrow">Arknights: Endfield Operator</div>
         <h1><span class="operator-name">${escapeHtml(name)}</span><span class="rotation-guide-label">Rotation Guide</span></h1>
         <div class="stars" aria-label="${operator.star} star operator">${stars(operator.star)}</div>
-        <p class="subtitle">${escapeHtml(heroDescription)}</p>
         <div class="actions">
           <a class="button primary" href="${toolUrl}">Plan with ${escapeHtml(name)} ↗</a>
         </div>

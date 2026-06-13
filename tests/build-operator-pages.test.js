@@ -195,7 +195,9 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /aspect-ratio:1/);
   assert.match(page, /object-position:center bottom/);
   assert.match(page, /Database ID: OPERATOR_MI_FU/);
-  assert.match(page, /Key skills include Battle Setup, Combo Burst, and Ultimate Finish/);
+  assert.match(page, /<h2>About Mi Fu<\/h2>/);
+  assert.match(page, /Key listed skills include Battle Setup, Combo Burst, and Ultimate Finish/);
+  assert.doesNotMatch(page, /class="subtitle"/);
   assert.match(page, /class="section-nav"/);
   assert.match(page, /href="#rotation-profile">Overview/);
   assert.match(page, /href="#related">Related/);
