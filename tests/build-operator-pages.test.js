@@ -195,7 +195,7 @@ test("operator pages render the compact rotation overview without redundant fiel
   const page = createOperatorPage(entry, [entry, relatedEntry], skills);
 
   assert.match(page, /<span class="operator-name">Mi Fu<\/span><span class="rotation-guide-label">Rotation Guide<\/span>/);
-  assert.match(page, /class="hero-stats"/);
+  assert.doesNotMatch(page, /class="hero-stats"/);
   assert.match(page, /Mi Fu Rotation Overview/);
   assert.match(page, /fetchpriority="high"/);
   assert.match(page, /class="portrait-media"/);
@@ -203,6 +203,12 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /object-position:center bottom/);
   assert.match(page, /Database ID: OPERATOR_MI_FU/);
   assert.match(page, /<h2>About Mi Fu<\/h2>/);
+  assert.match(page, /<h2>Mi Fu Attributes<\/h2>/);
+  assert.match(page, /Values shown at Level 1/);
+  assert.match(page, /class="stats-grid attribute-stats"/);
+  assert.match(page, /<span class="stat-label">HP<\/span>/);
+  assert.match(page, /<span class="stat-label">ATK<\/span>/);
+  assert.doesNotMatch(page, /<span class="stat-label">Level<\/span>/);
   assert.match(page, /Key listed skills include Battle Setup, Combo Burst, and Ultimate Finish/);
   assert.doesNotMatch(page, /class="subtitle"/);
   assert.match(page, /class="section-nav"/);

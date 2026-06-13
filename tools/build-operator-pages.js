@@ -534,6 +534,8 @@ function baseStyles() {
     @media(min-width:761px) and (max-width:1000px){.operator-page .portrait-media{left:16px;right:8px;border-radius:10px}}
     @media(max-width:760px){.operator-page .portrait-media{left:50%;right:auto;width:min(calc(100% - 32px),270px);transform:translate(-50%,-43%)}}
     .operator-page .related-card{grid-template-columns:62px minmax(0,1fr)}.operator-page .related-avatar-frame{display:grid;place-items:center;width:62px;aspect-ratio:1;overflow:hidden;padding:3px;border:1px solid rgba(216,224,220,.3);border-radius:11px;background:radial-gradient(circle at 50% 22%,rgba(248,245,70,.09),transparent 52%),linear-gradient(145deg,rgba(25,31,32,.18),rgba(15,19,20,.68));box-shadow:inset 0 0 0 1px rgba(255,255,255,.03),0 8px 18px rgba(0,0,0,.22);transition:border-color .16s ease,box-shadow .16s ease}.operator-page .related-avatar{display:block;width:100%;height:100%;object-fit:contain;border-radius:8px}.operator-page .related-avatar-frame .avatar-placeholder{border:0;background:transparent}.operator-page .related-card:hover .related-avatar-frame{border-color:rgba(248,245,70,.55);box-shadow:inset 0 0 0 1px rgba(248,245,70,.08),0 8px 20px rgba(0,0,0,.28)}
+    .operator-page .attribute-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}.operator-page .attribute-heading h2{margin:0}.operator-page .attribute-level{flex:0 0 auto;padding:6px 9px;border:1px solid rgba(248,245,70,.22);border-radius:999px;color:var(--yellow);background:rgba(248,245,70,.06);font-size:.64rem;font-weight:850;letter-spacing:.04em}.operator-page .attribute-stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+    @media(max-width:520px){.operator-page .attribute-heading{align-items:flex-start;flex-direction:column;gap:7px}.operator-page .attribute-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.related-card,.operator-tile{transition:none}}
   </style>`;
 }
@@ -602,13 +604,9 @@ export function createOperatorPage(operator, allOperators, skillsByOperator) {
     ? `${profile.skillNames.slice(0, 4).join(" → ")}${profile.skillNames.length > 4 ? ` → +${profile.skillNames.length - 4} more` : ""}`
     : `No skill order is stored for ${name} yet.`;
 
-  const baseStatsHtml = [
+  const attributeStatsHtml = [
     stat("HP", operator.base_hp, "♥"),
     stat("ATK", operator.base_atk, "⚔"),
-    stat("Level", operator.base_stats_level, "▣")
-  ].join("\n");
-
-  const attributeStatsHtml = [
     stat("Strength", operator.base_strength, "●"),
     stat("Agility", operator.base_agility, "✦"),
     stat("Intellect", operator.base_intellect, "◆"),
@@ -716,7 +714,6 @@ export function createOperatorPage(operator, allOperators, skillsByOperator) {
         <div class="actions">
           <a class="button primary" href="${toolUrl}">Plan with ${escapeHtml(name)} ↗</a>
         </div>
-        <div class="hero-stats">${baseStatsHtml}</div>
       </section>
 
       <aside class="info-panel">
@@ -744,8 +741,11 @@ export function createOperatorPage(operator, allOperators, skillsByOperator) {
 
     <section class="lower" id="stats">
       <article class="panel">
-        <h2>${escapeHtml(name)} Attributes</h2>
-        <div class="stats-grid">${attributeStatsHtml}</div>
+        <div class="attribute-heading">
+          <h2>${escapeHtml(name)} Attributes</h2>
+          <span class="attribute-level">Values shown at Level ${escapeHtml(numberValue(operator.base_stats_level))}</span>
+        </div>
+        <div class="stats-grid attribute-stats">${attributeStatsHtml}</div>
       </article>
 
       <article class="panel about">
