@@ -24,7 +24,10 @@ jobs:
           node-version: 22
 
       - name: Pakete installieren
-        run: npm install
+        run: npm ci
+
+      - name: Generator testen
+        run: npm test
 
       - name: Operator-Seiten bauen
         run: npm run build:operators
