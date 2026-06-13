@@ -115,6 +115,7 @@ test("generated pages use placeholders when an operator image is missing", () =>
   const index = createIndexPage([entry]);
 
   assert.match(page, /portrait-placeholder/);
+  assert.match(page, /class="portrait-media"/);
   assert.doesNotMatch(page, /property="og:image"/);
   assert.doesNotMatch(page, /src="\/endfield\/"/);
   assert.match(index, /avatar-placeholder/);
@@ -190,6 +191,9 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /class="hero-stats"/);
   assert.match(page, /Mi Fu Rotation Overview/);
   assert.match(page, /fetchpriority="high"/);
+  assert.match(page, /class="portrait-media"/);
+  assert.match(page, /aspect-ratio:1/);
+  assert.match(page, /object-position:center bottom/);
   assert.match(page, /Database ID: OPERATOR_MI_FU/);
   assert.match(page, /Key skills include Battle Setup, Combo Burst, and Ultimate Finish/);
   assert.match(page, /class="section-nav"/);

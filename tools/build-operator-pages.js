@@ -530,6 +530,10 @@ function baseStyles() {
     @media(min-width:761px) and (max-width:1000px){.operator-page .hero{grid-template-columns:210px minmax(0,1fr);grid-template-areas:"portrait copy" "info info"}.operator-page .portrait-card{min-height:290px}.operator-page .portrait{width:min(205px,88%);max-height:245px}.operator-page .hero-stats{max-width:none}.operator-page .overview-section{margin-top:12px}}
     @media(max-width:760px){.operator-page .nav{height:58px;padding:0;flex-direction:row;align-items:center;gap:9px}.operator-page .brand{flex:0 0 auto;gap:8px;font-size:.88rem}.operator-page .mark{width:32px;height:32px;border-radius:7px}.operator-page .tool-name{min-width:0;margin-left:auto;padding-left:9px;border-left:1px solid rgba(160,170,169,.25);font-size:.7rem;white-space:nowrap}.operator-page .tool-name-full{display:none}.operator-page .tool-name-short{display:inline}.operator-page .breadcrumbs{margin-bottom:10px}.operator-page .section-nav{margin-bottom:14px}.operator-page .rotation-guide-label{font-size:.3em}.operator-page .hero-stats{max-width:none}.operator-page .overview-section{padding:16px}.operator-page .overview-section .profile-heading p{text-align:left}.operator-page footer{display:block}.operator-page .database-ref{display:block;margin-top:5px}}
     @media(max-width:520px){.operator-page .brand{font-size:.82rem}.operator-page .tool-name{font-size:.66rem}.operator-page .hero-stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.operator-page .hero-stats .stat{padding-left:30px}.operator-page .hero-stats .stat-icon{left:9px}.operator-page .overview-section .profile-card{min-height:auto}}
+    .operator-page .portrait-media{position:absolute;left:20px;right:10px;top:50%;z-index:1;aspect-ratio:1;overflow:hidden;border:1px solid rgba(216,224,220,.3);border-radius:13px;background:radial-gradient(circle at 50% 22%,rgba(248,245,70,.1),transparent 48%),linear-gradient(155deg,rgba(25,31,32,.08),rgba(15,19,20,.62));box-shadow:inset 0 0 0 1px rgba(255,255,255,.035),0 14px 30px rgba(0,0,0,.2);transform:translateY(-43%)}.operator-page .portrait-media:after{content:"";position:absolute;inset:auto 0 0;height:24%;z-index:2;pointer-events:none;background:linear-gradient(180deg,transparent,rgba(16,20,21,.28))}.operator-page .portrait-media .portrait{left:50%;top:auto;bottom:0;width:100%;height:100%;max-width:none;max-height:none;object-fit:contain;object-position:center bottom;transform:translateX(-50%);filter:drop-shadow(0 16px 18px rgba(0,0,0,.42))}.operator-page .portrait-media .portrait-placeholder{position:absolute;inset:12%;width:auto;aspect-ratio:auto;transform:none}.operator-page .portrait-card:before,.operator-page .portrait-card:after{z-index:3}.operator-page .portrait-card .barcode{z-index:4}
+    @media(min-width:1001px){.operator-page .portrait-media{left:16px;right:8px;border-radius:10px}}
+    @media(min-width:761px) and (max-width:1000px){.operator-page .portrait-media{left:16px;right:8px;border-radius:10px}}
+    @media(max-width:760px){.operator-page .portrait-media{left:50%;right:auto;width:min(calc(100% - 32px),270px);transform:translate(-50%,-43%)}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.related-card,.operator-tile{transition:none}}
   </style>`;
 }
@@ -701,7 +705,9 @@ export function createOperatorPage(operator, allOperators, skillsByOperator) {
 
     <main class="hero">
       <section class="portrait-card">
-        ${portraitMarkup}
+        <div class="portrait-media">
+          ${portraitMarkup}
+        </div>
         <span class="barcode">ROTATIONFORGE DATABASE</span>
       </section>
 
