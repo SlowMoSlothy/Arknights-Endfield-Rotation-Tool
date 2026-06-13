@@ -131,7 +131,33 @@ test("operator pages render the compact rotation overview without redundant fiel
           id: 1,
           operator_id: entry.id,
           slot_index: 1,
-          name: "Opening Move",
+          name: "Opening Strike",
+          skill_type: "final_strike",
+          short_type: "fs",
+          cooldown: 8,
+          energy: null,
+          element_type: "nature",
+          description: "Starts the rotation.",
+          raw_data: {}
+        },
+        {
+          id: 2,
+          operator_id: entry.id,
+          slot_index: 2,
+          name: "Ultimate Finish",
+          skill_type: "ultimate",
+          short_type: "ult",
+          cooldown: 60,
+          energy: 100,
+          element_type: "nature",
+          description: "Finishes the rotation.",
+          raw_data: {}
+        },
+        {
+          id: 3,
+          operator_id: entry.id,
+          slot_index: 3,
+          name: "Battle Setup",
           skill_type: "battle_skill",
           short_type: "bs",
           cooldown: 12,
@@ -139,6 +165,20 @@ test("operator pages render the compact rotation overview without redundant fiel
           element_type: "nature",
           description: "Starts the rotation.",
           raw_data: { sp_cost: 100 }
+        },
+        {
+          id: 4,
+          operator_id: entry.id,
+          slot_index: 4,
+          name: "Combo Burst",
+          skill_type: "combo_skill",
+          short_type: "cs",
+          cooldown: 20,
+          energy: null,
+          element_type: "nature",
+          description: "Triggers the combo.",
+          combo_trigger: "final_strike",
+          raw_data: {}
         }
       ]
     ]
@@ -151,10 +191,22 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /Mi Fu Rotation Overview/);
   assert.match(page, /fetchpriority="high"/);
   assert.match(page, /Database ID: OPERATOR_MI_FU/);
+  assert.match(page, /Key skills include Battle Setup, Combo Burst, and Ultimate Finish/);
+  assert.match(page, /class="section-nav"/);
+  assert.match(page, /href="#rotation-profile">Overview/);
+  assert.match(page, /href="#related">Related/);
+  assert.match(page, /id="related"/);
+  assert.match(page, /name="twitter:card" content="summary_large_image"/);
+  assert.match(page, /property="og:image:alt"/);
+  assert.match(page, /"@type":"WebPage"/);
+  assert.match(page, /a:focus-visible/);
+  assert.match(page, /class="tool-name-short"/);
   assert.doesNotMatch(page, /Back to Operator Database/);
   assert.doesNotMatch(page, /Open Rotation Tool/);
+  assert.doesNotMatch(page, /class="nav-links"/);
   assert.doesNotMatch(page, /<section class="meta-strip">/);
-  assert.doesNotMatch(page, />Ultimate</);
+  assert.doesNotMatch(page, /<span class="stat-label">Ultimate<\/span>/);
+  assert.doesNotMatch(page, /-webkit-line-clamp/);
 });
 
 test("writeGeneratedOutput replaces output and sitemap without leaving temporary files", () => {

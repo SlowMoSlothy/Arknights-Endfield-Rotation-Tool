@@ -287,6 +287,55 @@ function numericValues(values) {
   );
 }
 
+function canonicalSkillType(skill) {
+  const aliases = {
+    bs: "battle_skill",
+    battle: "battle_skill",
+    cs: "combo_skill",
+    combo: "combo_skill",
+    fs: "final_strike",
+    ult: "ultimate"
+  };
+  const values = [skill.skill_type, skill.short_type]
+    .map(normalizeKey)
+    .filter(Boolean);
+
+  for (const value of values) {
+    if (aliases[value]) return aliases[value];
+    if (["battle_skill", "combo_skill", "final_strike", "ultimate"].includes(value)) {
+      return value;
+    }
+  }
+
+  return values[0] || "skill";
+}
+
+function featuredSkillNames(skills, limit = 3) {
+  const selected = [];
+  const selectedSkills = new Set();
+  const priorities = ["battle_skill", "combo_skill", "ultimate"];
+
+  for (const skillType of priorities) {
+    const skill = skills.find(
+      (entry) => canonicalSkillType(entry) === skillType && !selectedSkills.has(entry)
+    );
+    if (!skill?.name) continue;
+
+    selected.push(formatValue(skill.name));
+    selectedSkills.add(skill);
+  }
+
+  for (const skill of skills) {
+    if (selected.length >= limit) break;
+    if (!skill?.name || selectedSkills.has(skill)) continue;
+
+    selected.push(formatValue(skill.name));
+    selectedSkills.add(skill);
+  }
+
+  return uniqueValues(selected).slice(0, limit);
+}
+
 function buildRotationProfile(operator, skills) {
   const name = formatValue(operator.name);
   const skillNames = uniqueValues(skills.map((skill) => formatValue(skill.name, "")).filter(Boolean));
@@ -298,7 +347,7 @@ function buildRotationProfile(operator, skills) {
   );
   const ultimateCosts = numericValues(
     skills
-      .filter((skill) => normalizeKey(skill.skill_type || skill.short_type) === "ultimate")
+      .filter((skill) => canonicalSkillType(skill) === "ultimate")
       .map((skill) => skill.energy)
   );
   const appliedEffects = visibleEffectNames(skills, ["debuffs", "conditionalDebuffs"]);
@@ -310,9 +359,7 @@ function buildRotationProfile(operator, skills) {
     })
   );
   const comboSkills = skills.filter(
-    (skill) =>
-      normalizeKey(skill.skill_type) === "combo_skill" ||
-      normalizeKey(skill.short_type) === "cs"
+    (skill) => canonicalSkillType(skill) === "combo_skill"
   );
 
   const timingParts = [];
@@ -355,10 +402,7 @@ function buildRotationProfile(operator, skills) {
     ? interactionParts.join(" ")
     : `No structured Combo Skill trigger or visible persistent effect is stored for ${name} yet.`;
 
-  const signatureSkills = skills
-    .filter((skill) => ["battle_skill", "combo_skill", "ultimate"].includes(normalizeKey(skill.skill_type)))
-    .map((skill) => skill.name)
-    .slice(0, 3);
+  const signatureSkills = featuredSkillNames(skills);
   const aboutParts = [
     `${name} is a ${operator.star}-star ${formatLabel(operator.element_type)} ${formatLabel(operator.operator_class)} operator using ${formatLabel(operator.weapon_type)}.`
   ];
@@ -377,7 +421,8 @@ function buildRotationProfile(operator, skills) {
     aboutText: aboutParts.join(" "),
     timingText,
     interactionText,
-    skillNames
+    skillNames,
+    featuredSkills: signatureSkills
   };
 }
 
@@ -480,11 +525,12 @@ function baseStyles() {
     @media(min-width:761px) and (max-width:1000px){.operator-page .nav,.operator-page .page{width:min(860px,calc(100% - 32px))}.operator-page .hero{grid-template-columns:280px minmax(0,1fr);grid-template-areas:"portrait copy" "info info"}.operator-page .portrait-card{min-height:360px}.operator-page .portrait{max-height:285px}.operator-page h1{font-size:clamp(3rem,7vw,4rem)}}
     @media(min-width:1001px){.operator-page .page{padding-top:16px}.operator-page .breadcrumbs{margin-bottom:14px}.operator-page .hero{grid-template-columns:250px minmax(0,1fr);grid-template-areas:"portrait copy" "portrait info";column-gap:22px;row-gap:12px}.operator-page .portrait-card{min-height:330px;border-radius:12px}.operator-page .portrait-card:before{width:11px}.operator-page .portrait-card:after{left:25px;top:18px;font-size:.64rem}.operator-page .portrait{width:min(245px,88%);max-height:275px}.operator-page .barcode{left:17px;bottom:18px;font-size:.5rem;padding:6px 4px}.operator-page .hero-copy{padding:4px 0 0}.operator-page .eyebrow{margin-bottom:9px;font-size:.62rem}.operator-page h1{font-size:clamp(3rem,4vw,4.25rem);line-height:.94}.operator-page .stars{margin-top:8px;font-size:1.35rem}.operator-page .subtitle{max-width:780px;margin-top:12px;line-height:1.5;font-size:.9rem}.operator-page .actions{gap:9px;margin-top:14px}.operator-page .button{min-height:40px;padding:0 15px;font-size:.84rem}.operator-page .info-panel{padding:8px;border-radius:10px}.operator-page .info-grid{gap:5px}.operator-page .info-card{min-height:64px;padding:10px 7px 8px 38px;border-radius:7px}.operator-page .info-icon{left:9px;top:20px;width:21px;height:21px}.operator-page .text-icon{font-size:.92rem}.operator-page .info-label{font-size:.52rem;letter-spacing:.1em}.operator-page .info-card strong{margin-top:4px;font-size:.78rem}.operator-page .meta-strip{margin-top:14px}.operator-page .meta-item{padding:12px 18px}.operator-page .lower{margin-top:14px}}
     @media(min-width:761px) and (max-width:1000px){.operator-page .hero{grid-template-columns:240px minmax(0,1fr);column-gap:20px;row-gap:12px}.operator-page .portrait-card{min-height:320px}.operator-page .portrait{width:min(230px,88%);max-height:260px}.operator-page .hero-copy{padding-top:3px}.operator-page .eyebrow{margin-bottom:9px}.operator-page h1{font-size:clamp(2.8rem,6vw,3.7rem)}.operator-page .stars{margin-top:8px}.operator-page .subtitle{margin-top:12px;line-height:1.5}.operator-page .actions{margin-top:14px}.operator-page .info-panel{padding:8px}.operator-page .info-card{min-height:66px;padding-top:11px;padding-bottom:9px}.operator-page .meta-strip{margin-top:14px}.operator-page .meta-item{padding:13px 18px}.operator-page .lower{margin-top:14px}}
-    .operator-page .rotation-guide-label{display:block;margin-top:.35rem;color:var(--yellow);font-size:.25em;font-weight:950;letter-spacing:.12em;line-height:1;text-transform:uppercase;text-shadow:none}.operator-page .hero-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;max-width:520px;margin-top:12px}.operator-page .hero-stats .stat{min-height:52px;padding:9px 8px 7px 36px;border-radius:7px;background:linear-gradient(135deg,rgba(101,113,54,.30),rgba(49,55,57,.72))}.operator-page .hero-stats .stat-icon{left:12px;top:18px;font-size:.85rem}.operator-page .hero-stats .stat-label{font-size:.5rem}.operator-page .hero-stats .stat strong{margin-top:2px;font-size:.82rem}.operator-page .overview-section{margin-top:14px;padding:16px}.operator-page .overview-section .profile-heading{margin-bottom:10px;align-items:center}.operator-page .overview-section .profile-heading p{max-width:520px;font-size:.78rem;line-height:1.4}.operator-page .overview-section .profile-grid{gap:8px}.operator-page .overview-section .profile-card{min-height:126px;padding:14px}.operator-page .overview-section .profile-card h3{margin:6px 0 7px;font-size:.9rem}.operator-page .overview-section .profile-card p{display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:3;font-size:.78rem;line-height:1.45}.operator-page .lower{margin-top:14px}.operator-page footer{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}.operator-page .database-ref{color:rgba(160,170,169,.52)}
+    html{scroll-behavior:smooth}.tool-name-short{display:none}a:focus-visible{outline:3px solid var(--yellow);outline-offset:3px;border-radius:5px}.operator-page .section-nav{display:flex;align-items:center;gap:6px;margin:-4px 0 12px;overflow-x:auto;scrollbar-width:none}.operator-page .section-nav::-webkit-scrollbar{display:none}.operator-page .section-nav a{flex:0 0 auto;border:1px solid rgba(160,170,169,.24);border-radius:999px;padding:6px 11px;color:#d2d9d5;background:rgba(37,44,46,.55);font-size:.7rem;font-weight:850;letter-spacing:.04em}.operator-page .section-nav a:hover{border-color:rgba(248,245,70,.52);color:var(--yellow)}.operator-page #rotation-profile,.operator-page #stats,.operator-page #skills,.operator-page #related{scroll-margin-top:72px}.operator-page .subtitle,.operator-page .profile-heading p,.operator-page .profile-card p,.operator-page .skill-card p,.operator-page .related-card span{color:#c8d0cc}.operator-page .rotation-guide-label{display:block;margin-top:.35rem;color:var(--yellow);font-size:.25em;font-weight:950;letter-spacing:.12em;line-height:1;text-transform:uppercase;text-shadow:none}.operator-page .hero-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;max-width:520px;margin-top:12px}.operator-page .hero-stats .stat{min-height:52px;padding:9px 8px 7px 36px;border-radius:7px;background:linear-gradient(135deg,rgba(101,113,54,.30),rgba(49,55,57,.72))}.operator-page .hero-stats .stat-icon{left:12px;top:18px;font-size:.85rem}.operator-page .hero-stats .stat-label{font-size:.5rem}.operator-page .hero-stats .stat strong{margin-top:2px;font-size:.82rem}.operator-page .overview-section{margin-top:14px;padding:16px}.operator-page .overview-section .profile-heading{margin-bottom:10px;align-items:center}.operator-page .overview-section .profile-heading p{max-width:520px;font-size:.78rem;line-height:1.4}.operator-page .overview-section .profile-grid{gap:8px}.operator-page .overview-section .profile-card{min-height:126px;padding:14px}.operator-page .overview-section .profile-card h3{margin:6px 0 7px;font-size:.9rem}.operator-page .overview-section .profile-card p{font-size:.78rem;line-height:1.45}.operator-page .lower{margin-top:14px}.operator-page footer{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}.operator-page .database-ref{color:rgba(190,200,196,.72)}
     @media(min-width:1001px){.operator-page .hero{grid-template-columns:220px minmax(0,1fr);column-gap:20px;row-gap:10px}.operator-page .portrait-card{min-height:318px}.operator-page .portrait{width:min(215px,90%);max-height:270px}.operator-page .hero-copy{padding-top:2px}.operator-page h1{font-size:clamp(2.75rem,3.5vw,3.7rem)}.operator-page .subtitle{max-width:820px;margin-top:9px;line-height:1.42;font-size:.84rem}.operator-page .actions{margin-top:10px}.operator-page .button{min-height:38px}.operator-page .info-panel{padding:7px}.operator-page .info-card{min-height:58px;padding-top:8px;padding-bottom:7px}.operator-page .info-icon{top:17px}.operator-page .lower .panel{padding:16px}.operator-page .lower .stat{min-height:58px;padding-top:11px;padding-bottom:8px}}
     @media(min-width:761px) and (max-width:1000px){.operator-page .hero{grid-template-columns:210px minmax(0,1fr);grid-template-areas:"portrait copy" "info info"}.operator-page .portrait-card{min-height:290px}.operator-page .portrait{width:min(205px,88%);max-height:245px}.operator-page .hero-stats{max-width:none}.operator-page .overview-section{margin-top:12px}}
-    @media(max-width:760px){.operator-page .rotation-guide-label{font-size:.3em}.operator-page .hero-stats{max-width:none}.operator-page .overview-section{padding:16px}.operator-page .overview-section .profile-heading p{text-align:left}.operator-page footer{display:block}.operator-page .database-ref{display:block;margin-top:5px}}
-    @media(max-width:520px){.operator-page .hero-stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.operator-page .hero-stats .stat{padding-left:30px}.operator-page .hero-stats .stat-icon{left:9px}.operator-page .overview-section .profile-card{min-height:auto}.operator-page .overview-section .profile-card p{-webkit-line-clamp:4}}
+    @media(max-width:760px){.operator-page .nav{height:58px;padding:0;flex-direction:row;align-items:center;gap:9px}.operator-page .brand{flex:0 0 auto;gap:8px;font-size:.88rem}.operator-page .mark{width:32px;height:32px;border-radius:7px}.operator-page .tool-name{min-width:0;margin-left:auto;padding-left:9px;border-left:1px solid rgba(160,170,169,.25);font-size:.7rem;white-space:nowrap}.operator-page .tool-name-full{display:none}.operator-page .tool-name-short{display:inline}.operator-page .breadcrumbs{margin-bottom:10px}.operator-page .section-nav{margin-bottom:14px}.operator-page .rotation-guide-label{font-size:.3em}.operator-page .hero-stats{max-width:none}.operator-page .overview-section{padding:16px}.operator-page .overview-section .profile-heading p{text-align:left}.operator-page footer{display:block}.operator-page .database-ref{display:block;margin-top:5px}}
+    @media(max-width:520px){.operator-page .brand{font-size:.82rem}.operator-page .tool-name{font-size:.66rem}.operator-page .hero-stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.operator-page .hero-stats .stat{padding-left:30px}.operator-page .hero-stats .stat-icon{left:9px}.operator-page .overview-section .profile-card{min-height:auto}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.related-card,.operator-tile{transition:none}}
   </style>`;
 }
 
@@ -513,15 +559,15 @@ function operatorHeadingScript() {
   </script>`;
 }
 
-function siteHeader({ showToolCta = true } = {}) {
+function siteHeader({ showOperatorLink = true, showToolCta = true } = {}) {
   return `<header class="top">
     <nav class="nav">
       <a class="brand" href="${SITE_URL}/"><span class="mark">RF</span><span>RotationForge</span></a>
-      <span class="tool-name">▱ Arknights: Endfield Rotation Tool</span>
-      <div class="nav-links">
-        <a href="${SITE_URL}${BASE_PATH}/operators/">Operators</a>
+      <span class="tool-name"><span class="tool-name-full">▱ Arknights: Endfield Rotation Tool</span><span class="tool-name-short">▱ Endfield Tool</span></span>
+      ${showOperatorLink || showToolCta ? `<div class="nav-links">
+        ${showOperatorLink ? `<a href="${SITE_URL}${BASE_PATH}/operators/">Operators</a>` : ""}
         ${showToolCta ? `<a class="nav-cta" href="${SITE_URL}${BASE_PATH}/">Open Rotation Tool ↗</a>` : ""}
-      </div>
+      </div>` : ""}
     </nav>
   </header>`;
 }
@@ -548,7 +594,7 @@ export function createOperatorPage(operator, allOperators, skillsByOperator) {
 
   const title = `${name} Rotation Guide, Skills & Stats | Arknights Endfield`;
   const description = metaDescriptionFor(operator);
-  const featuredSkills = profile.skillNames.slice(0, 2);
+  const featuredSkills = profile.featuredSkills;
   const heroDescription = `${name} is a ${operator.star}-star ${elementType} ${operatorClass} using ${weaponType}.${featuredSkills.length > 0 ? ` Key skills include ${englishList(featuredSkills)}.` : ""} Review skill order, combo triggers, cooldowns and resource costs before opening the planner.`;
   const skillOrderText = profile.skillNames.length > 0
     ? `${profile.skillNames.slice(0, 4).join(" → ")}${profile.skillNames.length > 4 ? ` → +${profile.skillNames.length - 4} more` : ""}`
@@ -586,6 +632,32 @@ export function createOperatorPage(operator, allOperators, skillsByOperator) {
     url: pageUrl,
     isPartOf: { "@type": "VideoGame", name: "Arknights: Endfield" }
   };
+  const webPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: title,
+    description,
+    url: pageUrl,
+    isPartOf: {
+      "@type": "WebSite",
+      name: "RotationForge",
+      url: SITE_URL
+    },
+    mainEntity: {
+      "@type": "Character",
+      name,
+      url: pageUrl
+    },
+    ...(avatarUrl
+      ? {
+          primaryImageOfPage: {
+            "@type": "ImageObject",
+            url: avatarUrl,
+            caption: `${name} from Arknights: Endfield`
+          }
+        }
+      : {})
+  };
   const portraitMarkup = avatarPath
     ? `<img class="portrait" src="${escapeHtml(avatarPath)}" alt="${escapeHtml(name)} icon" width="330" height="330" fetchpriority="high" decoding="async">`
     : `<span class="portrait-placeholder avatar-placeholder" role="img" aria-label="No image available for ${escapeHtml(name)}">RF</span>`;
@@ -603,15 +675,29 @@ export function createOperatorPage(operator, allOperators, skillsByOperator) {
   <meta property="og:description" content="${escapeHtml(description)}">
   <meta property="og:url" content="${pageUrl}">
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="RotationForge">
   ${avatarUrl ? `<meta property="og:image" content="${escapeHtml(avatarUrl)}">` : ""}
+  ${avatarUrl ? `<meta property="og:image:alt" content="${escapeHtml(`${name} from Arknights: Endfield`)}">` : ""}
+  <meta name="twitter:card" content="${avatarUrl ? "summary_large_image" : "summary"}">
+  <meta name="twitter:title" content="${escapeHtml(title)}">
+  <meta name="twitter:description" content="${escapeHtml(description)}">
+  ${avatarUrl ? `<meta name="twitter:image" content="${escapeHtml(avatarUrl)}">` : ""}
+  ${avatarUrl ? `<meta name="twitter:image:alt" content="${escapeHtml(`${name} from Arknights: Endfield`)}">` : ""}
   <script type="application/ld+json">${JSON.stringify(characterSchema)}</script>
   <script type="application/ld+json">${JSON.stringify(breadcrumbSchema)}</script>
+  <script type="application/ld+json">${JSON.stringify(webPageSchema)}</script>
   ${baseStyles()}
 </head>
 <body class="operator-page">
-  ${siteHeader({ showToolCta: false })}
+  ${siteHeader({ showOperatorLink: false, showToolCta: false })}
   <div class="page">
     <div class="breadcrumbs"><a href="${SITE_URL}/">Home</a><span>›</span><a href="${SITE_URL}${BASE_PATH}/operators/">Operators</a><span>›</span><strong>${escapeHtml(name)}</strong></div>
+    <nav class="section-nav" aria-label="On this page">
+      <a href="#rotation-profile">Overview</a>
+      <a href="#stats">Attributes</a>
+      <a href="#skills">Skills</a>
+      <a href="#related">Related</a>
+    </nav>
 
     <main class="hero">
       <section class="portrait-card">
@@ -670,7 +756,7 @@ export function createOperatorPage(operator, allOperators, skillsByOperator) {
       <div class="skills-grid">${skills.length > 0 ? skills.map(skillCard).join("\n") : "<p>No skills are available in the database yet.</p>"}</div>
     </section>
 
-    <section class="panel related-section">
+    <section class="panel related-section" id="related">
       <h2>Related Operators</h2>
       <div class="related-grid">${relatedOperators.length > 0 ? relatedOperators.map(relatedCard).join("\n") : "<p>No related operators found yet.</p>"}</div>
     </section>
