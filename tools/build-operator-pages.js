@@ -370,13 +370,9 @@ function profileCard(label, title, body) {
   </article>`;
 }
 
-function metaDescriptionFor(operator, profile) {
+function metaDescriptionFor(operator) {
   const name = formatValue(operator.name);
-  const featuredSkills = profile.skillNames.slice(0, 2);
-  const skillText = featuredSkills.length > 0
-    ? ` See ${englishList(featuredSkills)}, stats, combo triggers and rotation data.`
-    : " See stats, attributes and rotation data.";
-  const text = `${name} is a ${operator.star}-star ${formatLabel(operator.element_type)} ${formatLabel(operator.operator_class)} using ${formatLabel(operator.weapon_type)}.${skillText}`;
+  const text = `Arknights: Endfield ${name} rotation guide with skill order, combo triggers, cooldowns, SP costs, effects, stats and a direct link to the rotation planner.`;
   if (text.length <= 160) return text;
   return `${text.slice(0, 157).replace(/\s+\S*$/, "")}...`;
 }
@@ -520,8 +516,8 @@ function createOperatorPage(operator, allOperators, skillsByOperator) {
   const relatedOperators = getRelatedOperators(operator, allOperators);
   const profile = buildRotationProfile(operator, skills);
 
-  const title = `${name} Skills, Stats & Rotation | Arknights: Endfield`;
-  const description = metaDescriptionFor(operator, profile);
+  const title = `${name} Rotation Guide, Skills & Stats | Arknights Endfield`;
+  const description = metaDescriptionFor(operator);
 
   const baseStatsHtml = [
     stat("HP", operator.base_hp, "♥"),
@@ -629,8 +625,8 @@ function createOperatorPage(operator, allOperators, skillsByOperator) {
 
     <section class="panel profile-section" id="rotation-profile">
       <div class="profile-heading">
-        <h2>${escapeHtml(name)} Rotation Profile</h2>
-        <p>Skill timing, resource costs, combo triggers and effects from the current database entry.</p>
+        <h2>${escapeHtml(name)} Rotation Guide</h2>
+        <p>Build an Arknights: Endfield ${escapeHtml(name)} rotation using the current skill order, resource costs, combo triggers, cooldowns and effects.</p>
       </div>
       <div class="profile-grid">
         ${profileCard("Skill overview", "Loadout & Elements", profile.loadoutText)}
