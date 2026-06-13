@@ -569,7 +569,6 @@ function siteHeader({ showOperatorLink = true, showToolCta = true } = {}) {
   return `<header class="top">
     <nav class="nav">
       <a class="brand" href="${SITE_URL}/"><span class="mark">RF</span><span>RotationForge</span></a>
-      <span class="tool-name"><span class="tool-name-full">▱ Arknights: Endfield Rotation Tool</span><span class="tool-name-short">▱ Endfield Tool</span></span>
       ${showOperatorLink || showToolCta ? `<div class="nav-links">
         ${showOperatorLink ? `<a href="${SITE_URL}${BASE_PATH}/operators/">Operators</a>` : ""}
         ${showToolCta ? `<a class="nav-cta" href="${SITE_URL}${BASE_PATH}/">Open Rotation Tool ↗</a>` : ""}

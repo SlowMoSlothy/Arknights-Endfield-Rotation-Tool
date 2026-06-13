@@ -119,6 +119,8 @@ test("generated pages use placeholders when an operator image is missing", () =>
   assert.doesNotMatch(page, /property="og:image"/);
   assert.doesNotMatch(page, /src="\/endfield\/"/);
   assert.match(index, /avatar-placeholder/);
+  assert.doesNotMatch(index, /Arknights: Endfield Rotation Tool/);
+  assert.doesNotMatch(index, /class="tool-name"/);
   assert.doesNotMatch(index, /src="\/endfield\/"/);
 });
 
@@ -221,7 +223,8 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /property="og:image:alt"/);
   assert.match(page, /"@type":"WebPage"/);
   assert.match(page, /a:focus-visible/);
-  assert.match(page, /class="tool-name-short"/);
+  assert.doesNotMatch(page, /Arknights: Endfield Rotation Tool/);
+  assert.doesNotMatch(page, /class="tool-name"/);
   assert.doesNotMatch(page, /Back to Operator Database/);
   assert.doesNotMatch(page, /Open Rotation Tool/);
   assert.doesNotMatch(page, /class="nav-links"/);
