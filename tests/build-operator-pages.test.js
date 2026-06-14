@@ -116,9 +116,12 @@ test("generated pages use placeholders when an operator image is missing", () =>
 
   assert.match(page, /portrait-placeholder/);
   assert.match(page, /class="portrait-media"/);
+  assert.match(page, /src="\/favicon-flat\.png"/);
   assert.doesNotMatch(page, /property="og:image"/);
   assert.doesNotMatch(page, /src="\/endfield\/"/);
   assert.match(index, /avatar-placeholder/);
+  assert.match(index, /<span class="mark"><img src="\/favicon-flat\.png" alt=""><\/span>/);
+  assert.doesNotMatch(index, />RF</);
   assert.match(index, /class="tile-avatar-frame"/);
   assert.match(index, /\.tile-avatar-frame\{[^}]*aspect-ratio:1/);
   assert.doesNotMatch(index, /Arknights: Endfield Rotation Tool/);
@@ -126,6 +129,17 @@ test("generated pages use placeholders when an operator image is missing", () =>
   assert.doesNotMatch(index, /<a href="https:\/\/rotationforge\.gg\/endfield\/operators\/">Operators<\/a>/);
   assert.match(index, /class="nav-cta"/);
   assert.match(index, /\.operator-index \.nav,\.operator-index \.page\{width:min\(1120px/);
+  assert.match(index, /class="operator-toolbar"/);
+  assert.match(index, /name="search"/);
+  assert.match(index, /name="class"/);
+  assert.match(index, /name="element"/);
+  assert.match(index, /name="rarity"/);
+  assert.match(index, /name="sort"/);
+  assert.match(index, /data-name="mi fu"/);
+  assert.match(index, /data-class="supporter"/);
+  assert.match(index, /id="operator-count">1 Operator/);
+  assert.match(index, /No operators match the selected filters/);
+  assert.match(index, /new Intl\.Collator/);
   assert.doesNotMatch(index, /src="\/endfield\/"/);
 });
 

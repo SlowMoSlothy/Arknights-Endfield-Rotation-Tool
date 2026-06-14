@@ -5,6 +5,7 @@ import { pathToFileURL } from "url";
 
 const SITE_URL = "https://rotationforge.gg";
 const BASE_PATH = "/endfield";
+const BRAND_ICON_PATH = "/favicon-flat.png";
 const OUTPUT_DIR = path.join(process.cwd(), "endfield", "operators");
 const SITEMAP_PATH = path.join(process.cwd(), "sitemap.xml");
 const SKILL_PAGE_SIZE = 1000;
@@ -478,7 +479,7 @@ function relatedCard(operator) {
   const elementIcon = elementIconPath(operator.element_type);
   const avatarMarkup = avatar
     ? `<img class="related-avatar" src="${escapeHtml(avatar)}" alt="${escapeHtml(operator.name)}" loading="lazy">`
-    : `<span class="related-avatar avatar-placeholder" role="img" aria-label="No image available for ${escapeHtml(operator.name)}">RF</span>`;
+    : `<img class="related-avatar avatar-placeholder" src="${BRAND_ICON_PATH}" alt="No image available for ${escapeHtml(operator.name)}" loading="lazy">`;
 
   return `<a class="related-card" href="${localPageUrlFor(operator)}">
     <span class="related-avatar-frame">${avatarMarkup}</span>
@@ -494,11 +495,17 @@ function indexCard(operator) {
   const avatar = normalizeAssetPath(operator.icon_path);
   const classIcon = classIconPath(operator.operator_class);
   const elementIcon = elementIconPath(operator.element_type);
+  const operatorClass = normalizeKey(operator.operator_class);
+  const elementType = normalizeKey(operator.element_type);
+  const rarity = Number(operator.star) || 0;
+  const sortOrder = Number.isFinite(Number(operator.sort_order))
+    ? Number(operator.sort_order)
+    : 9999;
   const avatarMarkup = avatar
     ? `<img class="tile-avatar" src="${escapeHtml(avatar)}" alt="${escapeHtml(operator.name)}" loading="lazy">`
-    : `<span class="tile-avatar avatar-placeholder" role="img" aria-label="No image available for ${escapeHtml(operator.name)}">RF</span>`;
+    : `<img class="tile-avatar avatar-placeholder" src="${BRAND_ICON_PATH}" alt="No image available for ${escapeHtml(operator.name)}" loading="lazy">`;
 
-  return `<a class="operator-tile" href="${localPageUrlFor(operator)}">
+  return `<a class="operator-tile" href="${localPageUrlFor(operator)}" data-name="${escapeHtml(String(operator.name).toLowerCase())}" data-class="${escapeHtml(operatorClass)}" data-element="${escapeHtml(elementType)}" data-rarity="${rarity}" data-order="${sortOrder}">
     <span class="tile-avatar-frame">${avatarMarkup}</span>
     <div class="tile-body">
       <span class="tile-stars">${stars(operator.star)}</span>
@@ -507,6 +514,13 @@ function indexCard(operator) {
       <div class="tile-icons">${classIcon ? `<img src="${escapeHtml(classIcon)}" alt="" loading="lazy">` : ""}${elementIcon ? `<img src="${escapeHtml(elementIcon)}" alt="" loading="lazy">` : ""}</div>
     </div>
   </a>`;
+}
+
+function filterOptions(values) {
+  return uniqueValues(values.map(normalizeKey).filter(Boolean))
+    .sort((a, b) => formatLabel(a).localeCompare(formatLabel(b), "en"))
+    .map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(formatLabel(value))}</option>`)
+    .join("");
 }
 
 function baseStyles() {
@@ -536,6 +550,10 @@ function baseStyles() {
     .operator-page .related-card{grid-template-columns:62px minmax(0,1fr)}.operator-page .related-avatar-frame{display:grid;place-items:center;width:62px;aspect-ratio:1;overflow:hidden;padding:3px;border:1px solid rgba(216,224,220,.3);border-radius:11px;background:radial-gradient(circle at 50% 22%,rgba(248,245,70,.09),transparent 52%),linear-gradient(145deg,rgba(25,31,32,.18),rgba(15,19,20,.68));box-shadow:inset 0 0 0 1px rgba(255,255,255,.03),0 8px 18px rgba(0,0,0,.22);transition:border-color .16s ease,box-shadow .16s ease}.operator-page .related-avatar{display:block;width:100%;height:100%;object-fit:contain;border-radius:8px}.operator-page .related-avatar-frame .avatar-placeholder{border:0;background:transparent}.operator-page .related-card:hover .related-avatar-frame{border-color:rgba(248,245,70,.55);box-shadow:inset 0 0 0 1px rgba(248,245,70,.08),0 8px 20px rgba(0,0,0,.28)}
     .operator-page .attribute-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}.operator-page .attribute-heading h2{margin:0}.operator-page .attribute-level{flex:0 0 auto;padding:6px 9px;border:1px solid rgba(248,245,70,.22);border-radius:999px;color:var(--yellow);background:rgba(248,245,70,.06);font-size:.64rem;font-weight:850;letter-spacing:.04em}.operator-page .attribute-stats{grid-template-columns:repeat(3,minmax(0,1fr))}
     @media(max-width:520px){.operator-page .attribute-heading{align-items:flex-start;flex-direction:column;gap:7px}.operator-page .attribute-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    .mark{display:block;overflow:hidden;color:inherit;background:none;box-shadow:0 0 24px rgba(205,166,94,.22)}.mark img{display:block;width:100%;height:100%;object-fit:cover}.avatar-placeholder{object-fit:contain}
+    .operator-index .nav-cta{color:var(--yellow);border:1px solid rgba(248,245,70,.42);background:rgba(248,245,70,.07);box-shadow:none;transition:color .16s ease,background .16s ease,border-color .16s ease}.operator-index .nav-cta:hover{color:#313739;border-color:var(--yellow);background:var(--yellow)}.operator-index .index-hero{padding:16px 24px;margin-bottom:10px}.operator-index .index-hero .eyebrow{margin-bottom:6px}.operator-index .index-hero h1{font-size:clamp(1.85rem,3vw,2.7rem)}.operator-index .index-hero p{max-width:1080px;margin:8px 0 0;font-size:.86rem;line-height:1.45}.operator-index .operator-toolbar{display:grid;grid-template-columns:auto minmax(220px,1fr) repeat(4,minmax(125px,auto)) auto;gap:8px;align-items:end;margin-bottom:12px;padding:10px;border:1px solid rgba(160,170,169,.2);border-radius:10px;background:rgba(37,44,46,.68);box-shadow:0 14px 34px rgba(0,0,0,.16)}.operator-index .operator-summary{min-width:116px;padding:0 6px 7px}.operator-index .operator-summary strong{display:block;font-size:.9rem}.operator-index .operator-summary span{display:block;margin-top:2px;color:var(--muted);font-size:.65rem}.operator-index .control{display:grid;gap:4px}.operator-index .control span{color:var(--muted);font-size:.58rem;font-weight:850;letter-spacing:.08em;text-transform:uppercase}.operator-index .control input,.operator-index .control select{width:100%;height:36px;border:1px solid rgba(160,170,169,.24);border-radius:7px;color:var(--text);background:#252c2e;padding:0 10px;font:inherit;font-size:.76rem;outline:none}.operator-index .control input:focus,.operator-index .control select:focus{border-color:rgba(248,245,70,.72);box-shadow:0 0 0 3px rgba(248,245,70,.08)}.operator-index .control input::placeholder{color:#899391}.operator-index .filter-reset{height:36px;padding:0 12px;border:1px solid rgba(160,170,169,.24);border-radius:7px;color:#d9dedb;background:rgba(126,128,124,.12);font:inherit;font-size:.72rem;font-weight:850;cursor:pointer}.operator-index .filter-reset:hover{color:var(--yellow);border-color:rgba(248,245,70,.42)}.operator-index .operator-grid{grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px}.operator-index .operator-tile{min-height:0;padding:10px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.12);transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease}.operator-index .operator-tile:hover{transform:translateY(-3px);border-color:rgba(248,245,70,.58);background:linear-gradient(135deg,rgba(101,113,54,.22),rgba(49,55,57,.86));box-shadow:0 18px 38px rgba(0,0,0,.3)}.operator-index .operator-tile:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}.operator-index .tile-avatar-frame{border-radius:9px}.operator-index .tile-avatar{border-radius:7px}.operator-index .tile-stars{margin-top:8px;font-size:.78rem}.operator-index .tile-body h2{margin-top:4px;font-size:.94rem}.operator-index .tile-body p{margin-top:3px;font-size:.76rem}.operator-index .tile-icons{gap:6px;margin-top:7px}.operator-index .tile-icons img{width:19px;height:19px}.operator-index .operator-tile[hidden]{display:none}.operator-index .empty-state{margin:24px 0;padding:28px;border:1px dashed rgba(160,170,169,.28);border-radius:10px;color:var(--muted);text-align:center}.operator-index .empty-state[hidden]{display:none}
+    @media(max-width:980px){.operator-index .operator-toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}.operator-index .operator-summary{grid-column:1/-1}.operator-index .search-control{grid-column:1/-1}}
+    @media(max-width:520px){.operator-index .operator-toolbar{grid-template-columns:1fr}.operator-index .operator-summary,.operator-index .search-control{grid-column:auto}.operator-index .index-hero{padding:16px}.operator-index .operator-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.operator-index .operator-tile{padding:8px}.operator-index .nav-cta{width:auto;margin-left:auto;padding:9px 11px}.operator-index .nav-links{width:auto;margin-left:auto}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.related-card,.operator-tile{transition:none}}
   </style>`;
 }
@@ -565,10 +583,70 @@ function operatorHeadingScript() {
   </script>`;
 }
 
+function operatorIndexScript() {
+  return `<script>
+    (() => {
+      const grid = document.querySelector(".operator-grid");
+      const cards = grid ? Array.from(grid.querySelectorAll(".operator-tile")) : [];
+      const form = document.querySelector(".operator-toolbar");
+      const count = document.querySelector("#operator-count");
+      const empty = document.querySelector(".empty-state");
+      if (!grid || !form || cards.length === 0) return;
+
+      const controls = {
+        search: form.querySelector("[name='search']"),
+        className: form.querySelector("[name='class']"),
+        element: form.querySelector("[name='element']"),
+        rarity: form.querySelector("[name='rarity']"),
+        sort: form.querySelector("[name='sort']")
+      };
+      const collator = new Intl.Collator("en", { sensitivity: "base" });
+
+      const update = () => {
+        const query = controls.search.value.trim().toLowerCase();
+        const className = controls.className.value;
+        const element = controls.element.value;
+        const rarity = controls.rarity.value;
+        const sort = controls.sort.value;
+
+        const sortedCards = [...cards].sort((left, right) => {
+          if (sort === "name-desc") return collator.compare(right.dataset.name, left.dataset.name);
+          if (sort === "rarity-desc") {
+            return Number(right.dataset.rarity) - Number(left.dataset.rarity)
+              || collator.compare(left.dataset.name, right.dataset.name);
+          }
+          if (sort === "database") return Number(left.dataset.order) - Number(right.dataset.order);
+          return collator.compare(left.dataset.name, right.dataset.name);
+        });
+
+        let visible = 0;
+        for (const card of sortedCards) {
+          const matches = (!query || card.dataset.name.includes(query))
+            && (!className || card.dataset.class === className)
+            && (!element || card.dataset.element === element)
+            && (!rarity || card.dataset.rarity === rarity);
+          card.hidden = !matches;
+          if (matches) visible += 1;
+          grid.append(card);
+        }
+
+        count.textContent = \`\${visible} \${visible === 1 ? "Operator" : "Operators"}\`;
+        empty.hidden = visible !== 0;
+      };
+
+      form.addEventListener("input", update);
+      form.addEventListener("change", update);
+      form.addEventListener("reset", () => requestAnimationFrame(update));
+      form.addEventListener("submit", (event) => event.preventDefault());
+      update();
+    })();
+  </script>`;
+}
+
 function siteHeader({ showOperatorLink = true, showToolCta = true } = {}) {
   return `<header class="top">
     <nav class="nav">
-      <a class="brand" href="${SITE_URL}/"><span class="mark">RF</span><span>RotationForge</span></a>
+      <a class="brand" href="${SITE_URL}/"><span class="mark"><img src="${BRAND_ICON_PATH}" alt=""></span><span>RotationForge</span></a>
       ${showOperatorLink || showToolCta ? `<div class="nav-links">
         ${showOperatorLink ? `<a href="${SITE_URL}${BASE_PATH}/operators/">Operators</a>` : ""}
         ${showToolCta ? `<a class="nav-cta" href="${SITE_URL}${BASE_PATH}/">Open Rotation Tool ↗</a>` : ""}
@@ -659,7 +737,7 @@ export function createOperatorPage(operator, allOperators, skillsByOperator) {
   };
   const portraitMarkup = avatarPath
     ? `<img class="portrait" src="${escapeHtml(avatarPath)}" alt="${escapeHtml(name)} icon" width="330" height="330" fetchpriority="high" decoding="async">`
-    : `<span class="portrait-placeholder avatar-placeholder" role="img" aria-label="No image available for ${escapeHtml(name)}">RF</span>`;
+    : `<img class="portrait-placeholder avatar-placeholder" src="${BRAND_ICON_PATH}" alt="No image available for ${escapeHtml(name)}" width="330" height="330" decoding="async">`;
 
   return `<!doctype html>
 <html lang="en">
@@ -669,6 +747,7 @@ export function createOperatorPage(operator, allOperators, skillsByOperator) {
   <meta name="description" content="${escapeHtml(description)}">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#313739">
+  <link rel="icon" type="image/png" href="${BRAND_ICON_PATH}">
   <link rel="canonical" href="${pageUrl}">
   <meta property="og:title" content="${escapeHtml(title)}">
   <meta property="og:description" content="${escapeHtml(description)}">
@@ -785,6 +864,12 @@ export function createIndexPage(operators) {
       name: operator.name
     }))
   };
+  const classOptions = filterOptions(operators.map((operator) => operator.operator_class));
+  const elementOptions = filterOptions(operators.map((operator) => operator.element_type));
+  const rarityOptions = numericValues(operators.map((operator) => operator.star))
+    .sort((a, b) => Number(b) - Number(a))
+    .map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)} stars</option>`)
+    .join("");
 
   return `<!doctype html>
 <html lang="en">
@@ -794,6 +879,7 @@ export function createIndexPage(operators) {
   <meta name="description" content="${escapeHtml(description)}">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#313739">
+  <link rel="icon" type="image/png" href="${BRAND_ICON_PATH}">
   <link rel="canonical" href="${pageUrl}">
   <meta property="og:title" content="${escapeHtml(title)}">
   <meta property="og:description" content="${escapeHtml(description)}">
@@ -811,9 +897,43 @@ export function createIndexPage(operators) {
       <h1>Arknights: Endfield Operators</h1>
       <p>Browse all operators stored in the RotationForge database. Each page includes operator stats, class and element icons, skills, related operators and a direct link into the rotation planner.</p>
     </section>
+    <form class="operator-toolbar" aria-label="Filter and sort operators">
+      <div class="operator-summary" aria-live="polite">
+        <strong id="operator-count">${operators.length} ${operators.length === 1 ? "Operator" : "Operators"}</strong>
+        <span>Filter the database</span>
+      </div>
+      <label class="control search-control">
+        <span>Search</span>
+        <input type="search" name="search" placeholder="Operator name" autocomplete="off">
+      </label>
+      <label class="control">
+        <span>Class</span>
+        <select name="class"><option value="">All classes</option>${classOptions}</select>
+      </label>
+      <label class="control">
+        <span>Element</span>
+        <select name="element"><option value="">All elements</option>${elementOptions}</select>
+      </label>
+      <label class="control">
+        <span>Rarity</span>
+        <select name="rarity"><option value="">All rarities</option>${rarityOptions}</select>
+      </label>
+      <label class="control">
+        <span>Sort</span>
+        <select name="sort">
+          <option value="name">Name A-Z</option>
+          <option value="name-desc">Name Z-A</option>
+          <option value="rarity-desc">Highest rarity</option>
+          <option value="database">Database order</option>
+        </select>
+      </label>
+      <button class="filter-reset" type="reset">Reset</button>
+    </form>
     <section class="operator-grid">${operators.map(indexCard).join("\n")}</section>
+    <p class="empty-state" hidden>No operators match the selected filters.</p>
     <footer>RotationForge is an unofficial fan-made tool for Arknights: Endfield.</footer>
   </div>
+  ${operatorIndexScript()}
 </body>
 </html>`;
 }
