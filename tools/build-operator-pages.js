@@ -942,6 +942,7 @@ export function createSitemap(operators) {
   const staticUrls = [
     `${SITE_URL}/`,
     `${SITE_URL}${BASE_PATH}/`,
+    `${SITE_URL}${BASE_PATH}/community/`,
     `${SITE_URL}${BASE_PATH}/operators/`
   ];
   const staticEntries = staticUrls

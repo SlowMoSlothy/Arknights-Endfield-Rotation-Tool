@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Arknights: Endfield Community Rotations | RotationForge</title>
+  <meta name="description" content="Browse approved Arknights: Endfield community rotations, compare teams and skill order, and load shared builds into the RotationForge planner.">
+  <link rel="canonical" href="https://rotationforge.gg/endfield/community/">
+  <link rel="icon" type="image/png" href="/favicon-flat.png">
+  <meta property="og:title" content="Arknights: Endfield Community Rotations">
+  <meta property="og:description" content="Browse and load approved Arknights: Endfield rotations shared by the RotationForge community.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rotationforge.gg/endfield/community/">
+  <link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+  <header class="top">
+    <nav class="nav" aria-label="Main navigation">
+      <a class="brand" href="/">
+        <span class="mark"><img src="/favicon-flat.png" alt=""></span>
+        <span>RotationForge</span>
+      </a>
+      <div class="nav-links">
+        <a href="../operators/">Operator Database</a>
+        <a class="nav-cta" href="../">Open Rotation Tool ↗</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="page">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span>›</span>
+      <strong>Community Rotations</strong>
+    </nav>
+
+    <section class="hero" aria-labelledby="pageTitle">
+      <span class="eyebrow">RotationForge Community</span>
+      <h1 id="pageTitle">Arknights: Endfield Community Rotations</h1>
+      <p>Browse approved team rotations, compare operator lineups and skill order, then open a shared build directly in the planner.</p>
+    </section>
+
+    <form id="communityToolbar" class="toolbar" aria-label="Filter and sort community rotations">
+      <div class="summary" aria-live="polite">
+        <strong id="rotationCount">Community builds</strong>
+        <span id="rotationStatus">Loading approved rotations</span>
+      </div>
+      <label class="control search-control">
+        <span>Search</span>
+        <input id="searchInput" type="search" placeholder="Rotation, author, operator">
+      </label>
+      <label class="control">
+        <span>Element</span>
+        <select id="elementFilter"><option value="all">All elements</option></select>
+      </label>
+      <label class="control">
+        <span>Class</span>
+        <select id="classFilter"><option value="all">All classes</option></select>
+      </label>
+      <label class="control">
+        <span>Sort</span>
+        <select id="sortSelect">
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+          <option value="views">Most viewed</option>
+          <option value="likes">Most liked</option>
+          <option value="skills">Most skills</option>
+        </select>
+      </label>
+      <button id="resetFilters" class="filter-reset" type="button">Reset</button>
+      <button id="refreshRotations" class="filter-reset" type="button">Refresh</button>
+    </form>
+
+    <section id="detailPanel" class="detail-panel" hidden aria-live="polite"></section>
+    <section id="rotationGrid" class="rotation-grid" aria-label="Community rotations"></section>
+    <div id="emptyState" class="empty-state" hidden>No matching rotations found.</div>
+  </main>
+
+  <footer>
+    <span>RotationForge is an unofficial fan-made tool for Arknights: Endfield.</span>
+    <a href="../">Create and submit a rotation in the planner</a>
+  </footer>
+
+  <div id="pageToast" class="page-toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "Arknights: Endfield Community Rotations",
+      "url": "https://rotationforge.gg/endfield/community/",
+      "description": "Approved Arknights: Endfield team rotations shared by the RotationForge community."
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../supabaseClient.js?v=2"></script>
+  <script src="community-page.js?v=3"></script>
+</body>
+</html>

@@ -14,6 +14,15 @@ import {
   writeGeneratedOutput
 } from "../tools/build-operator-pages.js";
 
+const checkedInOperatorIndex = fs.readFileSync("endfield/operators/index.html", "utf8");
+
+test("checked-in operator index contains no unresolved merge conflicts", () => {
+  assert.doesNotMatch(checkedInOperatorIndex, /^(?:<<<<<<<|=======|>>>>>>>)/m);
+  assert.doesNotMatch(checkedInOperatorIndex, /\uFFFD/);
+  assert.match(checkedInOperatorIndex, /Open Rotation Tool ↗/);
+  assert.match(checkedInOperatorIndex, /class="tile-stars">★★★★/);
+});
+
 function operator(overrides = {}) {
   return {
     id: 1,
@@ -274,6 +283,7 @@ test("writeGeneratedOutput replaces output and sitemap without leaving temporary
     assert.equal(fs.existsSync(path.join(outputDir, "index.html")), true);
     assert.equal(fs.existsSync(path.join(outputDir, "mi_fu", "index.html")), true);
     assert.match(fs.readFileSync(sitemapPath, "utf8"), /mi_fu/);
+    assert.match(fs.readFileSync(sitemapPath, "utf8"), /endfield\/community\//);
     assert.deepEqual(
       fs.readdirSync(root).filter((name) => name.includes(".tmp-") || name.includes(".backup-")),
       []

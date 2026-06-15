@@ -21,6 +21,7 @@ const communityRotationState = {
 const COMMUNITY_LIKES_STORAGE_KEY = "aertLikedCommunityRotations";
 const COMMUNITY_ROTATION_HASH_KEY = "community";
 const COMMUNITY_ROTATIONS_HASH = "community-rotations";
+const COMMUNITY_PAGE_PATH = "community/";
 
 let communityRotationsInitialized = false;
 
@@ -282,6 +283,16 @@ function getFocusedCommunityOperator() {
     if (operatorId === null) return null;
 
     return getCommunityOperatorById(operatorId);
+}
+
+function getCommunityPageUrl(params = {}) {
+    const url = new URL(COMMUNITY_PAGE_PATH, window.location.href);
+    Object.entries(params).forEach(([key, value]) => {
+        if (value !== null && value !== undefined && value !== "") {
+            url.searchParams.set(key, String(value));
+        }
+    });
+    return url.href;
 }
 
 function getFocusedCommunityOperatorId() {
@@ -1251,8 +1262,7 @@ function handleCommunityRotationDeepLink() {
     const rotationId = getCommunityRotationIdFromUrl();
     if (!rotationId) return false;
 
-    communityRotationState.deepLinkRotationId = String(rotationId);
-    openCommunityRotationsModal({ forceRefresh: !communityRotationState.loaded });
+    window.location.replace(getCommunityPageUrl({ community: rotationId }));
     return true;
 }
 
@@ -1263,7 +1273,7 @@ function isCommunityRotationsHash() {
 function handleCommunityRotationsHash() {
     if (!isCommunityRotationsHash()) return false;
 
-    openCommunityRotationsModal({ forceRefresh: !communityRotationState.loaded });
+    window.location.replace(getCommunityPageUrl());
     return true;
 }
 
@@ -1271,16 +1281,7 @@ function openCommunityRotationsFromLink(event) {
     if (event) event.preventDefault();
 
     const operatorId = Number(event?.currentTarget?.dataset?.communityOperatorId);
-    if (Number.isFinite(operatorId) && filterCommunityRotationsByOperator(operatorId)) {
-        return;
-    }
-
-    if (!isCommunityRotationsHash()) {
-        window.location.hash = COMMUNITY_ROTATIONS_HASH;
-        return;
-    }
-
-    handleCommunityRotationsHash();
+    window.location.href = getCommunityPageUrl(Number.isFinite(operatorId) ? { operator: operatorId } : {});
 }
 
 function handleCommunityHashNavigation() {
@@ -1462,16 +1463,7 @@ function loadCommunityRotation(rotationId) {
 }
 
 function openCommunityRotationsModal(options = {}) {
-    const modal = document.getElementById("communityModal");
-    if (!modal) return;
-
-    const forceRefresh = Object.prototype.hasOwnProperty.call(options || {}, "forceRefresh")
-        ? Boolean(options.forceRefresh)
-        : true;
-
-    modal.classList.add("open");
-    updateCommunitySubmitAvailability();
-    fetchCommunityRotations(forceRefresh);
+    window.location.href = getCommunityPageUrl();
 }
 
 function closeCommunityRotationsModal() {
@@ -1517,16 +1509,7 @@ function filterCommunityRotationsByOperator(operatorId) {
     const operator = getCommunityOperatorById(operatorId);
     if (!operator) return false;
 
-    communityRotationState.search = operator.name;
-    communityRotationState.focusedOperatorId = operator.id;
-    communityRotationState.elementFilter = "all";
-    communityRotationState.classFilter = "all";
-    communityRotationState.detailRotationId = "";
-
-    const searchInput = document.getElementById("communitySearchInput");
-    if (searchInput) searchInput.value = operator.name;
-
-    openCommunityRotationsModal({ forceRefresh: !communityRotationState.loaded });
+    window.location.href = getCommunityPageUrl({ operator: operator.id });
     return true;
 }
 
@@ -1548,7 +1531,9 @@ function initCommunityRotations() {
     const modal = document.getElementById("communityModal");
     const communityLinks = document.querySelectorAll("[data-open-community-rotations]");
 
-    if (openButton) openButton.addEventListener("click", () => openCommunityRotationsModal());
+    if (openButton && openButton.tagName !== "A") {
+        openButton.addEventListener("click", () => openCommunityRotationsModal());
+    }
     communityLinks.forEach(link => {
         link.addEventListener("click", openCommunityRotationsFromLink);
     });

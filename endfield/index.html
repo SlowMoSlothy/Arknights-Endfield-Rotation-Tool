@@ -41,7 +41,7 @@
       "isAccessibleForFree": true
     }
   </script>
-  <link rel="stylesheet" href="css/style.css?v=15">
+  <link rel="stylesheet" href="css/style.css?v=16">
   <link rel="stylesheet" href="css/mobile.css?v=12">
 </head>
 
@@ -151,7 +151,7 @@
             <span class="sidebar-command-label">Profile</span>
             <span class="sidebar-command-signal"></span>
           </button>
-          <button id="openCommunityRotationsBtn" class="sidebar-command" type="button">
+          <a id="openCommunityRotationsBtn" class="sidebar-command" href="community/">
             <span class="sidebar-command-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false">
                 <circle cx="9" cy="8" r="3"></circle>
@@ -162,7 +162,7 @@
             </span>
             <span class="sidebar-command-label">Community Rotations</span>
             <span class="sidebar-command-signal"></span>
-          </button>
+          </a>
           <button id="openOperatorGalleryBtn" class="sidebar-command" type="button" hidden>
             <span class="sidebar-command-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false">
@@ -519,81 +519,6 @@
           <button id="submitRotationQuickSaveBtn" class="my-primary-btn" type="submit">Save Rotation</button>
         </div>
       </form>
-    </div>
-  </div>
-
-  <div id="communityModal" class="settings-modal community-modal">
-    <div class="settings-dialog community-dialog">
-      <div class="settings-header">
-        <h2 class="settings-title">Community Rotations</h2>
-        <button id="closeCommunityModalBtn" class="settings-close" type="button" aria-label="Close community rotations">&times;</button>
-      </div>
-
-      <div class="community-toolbar">
-        <label class="community-search-wrap">
-          <span>Search</span>
-          <input id="communitySearchInput" class="community-search-input" type="search"
-            placeholder="Rotation, author, operator">
-        </label>
-        <div class="community-toolbar-actions">
-          <button id="toggleCommunityFiltersBtn" class="community-filter-toggle" type="button"
-            aria-expanded="false" aria-controls="communityFilterPanel">Filters</button>
-          <button id="refreshCommunityRotationsBtn" class="community-refresh-btn" type="button">Refresh</button>
-          <button id="openCommunitySubmitFormBtn" class="community-submit-toggle" type="button">Submit Current</button>
-        </div>
-      </div>
-
-      <div id="communityFilterPanel" class="community-filter-panel" aria-label="Community rotation filters" hidden>
-        <div class="community-filter-group">
-          <span class="community-filter-label">Element</span>
-          <div id="communityElementFilters" class="community-filter-options"></div>
-        </div>
-        <div class="community-filter-group">
-          <span class="community-filter-label">Class</span>
-          <div id="communityClassFilters" class="community-filter-options"></div>
-        </div>
-        <div class="community-filter-group community-sort-group">
-          <label class="community-sort-wrap">
-            <span class="community-filter-label">Sort</span>
-            <select id="communitySortSelect" class="community-sort-select">
-              <option value="newest">Newest</option>
-              <option value="oldest">Oldest</option>
-              <option value="views">Most viewed</option>
-              <option value="likes">Most liked</option>
-              <option value="skills">Most skills</option>
-            </select>
-          </label>
-          <button id="clearCommunityFiltersBtn" class="community-clear-filters-btn" type="button">Reset</button>
-        </div>
-      </div>
-
-      <form id="communitySubmitForm" class="community-submit-form" hidden>
-        <div class="community-form-grid">
-          <label class="community-field">
-            <span>Title</span>
-            <input id="communitySubmitTitle" type="text" minlength="3" maxlength="80" required
-              placeholder="Electric burst opener">
-          </label>
-          <label class="community-field">
-            <span>Author</span>
-            <input id="communitySubmitAuthor" type="text" maxlength="40" placeholder="Account username" readonly>
-          </label>
-        </div>
-        <label class="community-field">
-          <span>Description</span>
-          <textarea id="communitySubmitDescription" maxlength="600" rows="3"
-            placeholder="Short notes for this rotation"></textarea>
-        </label>
-        <div id="communitySubmitStatus" class="community-submit-status"></div>
-        <div class="community-submit-actions">
-          <button id="cancelCommunitySubmitBtn" class="community-secondary-btn" type="button">Cancel</button>
-          <button id="communitySubmitButton" class="community-submit-btn" type="submit">Submit for review</button>
-        </div>
-      </form>
-
-      <div id="communityDetailPanel" class="community-detail-panel" hidden></div>
-      <div id="communityRotationStatus" class="community-status"></div>
-      <div id="communityRotationList" class="community-rotation-list"></div>
     </div>
   </div>
 
