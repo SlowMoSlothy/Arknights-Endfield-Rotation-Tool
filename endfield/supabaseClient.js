@@ -109,8 +109,7 @@ function mapDatabaseEffectGroup(row) {
 
 async function loadRegistryTableFromSupabase(tableName, mapper, label) {
     if (!supabaseClient) {
-        console.warn(`Supabase client is not available. Using local ${label}.`);
-        return [];
+        throw new Error(`Supabase client is not available. Cannot load ${label}.`);
     }
 
     const { data, error } = await supabaseClient
@@ -120,8 +119,7 @@ async function loadRegistryTableFromSupabase(tableName, mapper, label) {
         .order("sort_order", { ascending: true });
 
     if (error) {
-        console.error(`${label} could not be loaded from Supabase:`, error);
-        return [];
+        throw error;
     }
 
     return Array.isArray(data) ? data.map(mapper) : [];
@@ -256,8 +254,7 @@ async function hydrateEffectGroupsFromSupabase() {
 
 async function loadOperatorsFromSupabase() {
     if (!supabaseClient) {
-        console.warn("Supabase client is not available. Using local operator data.");
-        return [];
+        throw new Error("Supabase client is not available. Cannot load operator data.");
     }
 
     const { data: operatorRows, error: operatorError } = await supabaseClient
@@ -268,13 +265,11 @@ async function loadOperatorsFromSupabase() {
         .order("name", { ascending: true });
 
     if (operatorError) {
-        console.error("Operatoren konnten nicht aus Supabase geladen werden:", operatorError);
-        return [];
+        throw operatorError;
     }
 
     if (!Array.isArray(operatorRows) || operatorRows.length === 0) {
-        console.warn("Supabase hat keine Operatoren geliefert. Using local operator data.");
-        return [];
+        throw new Error("Supabase returned no operator data.");
     }
 
     const operatorIds = operatorRows.map(row => row.id);
@@ -286,8 +281,7 @@ async function loadOperatorsFromSupabase() {
         .order("slot_index", { ascending: true });
 
     if (skillError) {
-        console.error("Skills konnten nicht aus Supabase geladen werden:", skillError);
-        return [];
+        throw skillError;
     }
 
     const skillsByOperatorId = new Map();
@@ -304,7 +298,7 @@ async function loadOperatorsFromSupabase() {
 
 async function hydrateOperatorsFromSupabase() {
     if (typeof useSupabaseOperators !== "undefined" && !useSupabaseOperators) {
-        console.info("Supabase operator loading is disabled. Using local operator data.");
+        console.info("Supabase operator loading is disabled.");
         return false;
     }
 
@@ -315,7 +309,7 @@ async function hydrateOperatorsFromSupabase() {
             return false;
         }
     } catch (error) {
-        console.error("Supabase loading failed. Using local operator data.", error);
+        console.error("Supabase operator loading failed.", error);
         return false;
     }
 

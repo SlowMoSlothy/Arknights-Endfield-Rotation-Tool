@@ -1,6 +1,5 @@
 -- Basic operator seed for Supabase.
--- This inserts only the operator rows. For skills + raw_data, run:
--- node tools/exportOperatorsForSupabase.js --stdout
+-- This inserts only the operator rows. Full operator and skill data is maintained in Supabase.
 
 begin;
 

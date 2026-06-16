@@ -116,8 +116,6 @@ supabase/
   user_rotations.sql
   admin_panel.sql
   seed_operators_basic.sql
-tools/
-  exportOperatorsForSupabase.js
 ```
 
 Run `supabase/schema.sql` first in the Supabase SQL Editor. It creates:
@@ -126,18 +124,11 @@ Run `supabase/schema.sql` first in the Supabase SQL Editor. It creates:
 - `operator_skills` for all skills linked to their operator.
 - public read policies for both tables.
 
-For a quick import of only the operator rows, run `supabase/seed_operators_basic.sql`.
-
-For the full import with operators, skills, and preserved raw JSON data, generate the SQL from the current local data:
-
-```bash
-node tools/exportOperatorsForSupabase.js --stdout > supabase/seed_operators.sql
-```
-
-Then paste/run `supabase/seed_operators.sql` in the Supabase SQL Editor after the schema.
+For a quick bootstrap of only the operator rows, run `supabase/seed_operators_basic.sql`.
+Full operator and skill data is maintained in Supabase.
 
 The frontend must only use the Supabase publishable/anon key. Never put a Supabase `service_role` key into browser code.
-When `useSupabaseOperators` is enabled, the app loads `operators` and `operator_skills` from Supabase on startup and falls back to the local JS files if loading fails.
+The app loads `operators` and `operator_skills` from Supabase on startup; local operator JS data is no longer bundled as a fallback.
 
 ### Community Rotations
 
