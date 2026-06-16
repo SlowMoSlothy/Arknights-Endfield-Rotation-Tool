@@ -287,6 +287,39 @@ function getVisibleTransientDebuffsForCurrentSkill(skillData) {
         });
 }
 
+function getRequiredConsumedRotationDebuffStacks(skillData, effectName) {
+    if (
+        effectName === "vulnerable" &&
+        Number.isFinite(Number(skillData?.requiresConsumedVulnerableStacks))
+    ) {
+        return Number(skillData.requiresConsumedVulnerableStacks);
+    }
+
+    return 1;
+}
+
+function getConsumedRotationDebuffEffectName(value) {
+    if (typeof value === "string") return value;
+    return value?.effect || value?.id || value?.appliesEffect || value?.name || "";
+}
+
+function shouldConsumeVisibleRotationDebuff(skillData, consumeDebuff, debuffStackState) {
+    const effectName = getConsumedRotationDebuffEffectName(consumeDebuff);
+    const key = normalizeDebuffKey({ id: effectName });
+    const requiredStacks = getRequiredConsumedRotationDebuffStacks(skillData, key);
+    return Number(debuffStackState?.[key] || 0) >= requiredStacks;
+}
+
+function consumeVisibleRotationDebuff(skillData, consumeDebuff, debuffStackState, debuffMetaState) {
+    const effectName = getConsumedRotationDebuffEffectName(consumeDebuff);
+    const key = normalizeDebuffKey({ id: effectName });
+    if (!key || !shouldConsumeVisibleRotationDebuff(skillData, consumeDebuff, debuffStackState)) return false;
+
+    delete debuffStackState[key];
+    delete debuffMetaState[key];
+    return true;
+}
+
 window.applySkillDebuffsAndGetActiveState = function patchedApplySkillDebuffsAndGetActiveState(
     skillData,
     activeBuffMetaState,
@@ -297,14 +330,18 @@ window.applySkillDebuffsAndGetActiveState = function patchedApplySkillDebuffsAnd
     buffMetaState
 ) {
     if (Array.isArray(skillData?.consumeDebuffs)) {
-        skillData.consumeDebuffs.forEach(effectName => {
-            const key = normalizeDebuffKey({ id: effectName });
-            delete debuffStackState[key];
-            delete debuffMetaState[key];
+        skillData.consumeDebuffs.forEach(consumeDebuff => {
+            const effectName = getConsumedRotationDebuffEffectName(consumeDebuff);
+            const requiredStacks = getRequiredConsumedRotationDebuffStacks(
+                skillData,
+                normalizeDebuffKey({ id: effectName })
+            );
+            if (requiredStacks > 1) return;
+            consumeVisibleRotationDebuff(skillData, consumeDebuff, debuffStackState, debuffMetaState);
         });
     }
 
-    const activeDebuffs = originalApplySkillDebuffsAndGetActiveState(
+    let activeDebuffs = originalApplySkillDebuffsAndGetActiveState(
         skillData,
         activeBuffMetaState,
         activeBuffStackState,
@@ -313,6 +350,28 @@ window.applySkillDebuffsAndGetActiveState = function patchedApplySkillDebuffsAnd
         buffStackState,
         buffMetaState
     );
+
+    if (Array.isArray(skillData?.consumeDebuffs)) {
+        let consumedAfterSkillEffects = false;
+        skillData.consumeDebuffs.forEach(consumeDebuff => {
+            const effectName = getConsumedRotationDebuffEffectName(consumeDebuff);
+            const requiredStacks = getRequiredConsumedRotationDebuffStacks(
+                skillData,
+                normalizeDebuffKey({ id: effectName })
+            );
+            if (requiredStacks <= 1) return;
+            consumedAfterSkillEffects = consumeVisibleRotationDebuff(
+                skillData,
+                consumeDebuff,
+                debuffStackState,
+                debuffMetaState
+            ) || consumedAfterSkillEffects;
+        });
+
+        if (consumedAfterSkillEffects && typeof getActiveDebuffsFromRotationState === "function") {
+            activeDebuffs = getActiveDebuffsFromRotationState(debuffStackState, debuffMetaState);
+        }
+    }
 
     const transientDebuffs = getVisibleTransientDebuffsForCurrentSkill(skillData);
     const activeKeys = new Set(activeDebuffs.map(effect => normalizeDebuffKey(effect)));

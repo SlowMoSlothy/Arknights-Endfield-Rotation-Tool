@@ -10,6 +10,7 @@ function removeConsumedDebuffsFromEffectMap(skillData, effectMap) {
     skillData.consumeDebuffs.forEach(value => {
         const effectName = getConsumedDebuffEffectName(value);
         if (!effectName) return;
+        if (!shouldConsumeDebuffFromEffectMap(skillData, value, effectMap)) return;
         delete effectMap[effectName];
     });
 }
@@ -19,12 +20,40 @@ function getConsumedDebuffEffectName(value) {
     return value?.effect || value?.id || value?.appliesEffect || value?.name || "";
 }
 
+function getRequiredConsumedDebuffStacks(skillData, value, effectName) {
+    const explicitRequirement = Number(
+        typeof value === "object"
+            ? value.minStacks ?? value.requiredStacks ?? value.requiresStacks
+            : NaN
+    );
+    if (Number.isFinite(explicitRequirement) && explicitRequirement > 0) {
+        return explicitRequirement;
+    }
+
+    if (
+        effectName === "vulnerable" &&
+        Number.isFinite(Number(skillData?.requiresConsumedVulnerableStacks))
+    ) {
+        return Number(skillData.requiresConsumedVulnerableStacks);
+    }
+
+    return 1;
+}
+
+function shouldConsumeDebuffFromEffectMap(skillData, value, effectMap) {
+    const effectName = getConsumedDebuffEffectName(value);
+    if (!effectName) return false;
+
+    const requiredStacks = getRequiredConsumedDebuffStacks(skillData, value, effectName);
+    return Number(effectMap?.[effectName] || 0) >= requiredStacks;
+}
+
 function addConsumedDebuffTriggersForSkill(skillData, effectMap, contextEffectMap = effectMap) {
     if (!Array.isArray(skillData?.consumeDebuffs)) return;
 
     skillData.consumeDebuffs.forEach(value => {
         const effectName = getConsumedDebuffEffectName(value);
-        if (!effectName || Number(contextEffectMap?.[effectName] || 0) <= 0) return;
+        if (!effectName || !shouldConsumeDebuffFromEffectMap(skillData, value, contextEffectMap)) return;
 
         const consumedEffectName = `${effectName}_consumed`;
         if (Number(effectMap[consumedEffectName] || 0) <= 0) {
