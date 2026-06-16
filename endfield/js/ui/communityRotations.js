@@ -925,32 +925,26 @@ function getCommunityAccountUserId() {
 }
 
 function getCommunitySubmitAuthorName() {
+    if (!isCommunityAccountSignedIn()) return "Anonymous";
+
     const profile = getCommunityAccountProfile();
     const username = String(profile?.username || "").trim();
-    return username || "Account";
+    return username || "Anonymous";
 }
 
 function updateCommunitySubmitAvailability() {
     const submitToggle = document.getElementById("openCommunitySubmitFormBtn");
     if (!submitToggle) return;
 
-    const isSignedIn = isCommunityAccountSignedIn();
     const hasRotation = typeof hasCreatedRotation === "function" ? hasCreatedRotation() : getCurrentCommunityRotationEntries().length > 0;
 
-    submitToggle.disabled = !isSignedIn || !hasRotation;
-    submitToggle.textContent = !isSignedIn ? "Sign in required" : hasRotation ? "Submit Current" : "No Rotation";
+    submitToggle.disabled = !hasRotation;
+    submitToggle.textContent = hasRotation ? "Submit Current" : "No Rotation";
 }
 
 function setCommunitySubmitFormOpen(isOpen) {
     const form = document.getElementById("communitySubmitForm");
     if (!form) return;
-
-    if (isOpen && !isCommunityAccountSignedIn()) {
-        form.hidden = true;
-        updateCommunitySubmitAvailability();
-        setCommunitySubmitStatus("Sign in before submitting a rotation.", "is-error");
-        return;
-    }
 
     form.hidden = !isOpen;
     if (isOpen) {
@@ -971,10 +965,6 @@ function validateCommunitySubmission(values) {
     const description = values.description.trim();
     const teamIds = getCurrentCommunityTeamIds();
     const rotationEntries = getCurrentCommunityRotationEntries();
-
-    if (!isCommunityAccountSignedIn()) {
-        return "Sign in before submitting a rotation.";
-    }
 
     if (!title || title.length < 3 || title.length > 80) {
         return "Please enter a title between 3 and 80 characters.";

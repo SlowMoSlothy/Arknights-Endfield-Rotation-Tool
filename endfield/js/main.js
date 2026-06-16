@@ -90,7 +90,7 @@ function promptRotationSaveSignIn() {
 function openRotationQuickSaveModal(destination = "my") {
     if (typeof hasCreatedRotation === "function" && !hasCreatedRotation()) return;
 
-    if (typeof isMyAccountSignedIn !== "function" || !isMyAccountSignedIn()) {
+    if (destination !== "community" && (typeof isMyAccountSignedIn !== "function" || !isMyAccountSignedIn())) {
         promptRotationSaveSignIn();
         return;
     }
@@ -128,7 +128,7 @@ async function submitRotationQuickSave(event) {
     event.preventDefault();
     if (rotationQuickSaveState.submitting) return;
 
-    if (typeof isMyAccountSignedIn !== "function" || !isMyAccountSignedIn()) {
+    if (rotationQuickSaveState.destination !== "community" && (typeof isMyAccountSignedIn !== "function" || !isMyAccountSignedIn())) {
         promptRotationSaveSignIn();
         return;
     }

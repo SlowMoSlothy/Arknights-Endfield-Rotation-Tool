@@ -61,6 +61,9 @@ create index if not exists idx_community_rotations_filters
 
 alter table public.community_rotations enable row level security;
 
+grant select on public.community_rotations to anon, authenticated;
+grant insert on public.community_rotations to anon, authenticated;
+
 drop policy if exists "Public read approved community rotations" on public.community_rotations;
 create policy "Public read approved community rotations"
     on public.community_rotations
@@ -76,10 +79,13 @@ drop policy if exists "Public submit community rotations for review" on public.c
 create policy "Public submit community rotations for review"
     on public.community_rotations
     for insert
-    to authenticated
+    to anon, authenticated
     with check (
         game = 'arknights_endfield'
-        and (submitted_by is null or submitted_by = auth.uid())
+        and (
+            (auth.uid() is null and submitted_by is null)
+            or (auth.uid() is not null and (submitted_by is null or submitted_by = auth.uid()))
+        )
         and is_public = true
         and is_approved = false
         and is_hidden = false

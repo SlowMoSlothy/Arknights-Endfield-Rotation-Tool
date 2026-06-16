@@ -25,6 +25,12 @@ test("community page keeps planner loading and legacy links available", () => {
   assert.match(plannerCommunityScript, /window\.location\.replace\(getCommunityPageUrl/);
 });
 
+test("planner allows anonymous community submissions", () => {
+  assert.match(plannerCommunityScript, /!isCommunityAccountSignedIn\(\)\) return "Anonymous"/);
+  assert.doesNotMatch(plannerCommunityScript, /Sign in before submitting a rotation/);
+  assert.match(plannerCommunityScript, /submitted_by: getCommunityAccountUserId\(\) \|\| null/);
+});
+
 test("community skill icons use element colors and ultimate fill modes", () => {
   assert.match(communityScript, /short_type,element_type,icon_path/);
   assert.match(communityScript, /ef-fill-\$\{fillMode\}/);
