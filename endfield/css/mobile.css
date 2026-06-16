@@ -130,15 +130,13 @@
         margin: 0 0 6px 0;
     }
 
-    .builder-sidebar button {
+    .builder-sidebar .sidebar-command {
         width: 100%;
         text-align: center;
-        padding: 6px 5px;
-        font-size: 11px;
     }
 
     .sidebar-command {
-        min-height: 44px;
+        min-height: 54px;
         grid-template-columns: 1fr;
         justify-items: center;
         gap: 4px;

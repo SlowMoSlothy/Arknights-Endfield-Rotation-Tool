@@ -2,7 +2,7 @@
 <html lang="de">
 
 <head>
-  <link rel="icon" type="image/png" href="./assets/favicon.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/favicon-flat.png">
   <meta name="google-site-verification" content="3HTRnl53o187nzooCTo5wvQL0SCGiNXD-183J0SOC1o" />
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -41,12 +41,12 @@
       "isAccessibleForFree": true
     }
   </script>
-  <link rel="stylesheet" href="css/style.css?v=11">
-  <link rel="stylesheet" href="css/mobile.css?v=11">
+  <link rel="stylesheet" href="css/style.css?v=16">
+  <link rel="stylesheet" href="css/mobile.css?v=12">
 </head>
 
 <body class="app-loading">
-  <link rel="stylesheet" href="css/settings.css?v=6">
+  <link rel="stylesheet" href="css/settings.css?v=7">
   <div id="globalTooltip" class="global-tooltip"></div>
 
   <div id="appLoadingScreen" class="app-loading-screen" role="status" aria-live="polite" aria-busy="true">
@@ -151,7 +151,7 @@
             <span class="sidebar-command-label">Profile</span>
             <span class="sidebar-command-signal"></span>
           </button>
-          <button id="openCommunityRotationsBtn" class="sidebar-command" type="button">
+          <a id="openCommunityRotationsBtn" class="sidebar-command" href="community/">
             <span class="sidebar-command-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false">
                 <circle cx="9" cy="8" r="3"></circle>
@@ -160,10 +160,10 @@
                 <path d="M14.5 15c2.8.2 4.8 1.9 6 5"></path>
               </svg>
             </span>
-            <span class="sidebar-command-label">Community</span>
+            <span class="sidebar-command-label">Community Rotations</span>
             <span class="sidebar-command-signal"></span>
-          </button>
-          <button id="openOperatorGalleryBtn" class="sidebar-command" type="button">
+          </a>
+          <button id="openOperatorGalleryBtn" class="sidebar-command" type="button" hidden>
             <span class="sidebar-command-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false">
                 <rect x="4" y="5" width="6" height="6" rx="1"></rect>
@@ -175,6 +175,18 @@
             <span class="sidebar-command-label">Operator Gallery</span>
             <span class="sidebar-command-signal"></span>
           </button>
+          <a class="sidebar-command" href="operators/" target="_blank" rel="noopener">
+            <span class="sidebar-command-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M5 4h14v16H5z"></path>
+                <path d="M8 8h8"></path>
+                <path d="M8 12h8"></path>
+                <path d="M8 16h5"></path>
+              </svg>
+            </span>
+            <span class="sidebar-command-label">Operator Database</span>
+            <span class="sidebar-command-signal"></span>
+          </a>
           <button id="openAdminPanelBtn" class="sidebar-command" type="button" hidden>
             <span class="sidebar-command-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false">
@@ -295,7 +307,7 @@
     <div class="settings-dialog">
       <div class="settings-header">
         <h2 class="settings-title">Settings</h2>
-        <button id="closeSettingsBtn" class="settings-close" type="button">×</button>
+        <button id="closeSettingsBtn" class="settings-close" type="button" aria-label="Close settings">×</button>
       </div>
       <div class="settings-section">
         <span class="settings-label">Rotation Mode</span>
@@ -371,7 +383,7 @@
     <div class="settings-dialog my-rotations-dialog">
       <div class="settings-header">
         <h2 id="myRotationsTitle" class="settings-title">My Rotations</h2>
-        <button id="closeMyRotationsModalBtn" class="settings-close" type="button">&times;</button>
+        <button id="closeMyRotationsModalBtn" class="settings-close" type="button" aria-label="Close my rotations">&times;</button>
       </div>
 
       <section id="myRotationsAuthPanel" class="my-rotations-auth-panel">
@@ -424,7 +436,7 @@
     <div class="settings-dialog my-profile-dialog">
       <div class="settings-header">
         <h2 class="settings-title">Profile</h2>
-        <button id="closeProfileModalBtn" class="settings-close" type="button">&times;</button>
+        <button id="closeProfileModalBtn" class="settings-close" type="button" aria-label="Close profile">&times;</button>
       </div>
 
       <section class="my-account-panel">
@@ -459,7 +471,7 @@
     <div class="settings-dialog my-profile-dialog">
       <div class="settings-header">
         <h2 class="settings-title">Reset Password</h2>
-        <button id="closePasswordResetModalBtn" class="settings-close" type="button">&times;</button>
+        <button id="closePasswordResetModalBtn" class="settings-close" type="button" aria-label="Close password reset">&times;</button>
       </div>
 
       <p class="my-rotations-intro">Enter a new password for your account.</p>
@@ -486,7 +498,7 @@
     <div class="settings-dialog rotation-quick-save-dialog">
       <div class="settings-header">
         <h2 id="rotationQuickSaveTitle" class="settings-title">Save Rotation</h2>
-        <button id="closeRotationQuickSaveModalBtn" class="settings-close" type="button">&times;</button>
+        <button id="closeRotationQuickSaveModalBtn" class="settings-close" type="button" aria-label="Close save rotation">&times;</button>
       </div>
 
       <p id="rotationQuickSaveIntro" class="my-rotations-intro">Save this rotation.</p>
@@ -510,84 +522,11 @@
     </div>
   </div>
 
-  <div id="communityModal" class="settings-modal community-modal">
-    <div class="settings-dialog community-dialog">
-      <div class="settings-header">
-        <h2 class="settings-title">Community Rotations</h2>
-        <button id="closeCommunityModalBtn" class="settings-close" type="button">&times;</button>
-      </div>
-
-      <div class="community-toolbar">
-        <label class="community-search-wrap">
-          <span>Search</span>
-          <input id="communitySearchInput" class="community-search-input" type="search"
-            placeholder="Rotation, author, operator">
-        </label>
-        <div class="community-toolbar-actions">
-          <button id="refreshCommunityRotationsBtn" class="community-refresh-btn" type="button">Refresh</button>
-          <button id="openCommunitySubmitFormBtn" class="community-submit-toggle" type="button">Submit Current</button>
-        </div>
-      </div>
-
-      <div class="community-filter-panel" aria-label="Community rotation filters">
-        <div class="community-filter-group">
-          <span class="community-filter-label">Element</span>
-          <div id="communityElementFilters" class="community-filter-options"></div>
-        </div>
-        <div class="community-filter-group">
-          <span class="community-filter-label">Class</span>
-          <div id="communityClassFilters" class="community-filter-options"></div>
-        </div>
-        <div class="community-filter-group community-sort-group">
-          <label class="community-sort-wrap">
-            <span class="community-filter-label">Sort</span>
-            <select id="communitySortSelect" class="community-sort-select">
-              <option value="newest">Newest</option>
-              <option value="oldest">Oldest</option>
-              <option value="views">Most viewed</option>
-              <option value="likes">Most liked</option>
-              <option value="skills">Most skills</option>
-            </select>
-          </label>
-          <button id="clearCommunityFiltersBtn" class="community-clear-filters-btn" type="button">Reset</button>
-        </div>
-      </div>
-
-      <form id="communitySubmitForm" class="community-submit-form" hidden>
-        <div class="community-form-grid">
-          <label class="community-field">
-            <span>Title</span>
-            <input id="communitySubmitTitle" type="text" minlength="3" maxlength="80" required
-              placeholder="Electric burst opener">
-          </label>
-          <label class="community-field">
-            <span>Author</span>
-            <input id="communitySubmitAuthor" type="text" maxlength="40" placeholder="Account username" readonly>
-          </label>
-        </div>
-        <label class="community-field">
-          <span>Description</span>
-          <textarea id="communitySubmitDescription" maxlength="600" rows="3"
-            placeholder="Short notes for this rotation"></textarea>
-        </label>
-        <div id="communitySubmitStatus" class="community-submit-status"></div>
-        <div class="community-submit-actions">
-          <button id="cancelCommunitySubmitBtn" class="community-secondary-btn" type="button">Cancel</button>
-          <button id="communitySubmitButton" class="community-submit-btn" type="submit">Submit for review</button>
-        </div>
-      </form>
-
-      <div id="communityDetailPanel" class="community-detail-panel" hidden></div>
-      <div id="communityRotationStatus" class="community-status"></div>
-      <div id="communityRotationList" class="community-rotation-list"></div>
-    </div>
-  </div>
-
   <div id="operatorGalleryModal" class="settings-modal operator-gallery-modal">
     <div class="settings-dialog operator-gallery-dialog">
       <div class="settings-header">
         <h2 class="settings-title">Operator Gallery</h2>
-        <button id="closeOperatorGalleryBtn" class="settings-close" type="button">&times;</button>
+        <button id="closeOperatorGalleryBtn" class="settings-close" type="button" aria-label="Close operator gallery">&times;</button>
       </div>
 
       <div class="operator-gallery-toolbar">
@@ -626,7 +565,7 @@
     <div class="settings-dialog operator-gallery-dialog">
       <div class="settings-header">
         <h2 class="settings-title">Operator Details</h2>
-        <button id="closeOperatorDetailBtn" class="settings-close" type="button">&times;</button>
+        <button id="closeOperatorDetailBtn" class="settings-close" type="button" aria-label="Close operator details">&times;</button>
       </div>
 
       <section id="operatorGalleryDetail" class="operator-gallery-detail"></section>
@@ -637,7 +576,7 @@
     <div class="settings-dialog admin-dialog">
       <div class="settings-header">
         <h2 class="settings-title">Admin Review</h2>
-        <button id="closeAdminPanelBtn" class="settings-close" type="button">&times;</button>
+        <button id="closeAdminPanelBtn" class="settings-close" type="button" aria-label="Close admin review">&times;</button>
       </div>
 
       <section id="adminLoginPanel" class="admin-login-panel">
@@ -683,7 +622,7 @@
     <div class="settings-dialog">
       <div class="settings-header">
         <h2 class="settings-title">Select Enemy</h2>
-        <button id="closeEnemyModalBtn" class="settings-close" type="button">×</button>
+        <button id="closeEnemyModalBtn" class="settings-close" type="button" aria-label="Close enemy selection">×</button>
       </div>
       <div id="enemyModalList" class="settings-section"></div>
     </div>
@@ -722,43 +661,6 @@
       </article>
     </div>
 
-    <section class="seo-operator-section" aria-labelledby="operatorGalleryTitle">
-      <h3 id="operatorGalleryTitle">Operator gallery</h3>
-      <p>
-        The builder currently includes playable planning data for these Arknights: Endfield operators,
-        including their class, element and rotation-ready skill entries.
-      </p>
-      <div id="seoOperatorGallery" class="seo-operator-gallery">
-        <article><img src="assets/operators/avatars/Ardelia.png" alt="Ardelia operator avatar"><strong>Ardelia</strong><span>Supporter - Nature</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="12">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Antal.png" alt="Antal operator avatar"><strong>Antal</strong><span>Supporter - Electric</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="8">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Alesh.png" alt="Alesh operator avatar"><strong>Alesh</strong><span>Vanguard - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="10">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Chen.png" alt="Chen Qianyu operator avatar"><strong>Chen Qianyu</strong><span>Guard - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="14">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Catcher.png" alt="Catcher operator avatar"><strong>Catcher</strong><span>Defender - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="13">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Dapan.png" alt="Da Pan operator avatar"><strong>Da Pan</strong><span>Striker - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="16">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Ember.png" alt="Ember operator avatar"><strong>Ember</strong><span>Defender - Heat</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="17">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Estella.png" alt="Estella operator avatar"><strong>Estella</strong><span>Guard - Cryo</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="18">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Fluorite.png" alt="Fluorite operator avatar"><strong>Fluorite</strong><span>Caster - Nature</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="19">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Last_Rite.png" alt="Last Rite operator avatar"><strong>Last Rite</strong><span>Striker - Cryo</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="20">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Lifeng.png" alt="Lifeng operator avatar"><strong>Lifeng</strong><span>Guard - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="21">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Snowshine.png" alt="Snowshine operator avatar"><strong>Snowshine</strong><span>Defender - Cryo</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="23">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Wulfgard.png" alt="Wulfgard operator avatar"><strong>Wulfgard</strong><span>Caster - Heat</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="24">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Xaihi.png" alt="Xaihi operator avatar"><strong>Xaihi</strong><span>Supporter - Cryo</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="25">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Pogranichnik.png" alt="Pogranichnik operator avatar"><strong>Pogranichnik</strong><span>Vanguard - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="22">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Zhuang.png" alt="Zhuang operator avatar"><strong>Zhuang</strong><span>Striker - Electric</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="9">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Avywenna.png" alt="Avywenna operator avatar"><strong>Avywenna</strong><span>Striker - Electric</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="7">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Arclight.png" alt="Arclight operator avatar"><strong>Arclight</strong><span>Vanguard - Electric</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="6">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Laevatain.png" alt="Laevatain operator avatar"><strong>Laevatain</strong><span>Striker - Heat</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="1">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Akekuri.png" alt="Akekuri operator avatar"><strong>Akekuri</strong><span>Vanguard - Heat</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="2">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Endmin.png" alt="Endministrator operator avatar"><strong>Endministrator</strong><span>Guard - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="3">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Perlica.png" alt="Perlica operator avatar"><strong>Perlica</strong><span>Caster - Electric</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="4">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Rossi.png" alt="Rossi operator avatar"><strong>Rossi</strong><span>Guard - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="5">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Tangtang.png" alt="Tangtang operator avatar"><strong>Tangtang</strong><span>Caster - Cryo</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="15">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Gilberta.png" alt="Gilberta operator avatar"><strong>Gilberta</strong><span>Supporter - Nature</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="11">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Yvonne.png" alt="Yvonne operator avatar"><strong>Yvonne</strong><span>Caster - Cryo</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="26">Show rotation</a></article>
-        <article><img src="assets/operators/avatars/Mi_Fu.png" alt="Mi Fu operator avatar"><strong>Mi Fu</strong><span>Guard - Physical</span><a href="#community-rotations" data-open-community-rotations data-community-operator-id="27">Show rotation</a></article>
-      </div>
-    </section>
-
     <section class="seo-faq" aria-labelledby="seoFaqTitle">
       <h3 id="seoFaqTitle">Arknights: Endfield rotation planner FAQ</h3>
       <details>
@@ -782,7 +684,7 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabaseClient.js"></script>
+  <script src="supabaseClient.js?v=2"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -798,33 +700,6 @@
   <script src="js/data/enemies/physicalAttacker.js"></script>
   <script src="js/data/enemies/bossDummy.js"></script>
   <script src="js/data/enemySkills.js"></script>
-  <script src="js/data/operators/alesh.js"></script>
-  <script src="js/data/operators/antal.js"></script>
-  <script src="js/data/operators/akekuri.js"></script>
-  <script src="js/data/operators/arclight.js"></script>
-  <script src="js/data/operators/ardelia.js"></script>
-  <script src="js/data/operators/avywenna.js"></script>
-  <script src="js/data/operators/catcher.js"></script>
-  <script src="js/data/operators/chen.js"></script>
-  <script src="js/data/operators/dapan.js"></script>
-  <script src="js/data/operators/estella.js"></script>
-  <script src="js/data/operators/ember.js"></script>
-  <script src="js/data/operators/fluorite.js"></script>
-  <script src="js/data/operators/gilberta.js"></script>
-  <script src="js/data/operators/laevatain.js"></script>
-  <script src="js/data/operators/lifeng.js"></script>
-  <script src="js/data/operators/wulfgard.js"></script>
-  <script src="js/data/operators/pogranichnik.js"></script>
-  <script src="js/data/operators/xaihi.js"></script>
-  <script src="js/data/operators/snowshine.js"></script>
-  <script src="js/data/operators/lastrite.js"></script>
-  <script src="js/data/operators/rossi.js"></script>
-  <script src="js/data/operators/perlica.js"></script>
-  <script src="js/data/operators/endministrator.js"></script>
-  <script src="js/data/operators/tangtang.js"></script>
-  <script src="js/data/operators/zhuang.js"></script>
-  <script src="js/data/operators/yvonne.js"></script>
-  <script src="js/data/operators.js"></script>
   <script src="js/state/appState.js"></script>
   <script src="js/logic/operatorStateEngine.js"></script>
   <script src="js/logic/basicAttack.js"></script>
@@ -845,10 +720,10 @@
   <script src="js/ui/rotationGrid.js"></script>
   <script src="js/ui/teamSelection.js"></script>
   <script src="js/ui/communityRotations.js"></script>
-  <script src="js/ui/operatorGallery.js"></script>
+  <script src="js/ui/operatorGallery.js?v=2"></script>
   <script src="js/ui/myRotations.js"></script>
   <script src="js/ui/adminPanel.js"></script>
-  <script src="js/main.js"></script>
+  <script src="js/main.js?v=2"></script>
 </body>
 
 </html>

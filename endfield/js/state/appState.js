@@ -1,6 +1,7 @@
 let rotation = [null];
 let selectedTeam = [null, null, null, null];
 let activeSlotIndex = null;
+let operators = [];
 
 let skillSourceSortables = [];
 let slotSortables = [];

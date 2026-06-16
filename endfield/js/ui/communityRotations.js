@@ -4,6 +4,7 @@ const communityRotationState = {
     elementFilter: "all",
     classFilter: "all",
     sort: "newest",
+    filtersOpen: false,
     detailRotationId: "",
     deepLinkRotationId: "",
     focusedOperatorId: null,
@@ -20,6 +21,7 @@ const communityRotationState = {
 const COMMUNITY_LIKES_STORAGE_KEY = "aertLikedCommunityRotations";
 const COMMUNITY_ROTATION_HASH_KEY = "community";
 const COMMUNITY_ROTATIONS_HASH = "community-rotations";
+const COMMUNITY_PAGE_PATH = "community/";
 
 let communityRotationsInitialized = false;
 
@@ -277,10 +279,28 @@ function createCommunityTextElement(tagName, className, text) {
 }
 
 function getFocusedCommunityOperator() {
-    const operatorId = Number(communityRotationState.focusedOperatorId);
-    if (!Number.isFinite(operatorId)) return null;
+    const operatorId = getFocusedCommunityOperatorId();
+    if (operatorId === null) return null;
 
     return getCommunityOperatorById(operatorId);
+}
+
+function getCommunityPageUrl(params = {}) {
+    const url = new URL(COMMUNITY_PAGE_PATH, window.location.href);
+    Object.entries(params).forEach(([key, value]) => {
+        if (value !== null && value !== undefined && value !== "") {
+            url.searchParams.set(key, String(value));
+        }
+    });
+    return url.href;
+}
+
+function getFocusedCommunityOperatorId() {
+    const value = communityRotationState.focusedOperatorId;
+    if (value === null || value === undefined || value === "") return null;
+
+    const operatorId = Number(value);
+    return Number.isFinite(operatorId) ? operatorId : null;
 }
 
 function createCommunityStateCard({ type = "", title, message, actionLabel = "", action = null, loading = false }) {
@@ -531,11 +551,11 @@ function getFilteredCommunityRotations() {
     const query = communityRotationState.search.trim().toLowerCase();
     const elementFilter = normalizeCommunityFilterValue(communityRotationState.elementFilter);
     const classFilter = normalizeCommunityFilterValue(communityRotationState.classFilter);
-    const focusedOperatorId = Number(communityRotationState.focusedOperatorId);
+    const focusedOperatorId = getFocusedCommunityOperatorId();
 
     const filteredRotations = communityRotationState.rotations.filter(row => {
         const matchesSearch = !query || getCommunitySearchText(row).includes(query);
-        const matchesFocusedOperator = !Number.isFinite(focusedOperatorId)
+        const matchesFocusedOperator = focusedOperatorId === null
             || normalizeCommunityList(row.team_operator_ids).some(operatorId => Number(operatorId) === focusedOperatorId);
         const matchesElement = elementFilter === "all" || getCommunityElements(row)
             .map(normalizeCommunityFilterValue)
@@ -587,9 +607,37 @@ function sortCommunityRotations(rotations) {
 
 function hasActiveCommunityFilters() {
     return Boolean(communityRotationState.search.trim())
-        || Number.isFinite(Number(communityRotationState.focusedOperatorId))
+        || getFocusedCommunityOperatorId() !== null
         || communityRotationState.elementFilter !== "all"
         || communityRotationState.classFilter !== "all";
+}
+
+function getActiveCommunityFilterCount() {
+    let count = 0;
+    if (getFocusedCommunityOperatorId() !== null) count += 1;
+    if (communityRotationState.elementFilter !== "all") count += 1;
+    if (communityRotationState.classFilter !== "all") count += 1;
+    if (communityRotationState.sort !== "newest") count += 1;
+    return count;
+}
+
+function renderCommunityFilterPanel() {
+    const panel = document.getElementById("communityFilterPanel");
+    const toggleButton = document.getElementById("toggleCommunityFiltersBtn");
+    const activeFilterCount = getActiveCommunityFilterCount();
+
+    if (panel) panel.hidden = !communityRotationState.filtersOpen;
+    if (!toggleButton) return;
+
+    toggleButton.textContent = activeFilterCount ? `Filters (${activeFilterCount})` : "Filters";
+    toggleButton.setAttribute("aria-expanded", String(communityRotationState.filtersOpen));
+    toggleButton.classList.toggle("is-open", communityRotationState.filtersOpen);
+    toggleButton.classList.toggle("is-active", activeFilterCount > 0);
+}
+
+function toggleCommunityFilters() {
+    communityRotationState.filtersOpen = !communityRotationState.filtersOpen;
+    renderCommunityFilterPanel();
 }
 
 function getCommunityFilterIconPath(filterKey, value) {
@@ -675,6 +723,7 @@ function renderCommunityFilters() {
 
     const sortSelect = document.getElementById("communitySortSelect");
     if (sortSelect) sortSelect.value = communityRotationState.sort;
+    renderCommunityFilterPanel();
 }
 
 function getActiveCommunityDetailRow() {
@@ -876,32 +925,26 @@ function getCommunityAccountUserId() {
 }
 
 function getCommunitySubmitAuthorName() {
+    if (!isCommunityAccountSignedIn()) return "Anonymous";
+
     const profile = getCommunityAccountProfile();
     const username = String(profile?.username || "").trim();
-    return username || "Account";
+    return username || "Anonymous";
 }
 
 function updateCommunitySubmitAvailability() {
     const submitToggle = document.getElementById("openCommunitySubmitFormBtn");
     if (!submitToggle) return;
 
-    const isSignedIn = isCommunityAccountSignedIn();
     const hasRotation = typeof hasCreatedRotation === "function" ? hasCreatedRotation() : getCurrentCommunityRotationEntries().length > 0;
 
-    submitToggle.disabled = !isSignedIn || !hasRotation;
-    submitToggle.textContent = !isSignedIn ? "Sign in required" : hasRotation ? "Submit Current" : "No Rotation";
+    submitToggle.disabled = !hasRotation;
+    submitToggle.textContent = hasRotation ? "Submit Current" : "No Rotation";
 }
 
 function setCommunitySubmitFormOpen(isOpen) {
     const form = document.getElementById("communitySubmitForm");
     if (!form) return;
-
-    if (isOpen && !isCommunityAccountSignedIn()) {
-        form.hidden = true;
-        updateCommunitySubmitAvailability();
-        setCommunitySubmitStatus("Sign in before submitting a rotation.", "is-error");
-        return;
-    }
 
     form.hidden = !isOpen;
     if (isOpen) {
@@ -922,10 +965,6 @@ function validateCommunitySubmission(values) {
     const description = values.description.trim();
     const teamIds = getCurrentCommunityTeamIds();
     const rotationEntries = getCurrentCommunityRotationEntries();
-
-    if (!isCommunityAccountSignedIn()) {
-        return "Sign in before submitting a rotation.";
-    }
 
     if (!title || title.length < 3 || title.length > 80) {
         return "Please enter a title between 3 and 80 characters.";
@@ -1169,17 +1208,10 @@ function createCommunityRotationCard(row) {
 
     const rotationPreview = createCommunityRotationPreview(row);
 
-    const description = createCommunityTextElement(
-        "p",
-        "community-description",
-        row.description || "No description added."
-    );
-
-    const chipRow = document.createElement("div");
-    chipRow.className = "community-chip-row";
-    [...getCommunityElements(row), ...getCommunityClasses(row)].slice(0, 8).forEach(label => {
-        chipRow.appendChild(createCommunityTextElement("span", "community-chip", formatCommunityLabel(label)));
-    });
+    const descriptionText = String(row.description || "").trim();
+    const description = descriptionText
+        ? createCommunityTextElement("p", "community-description", descriptionText)
+        : null;
 
     const footer = document.createElement("div");
     footer.className = "community-card-footer";
@@ -1194,7 +1226,9 @@ function createCommunityRotationCard(row) {
     actions.append(createCommunityDetailButton(row), createCommunityCopyLinkButton(row, "Link"), createCommunityLikeButton(row));
     footer.appendChild(actions);
 
-    card.append(header, team, rotationPreview, description, chipRow, footer);
+    card.append(header, team, rotationPreview);
+    if (description) card.appendChild(description);
+    card.appendChild(footer);
     return card;
 }
 
@@ -1218,8 +1252,7 @@ function handleCommunityRotationDeepLink() {
     const rotationId = getCommunityRotationIdFromUrl();
     if (!rotationId) return false;
 
-    communityRotationState.deepLinkRotationId = String(rotationId);
-    openCommunityRotationsModal({ forceRefresh: !communityRotationState.loaded });
+    window.location.replace(getCommunityPageUrl({ community: rotationId }));
     return true;
 }
 
@@ -1230,7 +1263,7 @@ function isCommunityRotationsHash() {
 function handleCommunityRotationsHash() {
     if (!isCommunityRotationsHash()) return false;
 
-    openCommunityRotationsModal({ forceRefresh: !communityRotationState.loaded });
+    window.location.replace(getCommunityPageUrl());
     return true;
 }
 
@@ -1238,16 +1271,7 @@ function openCommunityRotationsFromLink(event) {
     if (event) event.preventDefault();
 
     const operatorId = Number(event?.currentTarget?.dataset?.communityOperatorId);
-    if (Number.isFinite(operatorId) && filterCommunityRotationsByOperator(operatorId)) {
-        return;
-    }
-
-    if (!isCommunityRotationsHash()) {
-        window.location.hash = COMMUNITY_ROTATIONS_HASH;
-        return;
-    }
-
-    handleCommunityRotationsHash();
+    window.location.href = getCommunityPageUrl(Number.isFinite(operatorId) ? { operator: operatorId } : {});
 }
 
 function handleCommunityHashNavigation() {
@@ -1429,16 +1453,7 @@ function loadCommunityRotation(rotationId) {
 }
 
 function openCommunityRotationsModal(options = {}) {
-    const modal = document.getElementById("communityModal");
-    if (!modal) return;
-
-    const forceRefresh = Object.prototype.hasOwnProperty.call(options || {}, "forceRefresh")
-        ? Boolean(options.forceRefresh)
-        : true;
-
-    modal.classList.add("open");
-    updateCommunitySubmitAvailability();
-    fetchCommunityRotations(forceRefresh);
+    window.location.href = getCommunityPageUrl();
 }
 
 function closeCommunityRotationsModal() {
@@ -1446,6 +1461,7 @@ function closeCommunityRotationsModal() {
     if (!modal) return;
 
     setCommunitySubmitFormOpen(false);
+    communityRotationState.filtersOpen = false;
     communityRotationState.detailRotationId = "";
     renderCommunityDetailPanel();
     modal.classList.remove("open");
@@ -1483,16 +1499,7 @@ function filterCommunityRotationsByOperator(operatorId) {
     const operator = getCommunityOperatorById(operatorId);
     if (!operator) return false;
 
-    communityRotationState.search = operator.name;
-    communityRotationState.focusedOperatorId = operator.id;
-    communityRotationState.elementFilter = "all";
-    communityRotationState.classFilter = "all";
-    communityRotationState.detailRotationId = "";
-
-    const searchInput = document.getElementById("communitySearchInput");
-    if (searchInput) searchInput.value = operator.name;
-
-    openCommunityRotationsModal({ forceRefresh: !communityRotationState.loaded });
+    window.location.href = getCommunityPageUrl({ operator: operator.id });
     return true;
 }
 
@@ -1504,6 +1511,7 @@ function initCommunityRotations() {
     const openButton = document.getElementById("openCommunityRotationsBtn");
     const closeButton = document.getElementById("closeCommunityModalBtn");
     const refreshButton = document.getElementById("refreshCommunityRotationsBtn");
+    const filterToggle = document.getElementById("toggleCommunityFiltersBtn");
     const submitToggle = document.getElementById("openCommunitySubmitFormBtn");
     const submitForm = document.getElementById("communitySubmitForm");
     const cancelSubmitButton = document.getElementById("cancelCommunitySubmitBtn");
@@ -1513,11 +1521,14 @@ function initCommunityRotations() {
     const modal = document.getElementById("communityModal");
     const communityLinks = document.querySelectorAll("[data-open-community-rotations]");
 
-    if (openButton) openButton.addEventListener("click", () => openCommunityRotationsModal());
+    if (openButton && openButton.tagName !== "A") {
+        openButton.addEventListener("click", () => openCommunityRotationsModal());
+    }
     communityLinks.forEach(link => {
         link.addEventListener("click", openCommunityRotationsFromLink);
     });
     if (closeButton) closeButton.addEventListener("click", closeCommunityRotationsModal);
+    if (filterToggle) filterToggle.addEventListener("click", toggleCommunityFilters);
     if (refreshButton) refreshButton.addEventListener("click", () => fetchCommunityRotations(true));
     if (submitToggle) submitToggle.addEventListener("click", () => setCommunitySubmitFormOpen(true));
     if (submitForm) submitForm.addEventListener("submit", submitCommunityRotation);

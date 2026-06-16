@@ -17,6 +17,21 @@ function getOperatorGallerySlug(operator) {
         .replace(/^-+|-+$/g, "");
 }
 
+function getOperatorLandingPageSlug(operator) {
+    if (operator?.slug) return String(operator.slug).trim().toLowerCase();
+
+    return String(operator?.name || operator?.id || "")
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "_")
+        .replace(/^_+|_+$/g, "");
+}
+
+function createOperatorLandingPageUrl(operator) {
+    const slug = getOperatorLandingPageSlug(operator);
+    return new URL(`operators/${slug}/`, `${window.location.origin}${window.location.pathname}`).href;
+}
+
 function getOperatorGallerySlugFromHash() {
     const hash = window.location.hash.replace(/^#/, "");
     if (!hash.startsWith("operator-")) return "";
@@ -715,6 +730,13 @@ function openOperatorGalleryDetail(operatorId) {
     const actions = document.createElement("div");
     actions.className = "operator-gallery-actions operator-gallery-detail-actions";
 
+    const landingPageLink = document.createElement("a");
+    landingPageLink.className = "operator-gallery-landing-link";
+    landingPageLink.href = createOperatorLandingPageUrl(operator);
+    landingPageLink.target = "_blank";
+    landingPageLink.rel = "noopener";
+    landingPageLink.textContent = "View Operator Page";
+
     const useLeaderButton = document.createElement("button");
     useLeaderButton.type = "button";
     useLeaderButton.textContent = "Use as leader";
@@ -741,7 +763,7 @@ function openOperatorGalleryDetail(operatorId) {
     copyLinkButton.textContent = "Copy operator link";
     copyLinkButton.addEventListener("click", () => copyOperatorGalleryDeepLink(operator, copyLinkButton));
 
-    actions.append(useLeaderButton, showLink, createButton, copyLinkButton);
+    actions.append(landingPageLink, useLeaderButton, showLink, createButton, copyLinkButton);
     copy.append(title, subtitle, actions);
     header.append(image, copy);
 

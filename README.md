@@ -21,7 +21,7 @@ Interactive web tool for building, visualizing, exporting, and sharing Arknights
 - Share links with the setup embedded in the URL hash.
 - Export rotation images with a builder-address watermark.
 - Account-based private saves, password reset, usernames, and avatar profiles through `My Rotations`.
-- Browse, filter, sort, inspect, preview, link, and like approved Community rotations with visible author usernames and avatars, then submit your current setup for review when signed in.
+- Browse, filter, sort, inspect, preview, link, and like approved Community rotations with visible author usernames and avatars, then submit your current setup for review as an account or as Anonymous.
 - LocalStorage auto-save for team, rotation, UI settings, and operator states.
 - Optional Enemy panel controlled from `js/state/appState.js`.
 
@@ -116,8 +116,6 @@ supabase/
   user_rotations.sql
   admin_panel.sql
   seed_operators_basic.sql
-tools/
-  exportOperatorsForSupabase.js
 ```
 
 Run `supabase/schema.sql` first in the Supabase SQL Editor. It creates:
@@ -126,18 +124,11 @@ Run `supabase/schema.sql` first in the Supabase SQL Editor. It creates:
 - `operator_skills` for all skills linked to their operator.
 - public read policies for both tables.
 
-For a quick import of only the operator rows, run `supabase/seed_operators_basic.sql`.
-
-For the full import with operators, skills, and preserved raw JSON data, generate the SQL from the current local data:
-
-```bash
-node tools/exportOperatorsForSupabase.js --stdout > supabase/seed_operators.sql
-```
-
-Then paste/run `supabase/seed_operators.sql` in the Supabase SQL Editor after the schema.
+For a quick bootstrap of only the operator rows, run `supabase/seed_operators_basic.sql`.
+Full operator and skill data is maintained in Supabase.
 
 The frontend must only use the Supabase publishable/anon key. Never put a Supabase `service_role` key into browser code.
-When `useSupabaseOperators` is enabled, the app loads `operators` and `operator_skills` from Supabase on startup and falls back to the local JS files if loading fails.
+The app loads `operators` and `operator_skills` from Supabase on startup; local operator JS data is no longer bundled as a fallback.
 
 ### Community Rotations
 
@@ -149,7 +140,8 @@ supabase/community_rotations.sql
 
 It creates `community_rotations` and the access rules:
 
-- signed-in users can submit rotations for review.
+- signed-in users can submit rotations for review with their profile.
+- visitors can submit rotations for review as Anonymous without choosing a user.
 - visitors can only read rotations that are public, approved, and not hidden.
 - visitors can increment view and like counters through restricted database functions.
 - pending submissions stay hidden until you approve them in Supabase.
