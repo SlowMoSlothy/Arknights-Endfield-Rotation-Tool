@@ -5,7 +5,7 @@
 @import url("my-rotations.css");
 @import url("admin.css");
 @import url("skills.css?v=2");
-@import url("rotation.css");
+@import url("rotation.css?v=1");
 @import url("dragdrop.css");
 @import url("effects.css");
 @import url("enemy.css");
