@@ -662,6 +662,12 @@ function createRotationTimelineStep(index, secondsPerSlot = DEFAULT_BASIC_ATTACK
             : `${seconds}s`;
         marker.title = `Timeline ${marker.textContent}`;
         step.appendChild(marker);
+    } else {
+        const stepNumber = document.createElement("div");
+        stepNumber.className = "rotation-step-number";
+        stepNumber.textContent = String(index + 1);
+        stepNumber.setAttribute("aria-hidden", "true");
+        step.appendChild(stepNumber);
     }
 
     const skillSlot = createRotationLaneSlot(index, "skill");
@@ -4069,7 +4075,7 @@ function renderRotation() {
                 const debuffTray = createEffectTray(activeDebuffs, "debuff");
                 if (debuffTray) skillDiv.appendChild(debuffTray);
                 const removeBtn = document.createElement("button");
-                removeBtn.className = "remove-btn";
+                removeBtn.className = "remove-btn rotation-slot-action is-remove";
                 removeBtn.type = "button";
                 removeBtn.textContent = "×";
                 removeBtn.setAttribute("aria-label", "Remove skill");
@@ -4078,7 +4084,10 @@ function renderRotation() {
                     e.preventDefault();
                     e.stopPropagation();
                 });
-                skillDiv.appendChild(removeBtn);
+                const actionWrap = document.createElement("div");
+                actionWrap.className = "rotation-slot-actions";
+                actionWrap.appendChild(removeBtn);
+                skillDiv.appendChild(actionWrap);
                 skillSlot.appendChild(skillDiv);
             }
         }

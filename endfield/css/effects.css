@@ -49,7 +49,7 @@
     border-radius: 4px;
     white-space: nowrap;
 }
-.remove-btn {
+.remove-btn:not(.rotation-slot-action) {
     position: absolute;
     top: -6px;
     right: -6px;
@@ -71,7 +71,7 @@
     line-height: 1;
 }
 
-.rotation-skill:hover .remove-btn {
+.rotation-skill:hover .remove-btn:not(.rotation-slot-action) {
     opacity: 1;
 }
 

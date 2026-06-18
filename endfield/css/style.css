@@ -1,48 +1,61 @@
 @import url("base.css");
 @import url("loading.css");
-@import url("layout.css?v=4");
+@import url("layout.css?v=5");
 @import url("team.css");
 @import url("my-rotations.css");
 @import url("admin.css");
-@import url("skills.css?v=2");
-@import url("rotation.css?v=1");
+@import url("skills.css?v=10");
+@import url("rotation.css?v=6");
 @import url("dragdrop.css");
-@import url("effects.css");
+@import url("effects.css?v=2");
 @import url("enemy.css");
-@import url("mobile.css?v=12");
+@import url("mobile.css?v=14");
 @import url("tooltip.css");
 @import url("skill-elements.css");
 .seo-description {
-    max-width: 1200px;
-    margin: 80px auto 42px;
-    padding: 0 24px;
-    color: rgba(255,255,255,0.72);
-    line-height: 1.7;
+    margin-top: 34px;
+    margin-bottom: 30px;
+    padding: 20px 0 0;
+    border-top: 1px solid rgba(160,170,169,0.16);
+    color: rgba(255,255,255,0.64);
+    line-height: 1.55;
 }
 
 .seo-kicker {
-    margin: 0 0 8px;
-    color: rgba(248,245,70,0.76);
-    font-size: 12px;
+    margin: 0 0 6px;
+    color: rgba(248,245,70,0.62);
+    font-size: 10px;
     font-weight: 800;
     letter-spacing: 0.08em;
     text-transform: uppercase;
 }
 
 .seo-description h1 {
-    color: #F8F546;
-    margin: 0 0 18px;
-    font-size: clamp(32px, 5vw, 56px);
-    line-height: 1.02;
+    color: rgba(248,245,70,0.86);
+    margin: 0 0 10px;
+    font-size: clamp(24px, 2.6vw, 34px);
+    line-height: 1.05;
 }
 
 .seo-description h3 {
-    margin: 0 0 10px;
-    color: rgba(255,255,255,0.92);
+    margin: 0 0 7px;
+    color: rgba(255,255,255,0.86);
+    font-size: 15px;
+    line-height: 1.2;
 }
 
 .seo-intro {
-    max-width: 920px;
+    max-width: none;
+}
+
+.seo-intro p:not(.seo-kicker) {
+    max-width: 1120px;
+    margin: 0;
+    font-size: 14px;
+}
+
+.seo-intro p + p {
+    margin-top: 8px;
 }
 
 .seo-operator-actions {
@@ -821,29 +834,30 @@
 .seo-feature-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px;
-    margin: 28px 0 34px;
+    gap: 10px;
+    margin: 18px 0 20px;
 }
 
 .seo-feature-grid article,
 .seo-faq details {
-    border: 1px solid rgba(160,170,169,0.18);
-    background: rgba(11,16,18,0.58);
+    border: 1px solid rgba(160,170,169,0.12);
+    background: rgba(11,16,18,0.34);
 }
 
 .seo-feature-grid article {
-    padding: 18px;
+    padding: 12px;
 }
 
 .seo-feature-grid p,
 .seo-faq p,
 .seo-operator-section p {
     margin: 0;
+    font-size: 13px;
 }
 
 .seo-operator-section,
 .seo-faq {
-    margin-top: 34px;
+    margin-top: 22px;
 }
 
 .seo-operator-gallery {
@@ -877,27 +891,29 @@
 
 .seo-faq {
     display: grid;
-    gap: 10px;
+    gap: 7px;
+    max-width: 980px;
 }
 
 .seo-faq details {
-    padding: 14px 16px;
+    padding: 10px 12px;
 }
 
 .seo-faq summary {
     cursor: pointer;
-    color: rgba(255,255,255,0.9);
+    color: rgba(255,255,255,0.82);
+    font-size: 13px;
     font-weight: 800;
 }
 
 .seo-faq p {
-    padding-top: 10px;
+    padding-top: 8px;
 }
 
 @media (max-width: 760px) {
     .seo-description {
-        margin: 48px auto 28px;
-        padding: 0 14px;
+        margin: 28px auto 24px;
+        padding-top: 16px;
     }
 
     .seo-feature-grid {

@@ -354,57 +354,57 @@
 }
 
 :root.rotation-size-medium {
-    --rotation-slot-size: 72px;
-    --rotation-gap: 14px;
-    --rotation-row-gap: 36px;
-    --rotation-arrow-size: 18px;
-    --rotation-arrow-width: 24px;
+    --rotation-slot-size: 68px;
+    --rotation-gap: 12px;
+    --rotation-row-gap: 34px;
+    --rotation-arrow-size: 16px;
+    --rotation-arrow-width: 22px;
     --rotation-effect-size: 15px;
     --rotation-effect-gap: 2px;
     --rotation-effect-row-gap: 2px;
-    --rotation-effect-tray-width: 84px;
+    --rotation-effect-tray-width: 78px;
     --rotation-buff-offset: -17px;
     --rotation-debuff-offset: -26px;
 }
 
 :root.rotation-size-large {
-    --rotation-slot-size: 88px;
-    --rotation-gap: 18px;
-    --rotation-row-gap: 34px;
-    --rotation-arrow-size: 22px;
-    --rotation-arrow-width: 30px;
+    --rotation-slot-size: 80px;
+    --rotation-gap: 16px;
+    --rotation-row-gap: 32px;
+    --rotation-arrow-size: 20px;
+    --rotation-arrow-width: 28px;
     --rotation-effect-size: 15px;
     --rotation-effect-gap: 3px;
     --rotation-effect-row-gap: 2px;
-    --rotation-effect-tray-width: 88px;
+    --rotation-effect-tray-width: 82px;
     --rotation-buff-offset: -19px;
     --rotation-debuff-offset: -30px;
 }
 
 :root.rotation-size-xl {
-    --rotation-slot-size: 104px;
-    --rotation-gap: 22px;
-    --rotation-row-gap: 38px;
-    --rotation-arrow-size: 26px;
-    --rotation-arrow-width: 36px;
+    --rotation-slot-size: 92px;
+    --rotation-gap: 20px;
+    --rotation-row-gap: 36px;
+    --rotation-arrow-size: 23px;
+    --rotation-arrow-width: 32px;
     --rotation-effect-size: 16px;
     --rotation-effect-gap: 3px;
     --rotation-effect-row-gap: 2px;
-    --rotation-effect-tray-width: 104px;
+    --rotation-effect-tray-width: 94px;
     --rotation-buff-offset: -20px;
     --rotation-debuff-offset: -31px;
 }
 
 :root.rotation-size-xxl {
-    --rotation-slot-size: 120px;
-    --rotation-gap: 26px;
-    --rotation-row-gap: 42px;
-    --rotation-arrow-size: 30px;
-    --rotation-arrow-width: 42px;
+    --rotation-slot-size: 104px;
+    --rotation-gap: 24px;
+    --rotation-row-gap: 40px;
+    --rotation-arrow-size: 26px;
+    --rotation-arrow-width: 36px;
     --rotation-effect-size: 18px;
     --rotation-effect-gap: 3px;
     --rotation-effect-row-gap: 2px;
-    --rotation-effect-tray-width: 120px;
+    --rotation-effect-tray-width: 106px;
     --rotation-buff-offset: -22px;
     --rotation-debuff-offset: -32px;
 }
