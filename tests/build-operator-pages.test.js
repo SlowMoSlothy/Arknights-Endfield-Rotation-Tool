@@ -133,6 +133,9 @@ test("generated pages use placeholders when an operator image is missing", () =>
   assert.doesNotMatch(index, />RF</);
   assert.match(index, /class="tile-avatar-frame"/);
   assert.match(index, /\.tile-avatar-frame\{[^}]*aspect-ratio:1/);
+  assert.match(index, /\.tile-avatar-frame:before/);
+  assert.match(index, /\.tile-avatar-frame:after/);
+  assert.match(index, /backdrop-filter:blur\(10px\) saturate\(130%\)/);
   assert.doesNotMatch(index, /Arknights: Endfield Rotation Tool/);
   assert.doesNotMatch(index, /class="tool-name"/);
   assert.doesNotMatch(index, /<a href="https:\/\/rotationforge\.gg\/endfield\/operators\/">Operators<\/a>/);
@@ -230,6 +233,8 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /fetchpriority="high"/);
   assert.match(page, /class="portrait-media"/);
   assert.match(page, /aspect-ratio:1/);
+  assert.match(page, /backdrop-filter:blur\(15px\) saturate\(135%\)/);
+  assert.match(page, /\.portrait-media:before/);
   assert.match(page, /object-position:center bottom/);
   assert.match(page, /Database ID: OPERATOR_MI_FU/);
   assert.match(page, /<h2>About Mi Fu<\/h2>/);
@@ -247,6 +252,8 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /id="related"/);
   assert.match(page, /class="related-avatar-frame"/);
   assert.match(page, /\.operator-page \.related-avatar-frame/);
+  assert.match(page, /\.operator-page \.related-avatar-frame:before/);
+  assert.match(page, /backdrop-filter:blur\(9px\) saturate\(130%\)/);
   assert.match(page, /name="twitter:card" content="summary_large_image"/);
   assert.match(page, /property="og:image:alt"/);
   assert.match(page, /"@type":"WebPage"/);

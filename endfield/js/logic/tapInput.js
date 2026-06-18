@@ -151,7 +151,7 @@ function handleTapInput(e) {
         }
     }
 
-    if (e.target.closest(".remove-btn")) {
+    if (e.target.closest(".rotation-slot-action, .remove-btn")) {
         return;
     }
 

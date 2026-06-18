@@ -41,13 +41,23 @@
       "isAccessibleForFree": true
     }
   </script>
-  <link rel="stylesheet" href="css/style.css?v=16">
-  <link rel="stylesheet" href="css/mobile.css?v=12">
+  <link rel="stylesheet" href="css/style.css?v=29">
+  <link rel="stylesheet" href="css/mobile.css?v=14">
 </head>
 
 <body class="app-loading">
-  <link rel="stylesheet" href="css/settings.css?v=7">
+  <link rel="stylesheet" href="css/settings.css?v=8">
   <div id="globalTooltip" class="global-tooltip"></div>
+
+  <header class="top">
+    <nav class="nav" aria-label="Primary">
+      <a class="brand" href="/">
+        <span class="mark"><img src="/favicon-flat.png" alt=""></span>
+        <span>RotationForge</span>
+      </a>
+      <span class="tool-name">Combat Rotation Tools</span>
+    </nav>
+  </header>
 
   <div id="appLoadingScreen" class="app-loading-screen" role="status" aria-live="polite" aria-busy="true">
     <div class="app-loading-card">
@@ -351,28 +361,28 @@
             <div class="settings-preview">
               <div class="settings-preview-box" style="width: 52px; height: 52px;"></div>
             </div>
-            <div class="settings-size-label">72px</div>
+            <div class="settings-size-label">68px</div>
           </button>
           <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="large">
             <div class="settings-option-title">Large</div>
             <div class="settings-preview">
               <div class="settings-preview-box" style="width: 66px; height: 66px;"></div>
             </div>
-            <div class="settings-size-label">88px</div>
+            <div class="settings-size-label">80px</div>
           </button>
           <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="xl">
             <div class="settings-option-title">XL</div>
             <div class="settings-preview">
               <div class="settings-preview-box" style="width: 78px; height: 78px;"></div>
             </div>
-            <div class="settings-size-label">104px</div>
+            <div class="settings-size-label">92px</div>
           </button>
           <button class="settings-option-btn" data-setting="rotationSkillSize" data-value="xxl">
             <div class="settings-option-title">XXL</div>
             <div class="settings-preview">
               <div class="settings-preview-box" style="width: 92px; height: 92px;"></div>
             </div>
-            <div class="settings-size-label">120px</div>
+            <div class="settings-size-label">104px</div>
           </button>
         </div>
       </div>
@@ -678,7 +688,7 @@
     </section>
   </section>
   <footer class="site-footer">
-    <span>&copy; 2026 Arknights Endfield Rotation Builder</span>
+    <span>&copy; 2026 RotationForge</span>
     <span>App Version 2.15.11</span>
     <span>Fan-made tool, not affiliated with Gryphline or Hypergryph.</span>
   </footer>
@@ -711,13 +721,13 @@
   <script src="js/logic/comboEngine.js"></script>
   <script src="js/logic/dragDrop.js"></script>
   <script src="js/logic/uiSettings.js"></script>
-  <script src="js/logic/tapInput.js"></script>
+  <script src="js/logic/tapInput.js?v=3"></script>
   <script src="js/ui/enemyPanel.js"></script>
   <script src="js/ui/teamPreview.js"></script>
   <script src="js/ui/skillIconRenderer.js"></script>
   <script src="js/ui/skillsPanel.js"></script>
   <script src="js/ui/operatorBuffs.js"></script>
-  <script src="js/ui/rotationGrid.js"></script>
+  <script src="js/ui/rotationGrid.js?v=3"></script>
   <script src="js/ui/teamSelection.js"></script>
   <script src="js/ui/communityRotations.js"></script>
   <script src="js/ui/operatorGallery.js?v=2"></script>
