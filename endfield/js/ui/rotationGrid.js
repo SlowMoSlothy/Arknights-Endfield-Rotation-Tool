@@ -1610,7 +1610,14 @@ function scrollSimulationTrackToTime(time, pixelsPerSecond, options = {}) {
 
     const targetX = Math.max(0, Number(time || 0) * pixelsPerSecond);
     const maxScroll = Math.max(0, scrollArea.scrollWidth - scrollArea.clientWidth);
-    const nextLeft = Math.max(0, Math.min(maxScroll, targetX - (scrollArea.clientWidth * 0.45)));
+    const stickyLabelWidth = options.align === "center"
+        ? Math.max(0, scrollArea.querySelector(".rotation-sim-labels")?.getBoundingClientRect?.().width || 0)
+        : 0;
+    const followWidth = Math.max(1, scrollArea.clientWidth - stickyLabelWidth);
+    const targetOffset = options.align === "center"
+        ? followWidth * 0.5
+        : scrollArea.clientWidth * 0.45;
+    const nextLeft = Math.max(0, Math.min(maxScroll, targetX - targetOffset));
 
     if (typeof scrollArea.scrollTo === "function") {
         scrollArea.scrollTo({
@@ -1839,7 +1846,8 @@ function createSimulationCursorController(body, events, durationSeconds, pixelsP
         });
         if (options.scrollTrack) {
             scrollSimulationTrackToTime(simulationCursorTime, pixelsPerSecond, {
-                instant: Boolean(options.scrollTrackInstant)
+                instant: Boolean(options.scrollTrackInstant),
+                align: options.scrollTrackAlign || (simulationCursorPlaybackTimer ? "center" : undefined)
             });
         }
         updatePlayButton();
@@ -1853,10 +1861,18 @@ function createSimulationCursorController(body, events, durationSeconds, pixelsP
         }
 
         if (simulationCursorTime >= durationSeconds) setCursorTime(0, { autoScroll: true });
+        const playbackFollowOptions = {
+            autoScroll: true,
+            scrollTrack: true,
+            scrollTrackAlign: "center",
+            scrollTrackInstant: true
+        };
+
+        setCursorTime(simulationCursorTime, playbackFollowOptions);
 
         simulationCursorPlaybackTimer = window.setInterval(() => {
             const nextTime = clampSimulationCursorTime(simulationCursorTime + SIMULATION_TIME_STEP, durationSeconds);
-            setCursorTime(nextTime, { autoScroll: true });
+            setCursorTime(nextTime, playbackFollowOptions);
             if (nextTime >= durationSeconds) {
                 stopSimulationCursorPlayback();
                 updatePlayButton();

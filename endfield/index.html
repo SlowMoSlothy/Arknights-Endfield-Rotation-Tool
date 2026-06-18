@@ -224,6 +224,16 @@
         <main class="builder-main">
           <section class="builder-panel">
             <div class="rotation-actions" aria-label="Rotation actions">
+                <div class="rotation-mode-switch" role="group" aria-label="Rotation mode">
+                  <button class="rotation-mode-switch-btn" type="button" data-setting="timelineMode"
+                    data-value="simulation" aria-pressed="false" title="0.1s free placement">
+                    Simulation
+                  </button>
+                  <button class="rotation-mode-switch-btn" type="button" data-setting="timelineMode"
+                    data-value="slot" aria-pressed="false" title="Fixed skill order">
+                    Slot
+                  </button>
+                </div>
                 <span class="rotation-action-tooltip-host" data-action-tooltip="Export rotation as PNG image">
                   <button id="exportRotationBtn" class="rotation-action-btn rotation-action-primary" type="button"
                     onclick="exportImage()" aria-label="Export rotation as PNG image" disabled>
@@ -318,19 +328,6 @@
       <div class="settings-header">
         <h2 class="settings-title">Settings</h2>
         <button id="closeSettingsBtn" class="settings-close" type="button" aria-label="Close settings">×</button>
-      </div>
-      <div class="settings-section">
-        <span class="settings-label">Rotation Mode</span>
-        <div class="settings-option-row settings-mode-row">
-          <button class="settings-option-btn settings-mode-btn" data-setting="timelineMode" data-value="slot">
-            <div class="settings-option-title">Slot Mode</div>
-            <div class="settings-size-label">Fixed order</div>
-          </button>
-          <button class="settings-option-btn settings-mode-btn" data-setting="timelineMode" data-value="simulation">
-            <div class="settings-option-title">Simulation Mode</div>
-            <div class="settings-size-label">0.1s free placement</div>
-          </button>
-        </div>
       </div>
       <div class="settings-section">
         <label class="settings-label" for="simulationSpPerSecondInput">SP per second</label>

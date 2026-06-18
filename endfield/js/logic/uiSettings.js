@@ -166,7 +166,9 @@ function updateSettingsUi() {
 
     document.querySelectorAll("[data-setting='timelineMode']").forEach(btn => {
         const value = btn.dataset.value;
-        btn.classList.toggle("active", value === uiSettings.timelineMode);
+        const isActive = value === uiSettings.timelineMode;
+        btn.classList.toggle("active", isActive);
+        btn.setAttribute("aria-pressed", String(isActive));
     });
 
     document.querySelectorAll("[data-setting='simulationTimelineDensity']").forEach(btn => {

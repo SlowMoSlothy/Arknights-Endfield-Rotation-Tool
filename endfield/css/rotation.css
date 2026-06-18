@@ -42,6 +42,58 @@
     margin: 0 0 8px;
 }
 
+.rotation-mode-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    min-height: 30px;
+    margin-right: auto;
+    padding: 3px;
+    border: 1px solid rgba(160,170,169,0.24);
+    border-radius: 999px;
+    background:
+        radial-gradient(circle at 50% 0%, rgba(248,245,70,0.10), transparent 62%),
+        linear-gradient(180deg, rgba(49,55,57,0.70), rgba(16,18,20,0.96));
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.03),
+        0 6px 16px rgba(0,0,0,0.22);
+}
+
+.rotation-mode-switch-btn {
+    min-height: 24px;
+    min-width: 82px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: rgba(244,245,242,0.66);
+    font: inherit;
+    font-size: 11px;
+    font-weight: 1000;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+        background 0.16s ease,
+        color 0.16s ease,
+        box-shadow 0.16s ease;
+}
+
+.rotation-mode-switch-btn:hover,
+.rotation-mode-switch-btn:focus-visible {
+    color: #ffffff;
+    outline: none;
+}
+
+.rotation-mode-switch-btn.active {
+    background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.18), transparent 58%),
+        linear-gradient(180deg, rgba(248,245,70,0.24), rgba(64,68,43,0.94));
+    color: #F8F546;
+    box-shadow:
+        inset 0 0 0 1px rgba(248,245,70,0.22),
+        0 0 14px rgba(248,245,70,0.12);
+}
+
 .rotation-action-tooltip-host {
     display: inline-flex;
     line-height: 0;
@@ -678,35 +730,43 @@
 .rotation-sim-cursor-toolbar {
     box-sizing: border-box;
     display: grid;
-    grid-template-columns: auto minmax(260px, 1fr) auto;
-    gap: 6px;
+    grid-template-columns: max-content minmax(240px, 1fr) max-content;
+    gap: 8px;
     align-items: center;
     width: 100%;
     margin: 0 0 10px;
-    padding: 6px 8px;
+    min-height: 48px;
+    padding: 7px 9px;
     border: 1px solid rgba(160,170,169,0.16);
-    border-radius: 8px;
+    border-radius: 12px;
     background:
+        radial-gradient(circle at 0% 50%, rgba(248,245,70,0.08), transparent 34%),
         linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.012)),
-        rgba(10,12,14,0.54);
+        rgba(10,12,14,0.66);
     box-shadow:
         inset 0 0 0 1px rgba(255,255,255,0.02),
-        0 8px 18px rgba(0,0,0,0.20);
+        0 10px 22px rgba(0,0,0,0.22);
 }
 
 .rotation-sim-cursor-controls {
     display: flex;
-    gap: 4px;
+    gap: 3px;
     align-items: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    padding: 3px;
+    border: 1px solid rgba(160,170,169,0.13);
+    border-radius: 999px;
+    background:
+        linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.008)),
+        rgba(6,8,9,0.46);
 }
 
 .rotation-sim-cursor-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 34px;
-    height: 30px;
+    min-width: 30px;
+    height: 28px;
     padding: 0 8px;
     border: 1px solid rgba(160,170,169,0.22);
     border-radius: 999px;
@@ -720,15 +780,15 @@
 }
 
 .rotation-sim-cursor-button.is-icon {
-    width: 34px;
-    min-width: 34px;
+    width: 30px;
+    min-width: 30px;
     padding: 0;
 }
 
 .rotation-sim-cursor-button.is-icon svg {
     display: block;
-    width: 15px;
-    height: 15px;
+    width: 14px;
+    height: 14px;
     fill: none;
     stroke: currentColor;
     stroke-width: 2.15;
@@ -745,8 +805,8 @@
 }
 
 .rotation-sim-cursor-button.is-primary {
-    width: 38px;
-    min-width: 38px;
+    width: 34px;
+    min-width: 34px;
     border-color: rgba(248,245,70,0.58);
     color: #f8f546;
 }
@@ -770,10 +830,10 @@
 
 .rotation-sim-cursor-readout {
     display: grid;
-    grid-template-columns: minmax(54px, auto) minmax(82px, auto) minmax(0, 1fr);
+    grid-template-columns: minmax(46px, auto) minmax(72px, auto) minmax(0, 1fr);
     align-items: center;
     min-width: 0;
-    min-height: 30px;
+    min-height: 28px;
     overflow: hidden;
     border: 1px solid rgba(160,170,169,0.14);
     border-radius: 999px;
@@ -785,9 +845,9 @@
 .rotation-sim-cursor-readout .rotation-sim-cursor-stat {
     display: flex;
     align-items: center;
-    gap: 6px;
-    min-height: 28px;
-    padding: 0 9px;
+    gap: 5px;
+    min-height: 26px;
+    padding: 0 8px;
     border: 0;
     border-left: 1px solid rgba(160,170,169,0.12);
     border-radius: 0;
@@ -834,7 +894,7 @@
 
 .rotation-sim-cursor-effects-panel {
     display: flex;
-    gap: 5px;
+    gap: 4px;
     align-items: center;
     justify-content: flex-end;
     min-width: 0;
@@ -844,9 +904,9 @@
     display: flex;
     align-items: center;
     gap: 5px;
-    min-width: 48px;
-    min-height: 30px;
-    padding: 0 8px;
+    min-width: 42px;
+    min-height: 28px;
+    padding: 0 7px;
     border-radius: 999px;
 }
 
@@ -909,18 +969,23 @@
     line-height: 17px;
 }
 
-@media (max-width: 1160px) {
+@media (max-width: 760px) {
     .rotation-sim-cursor-toolbar {
-        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .rotation-sim-cursor-controls {
+        flex-wrap: wrap;
+        justify-content: center;
     }
 
     .rotation-sim-cursor-readout {
-        grid-column: 1 / -1;
-        order: 3;
+        order: 2;
     }
 
     .rotation-sim-cursor-effects-panel {
-        justify-content: flex-end;
+        order: 3;
+        justify-content: center;
     }
 }
 
@@ -3028,6 +3093,15 @@
     .rotation-actions {
         gap: 5px;
         margin-bottom: 10px;
+    }
+
+    .rotation-mode-switch {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .rotation-mode-switch-btn {
+        flex: 1 1 0;
     }
 
     .rotation-action-btn {
