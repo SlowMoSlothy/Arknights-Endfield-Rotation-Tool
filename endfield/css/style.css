@@ -5,10 +5,11 @@
 @import url("my-rotations.css");
 @import url("admin.css");
 @import url("skills.css?v=10");
-@import url("rotation.css?v=6");
+@import url("../loadout.css?v=14");
+@import url("rotation.css?v=7");
 @import url("dragdrop.css");
 @import url("effects.css?v=2");
-@import url("enemy.css");
+@import url("enemy.css?v=4");
 @import url("mobile.css?v=14");
 @import url("tooltip.css");
 @import url("skill-elements.css");

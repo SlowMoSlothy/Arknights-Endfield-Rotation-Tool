@@ -67,6 +67,119 @@
     gap: 6px;
     width: 148px;
 }
+
+.operator-weapon-loadout {
+    display: grid;
+    grid-template-columns: 27px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: 7px;
+    row-gap: 2px;
+    align-items: center;
+    min-height: 54px;
+    box-sizing: border-box;
+    padding: 6px 7px;
+    border: 1px solid rgba(160, 170, 169, 0.18);
+    border-radius: 11px;
+    background:
+        radial-gradient(circle at 12% 50%, rgba(248, 245, 70, 0.07), transparent 42%),
+        linear-gradient(180deg, rgba(34, 38, 40, 0.92), rgba(11, 13, 15, 0.98));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.045),
+        0 4px 10px rgba(0, 0, 0, 0.20);
+}
+
+.operator-weapon-loadout.equipped {
+    border-color: rgba(248, 245, 70, 0.34);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.055),
+        0 0 12px rgba(248, 245, 70, 0.07),
+        0 4px 10px rgba(0, 0, 0, 0.20);
+}
+
+.operator-weapon-loadout-icon {
+    grid-row: 1 / span 2;
+    width: 27px;
+    height: 27px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(160, 170, 169, 0.23);
+    border-radius: 8px;
+    color: rgba(244, 245, 242, 0.72);
+    background: rgba(0, 0, 0, 0.30);
+}
+
+.operator-weapon-loadout.equipped .operator-weapon-loadout-icon {
+    border-color: rgba(248, 245, 70, 0.38);
+    color: #F8F546;
+}
+
+.operator-weapon-loadout-icon svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.operator-weapon-loadout-label {
+    min-width: 0;
+    color: rgba(160, 170, 169, 0.86);
+    font-size: 8px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+}
+
+.operator-weapon-loadout-select {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    margin-top: 3px;
+    padding: 0 15px 0 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #f4f5f2;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+
+.operator-weapon-loadout-select:focus-visible {
+    color: #F8F546;
+}
+
+.operator-weapon-loadout-select:disabled {
+    color: rgba(160, 170, 169, 0.56);
+    cursor: not-allowed;
+}
+
+.operator-weapon-loadout-select option {
+    background: #1b1f21;
+    color: #f4f5f2;
+}
+
+.operator-weapon-loadout-summary {
+    min-width: 0;
+    overflow: hidden;
+    color: rgba(160, 170, 169, 0.72);
+    font-size: 8px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.operator-weapon-loadout.equipped .operator-weapon-loadout-summary {
+    color: rgba(244, 245, 242, 0.72);
+}
 .operator-skill-card {
     position: relative;
     display: block;

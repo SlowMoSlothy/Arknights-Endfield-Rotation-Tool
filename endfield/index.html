@@ -41,8 +41,9 @@
       "isAccessibleForFree": true
     }
   </script>
-  <link rel="stylesheet" href="css/style.css?v=29">
+  <link rel="stylesheet" href="css/style.css?v=41">
   <link rel="stylesheet" href="css/mobile.css?v=14">
+  <link rel="stylesheet" href="atk-chart.css?v=5">
 </head>
 
 <body class="app-loading">
@@ -234,6 +235,25 @@
                     Slot
                   </button>
                 </div>
+                <button id="selectEnemyBtn" class="enemy-profile-picker" type="button" aria-haspopup="dialog"
+                  aria-controls="enemyModal" title="Choose enemy combat profile">
+                  <span class="enemy-profile-picker-icon" aria-hidden="true">DEF</span>
+                  <span class="enemy-profile-picker-copy">
+                    <span class="enemy-profile-picker-label">Enemy profile</span>
+                    <strong id="selectedEnemyName">Training Dummy</strong>
+                    <span id="selectedEnemyMeta">DEF 100 / Neutral resistance</span>
+                  </span>
+                  <span class="enemy-profile-picker-arrow" aria-hidden="true">›</span>
+                </button>
+                <div class="damage-mode-switch" role="group" aria-label="Damage result">
+                  <span class="damage-mode-switch-label">DMG</span>
+                  <button type="button" data-setting="simulationDamageMode" data-value="normal"
+                    aria-pressed="false" title="Show damage without critical hits">Normal</button>
+                  <button type="button" data-setting="simulationDamageMode" data-value="expected"
+                    aria-pressed="true" title="Show average damage weighted by Crit Rate">Expected</button>
+                  <button type="button" data-setting="simulationDamageMode" data-value="critical"
+                    aria-pressed="false" title="Show damage when the hit is critical">Crit</button>
+                </div>
                 <span class="rotation-action-tooltip-host" data-action-tooltip="Export rotation as PNG image">
                   <button id="exportRotationBtn" class="rotation-action-btn rotation-action-primary" type="button"
                     onclick="exportImage()" aria-label="Export rotation as PNG image" disabled>
@@ -315,10 +335,72 @@
           </section>
           <section id="enemyPanel" class="builder-panel">
             <h3>Enemy</h3>
-            <button id="selectEnemyBtn" type="button">Select Enemy</button>
             <div id="enemySkillBar" class="skills-panel"></div>
           </section>
         </main>
+      </div>
+    </div>
+  </div>
+
+  <div id="operatorLoadoutModal" class="settings-modal loadout-modal" aria-hidden="true">
+    <div class="settings-dialog loadout-dialog" role="dialog" aria-modal="true" aria-labelledby="operatorLoadoutTitle">
+      <div class="settings-header loadout-header">
+        <div>
+          <span class="loadout-kicker">Simulation equipment</span>
+          <h2 id="operatorLoadoutTitle" class="settings-title">Operator Loadout</h2>
+        </div>
+        <button id="closeOperatorLoadoutModalBtn" class="settings-close" type="button" aria-label="Close operator loadout">&times;</button>
+      </div>
+
+      <section class="loadout-operator-summary" aria-label="Selected operator">
+        <img id="loadoutOperatorAvatar" class="loadout-operator-avatar" alt="">
+        <div>
+          <span>Configure equipment for</span>
+          <strong id="loadoutOperatorName">Operator</strong>
+          <small id="loadoutOperatorMeta"></small>
+        </div>
+      </section>
+
+      <section class="loadout-slot-grid" aria-label="Equipment slots">
+        <div class="loadout-slot active">
+          <span class="loadout-slot-icon" aria-hidden="true">W</span>
+          <span class="loadout-slot-copy"><small>Weapon</small><strong id="loadoutWeaponSlotValue">Not equipped</strong></span>
+        </div>
+        <div class="loadout-slot future" aria-disabled="true">
+          <span class="loadout-slot-icon" aria-hidden="true">E</span>
+          <span class="loadout-slot-copy"><small>Essence</small><strong id="loadoutEssenceSlotValue">Select a weapon</strong></span>
+        </div>
+        <div class="loadout-slot future" aria-disabled="true">
+          <span class="loadout-slot-icon" aria-hidden="true">G</span>
+          <span class="loadout-slot-copy"><small>Gloves</small><strong>Coming later</strong></span>
+        </div>
+        <div class="loadout-slot future" aria-disabled="true">
+          <span class="loadout-slot-icon" aria-hidden="true">A</span>
+          <span class="loadout-slot-copy"><small>Armor</small><strong>Coming later</strong></span>
+        </div>
+        <div class="loadout-slot future" aria-disabled="true">
+          <span class="loadout-slot-icon" aria-hidden="true">K1</span>
+          <span class="loadout-slot-copy"><small>Kit 1</small><strong>Coming later</strong></span>
+        </div>
+        <div class="loadout-slot future" aria-disabled="true">
+          <span class="loadout-slot-icon" aria-hidden="true">K2</span>
+          <span class="loadout-slot-copy"><small>Kit 2</small><strong>Coming later</strong></span>
+        </div>
+      </section>
+
+      <div class="loadout-workspace">
+        <section class="loadout-weapon-browser" aria-labelledby="loadoutWeaponsTitle">
+          <div class="loadout-section-heading">
+            <div>
+              <span>Compatible equipment</span>
+              <h3 id="loadoutWeaponsTitle">Weapons</h3>
+            </div>
+            <small>Sorted by rarity</small>
+          </div>
+          <div id="loadoutWeaponList" class="loadout-weapon-list"></div>
+        </section>
+
+        <aside id="loadoutWeaponDetails" class="loadout-weapon-details empty" aria-live="polite"></aside>
       </div>
     </div>
   </div>
@@ -691,7 +773,7 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabaseClient.js?v=2"></script>
+  <script src="supabaseClient.js?v=10"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -706,31 +788,37 @@
   <script src="js/data/enemies/electricAttacker.js"></script>
   <script src="js/data/enemies/physicalAttacker.js"></script>
   <script src="js/data/enemies/bossDummy.js"></script>
-  <script src="js/data/enemySkills.js"></script>
+  <script src="js/data/enemySkills.js?v=2"></script>
   <script src="js/state/appState.js"></script>
   <script src="js/logic/operatorStateEngine.js"></script>
   <script src="js/logic/basicAttack.js"></script>
   <script src="js/logic/storage.js"></script>
-  <script src="js/logic/shareCode.js"></script>
+  <script src="js/logic/weaponPassiveEngine.js?v=3"></script>
+  <script src="js/logic/weaponLoadout.js?v=15"></script>
+  <script src="js/logic/weaponPassiveSimulation.js?v=4"></script>
+    <script src="js/logic/damageBreakdown.js?v=9"></script>
+    <script src="js/logic/shareCode.js?v=6"></script>
   <script src="js/logic/export.js"></script>
   <script src="js/logic/snakeLayout.js"></script>
   <script src="js/logic/reactionEngine.js"></script>
   <script src="js/logic/comboEngine.js"></script>
   <script src="js/logic/dragDrop.js"></script>
-  <script src="js/logic/uiSettings.js"></script>
+  <script src="js/logic/uiSettings.js?v=2"></script>
   <script src="js/logic/tapInput.js?v=3"></script>
-  <script src="js/ui/enemyPanel.js"></script>
+  <script src="js/ui/enemyPanel.js?v=2"></script>
   <script src="js/ui/teamPreview.js"></script>
   <script src="js/ui/skillIconRenderer.js"></script>
   <script src="js/ui/skillsPanel.js"></script>
   <script src="js/ui/operatorBuffs.js"></script>
-  <script src="js/ui/rotationGrid.js?v=3"></script>
+    <script src="js/ui/rotationGrid.js?v=7"></script>
+    <script src="js/ui/weaponAtkChart.js?v=15"></script>
+    <script src="js/logic/weaponPassiveIntegration.js?v=6"></script>
   <script src="js/ui/teamSelection.js"></script>
   <script src="js/ui/communityRotations.js"></script>
   <script src="js/ui/operatorGallery.js?v=2"></script>
   <script src="js/ui/myRotations.js"></script>
   <script src="js/ui/adminPanel.js"></script>
-  <script src="js/main.js?v=2"></script>
+  <script src="js/main.js?v=3"></script>
 </body>
 
 </html>

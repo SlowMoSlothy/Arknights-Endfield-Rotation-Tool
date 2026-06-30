@@ -16,6 +16,12 @@ const SIMULATION_TIMELINE_DENSITY_OPTIONS = {
     detailed: "detailed"
 };
 
+const SIMULATION_DAMAGE_MODE_OPTIONS = {
+    normal: "normal",
+    expected: "expected",
+    critical: "critical"
+};
+
 const DEFAULT_SIMULATION_SP_PER_SECOND = 8;
 
 let uiSettings = {
@@ -23,7 +29,8 @@ let uiSettings = {
     timelineMode: TIMELINE_MODE_OPTIONS.slot,
     simulationSpPerSecond: DEFAULT_SIMULATION_SP_PER_SECOND,
     simulationTimelineDensity: SIMULATION_TIMELINE_DENSITY_OPTIONS.normal,
-    simulationDurationSeconds: null
+    simulationDurationSeconds: null,
+    simulationDamageMode: SIMULATION_DAMAGE_MODE_OPTIONS.expected
 };
 
 function loadUiSettings() {
@@ -67,6 +74,9 @@ function applyUiSettings() {
         : TIMELINE_MODE_OPTIONS.slot;
     uiSettings.timelineMode = timelineMode;
     root.classList.toggle("rotation-mode-simulation", timelineMode === TIMELINE_MODE_OPTIONS.simulation);
+    if (timelineMode !== TIMELINE_MODE_OPTIONS.simulation && typeof closeEnemyModal === "function") {
+        closeEnemyModal();
+    }
 
     const spPerSecond = Number(uiSettings.simulationSpPerSecond);
     uiSettings.simulationSpPerSecond = Number.isFinite(spPerSecond) && spPerSecond >= 0
@@ -77,6 +87,11 @@ function applyUiSettings() {
         ? uiSettings.simulationTimelineDensity
         : SIMULATION_TIMELINE_DENSITY_OPTIONS.normal;
     uiSettings.simulationTimelineDensity = timelineDensity;
+
+    const damageMode = Object.values(SIMULATION_DAMAGE_MODE_OPTIONS).includes(uiSettings.simulationDamageMode)
+        ? uiSettings.simulationDamageMode
+        : SIMULATION_DAMAGE_MODE_OPTIONS.expected;
+    uiSettings.simulationDamageMode = damageMode;
 
     const simulationDurationSeconds = Number(uiSettings.simulationDurationSeconds);
     uiSettings.simulationDurationSeconds = Number.isFinite(simulationDurationSeconds) && simulationDurationSeconds > 0
@@ -143,6 +158,18 @@ function setSimulationTimelineDensity(value) {
     }
 }
 
+function setSimulationDamageMode(value) {
+    if (!Object.values(SIMULATION_DAMAGE_MODE_OPTIONS).includes(value)) return;
+
+    uiSettings.simulationDamageMode = value;
+    saveUiSettings();
+    applyUiSettings();
+
+    if (typeof renderRotation === "function") {
+        renderRotation();
+    }
+}
+
 function openSettingsModal() {
     const modal = document.getElementById("settingsModal");
     if (!modal) return;
@@ -174,6 +201,13 @@ function updateSettingsUi() {
     document.querySelectorAll("[data-setting='simulationTimelineDensity']").forEach(btn => {
         const value = btn.dataset.value;
         btn.classList.toggle("active", value === uiSettings.simulationTimelineDensity);
+    });
+
+    document.querySelectorAll("[data-setting='simulationDamageMode']").forEach(btn => {
+        const value = btn.dataset.value;
+        const isActive = value === uiSettings.simulationDamageMode;
+        btn.classList.toggle("active", isActive);
+        btn.setAttribute("aria-pressed", String(isActive));
     });
 
     const spPerSecondInput = document.getElementById("simulationSpPerSecondInput");
@@ -223,6 +257,12 @@ function initUiSettings() {
         btn.addEventListener("click", () => {
             const value = btn.dataset.value;
             setSimulationTimelineDensity(value);
+        });
+    });
+
+    document.querySelectorAll("[data-setting='simulationDamageMode']").forEach(btn => {
+        btn.addEventListener("click", () => {
+            setSimulationDamageMode(btn.dataset.value);
         });
     });
 

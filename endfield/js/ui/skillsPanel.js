@@ -483,6 +483,92 @@ function createAddOperatorCard(index) {
     return button;
 }
 
+function getWeaponLoadoutSummary(weapon) {
+    if (!weapon) return "No weapon equipped";
+
+    const details = [];
+    const level = Number(weapon.baseStatsLevel);
+    const attack = Number(weapon.baseAtk);
+    if (Number.isFinite(level)) details.push(`Lv. ${level}`);
+    if (Number.isFinite(attack)) details.push(`${attack} ATK`);
+    if (weapon.passiveName) details.push(weapon.passiveName);
+    return details.join(" / ") || "Equipped";
+}
+
+function createWeaponLoadoutControl(op) {
+    const control = document.createElement("div");
+    control.className = "operator-weapon-loadout";
+
+    const icon = document.createElement("span");
+    icon.className = "operator-weapon-loadout-icon";
+    icon.setAttribute("aria-hidden", "true");
+    icon.innerHTML = `
+        <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M14.5 4.5l5 5"></path>
+            <path d="M13 6l5 5L9 20H4v-5z"></path>
+            <path d="M11 8l5 5"></path>
+        </svg>
+    `;
+
+    const label = document.createElement("label");
+    label.className = "operator-weapon-loadout-label";
+    label.textContent = "Weapon";
+
+    const select = document.createElement("select");
+    select.className = "operator-weapon-loadout-select";
+    select.setAttribute("aria-label", `Equip weapon for ${op.name}`);
+
+    const emptyOption = document.createElement("option");
+    emptyOption.value = "";
+    emptyOption.textContent = "No weapon";
+    select.appendChild(emptyOption);
+
+    const compatibleWeapons = typeof getCompatibleWeaponsForOperator === "function"
+        ? getCompatibleWeaponsForOperator(op)
+        : [];
+    compatibleWeapons.forEach(weapon => {
+        const option = document.createElement("option");
+        option.value = String(weapon.key);
+        option.textContent = `${weapon.name} (${Number(weapon.rarity) || "?"}-star)`;
+        select.appendChild(option);
+    });
+
+    const equippedKey = typeof getEquippedWeaponKey === "function"
+        ? getEquippedWeaponKey(op.id)
+        : null;
+    select.value = equippedKey || "";
+    select.disabled = compatibleWeapons.length === 0;
+
+    const summary = document.createElement("div");
+    summary.className = "operator-weapon-loadout-summary";
+    const updateSummary = () => {
+        const weapon = typeof getWeaponByKey === "function" ? getWeaponByKey(select.value) : null;
+        summary.textContent = compatibleWeapons.length === 0
+            ? "No compatible weapons"
+            : getWeaponLoadoutSummary(weapon);
+        control.classList.toggle("equipped", Boolean(weapon));
+        select.title = weapon
+            ? `${weapon.name}: ${getWeaponLoadoutSummary(weapon)}`
+            : summary.textContent;
+    };
+    updateSummary();
+
+    select.addEventListener("click", event => event.stopPropagation());
+    select.addEventListener("change", event => {
+        event.stopPropagation();
+        if (typeof setEquippedWeaponForOperator === "function") {
+            setEquippedWeaponForOperator(op.id, select.value);
+        }
+        updateSummary();
+    });
+
+    label.appendChild(select);
+    control.appendChild(icon);
+    control.appendChild(label);
+    control.appendChild(summary);
+    return control;
+}
+
 function renderSkills() {
     const list = document.getElementById("skillList");
     if (!list) return;
@@ -553,6 +639,9 @@ function renderSkills() {
         opRow.appendChild(swapBtn);
         card.appendChild(opRow);
         operatorWrapper.appendChild(card);
+        if (uiSettings?.timelineMode === "simulation") {
+            operatorWrapper.appendChild(createWeaponLoadoutControl(op));
+        }
         operatorWrapper.appendChild(skillRow);
         wrapper.appendChild(operatorWrapper);
     });

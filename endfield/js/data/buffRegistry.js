@@ -102,7 +102,13 @@ const BUFF_REGISTRY = {
         iconBase: "assets/buffs/rossi/crit_buff",
         stackable: false,
         maxStacks: 0,
-        extension: "png"
+        extension: "png",
+        critRatePercent: 15,
+        critDamagePercent: 30,
+        durationSeconds: 15,
+        target: "self",
+        verified: true,
+        sourceUrl: "https://endfield.wiki.gg/wiki/Rossi"
     }
 };
 

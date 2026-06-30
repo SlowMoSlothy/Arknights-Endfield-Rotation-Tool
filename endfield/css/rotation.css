@@ -59,6 +59,10 @@
         0 6px 16px rgba(0,0,0,0.22);
 }
 
+.rotation-mode-simulation .rotation-mode-switch {
+    margin-right: 0;
+}
+
 .rotation-mode-switch-btn {
     min-height: 24px;
     min-width: 82px;

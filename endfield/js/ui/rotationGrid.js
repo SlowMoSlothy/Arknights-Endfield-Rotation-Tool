@@ -58,6 +58,14 @@ function addDebuffToRotationState(effect, stackState, metaState) {
     const isStackable = effect?.stackable === true || registryEntry?.stackable === true;
     const maxStacks = Number(effect?.maxStacks || registryEntry?.maxStacks || 4);
     const stacksApplied = Number(effect?.stacksApplied || effect?.stackCount || 1);
+    const previousStackTimes = Array.isArray(metaState[key]?.appliedStackTimes) ? metaState[key].appliedStackTimes : [];
+    const appliedAt = Number(effect?.appliedAt);
+    const appliedStackCount = Math.max(1, Math.round(Number(stacksApplied)) || 1);
+    const appliedStackTimes = Number.isFinite(appliedAt)
+        ? (isStackable
+            ? [...previousStackTimes, ...Array(appliedStackCount).fill(appliedAt)].slice(-maxStacks)
+            : [appliedAt])
+        : previousStackTimes;
     stackState[key] = isStackable ? Math.max(1, Math.min((stackState[key] || 0) + stacksApplied, maxStacks)) : 1;
     metaState[key] = {
         ...effect,
@@ -65,7 +73,8 @@ function addDebuffToRotationState(effect, stackState, metaState) {
         appliesEffect: key,
         stackable: isStackable,
         maxStacks,
-        lastAppliedOrder: getNextRotationEffectOrder(stackState)
+        lastAppliedOrder: getNextRotationEffectOrder(stackState),
+        appliedStackTimes
     };
 }
 
@@ -76,13 +85,22 @@ function addBuffToRotationState(effect, stackState, metaState) {
     const isStackable = effect?.stackable === true || registryEntry?.stackable === true;
     const maxStacks = Number(effect?.maxStacks || registryEntry?.maxStacks || 4);
     const stacksApplied = Number(effect?.stacksApplied || effect?.stackCount || 1);
+    const previousStackTimes = Array.isArray(metaState[key]?.appliedStackTimes) ? metaState[key].appliedStackTimes : [];
+    const appliedAt = Number(effect?.appliedAt);
+    const appliedStackCount = Math.max(1, Math.round(Number(stacksApplied)) || 1);
+    const appliedStackTimes = Number.isFinite(appliedAt)
+        ? (isStackable
+            ? [...previousStackTimes, ...Array(appliedStackCount).fill(appliedAt)].slice(-maxStacks)
+            : [appliedAt])
+        : previousStackTimes;
     stackState[key] = isStackable ? Math.max(1, Math.min((stackState[key] || 0) + stacksApplied, maxStacks)) : 1;
     metaState[key] = {
         ...effect,
         id: key,
         appliesEffect: key,
         stackable: isStackable,
-        maxStacks
+        maxStacks,
+        appliedStackTimes
     };
 }
 
@@ -837,6 +855,12 @@ function isBattleSkillData(skillData) {
     return type === "battle skill" || shortType === "bs";
 }
 
+function isUltimateSkillData(skillData) {
+    const type = String(skillData?.type || "").toLowerCase();
+    const shortType = String(skillData?.shortType || "").toLowerCase();
+    return type.includes("ultimate") || shortType === "ult" || shortType === "u";
+}
+
 function getSimulationSkillLane(skillData) {
     if (isComboSkillData(skillData)) return "combo";
     if (isBattleSkillData(skillData)) return "battle";
@@ -980,11 +1004,111 @@ function getSimulationSourceOperatorId(skillData) {
     return getOperatorBySkillId(skillData.id)?.id ?? null;
 }
 
+function getSimulationEventOperatorId(event) {
+    const explicitId = Number(event?.sourceOperatorId);
+    return Number.isFinite(explicitId) ? explicitId : getSimulationSourceOperatorId(event?.skillData);
+}
+
 function getSimulationOperatorName(operatorId) {
     const operator = Array.isArray(operators)
         ? operators.find(op => Number(op.id) === Number(operatorId))
         : null;
     return operator?.name || "Operator";
+}
+
+function enrichSimulationSkillEventsWithLoadouts(events) {
+    if (typeof getOperatorSimulationLoadoutStats !== "function") return events;
+
+    return events.map(event => {
+        const operatorId = getSimulationEventOperatorId(event);
+        return {
+            ...event,
+            loadoutState: operatorId === null ? null : getOperatorSimulationLoadoutStats(operatorId)
+        };
+    });
+}
+
+function formatSimulationLoadoutValue(value, isPercent = false) {
+    const numericValue = Number(value);
+    if (!Number.isFinite(numericValue)) return "-";
+    return `${numericValue > 0 ? "+" : ""}${numericValue}${isPercent ? "%" : ""}`;
+}
+
+function createSimulationLoadoutSummary() {
+    const loadouts = (Array.isArray(selectedTeam) ? selectedTeam : [])
+        .filter(operatorId => operatorId !== null && operatorId !== undefined)
+        .map(operatorId => typeof getOperatorSimulationLoadoutStats === "function"
+            ? getOperatorSimulationLoadoutStats(operatorId)
+            : null)
+        .filter(Boolean);
+    if (loadouts.length === 0) return null;
+
+    const root = document.createElement("section");
+    root.className = "rotation-sim-loadout-summary";
+    root.setAttribute("aria-label", "Active simulation loadouts");
+
+    const label = document.createElement("div");
+    label.className = "rotation-sim-loadout-summary-label";
+    const labelTop = document.createElement("span");
+    labelTop.textContent = "Active loadouts";
+    const labelTitle = document.createElement("strong");
+    labelTitle.textContent = "Combat stats";
+    label.append(labelTop, labelTitle);
+    root.appendChild(label);
+
+    loadouts.forEach(loadout => {
+        const card = document.createElement("div");
+        card.className = "rotation-sim-loadout-card";
+
+        const identity = document.createElement("div");
+        identity.className = "rotation-sim-loadout-card-identity";
+        if (loadout.weaponIcon) {
+            const weaponIcon = document.createElement("img");
+            weaponIcon.className = "rotation-sim-loadout-weapon-icon";
+            weaponIcon.src = loadout.weaponIcon;
+            weaponIcon.alt = "";
+            weaponIcon.loading = "lazy";
+            identity.appendChild(weaponIcon);
+        }
+        const heading = document.createElement("div");
+        const operatorName = document.createElement("strong");
+        operatorName.textContent = getSimulationOperatorName(loadout.operatorId);
+        const weaponName = document.createElement("span");
+        weaponName.textContent = `${loadout.weaponName} / P${loadout.potential}`;
+        heading.append(operatorName, weaponName);
+        identity.appendChild(heading);
+
+        const stats = document.createElement("div");
+        stats.className = "rotation-sim-loadout-card-stats";
+        const attack = document.createElement("strong");
+        attack.textContent = `${loadout.totalAtk} ATK`;
+        stats.appendChild(attack);
+        const crit = document.createElement("span");
+        const critRatePercent = Number.isFinite(Number(loadout.critRatePercent))
+            ? Number(loadout.critRatePercent)
+            : 5;
+        const critDamagePercent = Number.isFinite(Number(loadout.critDamagePercent))
+            ? Number(loadout.critDamagePercent)
+            : 50;
+        crit.textContent = `CR ${critRatePercent}% / CD +${critDamagePercent}%`;
+        crit.title = `Critical Rate ${critRatePercent}% / Critical DMG +${critDamagePercent}%`;
+        stats.appendChild(crit);
+        if (loadout.mainAttributeBonus) {
+            const attribute = document.createElement("span");
+            attribute.textContent = `${loadout.mainAttributeBonus.label} ${formatSimulationLoadoutValue(loadout.mainAttributeBonus.value, loadout.mainAttributeBonus.isPercent)}`;
+            stats.appendChild(attribute);
+        }
+        if (loadout.passive?.name) {
+            const passive = document.createElement("span");
+            passive.textContent = `${loadout.passive.name} R${loadout.passive.rank}`;
+            passive.title = loadout.passive.description || loadout.passive.name;
+            stats.appendChild(passive);
+        }
+        card.append(identity, stats);
+        root.appendChild(card);
+    });
+
+    return root;
 }
 
 function addSimulationEffectsToMap(effectMap, effects) {
@@ -2219,6 +2343,18 @@ function createSimulationSkillInspector(event) {
         ["Cooldown", Number(skillData.cooldown || 0) > 0 ? formatSimulationInspectorSeconds(skillData.cooldown) : "None"]
     ]);
 
+    if (primaryEvent.loadoutState) {
+        const loadout = primaryEvent.loadoutState;
+        appendSimulationInspectorSection(panel, "Simulation Loadout", [
+            ["Weapon", `${loadout.weaponName} / P${loadout.potential}`],
+            ["ATK", `${loadout.operatorBaseAtk} + ${loadout.weaponBaseAtk}${loadout.flatAtkBonus ? ` + ${loadout.flatAtkBonus}` : ""}${loadout.atkPercentBonus ? ` + ${loadout.atkPercentBonus}%` : ""} = ${loadout.totalAtk}`],
+            ["Crit Rate", `${Number.isFinite(Number(loadout.critRatePercent)) ? Number(loadout.critRatePercent) : 5}%`],
+            ["Crit DMG", `+${Number.isFinite(Number(loadout.critDamagePercent)) ? Number(loadout.critDamagePercent) : 50}%`],
+            [loadout.mainAttributeBonus?.label || "Attribute", loadout.mainAttributeBonus ? formatSimulationLoadoutValue(loadout.mainAttributeBonus.value, loadout.mainAttributeBonus.isPercent) : ""],
+            ["Passive", loadout.passive?.name ? `${loadout.passive.name} / Rank ${loadout.passive.rank}` : ""]
+        ]);
+    }
+
     if (primaryEvent.kind === "auto") {
         appendSimulationInspectorSection(panel, "Trigger", [
             ["Source", primaryEvent.triggerSourceName || "Timeline event"],
@@ -3403,6 +3539,33 @@ function enrichSimulationSkillEventsWithEffects(events) {
     return [...events]
         .sort((left, right) => (left.time - right.time) || (left.order - right.order))
         .map(event => {
+            const expireTimedEffects = (stackState, metaState, registry) => {
+                Object.entries(metaState).forEach(([effectId, effect]) => {
+                    const registryEntry = registry?.[effectId] || null;
+                    const durationSeconds = Number(effect?.durationSeconds ?? registryEntry?.durationSeconds);
+                    if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) return;
+
+                    const currentStacks = Math.max(0, Number(stackState[effectId]) || 0);
+                    const stackTimes = Array.isArray(effect?.appliedStackTimes)
+                        ? effect.appliedStackTimes.slice(-currentStacks)
+                        : [];
+                    if (stackTimes.length > 0) {
+                        const activeStackTimes = stackTimes.filter(appliedAt => event.time < Number(appliedAt) + durationSeconds);
+                        if (activeStackTimes.length > 0) {
+                            stackState[effectId] = activeStackTimes.length;
+                            metaState[effectId] = { ...effect, appliedStackTimes: activeStackTimes };
+                            return;
+                        }
+                    } else {
+                        const appliedAt = Number(effect?.appliedAt);
+                        if (!Number.isFinite(appliedAt) || event.time < appliedAt + durationSeconds) return;
+                    }
+                    delete stackState[effectId];
+                    delete metaState[effectId];
+                });
+            };
+            expireTimedEffects(rotationBuffStackState, rotationBuffMetaState, typeof BUFF_REGISTRY !== "undefined" ? BUFF_REGISTRY : null);
+            expireTimedEffects(rotationDebuffStackState, rotationDebuffMetaState, typeof DEBUFF_REGISTRY !== "undefined" ? DEBUFF_REGISTRY : null);
             const activeDebuffsBeforeSkill = getActiveDebuffsFromRotationState(rotationDebuffStackState, rotationDebuffMetaState);
             const activeBuffsBeforeSkill = {
                 ...rotationBuffMetaState
@@ -3411,9 +3574,29 @@ function enrichSimulationSkillEventsWithEffects(events) {
             const activeBuffStacksBeforeSkill = {
                 ...rotationBuffStackState
             };
-            applySkillBuffsAndGetActiveState(event.skillData, rotationBuffStackState, rotationBuffMetaState, activeBuffsBeforeSkill, activeBuffStacksBeforeSkill);
+            const withTiming = effect => ({
+                ...effect,
+                sourceOperatorId: event.sourceOperatorId,
+                appliedAt: event.time
+            });
+            const skillDataWithTimedEffects = {
+                ...event.skillData,
+                buffs: Array.isArray(event.skillData?.buffs)
+                    ? event.skillData.buffs.map(withTiming)
+                    : event.skillData?.buffs,
+                debuffs: Array.isArray(event.skillData?.debuffs)
+                    ? event.skillData.debuffs.map(withTiming)
+                    : event.skillData?.debuffs,
+                conditionalDebuffs: Array.isArray(event.skillData?.conditionalDebuffs)
+                    ? event.skillData.conditionalDebuffs.map(rule => ({
+                        ...rule,
+                        debuffs: Array.isArray(rule.debuffs) ? rule.debuffs.map(withTiming) : rule.debuffs
+                    }))
+                    : event.skillData?.conditionalDebuffs
+            };
+            applySkillBuffsAndGetActiveState(skillDataWithTimedEffects, rotationBuffStackState, rotationBuffMetaState, activeBuffsBeforeSkill, activeBuffStacksBeforeSkill);
             const activeDebuffs = applySkillDebuffsAndGetActiveState(
-                event.skillData,
+                skillDataWithTimedEffects,
                 activeBuffsBeforeSkill,
                 activeBuffStacksBeforeSkill,
                 rotationDebuffStackState,
@@ -3876,10 +4059,10 @@ function renderSimulationRotation() {
     const durationSeconds = Math.max(initialDurationSeconds, Math.ceil(cooldownEndTime + 1));
     const pixelsPerSecond = getSimulationPixelsPerSecond();
     const trackWidth = durationSeconds * pixelsPerSecond;
-    const skillEvents = enrichSimulationSkillEventsWithSp(assignSimulationCooldownDisplay(enrichSimulationSkillEventsWithEffects([
+    const skillEvents = enrichSimulationSkillEventsWithLoadouts(enrichSimulationSkillEventsWithSp(assignSimulationCooldownDisplay(enrichSimulationSkillEventsWithEffects([
         ...manualSkillEvents,
         ...autoSkillEvents
-    ])));
+    ]))));
     const logEvents = [
         ...skillEvents,
         ...simulationProblemEvents
@@ -4004,6 +4187,8 @@ function renderSimulationRotation() {
         onSelectEvent: navigateToSimulationEvent
     });
     container.appendChild(cursorController.toolbar);
+    const loadoutSummary = createSimulationLoadoutSummary();
+    if (loadoutSummary) container.appendChild(loadoutSummary);
     container.appendChild(trackScroll);
     container.appendChild(eventLog);
     window.requestAnimationFrame(() => {

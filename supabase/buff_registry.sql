@@ -75,7 +75,7 @@ insert into public.buff_registry (
     ('shield', 'arknights_endfield', 'Shield', null, 'assets/ui/buffs/ember/shield', false, 0, 'png', null, null, null, 110, '{"name":"Shield","iconBase":"assets/ui/buffs/ember/shield","stackable":false,"maxStacks":0,"extension":"png"}'::jsonb),
     ('protection', 'arknights_endfield', 'Protection', null, 'assets/ui/buffs/protection', false, 0, 'png', null, null, null, 120, '{"name":"Protection","iconBase":"assets/ui/buffs/protection","stackable":false,"maxStacks":0,"extension":"png"}'::jsonb),
     ('whirlpool', 'arknights_endfield', 'Whirlpool', null, 'assets/operators/skills/tangtang/65px-Combo-Tangtang', true, 2, 'webp', null, null, null, 130, '{"name":"Whirlpool","iconBase":"assets/operators/skills/tangtang/65px-Combo-Tangtang","stackable":true,"maxStacks":2,"extension":"webp"}'::jsonb),
-    ('rossi_crit_buff', 'arknights_endfield', 'Crit Rate / Crit DMG', null, 'assets/buffs/rossi/crit_buff', false, 0, 'png', null, null, null, 140, '{"name":"Crit Rate / Crit DMG","iconBase":"assets/buffs/rossi/crit_buff","stackable":false,"maxStacks":0,"extension":"png"}'::jsonb)
+    ('rossi_crit_buff', 'arknights_endfield', 'Crit Rate / Crit DMG', null, 'assets/buffs/rossi/crit_buff', false, 0, 'png', null, null, null, 140, '{"name":"Crit Rate / Crit DMG","iconBase":"assets/buffs/rossi/crit_buff","stackable":false,"maxStacks":0,"extension":"png","critRatePercent":15,"critDamagePercent":30,"durationSeconds":15,"target":"self","verified":true,"sourceUrl":"https://endfield.wiki.gg/wiki/Rossi"}'::jsonb)
 on conflict (effect_key) do update set
     game = excluded.game,
     name = excluded.name,

@@ -407,8 +407,13 @@ async function initApp() {
             await hydrateOperatorsFromSupabase();
         }
 
+        if (typeof hydrateEnemyCombatProfilesFromSupabase === "function") {
+            await hydrateEnemyCombatProfilesFromSupabase();
+        }
+
         loadOperatorUltimateStates();
         loadTeam();
+        if (typeof loadOperatorLoadouts === "function") loadOperatorLoadouts();
         loadRotation();
         const loadedSharedBuild = loadBuildShareCodeFromUrl();
         if (!loadedSharedBuild) {
@@ -419,6 +424,7 @@ async function initApp() {
         renderOperatorList();
 
         initUiSettings();
+        if (typeof initOperatorLoadoutModal === "function") initOperatorLoadoutModal();
         initEnemyPanel();
         initRotationSaveMenu();
         if (typeof initCommunityRotations === "function") initCommunityRotations();
