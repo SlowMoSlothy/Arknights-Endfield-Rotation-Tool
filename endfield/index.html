@@ -353,38 +353,53 @@
       </div>
 
       <section class="loadout-operator-summary" aria-label="Selected operator">
-        <img id="loadoutOperatorAvatar" class="loadout-operator-avatar" alt="">
-        <div>
-          <span>Configure equipment for</span>
-          <strong id="loadoutOperatorName">Operator</strong>
-          <small id="loadoutOperatorMeta"></small>
+        <div style="display: flex; flex-direction: row; align-items: center; gap: 14px; min-width: 0;">
+          <img id="loadoutOperatorAvatar" class="loadout-operator-avatar" alt="">
+          <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+            <span>Configure equipment for</span>
+            <strong id="loadoutOperatorName">Operator</strong>
+            <small id="loadoutOperatorMeta"></small>
+            <div id="loadoutOperatorAttributes" class="loadout-operator-attributes-row" style="display: flex; gap: 6px; margin-top: 4px;"></div>
+          </div>
+        </div>
+        <div class="loadout-operator-atk-summary">
+          <span>Simulation ATK</span>
+          <strong id="loadoutOperatorSimulationAtkValue">-</strong>
         </div>
       </section>
 
       <section class="loadout-slot-grid" aria-label="Equipment slots">
-        <div class="loadout-slot active">
+        <div id="loadoutSlotWeapon" class="loadout-slot active">
           <span class="loadout-slot-icon" aria-hidden="true">W</span>
           <span class="loadout-slot-copy"><small>Weapon</small><strong id="loadoutWeaponSlotValue">Not equipped</strong></span>
         </div>
-        <div class="loadout-slot future" aria-disabled="true">
-          <span class="loadout-slot-icon" aria-hidden="true">E</span>
+        <div id="loadoutSlotEssence" class="loadout-slot future" aria-disabled="true">
+          <span class="loadout-slot-icon essence" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display: block; width: 100%; height: 100%; padding: 4px; box-sizing: border-box;">
+              <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5"></polygon>
+              <line x1="12" y1="22" x2="12" y2="12"></line>
+              <line x1="12" y1="12" x2="22" y2="8.5"></line>
+              <line x1="12" y1="12" x2="2" y2="8.5"></line>
+              <circle cx="12" cy="12" r="3" fill="currentColor"></circle>
+            </svg>
+          </span>
           <span class="loadout-slot-copy"><small>Essence</small><strong id="loadoutEssenceSlotValue">Select a weapon</strong></span>
         </div>
-        <div class="loadout-slot future" aria-disabled="true">
-          <span class="loadout-slot-icon" aria-hidden="true">G</span>
-          <span class="loadout-slot-copy"><small>Gloves</small><strong>Coming later</strong></span>
+        <div id="loadoutSlotGloves" class="loadout-slot">
+          <span class="loadout-slot-icon gloves" aria-hidden="true">G</span>
+          <span class="loadout-slot-copy"><small>Gloves</small><strong id="loadoutGlovesSlotValue">Not equipped</strong></span>
         </div>
-        <div class="loadout-slot future" aria-disabled="true">
-          <span class="loadout-slot-icon" aria-hidden="true">A</span>
-          <span class="loadout-slot-copy"><small>Armor</small><strong>Coming later</strong></span>
+        <div id="loadoutSlotArmor" class="loadout-slot">
+          <span class="loadout-slot-icon armor" aria-hidden="true">A</span>
+          <span class="loadout-slot-copy"><small>Armor</small><strong id="loadoutArmorSlotValue">Not equipped</strong></span>
         </div>
-        <div class="loadout-slot future" aria-disabled="true">
-          <span class="loadout-slot-icon" aria-hidden="true">K1</span>
-          <span class="loadout-slot-copy"><small>Kit 1</small><strong>Coming later</strong></span>
+        <div id="loadoutSlotKit1" class="loadout-slot">
+          <span class="loadout-slot-icon kit" aria-hidden="true">K1</span>
+          <span class="loadout-slot-copy"><small>Kit 1</small><strong id="loadoutKit1SlotValue">Not equipped</strong></span>
         </div>
-        <div class="loadout-slot future" aria-disabled="true">
-          <span class="loadout-slot-icon" aria-hidden="true">K2</span>
-          <span class="loadout-slot-copy"><small>Kit 2</small><strong>Coming later</strong></span>
+        <div id="loadoutSlotKit2" class="loadout-slot">
+          <span class="loadout-slot-icon kit" aria-hidden="true">K2</span>
+          <span class="loadout-slot-copy"><small>Kit 2</small><strong id="loadoutKit2SlotValue">Not equipped</strong></span>
         </div>
       </section>
 
@@ -782,6 +797,14 @@
   <script src="js/data/buffRegistry.js"></script>
   <script src="js/data/effectGroups.js"></script>
   <script src="js/data/reactionRules.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="js/utils/tooltipFormatter.js"></script>
+  <script src="js/data/debuffRegistry.js"></script>
+  <script src="js/data/buffRegistry.js"></script>
+  <script src="js/data/effectGroups.js"></script>
+  <script src="js/data/reactionRules.js"></script>
   <script src="js/data/enemies/trainingDummy.js"></script>
   <script src="js/data/enemies/heatAttacker.js"></script>
   <script src="js/data/enemies/frostAttacker.js"></script>
@@ -790,6 +813,7 @@
   <script src="js/data/enemies/bossDummy.js"></script>
   <script src="js/data/enemySkills.js?v=2"></script>
   <script src="js/state/appState.js"></script>
+  <script src="js/data/gearData.js"></script>
   <script src="js/logic/operatorStateEngine.js"></script>
   <script src="js/logic/basicAttack.js"></script>
   <script src="js/logic/storage.js"></script>

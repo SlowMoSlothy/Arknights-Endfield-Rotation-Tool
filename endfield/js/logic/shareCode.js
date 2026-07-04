@@ -7,7 +7,8 @@ const BUILD_SHARE_CODE_PREFIX_V6 = "AERT6:";
 const BUILD_SHARE_CODE_PREFIX_V7 = "AERT7:";
 const BUILD_SHARE_CODE_PREFIX_V8 = "AERT8:";
 const BUILD_SHARE_CODE_PREFIX_V9 = "AERT9:";
-const BUILD_SHARE_CODE_PREFIX = "AERT10:";
+const BUILD_SHARE_CODE_PREFIX_V10 = "AERT10:";
+const BUILD_SHARE_CODE_PREFIX = "AERT11:";
 const BUILD_SHARE_HASH_KEY = "setup";
 const BUILD_SHARE_UI_FLAG_SIMULATION_MODE = 1;
 const BUILD_SHARE_UI_FLAG_HAS_SP_PER_SECOND = 2;
@@ -23,11 +24,12 @@ const BUILD_SHARE_UI_FLAG_MASK_V10 = BUILD_SHARE_UI_FLAG_MASK
 const BUILD_SHARE_MAX_ROTATION_ENTRIES = 240;
 const BUILD_SHARE_MAX_WEAPON_LOADOUTS = 4;
 const BUILD_SHARE_MAX_WEAPON_KEY_LENGTH = 120;
-const BUILD_PERSISTENCE_PAYLOAD_VERSION = 10;
+const BUILD_PERSISTENCE_PAYLOAD_VERSION = 11;
 
 function hasKnownBuildShareCodePrefix(value) {
     return [
         BUILD_SHARE_CODE_PREFIX,
+        BUILD_SHARE_CODE_PREFIX_V10,
         BUILD_SHARE_CODE_PREFIX_V9,
         BUILD_SHARE_CODE_PREFIX_V8,
         BUILD_SHARE_CODE_PREFIX_V7,
@@ -369,7 +371,11 @@ function createBuildPersistencePayloadFromShareCode(shareCode, options = {}) {
                 operatorClass: operator.operatorClass || "",
                 weaponKey: sharedOperatorLoadouts?.[String(operator.id)]?.weapon?.key || null,
                 weaponPotential: sharedOperatorLoadouts?.[String(operator.id)]?.weapon?.potential || null,
-                weaponEssence: sharedOperatorLoadouts?.[String(operator.id)]?.weapon?.essence || null
+                weaponEssence: sharedOperatorLoadouts?.[String(operator.id)]?.weapon?.essence || null,
+                glovesKey: sharedOperatorLoadouts?.[String(operator.id)]?.gloves?.key || null,
+                armorKey: sharedOperatorLoadouts?.[String(operator.id)]?.armor?.key || null,
+                kit1Key: sharedOperatorLoadouts?.[String(operator.id)]?.kit1?.key || null,
+                kit2Key: sharedOperatorLoadouts?.[String(operator.id)]?.kit2?.key || null
             })),
             rotation: rotationPayload
         }
@@ -571,10 +577,100 @@ function createCompactShareBytesV9() {
     return bytes;
 }
 
+function createCompactShareBytesV11() {
+    const bytes = [];
+    for (let index = 0; index < 4; index++) {
+        const operatorId = Array.isArray(selectedTeam) ? Number(selectedTeam[index]) : NaN;
+        writeVarInt(bytes, Number.isFinite(operatorId) && operatorId >= 0 ? operatorId + 1 : 0);
+    }
+
+    const shareableRotation = getShareableRotation();
+    writeVarInt(bytes, shareableRotation.length);
+    let previousTimeTenths = 0;
+    shareableRotation.forEach(entry => {
+        if (!entry) {
+            writeVarInt(bytes, 0);
+            return;
+        }
+
+        const time = Number(entry.time);
+        const hasTime = Number.isFinite(time);
+        if (entry.type === BASIC_ATTACK_ACTION_TYPE) {
+            writeVarInt(bytes, 2 | (hasTime ? 8 : 0));
+            writeVarInt(bytes, Number(entry.operatorId) + 1);
+            writeVarInt(bytes, Number(entry.hitCount) || DEFAULT_BASIC_ATTACK_HITS);
+            writeVarInt(bytes, Number(entry.finalHitCount) || DEFAULT_BASIC_ATTACK_FINAL_HITS);
+        } else {
+            writeVarInt(bytes, 1 | (entry.autoInserted === true ? 4 : 0) | (hasTime ? 8 : 0));
+            writeVarInt(bytes, Number(entry.id));
+        }
+
+        if (hasTime) {
+            const timeTenths = Math.max(0, Math.round(time * 10));
+            writeSignedVarInt(bytes, timeTenths - previousTimeTenths);
+            previousTimeTenths = timeTenths;
+        }
+    });
+
+    const activeUltimateStateIds = getActiveUltimateStateIds();
+    writeVarInt(bytes, activeUltimateStateIds.length);
+    activeUltimateStateIds.forEach(operatorId => writeVarInt(bytes, operatorId));
+
+    const shareableUiSettings = getShareableUiSettings(shareableRotation);
+    const fallbackSpPerSecond = typeof DEFAULT_SIMULATION_SP_PER_SECOND !== "undefined"
+        ? Number(DEFAULT_SIMULATION_SP_PER_SECOND)
+        : 8;
+    let uiFlags = shareableUiSettings.timelineMode === "simulation" ? BUILD_SHARE_UI_FLAG_SIMULATION_MODE : 0;
+    if (Number(shareableUiSettings.simulationSpPerSecond) !== fallbackSpPerSecond) {
+        uiFlags |= BUILD_SHARE_UI_FLAG_HAS_SP_PER_SECOND;
+    }
+    if (Number.isFinite(Number(shareableUiSettings.simulationDurationSeconds))) {
+        uiFlags |= BUILD_SHARE_UI_FLAG_HAS_SIMULATION_DURATION;
+    }
+    if (shareableUiSettings.simulationDamageMode === "normal") uiFlags |= BUILD_SHARE_UI_FLAG_DAMAGE_MODE_NORMAL;
+    if (shareableUiSettings.simulationDamageMode === "critical") uiFlags |= BUILD_SHARE_UI_FLAG_DAMAGE_MODE_CRITICAL;
+    writeVarInt(bytes, uiFlags);
+    if (uiFlags & BUILD_SHARE_UI_FLAG_HAS_SP_PER_SECOND) {
+        writeVarInt(bytes, Math.max(0, Math.round(Number(shareableUiSettings.simulationSpPerSecond) * 10)));
+    }
+    if (uiFlags & BUILD_SHARE_UI_FLAG_HAS_SIMULATION_DURATION) {
+        writeVarInt(bytes, Math.max(0, Math.round(Number(shareableUiSettings.simulationDurationSeconds) * 10)));
+    }
+
+    const enemyId = typeof getSelectedEnemy === "function" ? String(getSelectedEnemy()?.id || "") : "";
+    const hasCustomEnemy = Boolean(enemyId && enemyId !== "training_dummy");
+    writeVarInt(bytes, hasCustomEnemy ? 1 : 0);
+    if (hasCustomEnemy) writePackedShareKey(bytes, enemyId);
+
+    const operatorLoadouts = typeof getShareableOperatorLoadouts === "function"
+        ? getShareableOperatorLoadouts()
+        : {};
+    const weaponEntries = Object.entries(operatorLoadouts).slice(0, BUILD_SHARE_MAX_WEAPON_LOADOUTS);
+    writeVarInt(bytes, weaponEntries.length);
+    weaponEntries.forEach(([operatorId, loadout]) => {
+        const potential = Math.min(5, Math.max(1, Number(loadout?.weapon?.potential) || 1));
+        const primary = Math.min(15, Math.max(0, Number(loadout?.weapon?.essence?.primary) || 0));
+        const secondary = Math.min(15, Math.max(0, Number(loadout?.weapon?.essence?.secondary) || 0));
+        const skill = Math.min(15, Math.max(0, Number(loadout?.weapon?.essence?.skill) || 0));
+        const activationBits = (potential - 1) | (primary << 3) | (secondary << 7) | (skill << 11);
+
+        writeVarInt(bytes, Number(operatorId));
+        writePackedShareKey(bytes, loadout?.weapon?.key || "");
+        writeVarInt(bytes, activationBits);
+
+        writePackedShareKey(bytes, loadout?.gloves?.key || "");
+        writePackedShareKey(bytes, loadout?.armor?.key || "");
+        writePackedShareKey(bytes, loadout?.kit1?.key || "");
+        writePackedShareKey(bytes, loadout?.kit2?.key || "");
+    });
+
+    return bytes;
+}
+
 function createBuildShareCode() {
     const bytes = [];
     writeVarInt(bytes, BUILD_PERSISTENCE_PAYLOAD_VERSION);
-    bytes.push(...createCompactShareBytesV9());
+    bytes.push(...createCompactShareBytesV11());
     return encodeShareBytes(bytes);
 }
 
@@ -671,7 +767,11 @@ function parseBuildShareCode(code) {
     const trimmed = extractBuildShareCode(code);
 
     if (trimmed.startsWith(BUILD_SHARE_CODE_PREFIX)) {
-        return parseCompactBuildShareCodeV10(trimmed.slice(BUILD_SHARE_CODE_PREFIX.length));
+        return parseCompactBuildShareCodeV11(trimmed.slice(BUILD_SHARE_CODE_PREFIX.length));
+    }
+
+    if (trimmed.startsWith(BUILD_SHARE_CODE_PREFIX_V10)) {
+        return parseCompactBuildShareCodeV10(trimmed.slice(BUILD_SHARE_CODE_PREFIX_V10.length));
     }
 
     if (trimmed.startsWith(BUILD_SHARE_CODE_PREFIX_V9)) {
@@ -722,6 +822,7 @@ function parseVersionedDisplayBuildShareCode(code) {
     const encodedPayload = encodeShareBytes(bytes.slice(cursor.index));
 
     switch (version) {
+        case 11: return parseCompactBuildShareCodeV11(encodedPayload);
         case 10: return parseCompactBuildShareCodeV10(encodedPayload);
         case 9: return parseCompactBuildShareCodeV9(encodedPayload);
         case 8: return parseCompactBuildShareCodeV8(encodedPayload);
@@ -996,6 +1097,44 @@ function readCompactShareUiSettingsV9(cursor) {
     return settings;
 }
 
+function readCompactShareOperatorLoadoutsV11(cursor) {
+    const count = cursor.index < cursor.bytes.length ? readVarInt(cursor) : 0;
+    if (count > BUILD_SHARE_MAX_WEAPON_LOADOUTS) {
+        throw new Error("Share code contains too many operator loadouts.");
+    }
+
+    const loadouts = {};
+    for (let index = 0; index < count; index++) {
+        const operatorId = readVarInt(cursor);
+        const weaponKey = readPackedShareKey(cursor);
+        const activationBits = readVarInt(cursor);
+        if (activationBits & ~0x7fff) throw new Error("Share code contains invalid weapon activation data.");
+
+        const glovesKey = readPackedShareKey(cursor);
+        const armorKey = readPackedShareKey(cursor);
+        const kit1Key = readPackedShareKey(cursor);
+        const kit2Key = readPackedShareKey(cursor);
+
+        if (!weaponKey) continue;
+        loadouts[String(operatorId)] = {
+            weapon: {
+                key: weaponKey,
+                potential: (activationBits & 7) + 1,
+                essence: {
+                    primary: (activationBits >> 3) & 15,
+                    secondary: (activationBits >> 7) & 15,
+                    skill: (activationBits >> 11) & 15
+                }
+            },
+            gloves: glovesKey ? { key: glovesKey } : null,
+            armor: armorKey ? { key: armorKey } : null,
+            kit1: kit1Key ? { key: kit1Key } : null,
+            kit2: kit2Key ? { key: kit2Key } : null
+        };
+    }
+    return loadouts;
+}
+
 function readCompactShareOperatorLoadoutsV9(cursor) {
     const count = cursor.index < cursor.bytes.length ? readVarInt(cursor) : 0;
     if (count > BUILD_SHARE_MAX_WEAPON_LOADOUTS) {
@@ -1047,6 +1186,29 @@ function parseCompactBuildShareCodeV9(encoded) {
 
     return {
         v: 9,
+        team,
+        rotation: importedRotation,
+        operatorUltimateStates: importedUltimateStates,
+        operatorLoadouts: importedOperatorLoadouts,
+        enemyId,
+        uiSettings: uiSettingsPayload
+    };
+}
+
+function parseCompactBuildShareCodeV11(encoded) {
+    const bytes = decodeShareBytes(encoded.replace(/\s/g, ""));
+    const cursor = { bytes, index: 0 };
+    const team = readCompactShareTeam(cursor);
+    const importedRotation = readCompactShareRotationV9(cursor);
+    const importedUltimateStates = readCompactShareUltimateStates(cursor);
+    const uiSettingsPayload = readCompactShareUiSettingsV10(cursor);
+    const hasCustomEnemy = readVarInt(cursor) === 1;
+    const enemyId = hasCustomEnemy ? readPackedShareKey(cursor) : "training_dummy";
+    const importedOperatorLoadouts = readCompactShareOperatorLoadoutsV11(cursor);
+    assertCompactShareFullyRead(cursor);
+
+    return {
+        v: 11,
         team,
         rotation: importedRotation,
         operatorUltimateStates: importedUltimateStates,

@@ -8,6 +8,7 @@ const LOADOUT_SLOT_KEYS = ["weapon", "gloves", "armor", "kit1", "kit2"];
 let activeLoadoutOperatorId = null;
 let loadoutModalPreviousFocus = null;
 let loadoutControlObserver = null;
+let activeLoadoutSlot = "weapon";
 
 function normalizeWeaponType(value) {
     return String(value || "")
@@ -163,6 +164,10 @@ function getOperatorSimulationLoadoutStats(operatorId) {
     let flatAtkBonus = 0;
     let atkPercentBonus = 0;
     let mainAttributeBonus = null;
+    let strengthBonus = 0;
+    let agilityBonus = 0;
+    let intellectBonus = 0;
+    let willBonus = 0;
     const operatorBaseCritRatePercent = Number(
         operator.baseCritRatePercent ?? operator.baseCriticalRatePercent ?? operator.critRatePercent
     );
@@ -208,6 +213,26 @@ function getOperatorSimulationLoadoutStats(operatorId) {
             return;
         }
 
+        if (labelKey.includes("strength")) {
+            strengthBonus += value;
+            return;
+        }
+
+        if (labelKey.includes("agility")) {
+            agilityBonus += value;
+            return;
+        }
+
+        if (labelKey.includes("intellect")) {
+            intellectBonus += value;
+            return;
+        }
+
+        if (labelKey.includes("will")) {
+            willBonus += value;
+            return;
+        }
+
         const elementKey = Object.keys(elementDamageBonuses).find(element => (
             labelKey.includes(element) && (labelKey.includes("damage") || labelKey.includes("dmg"))
         ));
@@ -245,8 +270,192 @@ function getOperatorSimulationLoadoutStats(operatorId) {
         skillDamageBonuses[skillType] = (Number(skillDamageBonuses[skillType]) || 0) + (Number(value) || 0);
     });
 
+    // Retrieve and process gear stats
+    const equippedGloves = loadout.gloves ? getGearByKey(loadout.gloves.key, "gloves") : null;
+    const equippedArmor = loadout.armor ? getGearByKey(loadout.armor.key, "armor") : null;
+    const equippedKit1 = loadout.kit1 ? getGearByKey(loadout.kit1.key, "kits") : null;
+    const equippedKit2 = loadout.kit2 ? getGearByKey(loadout.kit2.key, "kits") : null;
+
+    const equippedSets = {};
+    const equippedGearItems = [equippedGloves, equippedArmor, equippedKit1, equippedKit2].filter(Boolean);
+
+    equippedGearItems.forEach(gear => {
+        if (gear.setKey) {
+            equippedSets[gear.setKey] = (equippedSets[gear.setKey] || 0) + 1;
+        }
+
+        const addStat = (statName, statValue) => {
+            const labelKey = String(statName || "").toLowerCase().replace(/[^a-z0-9%]/g, "");
+            const val = Number(statValue);
+            if (!labelKey || !Number.isFinite(val)) return;
+
+            if (labelKey.includes("flatatk")) {
+                flatAtkBonus += val;
+            } else if (labelKey.includes("atkbonus%") || labelKey.includes("atk%")) {
+                atkPercentBonus += val;
+            } else if (labelKey.includes("critrate")) {
+                critRateBonusPercent += val;
+            } else if (labelKey.includes("critdmg") || labelKey.includes("critdamage")) {
+                critDamageBonusPercent += val;
+            } else if (labelKey.includes("alldmg") || labelKey.includes("alldamage")) {
+                allDamageBonusPercent += val;
+            } else if (labelKey.includes("artsdmg") || labelKey.includes("artsdamage")) {
+                artsDamageBonusPercent += val;
+            } else if (labelKey.includes("strength")) {
+                strengthBonus += val;
+            } else if (labelKey.includes("agility")) {
+                agilityBonus += val;
+            } else if (labelKey.includes("intellect")) {
+                intellectBonus += val;
+            } else if (labelKey.includes("will")) {
+                willBonus += val;
+            } else {
+                Object.keys(elementDamageBonuses).forEach(element => {
+                    if (labelKey.includes(element)) {
+                        elementDamageBonuses[element] += val;
+                    }
+                });
+            }
+        };
+
+        if (gear.mainStat && gear.mainValue) {
+            addStat(gear.mainStat, gear.mainValue);
+        }
+        if (gear.secStat && gear.secValue) {
+            addStat(gear.secStat, gear.secValue);
+        }
+        if (gear.subStat && gear.subValue) {
+            addStat(gear.subStat, gear.subValue);
+        }
+    });
+
+    // Apply set bonuses (3 pieces required)
+    Object.entries(equippedSets).forEach(([setKey, count]) => {
+        if (count >= 3) {
+            switch (setKey) {
+                case "bonekrusha":
+                    atkPercentBonus += 15;
+                    skillDamageBonuses["battle"] = (skillDamageBonuses["battle"] || 0) + 30;
+                    break;
+                case "frontiers":
+                    allDamageBonusPercent += 16;
+                    break;
+                case "grizzled_edge":
+                case "swordmancer":
+                    atkPercentBonus += 8;
+                    elementDamageBonuses.physical += 24;
+                    break;
+                case "eternal_xiranite":
+                    allDamageBonusPercent += 16;
+                    break;
+                case "hot_work":
+                    intellectBonus += 30;
+                    elementDamageBonuses.heat += 60;
+                    elementDamageBonuses.nature += 60;
+                    break;
+                case "xiranflow":
+                case "mordvolt_insulation":
+                    intellectBonus += 50;
+                    artsDamageBonusPercent += 20;
+                    break;
+                case "lynx":
+                    break;
+                case "mi_security":
+                    critRateBonusPercent += 10;
+                    atkPercentBonus += 25;
+                    break;
+                case "tide_surge":
+                    skillDamageBonuses["skill"] = (skillDamageBonuses["skill"] || 0) + 20;
+                    artsDamageBonusPercent += 35;
+                    break;
+                case "aethertech":
+                    atkPercentBonus += 8;
+                    elementDamageBonuses.physical += 24;
+                    break;
+                case "qingbo":
+                    skillDamageBonuses["skill"] = (skillDamageBonuses["skill"] || 0) + 40;
+                    break;
+                case "pulser_labs":
+                    intellectBonus += 30;
+                    elementDamageBonuses.electric += 50;
+                    elementDamageBonuses.cryo += 50;
+                    break;
+                case "type_50":
+                case "type_50_yinglung":
+                    atkPercentBonus += 15;
+                    skillDamageBonuses["combo"] = (skillDamageBonuses["combo"] || 0) + 60;
+                    break;
+                case "armored_msgr":
+                    strengthBonus += 50;
+                    break;
+                case "roving_msgr":
+                    agilityBonus += 50;
+                    elementDamageBonuses.physical += 20;
+                    break;
+                case "mordvolt_resistant":
+                    willBonus += 50;
+                    break;
+                case "aburrey_legacy":
+                    skillDamageBonuses["skill"] = (skillDamageBonuses["skill"] || 0) + 24;
+                    atkPercentBonus += 15;
+                    break;
+                case "catastrophe":
+                    break;
+                case "aic_light":
+                case "aic_heavy":
+                    break;
+            }
+        }
+    });
+
+    // Calculate final attributes and ATK scaling
+    const statsLevel90 = operator.stats?.level90 || {};
+    let strength = (Number(statsLevel90.strength) || 0) + strengthBonus;
+    let agility = (Number(statsLevel90.agility) || 0) + agilityBonus;
+    let intellect = (Number(statsLevel90.intellect) || 0) + intellectBonus;
+    let will = (Number(statsLevel90.will) || 0) + willBonus;
+
+    let attributeBonus = 1.0;
+    if (operatorMainAttribute && operator.secondaryAttribute) {
+        const mainAttrKey = operatorMainAttribute.toLowerCase();
+        const secAttrKey = String(operator.secondaryAttribute || "").trim().toLowerCase();
+
+        let mainVal = 0;
+        if (mainAttrKey === "strength") mainVal = strength;
+        else if (mainAttrKey === "agility") mainVal = agility;
+        else if (mainAttrKey === "intellect") mainVal = intellect;
+        else if (mainAttrKey === "will") mainVal = will;
+
+        let secVal = 0;
+        if (secAttrKey === "strength") secVal = strength;
+        else if (secAttrKey === "agility") secVal = agility;
+        else if (secAttrKey === "intellect") secVal = intellect;
+        else if (secAttrKey === "will") secVal = will;
+
+        if (mainVal > 0 || secVal > 0) {
+            attributeBonus = 1 + (0.005 * mainVal) + (0.002 * secVal);
+        }
+    }
+
+    if (operatorMainAttribute) {
+        let gearMainAttrBonus = 0;
+        const mainAttrKey = operatorMainAttribute.toLowerCase();
+        if (mainAttrKey === "strength") gearMainAttrBonus = strengthBonus;
+        else if (mainAttrKey === "agility") gearMainAttrBonus = agilityBonus;
+        else if (mainAttrKey === "intellect") gearMainAttrBonus = intellectBonus;
+        else if (mainAttrKey === "will") gearMainAttrBonus = willBonus;
+
+        if (gearMainAttrBonus > 0) {
+            if (mainAttributeBonus) {
+                mainAttributeBonus.value += gearMainAttrBonus;
+            } else {
+                mainAttributeBonus = { label: operatorMainAttribute, value: gearMainAttrBonus, isPercent: false };
+            }
+        }
+    }
+
     const attackBeforePercent = operatorBaseAtk + weaponBaseAtk + flatAtkBonus;
-    const totalAtk = Math.round(attackBeforePercent * (1 + atkPercentBonus / 100) * 10) / 10;
+    const totalAtk = Math.round(attackBeforePercent * (1 + atkPercentBonus / 100) * attributeBonus * 10) / 10;
     return {
         operatorId: Number(operatorId),
         weaponKey: weapon.key,
@@ -258,6 +467,7 @@ function getOperatorSimulationLoadoutStats(operatorId) {
         atkPercentBonus,
         passiveStaticBonuses,
         attackBeforePercent,
+        attributeBonus,
         totalAtk,
         baseCritRatePercent,
         baseCritDamagePercent,
@@ -269,6 +479,9 @@ function getOperatorSimulationLoadoutStats(operatorId) {
         skillDamageBonuses,
         artsDamageBonusPercent,
         allDamageBonusPercent,
+        gearStats: {
+            equippedSets
+        },
         damageBonusVerified: passiveStaticBonuses.verified === true || activation?.profile?.verified === true || weapon.damageBonusVerified === true,
         damageBonusSourceUrl: passiveStaticBonuses.sourceUrl || activation?.profile?.sourceUrl || weapon.damageBonusSourceUrl || "",
         potential: activation?.potential || normalizeWeaponPotential(loadout.weapon?.potential),
@@ -326,7 +539,11 @@ function createLoadoutAttackBreakdown(combatStats) {
         const percentPart = combatStats.atkPercentBonus
             ? ` x ${formatLoadoutAttackNumber(multiplier)}`
             : "";
-        formula.textContent = `${formatLoadoutAttackNumber(combatStats.attackBeforePercent)}${percentPart} = ${formatLoadoutAttackNumber(combatStats.totalAtk)}`;
+        const attrMultiplier = Number(combatStats.attributeBonus) || 1.0;
+        const attrPart = attrMultiplier > 1.0
+            ? ` x ${formatLoadoutAttackNumber(attrMultiplier)}`
+            : "";
+        formula.textContent = `${formatLoadoutAttackNumber(combatStats.attackBeforePercent)}${percentPart}${attrPart} = ${formatLoadoutAttackNumber(combatStats.totalAtk)}`;
     } else {
         formula.textContent = "Available in Simulation Mode";
     }
@@ -352,6 +569,9 @@ function createLoadoutAttackBreakdown(combatStats) {
         addRow("Flat ATK bonuses", formatEssenceProfileValue(combatStats.flatAtkBonus));
         addRow("ATK before percent", formatLoadoutAttackNumber(combatStats.attackBeforePercent));
         addRow("Percent ATK bonuses", formatEssenceProfileValue(combatStats.atkPercentBonus, true));
+        if (combatStats.attributeBonus && combatStats.attributeBonus > 1.0) {
+            addRow("Attribute multiplier", `x ${formatLoadoutAttackNumber(combatStats.attributeBonus)}`);
+        }
         addRow("Simulation ATK", formatLoadoutAttackNumber(combatStats.totalAtk), "is-total");
     } else {
         addRow("Mode", "Switch to Simulation");
@@ -362,6 +582,41 @@ function createLoadoutAttackBreakdown(combatStats) {
     root.appendChild(rows);
     return root;
 }
+
+function appendCombatAttributesSection(panel, combatStats) {
+    if (!combatStats) return;
+
+    const critSection = document.createElement("div");
+    critSection.className = "loadout-essence-section";
+    const heading = document.createElement("div");
+    heading.className = "loadout-essence-heading";
+    const label = document.createElement("strong");
+    label.textContent = "Combat Attributes";
+    heading.appendChild(label);
+    critSection.appendChild(heading);
+
+    const grid = document.createElement("div");
+    grid.className = "loadout-detail-stats";
+    appendLoadoutDetailRow(grid, "Crit Rate", `${formatLoadoutAttackNumber(combatStats.critRatePercent)}%`);
+    appendLoadoutDetailRow(grid, "Crit DMG", `+${formatLoadoutAttackNumber(combatStats.critDamagePercent)}%`);
+
+    Object.entries(combatStats.elementDamageBonuses).forEach(([el, val]) => {
+        if (val > 0) {
+            const elName = el.charAt(0).toUpperCase() + el.slice(1);
+            appendLoadoutDetailRow(grid, `${elName} DMG`, `+${formatLoadoutAttackNumber(val)}%`);
+        }
+    });
+    if (combatStats.artsDamageBonusPercent > 0) {
+        appendLoadoutDetailRow(grid, "Arts DMG", `+${formatLoadoutAttackNumber(combatStats.artsDamageBonusPercent)}%`);
+    }
+    if (combatStats.allDamageBonusPercent > 0) {
+        appendLoadoutDetailRow(grid, "All DMG Boost", `+${formatLoadoutAttackNumber(combatStats.allDamageBonusPercent)}%`);
+    }
+
+    critSection.appendChild(grid);
+    panel.appendChild(critSection);
+}
+
 function getWeaponLoadoutOperator(operatorId) {
     const id = Number(operatorId);
     if (!Number.isFinite(id) || !Array.isArray(operators)) return null;
@@ -416,6 +671,15 @@ function normalizeWeaponLoadoutEntry(value, operator) {
     };
 }
 
+function normalizeGearLoadoutEntry(value, category) {
+    if (!value || typeof value !== "object") return null;
+    const key = value.key;
+    if (!key) return null;
+    const gear = getGearByKey(key, category);
+    if (!gear) return null;
+    return { key: String(gear.key) };
+}
+
 function normalizeOperatorLoadouts(value) {
     const normalized = {};
     if (!value || typeof value !== "object" || Array.isArray(value)) return normalized;
@@ -431,11 +695,13 @@ function normalizeOperatorLoadouts(value) {
             legacyWeaponValue || rawLoadout?.weapon,
             operator
         );
-        if (!weapon) return;
 
         normalized[String(operator.id)] = {
-            ...createEmptyOperatorLoadout(),
-            weapon
+            weapon: weapon || null,
+            gloves: normalizeGearLoadoutEntry(rawLoadout?.gloves, "gloves"),
+            armor: normalizeGearLoadoutEntry(rawLoadout?.armor, "armor"),
+            kit1: normalizeGearLoadoutEntry(rawLoadout?.kit1, "kits"),
+            kit2: normalizeGearLoadoutEntry(rawLoadout?.kit2, "kits")
         };
     });
 
@@ -510,18 +776,18 @@ function setEquippedWeaponForOperator(operatorId, weaponKey) {
     const weapon = getWeaponByKey(key);
     if (!isWeaponCompatibleWithOperator(weapon, operator)) return false;
 
-    const currentWeapon = getOperatorLoadout(operator.id).weapon;
-    const keepCurrent = currentWeapon?.key === String(weapon.key);
+    const current = getOperatorLoadout(operator.id);
+    const keepCurrent = current.weapon?.key === String(weapon.key);
     const potential = keepCurrent
-        ? normalizeWeaponPotential(currentWeapon.potential)
+        ? normalizeWeaponPotential(current.weapon.potential)
         : DEFAULT_WEAPON_POTENTIAL;
     operatorLoadouts[String(operator.id)] = {
-        ...createEmptyOperatorLoadout(),
+        ...current,
         weapon: {
             key: String(weapon.key),
             potential,
             essence: keepCurrent
-                ? normalizeWeaponEssenceAllocation(currentWeapon.essence, weapon, potential)
+                ? normalizeWeaponEssenceAllocation(current.weapon.essence, weapon, potential)
                 : createEmptyEssenceAllocation()
         }
     };
@@ -573,6 +839,25 @@ function setWeaponEssenceForOperator(operatorId, channelOrValue, value = null) {
             potential,
             essence: normalizeWeaponEssenceAllocation(nextEssence, weapon, potential)
         }
+    };
+    saveOperatorLoadouts();
+    return true;
+}
+
+function setEquippedGearForOperator(operatorId, slot, gearKey) {
+    if (!isWeaponLoadoutSimulationMode()) return false;
+    const operator = getWeaponLoadoutOperator(operatorId);
+    if (!operator) return false;
+
+    const slots = ["gloves", "armor", "kit1", "kit2"];
+    if (!slots.includes(slot)) return false;
+
+    const current = getOperatorLoadout(operator.id);
+    const key = gearKey ? String(gearKey).trim() : null;
+
+    operatorLoadouts[String(operator.id)] = {
+        ...current,
+        [slot]: key ? { key } : null
     };
     saveOperatorLoadouts();
     return true;
@@ -664,6 +949,60 @@ function createLoadoutWeaponIcon(className = "", weapon = null) {
     return icon;
 }
 
+function createLoadoutGearIcon(className = "", gear = null, slotType = "") {
+    const icon = document.createElement("span");
+    icon.className = `loadout-weapon-icon ${className}`.trim();
+    icon.setAttribute("aria-hidden", "true");
+
+    const category = slotType === "kit1" || slotType === "kit2" ? "kit" : slotType;
+    if (category && !gear) {
+        icon.style.backgroundImage = `url('assets/gear/${category}.png')`;
+        icon.style.backgroundSize = "cover";
+        icon.style.backgroundPosition = "center";
+    }
+
+    const iconPath = gear?.icon || (gear?.key ? `assets/gear/${gear.key}.png` : null);
+    if (iconPath) {
+        const image = document.createElement("img");
+        image.alt = "";
+        image.loading = "lazy";
+        image.decoding = "async";
+        icon.classList.add("has-image");
+        image.addEventListener("error", () => {
+            image.remove();
+            icon.classList.remove("has-image");
+            if (category) {
+                icon.style.backgroundImage = `url('assets/gear/${category}.png')`;
+                icon.style.backgroundSize = "cover";
+                icon.style.backgroundPosition = "center";
+            }
+        });
+        image.src = iconPath;
+        icon.prepend(image);
+    }
+    return icon;
+}
+
+function updateSlotIcon(slotName, imageUrl, defaultText) {
+    const slotEl = document.getElementById("loadoutSlot" + slotName.charAt(0).toUpperCase() + slotName.slice(1));
+    if (!slotEl) return;
+    const iconEl = slotEl.querySelector(".loadout-slot-icon");
+    if (!iconEl) return;
+
+    if (imageUrl) {
+        iconEl.innerHTML = `<img src="${imageUrl}" alt="" onerror="this.style.display='none'; const p=this.parentElement; p.classList.remove('has-image'); p.style.backgroundImage=''; p.style.color=''; p.innerHTML='${defaultText}';" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit; display: block;" />`;
+        iconEl.classList.add("has-image");
+        iconEl.style.backgroundImage = "none";
+        iconEl.style.color = "transparent";
+    } else {
+        iconEl.innerHTML = defaultText;
+        iconEl.classList.remove("has-image");
+        iconEl.style.backgroundImage = "";
+        iconEl.style.color = "";
+    }
+}
+
+
 function refreshOperatorLoadoutSurfaces() {
     if (typeof renderSkills === "function") renderSkills();
     if (typeof initSkillDragDrop === "function") initSkillDragDrop();
@@ -747,72 +1086,230 @@ function renderLoadoutOperatorHeader(operator) {
     const avatar = document.getElementById("loadoutOperatorAvatar");
     const name = document.getElementById("loadoutOperatorName");
     const meta = document.getElementById("loadoutOperatorMeta");
+    const attrsEl = document.getElementById("loadoutOperatorAttributes");
+    const simAtkEl = document.getElementById("loadoutOperatorSimulationAtkValue");
+
     if (avatar) {
         avatar.src = operator.icon || "";
         avatar.alt = operator.name || "Operator";
     }
     if (name) name.textContent = operator.name || "Operator";
     if (meta) meta.textContent = `${operator.operatorClass || "Operator"} / ${String(operator.weaponType || "Weapon").replace(/_/g, " ")}`;
+
+    if (attrsEl) {
+        attrsEl.innerHTML = "";
+        const formatAttr = attr => {
+            const a = String(attr || "").trim().toLowerCase();
+            if (a.startsWith("strength")) return "STR";
+            if (a.startsWith("agility")) return "AGI";
+            if (a.startsWith("intellect")) return "INT";
+            if (a.startsWith("will")) return "WILL";
+            return a.toUpperCase();
+        };
+
+        if (operator.mainAttribute) {
+            const mainChip = document.createElement("span");
+            mainChip.className = "loadout-weapon-atk-badge";
+            mainChip.style.borderColor = "rgba(248, 245, 70, 0.45)";
+            const label = document.createElement("small");
+            label.textContent = "MAIN";
+            const val = document.createElement("strong");
+            val.textContent = formatAttr(operator.mainAttribute);
+            mainChip.append(label, val);
+            attrsEl.appendChild(mainChip);
+        }
+        if (operator.secondaryAttribute) {
+            const secChip = document.createElement("span");
+            secChip.className = "loadout-weapon-atk-badge";
+            const label = document.createElement("small");
+            label.textContent = "SEC";
+            const val = document.createElement("strong");
+            val.textContent = formatAttr(operator.secondaryAttribute);
+            secChip.append(label, val);
+            attrsEl.appendChild(secChip);
+        }
+    }
+
+    if (simAtkEl) {
+        const stats = getOperatorSimulationLoadoutStats(operator.id);
+        simAtkEl.textContent = stats ? formatLoadoutAttackNumber(stats.totalAtk) : "-";
+    }
 }
 
 function renderLoadoutWeaponList(operator) {
     const list = document.getElementById("loadoutWeaponList");
+    const browserTitle = document.getElementById("loadoutWeaponsTitle");
     if (!list) return;
     list.innerHTML = "";
 
-    const equippedKey = getEquippedWeaponKey(operator.id);
-    const compatibleWeapons = getCompatibleWeaponsForOperator(operator);
-    compatibleWeapons.forEach(weapon => {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "loadout-weapon-card";
-        button.classList.toggle("selected", String(weapon.key) === equippedKey);
-        button.setAttribute("aria-pressed", String(String(weapon.key) === equippedKey));
-        button.setAttribute("aria-label", `Equip ${weapon.name}`);
+    if (activeLoadoutSlot === "weapon") {
+        if (browserTitle) browserTitle.textContent = "Weapons";
+        const equippedKey = getEquippedWeaponKey(operator.id);
+        const compatibleWeapons = getCompatibleWeaponsForOperator(operator);
+        compatibleWeapons.forEach(weapon => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "loadout-weapon-card";
+            button.classList.toggle("selected", String(weapon.key) === equippedKey);
+            button.setAttribute("aria-pressed", String(String(weapon.key) === equippedKey));
+            button.setAttribute("aria-label", `Equip ${weapon.name}`);
 
-        button.appendChild(createLoadoutWeaponIcon("", weapon));
+            button.appendChild(createLoadoutWeaponIcon("", weapon));
 
-        const copy = document.createElement("span");
-        copy.className = "loadout-weapon-card-copy";
-        const title = document.createElement("strong");
-        title.textContent = weapon.name;
-        const meta = document.createElement("span");
-        meta.className = "loadout-weapon-card-meta";
-        const stars = document.createElement("span");
-        stars.className = "loadout-weapon-rarity";
-        stars.textContent = getWeaponRarityStars(weapon);
-        stars.setAttribute("aria-label", `${Number(weapon.rarity) || "Unknown"} star weapon`);
-        const attack = document.createElement("span");
-        attack.className = "loadout-weapon-atk-badge";
-        const attackLabel = document.createElement("small");
-        attackLabel.textContent = "ATK";
-        const attackValue = document.createElement("strong");
-        attackValue.textContent = String(Number(weapon.baseAtk) || "-");
-        attack.append(attackLabel, attackValue);
-        meta.append(stars, attack);
-        copy.appendChild(title);
-        copy.appendChild(meta);
+            const copy = document.createElement("span");
+            copy.className = "loadout-weapon-card-copy";
+            const title = document.createElement("strong");
+            title.textContent = weapon.name;
+            const meta = document.createElement("span");
+            meta.className = "loadout-weapon-card-meta";
+            const stars = document.createElement("span");
+            stars.className = "loadout-weapon-rarity";
+            stars.textContent = getWeaponRarityStars(weapon);
+            stars.setAttribute("aria-label", `${Number(weapon.rarity) || "Unknown"} star weapon`);
+            const attack = document.createElement("span");
+            attack.className = "loadout-weapon-atk-badge";
+            const attackLabel = document.createElement("small");
+            attackLabel.textContent = "ATK";
+            const attackValue = document.createElement("strong");
+            attackValue.textContent = String(Number(weapon.baseAtk) || "-");
+            attack.append(attackLabel, attackValue);
+            meta.append(stars, attack);
+            copy.appendChild(title);
+            copy.appendChild(meta);
 
-        const marker = document.createElement("span");
-        marker.className = "loadout-weapon-card-marker";
-        if (String(weapon.key) === equippedKey) marker.classList.add("is-equipped");
-        marker.textContent = String(weapon.key) === equippedKey ? "Active" : "Equip";
+            const marker = document.createElement("span");
+            marker.className = "loadout-weapon-card-marker";
+            if (String(weapon.key) === equippedKey) marker.classList.add("is-equipped");
+            marker.textContent = String(weapon.key) === equippedKey ? "Active" : "Equip";
 
-        button.appendChild(copy);
-        button.appendChild(marker);
-        button.addEventListener("click", () => {
-            if (!setEquippedWeaponForOperator(operator.id, weapon.key)) return;
-            renderOperatorLoadoutModal();
-            refreshOperatorLoadoutSurfaces();
+            button.appendChild(copy);
+            button.appendChild(marker);
+            button.addEventListener("click", () => {
+                if (!setEquippedWeaponForOperator(operator.id, weapon.key)) return;
+                renderOperatorLoadoutModal();
+                refreshOperatorLoadoutSurfaces();
+            });
+            list.appendChild(button);
         });
-        list.appendChild(button);
-    });
 
-    if (compatibleWeapons.length === 0) {
-        const empty = document.createElement("p");
-        empty.className = "loadout-empty-message";
-        empty.textContent = "No compatible weapons are available in the database.";
-        list.appendChild(empty);
+        if (compatibleWeapons.length === 0) {
+            const empty = document.createElement("p");
+            empty.className = "loadout-empty-message";
+            empty.textContent = "No compatible weapons are available in the database.";
+            list.appendChild(empty);
+        }
+    } else {
+        const category = (activeLoadoutSlot === "kit1" || activeLoadoutSlot === "kit2") ? "kits" : activeLoadoutSlot;
+        const gearList = GEAR_DATABASE[category] || [];
+
+        if (browserTitle) {
+            browserTitle.textContent = activeLoadoutSlot === "gloves" ? "Gloves" :
+                                       activeLoadoutSlot === "armor" ? "Armor" : "Kits";
+        }
+
+        const equippedGear = getOperatorLoadout(operator.id)[activeLoadoutSlot];
+        const equippedKey = equippedGear?.key || null;
+
+        gearList.forEach(gear => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "loadout-weapon-card";
+            button.classList.toggle("selected", String(gear.key) === equippedKey);
+            button.setAttribute("aria-pressed", String(String(gear.key) === equippedKey));
+            button.setAttribute("aria-label", `Equip ${gear.name}`);
+
+            const icon = createLoadoutGearIcon("compact", gear, activeLoadoutSlot);
+            button.appendChild(icon);
+
+            const copy = document.createElement("span");
+            copy.className = "loadout-weapon-card-copy";
+            const title = document.createElement("strong");
+            title.textContent = gear.name;
+            const meta = document.createElement("span");
+            meta.className = "loadout-weapon-card-meta";
+            const stars = document.createElement("span");
+            stars.className = "loadout-weapon-rarity";
+            stars.textContent = "★".repeat(gear.rarity);
+            stars.setAttribute("aria-label", `${gear.rarity} star gear`);
+
+            const operatorMain = String(operator.mainAttribute || "").trim().toLowerCase();
+            const operatorSec = String(operator.secondaryAttribute || "").trim().toLowerCase();
+
+            const isMainMatch = gear.mainStat && (
+                String(gear.mainStat).trim().toLowerCase() === operatorMain ||
+                String(gear.mainStat).trim().toLowerCase() === operatorSec
+            );
+
+            const isSecMatch = gear.secStat && (
+                String(gear.secStat).trim().toLowerCase() === operatorMain ||
+                String(gear.secStat).trim().toLowerCase() === operatorSec
+            );
+
+            if (isMainMatch || isSecMatch) {
+                button.classList.add("synergistic");
+            }
+
+            const formatAttr = attr => {
+                const a = String(attr || "").trim().toLowerCase();
+                if (a.startsWith("strength")) return "STR";
+                if (a.startsWith("agility")) return "AGI";
+                if (a.startsWith("intellect")) return "INT";
+                if (a.startsWith("will")) return "WILL";
+                return a.toUpperCase();
+            };
+
+            const mainStatBadge = document.createElement("span");
+            mainStatBadge.className = "loadout-weapon-atk-badge";
+            if (isMainMatch) {
+                mainStatBadge.style.borderColor = "rgba(248, 245, 70, 0.65)";
+                mainStatBadge.style.color = "#F8F546";
+            }
+            const statLabel = document.createElement("small");
+            statLabel.textContent = formatAttr(gear.mainStat);
+            const statValue = document.createElement("strong");
+            statValue.textContent = `+${gear.mainValue}`;
+            mainStatBadge.append(statLabel, statValue);
+
+            meta.append(stars, mainStatBadge);
+
+            if (gear.secStat) {
+                const secStatBadge = document.createElement("span");
+                secStatBadge.className = "loadout-weapon-atk-badge";
+                if (isSecMatch) {
+                    secStatBadge.style.borderColor = "rgba(248, 245, 70, 0.65)";
+                    secStatBadge.style.color = "#F8F546";
+                }
+                const label = document.createElement("small");
+                label.textContent = formatAttr(gear.secStat);
+                const val = document.createElement("strong");
+                val.textContent = `+${gear.secValue}`;
+                secStatBadge.append(label, val);
+                meta.append(secStatBadge);
+            }
+            copy.appendChild(title);
+            copy.appendChild(meta);
+
+            const marker = document.createElement("span");
+            marker.className = "loadout-weapon-card-marker";
+            if (String(gear.key) === equippedKey) marker.classList.add("is-equipped");
+            marker.textContent = String(gear.key) === equippedKey ? "Active" : "Equip";
+
+            button.appendChild(copy);
+            button.appendChild(marker);
+            button.addEventListener("click", () => {
+                if (!setEquippedGearForOperator(operator.id, activeLoadoutSlot, gear.key)) return;
+                renderOperatorLoadoutModal();
+                refreshOperatorLoadoutSurfaces();
+            });
+            list.appendChild(button);
+        });
+
+        if (gearList.length === 0) {
+            const empty = document.createElement("p");
+            empty.className = "loadout-empty-message";
+            empty.textContent = `No gear is available for ${category} in the database.`;
+            list.appendChild(empty);
+        }
     }
 }
 
@@ -915,19 +1412,193 @@ function renderLoadoutWeaponDetails(operator) {
     const weapon = getEquippedWeapon(operator.id);
     const essenceProfile = getWeaponEssenceProfile(weapon);
     const activation = getWeaponActivationState(operator.id);
+    const currentLoadout = getOperatorLoadout(operator.id);
+
+    // Update slot values in modal
     if (slotValue) {
         slotValue.textContent = weapon?.name || "Not equipped";
     }
+    updateSlotIcon("weapon", weapon?.icon || null, "W");
+
     if (essenceSlotValue) {
         const essenceSlot = essenceSlotValue.closest(".loadout-slot");
         const essenceRanks = getWeaponEssenceRankSummary(activation);
         essenceSlotValue.textContent = !weapon
             ? "Select a weapon"
             : (activation ? `Potential ${activation.potential} / ${essenceRanks.used}/${essenceRanks.max} ranks` : "No essence data");
-        essenceSlot?.classList.toggle("active", Boolean(essenceProfile));
+        essenceSlot?.classList.toggle("active", Boolean(essenceProfile) && activeLoadoutSlot === "weapon");
         essenceSlot?.classList.toggle("future", !essenceProfile);
+        essenceSlot?.classList.toggle("active-essence", Boolean(essenceProfile));
         essenceSlot?.setAttribute("aria-disabled", String(!essenceProfile));
     }
+
+    const glovesVal = document.getElementById("loadoutGlovesSlotValue");
+    const equippedGloves = currentLoadout.gloves ? getGearByKey(currentLoadout.gloves.key, "gloves") : null;
+    if (glovesVal) glovesVal.textContent = equippedGloves ? equippedGloves.name : "Not equipped";
+    updateSlotIcon("gloves", equippedGloves ? (equippedGloves.icon || `assets/gear/${equippedGloves.key}.png`) : null, "G");
+
+    const armorVal = document.getElementById("loadoutArmorSlotValue");
+    const equippedArmor = currentLoadout.armor ? getGearByKey(currentLoadout.armor.key, "armor") : null;
+    if (armorVal) armorVal.textContent = equippedArmor ? equippedArmor.name : "Not equipped";
+    updateSlotIcon("armor", equippedArmor ? (equippedArmor.icon || `assets/gear/${equippedArmor.key}.png`) : null, "A");
+
+    const kit1Val = document.getElementById("loadoutKit1SlotValue");
+    const equippedKit1 = currentLoadout.kit1 ? getGearByKey(currentLoadout.kit1.key, "kits") : null;
+    if (kit1Val) kit1Val.textContent = equippedKit1 ? equippedKit1.name : "Not equipped";
+    updateSlotIcon("kit1", equippedKit1 ? (equippedKit1.icon || `assets/gear/${equippedKit1.key}.png`) : null, "K");
+
+    const kit2Val = document.getElementById("loadoutKit2SlotValue");
+    const equippedKit2 = currentLoadout.kit2 ? getGearByKey(currentLoadout.kit2.key, "kits") : null;
+    if (kit2Val) kit2Val.textContent = equippedKit2 ? equippedKit2.name : "Not equipped";
+    updateSlotIcon("kit2", equippedKit2 ? (equippedKit2.icon || `assets/gear/${equippedKit2.key}.png`) : null, "K");
+
+    // Toggle active status classes on slot DOM elements
+    const slots = ["weapon", "gloves", "armor", "kit1", "kit2"];
+    slots.forEach(slot => {
+        const slotEl = document.getElementById("loadoutSlot" + slot.charAt(0).toUpperCase() + slot.slice(1));
+        if (slotEl) {
+            slotEl.classList.toggle("active", activeLoadoutSlot === slot);
+        }
+    });
+
+    const activeSlot = activeLoadoutSlot;
+    if (activeSlot !== "weapon") {
+        const equippedGear = currentLoadout[activeSlot];
+        const gearCategory = (activeSlot === "kit1" || activeSlot === "kit2") ? "kits" : activeSlot;
+        const gear = equippedGear ? getGearByKey(equippedGear.key, gearCategory) : null;
+        const combatStats = getOperatorSimulationLoadoutStats(operator.id);
+
+        if (!gear) {
+            panel.classList.add("empty");
+            const icon = createLoadoutGearIcon("large", null, activeSlot);
+            icon.style.opacity = "0.22";
+            icon.style.width = "72px";
+            icon.style.height = "72px";
+            icon.style.margin = "0 auto 14px";
+            panel.appendChild(icon);
+
+            const title = document.createElement("strong");
+            title.textContent = activeSlot === "gloves" ? "No Gloves equipped" :
+                                activeSlot === "armor" ? "No Armor equipped" :
+                                activeSlot.startsWith("kit") ? `No Kit ${activeSlot.slice(3)} equipped` :
+                                `No ${activeSlot} equipped`;
+            const copy = document.createElement("p");
+            copy.textContent = activeSlot === "gloves" ? "Choose Gloves for this operator." :
+                               activeSlot === "armor" ? "Choose Armor for this operator." :
+                               activeSlot.startsWith("kit") ? `Choose Kit ${activeSlot.slice(3)} for this operator.` :
+                               `Choose ${activeSlot} for this operator.`;
+            panel.appendChild(title);
+            panel.appendChild(copy);
+
+            if (combatStats) {
+                panel.appendChild(createLoadoutAttackBreakdown(combatStats));
+                appendCombatAttributesSection(panel, combatStats);
+            }
+            return;
+        }
+
+        panel.classList.remove("empty");
+        const heading = document.createElement("div");
+        heading.className = "loadout-detail-heading";
+        const heroIdentity = document.createElement("div");
+        heroIdentity.className = "loadout-detail-identity";
+
+        const icon = createLoadoutGearIcon("large", gear, activeSlot);
+        icon.style.width = "72px";
+        icon.style.height = "72px";
+        heroIdentity.appendChild(icon);
+
+        const headingCopy = document.createElement("div");
+        const rarity = document.createElement("span");
+        rarity.className = "loadout-weapon-rarity is-large";
+        rarity.textContent = "★".repeat(gear.rarity);
+        rarity.setAttribute("aria-label", `${gear.rarity} star gear`);
+
+        const title = document.createElement("h3");
+        title.textContent = gear.name;
+        
+        const meta = document.createElement("small");
+        const setBonus = SET_BONUS_DATABASE[gear.setKey];
+        meta.textContent = setBonus ? `Set: ${setBonus.name}` : "Gear";
+
+        const activeBadge = document.createElement("span");
+        activeBadge.className = "loadout-detail-status";
+        activeBadge.textContent = "Equipped";
+
+        headingCopy.appendChild(rarity);
+        headingCopy.appendChild(title);
+        headingCopy.appendChild(meta);
+        headingCopy.appendChild(activeBadge);
+        heroIdentity.appendChild(headingCopy);
+        heading.appendChild(heroIdentity);
+
+        const mainStatChip = document.createElement("div");
+        mainStatChip.className = "loadout-detail-attack-chip";
+        const mainStatLabel = document.createElement("span");
+        mainStatLabel.textContent = gear.mainStat;
+        const mainStatValue = document.createElement("strong");
+        mainStatValue.textContent = `+${gear.mainValue}`;
+        mainStatChip.appendChild(mainStatLabel);
+        mainStatChip.appendChild(mainStatValue);
+        heading.appendChild(mainStatChip);
+        panel.appendChild(heading);
+
+        const statsSummary = document.createElement("div");
+        statsSummary.className = "loadout-combat-summary";
+        appendLoadoutDetailRow(statsSummary, "Main Attribute", `${gear.mainStat}: +${gear.mainValue}`);
+        if (gear.secStat) {
+            appendLoadoutDetailRow(statsSummary, "Secondary Attribute", `${gear.secStat}: +${gear.secValue}`);
+        }
+        appendLoadoutDetailRow(statsSummary, "Sub Stat", `${gear.subStat}: +${gear.subValue}`);
+        if (gear.defValue) {
+            appendLoadoutDetailRow(statsSummary, "Defense", `+${gear.defValue}`);
+        }
+
+        if (setBonus) {
+            const count = combatStats?.gearStats?.equippedSets?.[gear.setKey] || 0;
+            appendLoadoutDetailRow(statsSummary, "Set Pieces Equipped", `${count} / 3 equipped`, count >= 3 ? "is-attack" : "");
+        }
+        panel.appendChild(statsSummary);
+
+        if (setBonus) {
+            const setSection = document.createElement("div");
+            setSection.className = "loadout-essence-section";
+            const setHeading = document.createElement("div");
+            setHeading.className = "loadout-essence-heading";
+            const setLabel = document.createElement("strong");
+            setLabel.textContent = setBonus.name;
+            const count = combatStats?.gearStats?.equippedSets?.[gear.setKey] || 0;
+            const setHint = document.createElement("span");
+            setHint.textContent = count >= 3 
+                ? "Active: " + setBonus.description 
+                : "Inactive (requires 3 pieces): " + setBonus.description;
+            if (count >= 3) {
+                setHint.style.color = "#F8F546";
+            }
+            setHeading.appendChild(setLabel);
+            setHeading.appendChild(setHint);
+            setSection.appendChild(setHeading);
+            panel.appendChild(setSection);
+        }
+
+        if (combatStats) {
+            panel.appendChild(createLoadoutAttackBreakdown(combatStats));
+            appendCombatAttributesSection(panel, combatStats);
+        }
+
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.className = "loadout-remove-weapon";
+        removeButton.textContent = `Unequip ${activeSlot.replace("kit", "Kit ")}`;
+        removeButton.addEventListener("click", () => {
+            if (!setEquippedGearForOperator(operator.id, activeSlot, null)) return;
+            renderOperatorLoadoutModal();
+            refreshOperatorLoadoutSurfaces();
+        });
+        panel.appendChild(removeButton);
+        return;
+    }
+
     if (!weapon) {
         panel.classList.add("empty");
         panel.appendChild(createLoadoutWeaponIcon("large"));
@@ -989,6 +1660,7 @@ function renderLoadoutWeaponDetails(operator) {
     );
     panel.appendChild(combatSummary);
     panel.appendChild(createLoadoutAttackBreakdown(combatStats));
+    appendCombatAttributesSection(panel, combatStats);
 
     const stats = document.createElement("div");
     stats.className = "loadout-detail-stats";
@@ -1094,6 +1766,7 @@ function openOperatorLoadoutModal(operatorId) {
     if (!operator || !modal) return false;
 
     activeLoadoutOperatorId = Number(operator.id);
+    activeLoadoutSlot = "weapon";
     loadoutModalPreviousFocus = document.activeElement;
     renderOperatorLoadoutModal();
     modal.classList.add("open");
@@ -1130,8 +1803,20 @@ function initOperatorLoadoutModal() {
             closeOperatorLoadoutModal();
         }
     });
+
+    const slots = ["weapon", "gloves", "armor", "kit1", "kit2"];
+    slots.forEach(slot => {
+        const slotEl = document.getElementById("loadoutSlot" + slot.charAt(0).toUpperCase() + slot.slice(1));
+        if (slotEl) {
+            slotEl.addEventListener("click", () => {
+                activeLoadoutSlot = slot;
+                renderOperatorLoadoutModal();
+            });
+        }
+    });
 }
 
 window.getOperatorSimulationLoadoutStats = getOperatorSimulationLoadoutStats;
 window.openOperatorLoadoutModal = openOperatorLoadoutModal;
 window.closeOperatorLoadoutModal = closeOperatorLoadoutModal;
+window.setEquippedGearForOperator = setEquippedGearForOperator;

@@ -403,6 +403,10 @@ async function initApp() {
             await hydrateEffectGroupsFromSupabase();
         }
 
+        if (typeof hydrateGearFromSupabase === "function") {
+            await hydrateGearFromSupabase();
+        }
+
         if (typeof hydrateOperatorsFromSupabase === "function") {
             await hydrateOperatorsFromSupabase();
         }

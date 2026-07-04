@@ -546,3 +546,89 @@ async function hydrateOperatorsFromSupabase() {
     console.info(`Operatoren aus Supabase geladen: ${operators.length}; Waffen: ${weapons.length}; Essenzprofile: ${weaponEssenceProfiles.length}`);
     return true;
 }
+
+function mapDatabaseGearItem(row) {
+    return {
+        key: row.gear_key,
+        category: row.category,
+        name: row.name,
+        setKey: row.set_key,
+        rarity: row.rarity,
+        mainStat: row.main_stat,
+        mainValue: Number(row.main_value) || 0,
+        subStat: row.sub_stat,
+        subValue: Number(row.sub_value) || 0,
+        secStat: row.sec_stat,
+        secValue: Number(row.sec_value) || 0,
+        defValue: Number(row.def_value) || 0,
+        icon: row.icon
+    };
+}
+
+async function loadGearSetsFromSupabase() {
+    if (!supabaseClient) throw new Error("Supabase client is not available. Cannot load gear sets.");
+    const { data, error } = await supabaseClient
+        .from("gear_sets")
+        .select("*")
+        .order("set_key", { ascending: true });
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+}
+
+async function loadGearItemsFromSupabase() {
+    if (!supabaseClient) throw new Error("Supabase client is not available. Cannot load gear items.");
+    const { data, error } = await supabaseClient
+        .from("gear_items")
+        .select("*")
+        .order("name", { ascending: true });
+    if (error) throw error;
+    return Array.isArray(data) ? data.map(mapDatabaseGearItem) : [];
+}
+
+async function hydrateGearFromSupabase() {
+    let setsData = [];
+    let itemsData = [];
+    try {
+        setsData = await loadGearSetsFromSupabase();
+        itemsData = await loadGearItemsFromSupabase();
+    } catch (error) {
+        console.info("Supabase gear data is not available yet; using local defaults.", error?.message || error);
+        return false;
+    }
+    if (!setsData.length || !itemsData.length) return false;
+
+    // Build temporary databases
+    const newSets = {};
+    setsData.forEach(row => {
+        newSets[row.set_key] = {
+            name: row.name,
+            description: row.description
+        };
+    });
+
+    const newGear = {
+        gloves: [],
+        armor: [],
+        kits: []
+    };
+    itemsData.forEach(item => {
+        if (newGear[item.category]) {
+            newGear[item.category].push(item);
+        }
+    });
+
+    // Safely mutate global constants to preserve references across modules
+    if (typeof SET_BONUS_DATABASE !== "undefined") {
+        Object.keys(SET_BONUS_DATABASE).forEach(k => delete SET_BONUS_DATABASE[k]);
+        Object.assign(SET_BONUS_DATABASE, newSets);
+    }
+    if (typeof GEAR_DATABASE !== "undefined") {
+        Object.keys(GEAR_DATABASE).forEach(k => delete GEAR_DATABASE[k]);
+        Object.assign(GEAR_DATABASE, newGear);
+    }
+
+    console.info(`Ausrüstung erfolgreich aus Supabase geladen: ${setsData.length} Sets, ${itemsData.length} Items.`);
+    return true;
+}
+
+window.hydrateGearFromSupabase = hydrateGearFromSupabase;

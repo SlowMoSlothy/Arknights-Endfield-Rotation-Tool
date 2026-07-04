@@ -226,8 +226,12 @@ test("weapon Potential and Essence allocations are shared only in Simulation Mod
   assert.doesNotMatch(simulationCode, /^AERT\d+:/);
   const displayCode = context.getDisplayBuildShareCode(simulationCode);
   assert.doesNotMatch(displayCode, /^AERT\d+:/);
-  assert.equal(context.decodeShareBytes(displayCode)[0], 10);
-  assert.equal(context.parseBuildShareCode(displayCode).v, 10);
+  assert.equal(context.decodeShareBytes(displayCode)[0], 11);
+  assert.equal(context.parseBuildShareCode(displayCode).v, 11);
+
+  // Verify V10 backwards compatibility
+  const v10DisplayCode = context.encodeShareBytes([10, ...v9Bytes]);
+  assert.equal(context.parseBuildShareCode(v10DisplayCode).v, 10);
   context.location = { protocol: "https:", origin: "https://rotationforge.gg", pathname: "/endfield/" };
   const shareLink = context.createBuildShareLink();
   assert.match(shareLink, /^https:\/\/rotationforge\.gg\/endfield\/#setup=/);
