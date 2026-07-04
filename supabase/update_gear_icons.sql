@@ -1,4 +1,4 @@
--- Update script to set correct gear icon paths in the database for all 56 gear items.
+﻿-- Update script to set correct gear icon paths in the database for all 57 gear items.
 begin;
 
 update public.gear_items set icon = 'assets/gear/aic_light_gloves.png' where gear_key = 'aic_light_gloves';
@@ -51,6 +51,7 @@ update public.gear_items set icon = 'assets/gear/hot_work_kit.png' where gear_ke
 update public.gear_items set icon = 'assets/gear/lynx_gloves.png' where gear_key = 'lynx_gloves';
 update public.gear_items set icon = 'assets/gear/lynx_armor.png' where gear_key = 'lynx_armor';
 update public.gear_items set icon = 'assets/gear/lynx_kit.png' where gear_key = 'lynx_kit';
+update public.gear_items set icon = 'assets/gear/lynx_slab_kit.png' where gear_key = 'lynx_slab_kit';
 
 update public.gear_items set icon = 'assets/gear/mi_security_gloves.png' where gear_key = 'mi_security_gloves';
 update public.gear_items set icon = 'assets/gear/mi_security_armor.png' where gear_key = 'mi_security_armor';

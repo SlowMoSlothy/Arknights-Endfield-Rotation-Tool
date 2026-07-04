@@ -1,4 +1,4 @@
-const OPERATOR_LOADOUT_STORAGE_KEY = "operatorLoadouts";
+﻿const OPERATOR_LOADOUT_STORAGE_KEY = "operatorLoadouts";
 const LEGACY_WEAPON_LOADOUT_STORAGE_KEY = "operatorWeaponLoadouts";
 const DEFAULT_WEAPON_POTENTIAL = 1;
 const MAX_WEAPON_POTENTIAL = 5;
@@ -163,6 +163,7 @@ function getOperatorSimulationLoadoutStats(operatorId) {
     const weaponBaseAtk = Number(weapon.baseAtk) || 0;
     let flatAtkBonus = 0;
     let atkPercentBonus = 0;
+    let mainAttributePercentBonus = 0;
     let mainAttributeBonus = null;
     let strengthBonus = 0;
     let agilityBonus = 0;
@@ -309,6 +310,8 @@ function getOperatorSimulationLoadoutStats(operatorId) {
                 intellectBonus += val;
             } else if (labelKey.includes("will")) {
                 willBonus += val;
+            } else if (labelKey.includes("mainattribute%")) {
+                mainAttributePercentBonus += val;
             } else {
                 Object.keys(elementDamageBonuses).forEach(element => {
                     if (labelKey.includes(element)) {
@@ -415,6 +418,17 @@ function getOperatorSimulationLoadoutStats(operatorId) {
     let intellect = (Number(statsLevel90.intellect) || 0) + intellectBonus;
     let will = (Number(statsLevel90.will) || 0) + willBonus;
 
+    // Apply Main Attribute % bonus from gear if present
+    if (operatorMainAttribute && mainAttributePercentBonus > 0) {
+        const mainAttrKey = operatorMainAttribute.toLowerCase();
+        const baseVal = Number(statsLevel90[mainAttrKey]) || 0;
+        const pctBonus = baseVal * (mainAttributePercentBonus / 100);
+        if (mainAttrKey === "strength") strength += pctBonus;
+        else if (mainAttrKey === "agility") agility += pctBonus;
+        else if (mainAttrKey === "intellect") intellect += pctBonus;
+        else if (mainAttrKey === "will") will += pctBonus;
+    }
+
     let attributeBonus = 1.0;
     if (operatorMainAttribute && operator.secondaryAttribute) {
         const mainAttrKey = operatorMainAttribute.toLowerCase();
@@ -445,11 +459,20 @@ function getOperatorSimulationLoadoutStats(operatorId) {
         else if (mainAttrKey === "intellect") gearMainAttrBonus = intellectBonus;
         else if (mainAttrKey === "will") gearMainAttrBonus = willBonus;
 
-        if (gearMainAttrBonus > 0) {
+        if (gearMainAttrBonus > 0 || mainAttributePercentBonus > 0) {
             if (mainAttributeBonus) {
-                mainAttributeBonus.value += gearMainAttrBonus;
+                if (mainAttributePercentBonus > 0) {
+                    mainAttributeBonus.value += mainAttributePercentBonus;
+                    mainAttributeBonus.isPercent = true;
+                } else {
+                    mainAttributeBonus.value += gearMainAttrBonus;
+                }
             } else {
-                mainAttributeBonus = { label: operatorMainAttribute, value: gearMainAttrBonus, isPercent: false };
+                mainAttributeBonus = {
+                    label: operatorMainAttribute,
+                    value: mainAttributePercentBonus > 0 ? mainAttributePercentBonus : gearMainAttrBonus,
+                    isPercent: mainAttributePercentBonus > 0
+                };
             }
         }
     }
@@ -1549,7 +1572,8 @@ function renderLoadoutWeaponDetails(operator) {
         if (gear.secStat) {
             appendLoadoutDetailRow(statsSummary, "Secondary Attribute", `${gear.secStat}: +${gear.secValue}`);
         }
-        appendLoadoutDetailRow(statsSummary, "Sub Stat", `${gear.subStat}: +${gear.subValue}`);
+        const subStatValueDisplay = String(gear.subStat).includes("%") ? `+${gear.subValue}%` : `+${gear.subValue}`;
+        appendLoadoutDetailRow(statsSummary, "Sub Stat", `${gear.subStat}: ${subStatValueDisplay}`);
         if (gear.defValue) {
             appendLoadoutDetailRow(statsSummary, "Defense", `+${gear.defValue}`);
         }

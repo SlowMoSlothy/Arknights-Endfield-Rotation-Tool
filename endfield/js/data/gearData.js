@@ -55,7 +55,7 @@ const SET_BONUS_DATABASE = {
     },
     mi_security: {
         name: "MI Security Set Bonus",
-        description: "3-Piece: Wearer's Crit Rate +5%. Scoring critical hits grants +5% ATK for 5s (up to 5 stacks). At max stacks, Crit Rate +5%."
+        description: "3-Piece: Wearer's Crit Rate +5%. Scoring critical hits grants +5% ATK for 5s (up to 5 stacks). At max stacks, Crit Rate +5."
     },
     pulser_labs: {
         name: "Pulser Labs Set Bonus",
@@ -137,6 +137,7 @@ const GEAR_DATABASE = {
         { key: "frontiers_kit", name: "Frontiers Comm", setKey: "frontiers", rarity: 5, mainStat: "Strength", mainValue: 32, secStat: "Agility", secValue: 21, subStat: "Combo Skill DMG Bonus %", subValue: 41.4, defValue: 21, icon: "assets/gear/frontiers_kit.png" },
         { key: "hot_work_kit", name: "Hot Work Power Bank", setKey: "hot_work", rarity: 5, mainStat: "Strength", mainValue: 32, secStat: "Agility", secValue: 21, subStat: "Arts Intensity", subValue: 41.4, defValue: 21, icon: "assets/gear/hot_work_kit.png" },
         { key: "lynx_kit", name: "LYNX Connector", setKey: "lynx", rarity: 5, mainStat: "Strength", mainValue: 32, secStat: "Will", secValue: 21, subStat: "Treatment Effect %", subValue: 82.9, defValue: 21, icon: "assets/gear/lynx_kit.png" },
+        { key: "lynx_slab_kit", name: "LYNX Slab", setKey: "lynx", rarity: 5, mainStat: "Will", mainValue: 32, secStat: "Intellect", secValue: 21, subStat: "Main Attribute %", subValue: 20.7, defValue: 21, icon: "assets/gear/lynx_slab_kit.png" },
         { key: "mi_security_kit", name: "MI Security Toolkit", setKey: "mi_security", rarity: 5, mainStat: "Intellect", mainValue: 32, secStat: "Agility", secValue: 21, subStat: "Crit Rate %", subValue: 10.4, defValue: 21, icon: "assets/gear/mi_security_kit.png" },
         { key: "pulser_labs_kit", name: "Pulser Labs Calibrator", setKey: "pulser_labs", rarity: 5, mainStat: "Intellect", mainValue: 41, secStat: null, secValue: null, subStat: "Arts Intensity", subValue: 41.4, defValue: 21, icon: "assets/gear/pulser_labs_kit.png" },
         { key: "swordmancer_kit", name: "Swordmancer Flint", setKey: "swordmancer", rarity: 5, mainStat: "Agility", mainValue: 32, secStat: "Strength", secValue: 21, subStat: "Physical DMG Bonus %", subValue: 23, defValue: 21, icon: "assets/gear/swordmancer_kit.png" },
