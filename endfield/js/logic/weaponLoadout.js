@@ -1,4 +1,4 @@
-﻿const OPERATOR_LOADOUT_STORAGE_KEY = "operatorLoadouts";
+const OPERATOR_LOADOUT_STORAGE_KEY = "operatorLoadouts";
 const LEGACY_WEAPON_LOADOUT_STORAGE_KEY = "operatorWeaponLoadouts";
 const DEFAULT_WEAPON_POTENTIAL = 1;
 const MAX_WEAPON_POTENTIAL = 5;
@@ -1183,12 +1183,14 @@ function renderLoadoutWeaponList(operator) {
             copy.className = "loadout-weapon-card-copy";
             const title = document.createElement("strong");
             title.textContent = weapon.name;
-            const meta = document.createElement("span");
-            meta.className = "loadout-weapon-card-meta";
+            
             const stars = document.createElement("span");
             stars.className = "loadout-weapon-rarity";
             stars.textContent = getWeaponRarityStars(weapon);
             stars.setAttribute("aria-label", `${Number(weapon.rarity) || "Unknown"} star weapon`);
+
+            const meta = document.createElement("span");
+            meta.className = "loadout-weapon-card-meta";
             const attack = document.createElement("span");
             attack.className = "loadout-weapon-atk-badge";
             const attackLabel = document.createElement("small");
@@ -1196,8 +1198,10 @@ function renderLoadoutWeaponList(operator) {
             const attackValue = document.createElement("strong");
             attackValue.textContent = String(Number(weapon.baseAtk) || "-");
             attack.append(attackLabel, attackValue);
-            meta.append(stars, attack);
+            meta.append(attack);
+
             copy.appendChild(title);
+            copy.appendChild(stars);
             copy.appendChild(meta);
 
             const marker = document.createElement("span");
@@ -1233,7 +1237,22 @@ function renderLoadoutWeaponList(operator) {
         const equippedGear = getOperatorLoadout(operator.id)[activeLoadoutSlot];
         const equippedKey = equippedGear?.key || null;
 
-        gearList.forEach(gear => {
+        const operatorMain = String(operator.mainAttribute || "").trim().toLowerCase();
+        const operatorSec = String(operator.secondaryAttribute || "").trim().toLowerCase();
+
+        // Sort gearList so synergistic items (matching BOTH operator stats in order) come first!
+        const sortedGearList = [...gearList].sort((a, b) => {
+            const getScore = (gear) => {
+                const main = String(gear.mainStat || "").trim().toLowerCase();
+                const sec = String(gear.secStat || "").trim().toLowerCase();
+                
+                if (main === operatorMain && sec === operatorSec) return 1;
+                return 0;
+            };
+            return getScore(b) - getScore(a);
+        });
+
+        sortedGearList.forEach(gear => {
             const button = document.createElement("button");
             button.type = "button";
             button.className = "loadout-weapon-card";
@@ -1244,33 +1263,38 @@ function renderLoadoutWeaponList(operator) {
             const icon = createLoadoutGearIcon("compact", gear, activeLoadoutSlot);
             button.appendChild(icon);
 
+            const matchesMainPosition = gear.mainStat && 
+                String(gear.mainStat).trim().toLowerCase() === operatorMain;
+
+            const matchesSecPosition = gear.secStat && 
+                String(gear.secStat).trim().toLowerCase() === operatorSec;
+
+            const isPerfectMatch = matchesMainPosition && matchesSecPosition;
+
+            if (isPerfectMatch) {
+                button.classList.add("synergistic", "synergistic-best");
+            }
+
             const copy = document.createElement("span");
             copy.className = "loadout-weapon-card-copy";
+
+            if (isPerfectMatch) {
+                const badge = document.createElement("span");
+                badge.className = "loadout-gear-recommendation-badge";
+                badge.textContent = "✦ Synergy";
+                copy.appendChild(badge);
+            }
+
             const title = document.createElement("strong");
             title.textContent = gear.name;
-            const meta = document.createElement("span");
-            meta.className = "loadout-weapon-card-meta";
+            
             const stars = document.createElement("span");
             stars.className = "loadout-weapon-rarity";
             stars.textContent = "★".repeat(gear.rarity);
             stars.setAttribute("aria-label", `${gear.rarity} star gear`);
 
-            const operatorMain = String(operator.mainAttribute || "").trim().toLowerCase();
-            const operatorSec = String(operator.secondaryAttribute || "").trim().toLowerCase();
-
-            const isMainMatch = gear.mainStat && (
-                String(gear.mainStat).trim().toLowerCase() === operatorMain ||
-                String(gear.mainStat).trim().toLowerCase() === operatorSec
-            );
-
-            const isSecMatch = gear.secStat && (
-                String(gear.secStat).trim().toLowerCase() === operatorMain ||
-                String(gear.secStat).trim().toLowerCase() === operatorSec
-            );
-
-            if (isMainMatch || isSecMatch) {
-                button.classList.add("synergistic");
-            }
+            const meta = document.createElement("span");
+            meta.className = "loadout-weapon-card-meta";
 
             const formatAttr = attr => {
                 const a = String(attr || "").trim().toLowerCase();
@@ -1283,7 +1307,7 @@ function renderLoadoutWeaponList(operator) {
 
             const mainStatBadge = document.createElement("span");
             mainStatBadge.className = "loadout-weapon-atk-badge";
-            if (isMainMatch) {
+            if (matchesMainPosition) {
                 mainStatBadge.style.borderColor = "rgba(248, 245, 70, 0.65)";
                 mainStatBadge.style.color = "#F8F546";
             }
@@ -1293,12 +1317,12 @@ function renderLoadoutWeaponList(operator) {
             statValue.textContent = `+${gear.mainValue}`;
             mainStatBadge.append(statLabel, statValue);
 
-            meta.append(stars, mainStatBadge);
+            meta.append(mainStatBadge);
 
             if (gear.secStat) {
                 const secStatBadge = document.createElement("span");
                 secStatBadge.className = "loadout-weapon-atk-badge";
-                if (isSecMatch) {
+                if (matchesSecPosition) {
                     secStatBadge.style.borderColor = "rgba(248, 245, 70, 0.65)";
                     secStatBadge.style.color = "#F8F546";
                 }
@@ -1310,6 +1334,7 @@ function renderLoadoutWeaponList(operator) {
                 meta.append(secStatBadge);
             }
             copy.appendChild(title);
+            copy.appendChild(stars);
             copy.appendChild(meta);
 
             const marker = document.createElement("span");
@@ -1527,11 +1552,10 @@ function renderLoadoutWeaponDetails(operator) {
         heroIdentity.className = "loadout-detail-identity";
 
         const icon = createLoadoutGearIcon("large", gear, activeSlot);
-        icon.style.width = "72px";
-        icon.style.height = "72px";
         heroIdentity.appendChild(icon);
 
         const headingCopy = document.createElement("div");
+        headingCopy.className = "loadout-detail-heading-copy";
         const rarity = document.createElement("span");
         rarity.className = "loadout-weapon-rarity is-large";
         rarity.textContent = "★".repeat(gear.rarity);
@@ -1548,8 +1572,8 @@ function renderLoadoutWeaponDetails(operator) {
         activeBadge.className = "loadout-detail-status";
         activeBadge.textContent = "Equipped";
 
-        headingCopy.appendChild(rarity);
         headingCopy.appendChild(title);
+        headingCopy.appendChild(rarity);
         headingCopy.appendChild(meta);
         headingCopy.appendChild(activeBadge);
         heroIdentity.appendChild(headingCopy);

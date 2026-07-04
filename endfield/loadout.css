@@ -172,13 +172,15 @@
 .loadout-weapon-details.empty .loadout-weapon-icon.large { width: 64px; height: 64px; color: rgba(160, 170, 169, 0.58); }
 .loadout-weapon-details.empty > strong { color: #f4f5f2; font-size: 17px; }
 .loadout-weapon-details.empty p { max-width: 260px; margin: -5px 0 0; color: rgba(160, 170, 169, 0.78); font-size: 11px; line-height: 1.45; }
-.loadout-detail-heading { display: flex; align-items: center; justify-content: space-between; gap: 13px; min-height: 82px; padding: 12px; border: 1px solid rgba(248, 245, 70, 0.18); border-radius: 13px; background: radial-gradient(circle at 12% 0%, rgba(248, 245, 70, 0.12), transparent 42%), linear-gradient(135deg, rgba(46, 54, 53, 0.58), rgba(7, 10, 11, 0.72)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05); }
-.loadout-detail-identity { display: flex; min-width: 0; align-items: center; gap: 12px; }
-.loadout-detail-heading .loadout-weapon-icon.large { width: 64px; height: 64px; flex: 0 0 64px; border-color: rgba(248, 245, 70, 0.46); color: #F8F546; background: radial-gradient(circle at 50% 42%, rgba(248, 245, 70, 0.11), rgba(7, 9, 10, 0.62)); box-shadow: 0 0 18px rgba(248, 245, 70, 0.10); }
+.loadout-detail-heading { display: flex; align-items: stretch; justify-content: space-between; gap: 0; overflow: hidden; border: 1px solid rgba(248, 245, 70, 0.18); border-radius: 13px; background: radial-gradient(circle at 12% 0%, rgba(248, 245, 70, 0.12), transparent 42%), linear-gradient(135deg, rgba(46, 54, 53, 0.58), rgba(7, 10, 11, 0.72)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05); }
+.loadout-detail-identity { display: flex; min-width: 0; align-items: center; gap: 14px; flex: 1 1 0; padding: 0; }
+.loadout-detail-heading .loadout-weapon-icon.large { width: 88px; height: auto; min-height: 88px; flex: 0 0 88px; align-self: stretch; border-radius: 12px 0 0 12px; border: none; border-right: 1px solid rgba(248, 245, 70, 0.22); color: #F8F546; background: radial-gradient(circle at 50% 50%, rgba(248, 245, 70, 0.14), rgba(7, 9, 10, 0.85)); box-shadow: 4px 0 18px rgba(248, 245, 70, 0.08) inset; }
+.loadout-detail-heading .loadout-weapon-icon.large img { width: 100%; height: 100%; object-fit: cover; border-radius: 11px 0 0 11px; }
+.loadout-detail-heading-copy { min-width: 0; padding: 12px 10px; flex: 1 1 0; display: flex; flex-direction: column; justify-content: center; gap: 2px; }
 .loadout-detail-heading > div { min-width: 0; }
 .loadout-detail-heading span { color: rgba(160, 170, 169, 0.75); font-size: 9px; font-weight: 800; text-transform: uppercase; }
-.loadout-detail-heading h3 { margin: 4px 0 0; overflow: hidden; color: #f4f5f2; font-size: 20px; text-overflow: ellipsis; white-space: nowrap; }
-.loadout-detail-heading small { display: block; margin-top: 5px; overflow: hidden; color: rgba(160, 170, 169, 0.74); font-size: 9px; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.loadout-detail-heading h3 { margin: 0 0 2px; overflow: hidden; color: #f4f5f2; font-size: 18px; text-overflow: ellipsis; white-space: nowrap; line-height: 1.2; }
+.loadout-detail-heading small { display: block; margin-top: 4px; overflow: hidden; color: rgba(160, 170, 169, 0.74); font-size: 9px; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
 .loadout-detail-status { display: inline-flex; width: fit-content; min-height: 20px; align-items: center; margin-top: 7px; padding: 1px 8px; border: 1px solid rgba(248, 245, 70, 0.32); border-radius: 999px; background: rgba(248, 245, 70, 0.085); color: #F8F546 !important; font-size: 8px !important; letter-spacing: 0.08em; }
 .loadout-detail-attack-chip { display: flex; flex: 0 0 auto; flex-direction: column; align-items: flex-end; justify-content: center; min-width: 86px; min-height: 54px; padding: 8px 10px; border: 1px solid rgba(248, 245, 70, 0.24); border-radius: 12px; background: rgba(248, 245, 70, 0.055); }
 .loadout-detail-attack-chip span { color: rgba(160, 170, 169, 0.72); font-size: 8px; letter-spacing: 0.08em; }
@@ -281,4 +283,30 @@
     .loadout-slot.active { grid-column: 1 / -1; }
     .loadout-weapon-list { grid-template-columns: 1fr; }
     .loadout-operator-summary strong { font-size: 18px; }
+}
+
+.loadout-gear-recommendation-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    align-self: flex-start;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: rgba(248, 245, 70, 0.15);
+    color: #F8F546;
+    font-size: 8px !important;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 1px solid rgba(248, 245, 70, 0.35);
+    animation: recommend-pulse 2s infinite ease-in-out;
+}
+@keyframes recommend-pulse {
+    0%, 100% { opacity: 0.85; box-shadow: 0 0 4px rgba(248, 245, 70, 0.1); }
+    50% { opacity: 1; box-shadow: 0 0 8px rgba(248, 245, 70, 0.3); }
+}
+.loadout-weapon-card.synergistic-best {
+    border-color: rgba(248, 245, 70, 0.65);
+    background: linear-gradient(135deg, rgba(248, 245, 70, 0.12) 0%, rgba(15, 18, 20, 0.96) 100%);
+    box-shadow: 0 0 14px rgba(248, 245, 70, 0.08);
 }
