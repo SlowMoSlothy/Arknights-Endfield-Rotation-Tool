@@ -163,10 +163,11 @@ test("operator pages render the compact rotation overview without redundant fiel
       basicAttack: {
         name: "Measured Combo",
         cycleDuration: 2.5,
+        timingVerified: true,
         sequences: [
-          { sequenceIndex: 1, duration: 0.75 },
-          { sequenceIndex: 2, duration: 1.25 },
-          { sequenceIndex: 3, kind: "final_strike", duration: 0.5 }
+          { sequenceIndex: 1, duration: 0.75, hitCount: 2, hitTimings: [0.25, 0.5] },
+          { sequenceIndex: 2, duration: 1.25, hitCount: 1, hitTimings: [0.75] },
+          { sequenceIndex: 3, kind: "final_strike", duration: 0.5, hitCount: 1, hitTimings: [0.25] }
         ]
       }
     }
@@ -270,6 +271,13 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /SEQ 2: 1\.25s/);
   assert.match(page, /FS: 0\.5s/);
   assert.match(page, /--segment-duration:0\.75/);
+  assert.match(page, /class="batk-hit-track"/);
+  assert.match(page, /SEQ 1 hit 1: 0\.25s/);
+  assert.match(page, /SEQ 1 hit 2: 0\.5s/);
+  assert.match(page, /style="left:33\.333%"/);
+  assert.match(page, /class="batk-status is-verified"/);
+  assert.match(page, /data-label="Verified"/);
+  assert.ok(page.indexOf('id="stats"') < page.indexOf('id="batk"'));
   assert.match(page, /href="#related">Related/);
   assert.match(page, /id="related"/);
   assert.match(page, /class="related-avatar-frame"/);
@@ -304,13 +312,16 @@ test("BATK timing falls back to summed sequence durations and supports missing d
 
   assert.equal(timeline.totalDuration, 1);
   assert.deepEqual(timeline.sequences, [
-    { label: "A1", duration: 0.4 },
-    { label: "A2", duration: 0.6 }
+    { label: "A1", duration: 0.4, hitCount: 0, hitTimings: [], timingComplete: false },
+    { label: "A2", duration: 0.6, hitCount: 0, hitTimings: [], timingComplete: false }
   ]);
+  assert.equal(timeline.verified, false);
 
   const page = createOperatorPage(operator(), [operator()], new Map());
   assert.match(page, /id="batk"/);
   assert.match(page, /No Basic Attack sequence timing is available/);
+  assert.match(page, /class="batk-status is-unverified"/);
+  assert.match(page, /data-label="Not verified"/);
 });
 
 test("writeGeneratedOutput replaces output and sitemap without leaving temporary files", () => {
