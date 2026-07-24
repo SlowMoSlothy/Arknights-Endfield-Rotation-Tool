@@ -228,8 +228,8 @@ test("weapon Potential and Essence allocations are shared only in Simulation Mod
   assert.doesNotMatch(simulationCode, /^AERT\d+:/);
   const displayCode = context.getDisplayBuildShareCode(simulationCode);
   assert.doesNotMatch(displayCode, /^AERT\d+:/);
-  assert.equal(context.decodeShareBytes(displayCode)[0], 11);
-  assert.equal(context.parseBuildShareCode(displayCode).v, 11);
+  assert.equal(context.decodeShareBytes(displayCode)[0], 13);
+  assert.equal(context.parseBuildShareCode(displayCode).v, 13);
 
   const v9Bytes = context.createCompactShareBytesV9();
   // Verify V10 backwards compatibility
@@ -926,7 +926,8 @@ test("timed simulation effects expire before later events", () => {
   assert.match(rotationGridScript, /activeStackTimes/);
   assert.match(rotationGridScript, /event\.time < Number\(appliedAt\) \+ durationSeconds/);
   assert.match(rotationGridScript, /rotationDebuffMetaState/);
-  assert.match(rotationGridScript, /debuffs: Array\.isArray\(event\.skillData\?\.debuffs\)/);
+  assert.match(rotationGridScript, /debuffs: Array\.isArray\(extendedSkillData\?\.debuffs\)/);
+  assert.match(rotationGridScript, /skillData: skillDataWithTimedEffects/);
 });
 
 test("damage breakdown applies a self-only Crit buff to expected damage", () => {
@@ -1305,18 +1306,20 @@ test("ATK chart renders temporary buffs as discrete steps", () => {
   assert.doesNotMatch(path, / L /);
 });
 
-test("damage chart renders damage only as event impulses", () => {
+test("damage chart renders interval lines with event spikes", () => {
   const context = { console, window: null };
   context.window = context;
   vm.createContext(context);
   vm.runInContext(weaponAtkChartScript, context);
-  const path = context.createSimulationDamageImpulsePath([
+  const path = context.createSimulationDamageLinePath([
     { time: 0, damage: 0 },
     { time: 1, damage: 573 },
     { time: 2, damage: 762 }
-  ], 120, damage => 1000 - damage, 1000);
+  ], 120, damage => 1000 - damage, 3);
 
-  assert.equal(path, "M 120 1000 V 427 M 240 1000 V 238");
+  assert.match(path, /^M 0 1000/);
+  assert.match(path, /L 120 427 L 132 1000/);
+  assert.match(path, /L 240 238 L 252 1000/);
   assert.doesNotMatch(path, / H /);
 });
 
@@ -1475,7 +1478,7 @@ test("loadout modal exposes Supabase weapon Essence activation profiles", () => 
   assert.match(atkChartCss, /\.rotation-sim-damage-summary-content/);
   assert.match(weaponAtkChartScript, /rotation-sim-damage-summary-chevron/);
   assert.match(atkChartCss, /\.rotation-sim-damage-summary\[open\] \.rotation-sim-damage-summary-chevron[\s\S]*rotate\(180deg\)/);
-  assert.match(atkChartCss, /\.rotation-sim-damage-hit\.is-pinned/);
+  assert.match(atkChartCss, /\.rotation-sim-damage-hit-target/);
   assert.match(atkChartCss, /\.rotation-sim-body\.has-atk-chart/);
   assert.match(damageBreakdownScript, /Pre-mitigation DMG/);
   const damageMigration = fs.readFileSync("supabase/skill_damage_profiles.sql", "utf8");
