@@ -2,6 +2,14 @@ function normalizeSimulationDamageProfile(skillData) {
     const profile = skillData?.damageProfile;
     if (!profile || typeof profile !== "object" || Array.isArray(profile)) return null;
 
+    const damageIsDeferredToConsumedEffect = (Array.isArray(skillData?.buffs) ? skillData.buffs : []).some(effect => {
+        const key = normalizeSimulationDamageEffectKey(effect);
+        const registryEntry = typeof BUFF_REGISTRY !== "undefined" ? BUFF_REGISTRY[key] : null;
+        const onConsume = effect?.onConsume || registryEntry?.onConsume;
+        return onConsume?.damageProfile && onConsume.replacesSkillDamage === true;
+    });
+    if (damageIsDeferredToConsumedEffect) return null;
+
     const atkMultiplier = Number(profile.atkMultiplier);
     const flatDamage = Number(profile.flatDamage || 0);
     const hitCount = Math.max(1, Math.round(Number(profile.hitCount) || 1));
@@ -71,9 +79,22 @@ function getSimulationEventCritStats(event, profile) {
 
 function getSimulationEventDamageAtk(event) {
     const before = Number(event?.weaponPassiveStateBefore?.effectiveAtk);
-    if (Number.isFinite(before) && before > 0) return before;
     const loadoutAtk = Number(event?.loadoutState?.totalAtk);
-    return Number.isFinite(loadoutAtk) ? loadoutAtk : 0;
+    const baseAtk = Number.isFinite(before) && before > 0
+        ? before
+        : (Number.isFinite(loadoutAtk) ? loadoutAtk : 0);
+    const sourceOperatorId = Number(event?.sourceOperatorId);
+    const activeBuffAtkPercent = (Array.isArray(event?.activeBuffsBefore) ? event.activeBuffsBefore : [])
+        .filter(effect => {
+            const target = String(effect?.target || "team").toLowerCase();
+            const effectSourceId = Number(effect?.sourceOperatorId);
+            return target !== "self" || !Number.isFinite(effectSourceId) || effectSourceId === sourceOperatorId;
+        })
+        .reduce((total, effect) => {
+            const stacks = Math.max(1, Number(effect?.currentStacks ?? effect?.stackCount ?? effect?.stacks ?? 1) || 1);
+            return total + (Number(effect?.atkPercent) || 0) * stacks;
+        }, 0);
+    return Math.round(baseAtk * (1 + activeBuffAtkPercent / 100) * 10) / 10;
 }
 
 function getSimulationDamageMode() {
@@ -227,6 +248,10 @@ function isSimulationDamageEffectForSource(effect, sourceOperatorId) {
 }
 
 function getSimulationSkillDamageTypeKey(skillData) {
+    if (skillData?.normalAttackDamage === true) return "basicAttack";
+    const configuredDamageType = String(skillData?.damageType || skillData?.damageProfile?.damageType || "")
+        .trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+    if (["crush", "breach", "physicalstatus"].includes(configuredDamageType)) return "physicalStatus";
     const key = String(skillData?.shortType || skillData?.type || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
     if (key === "bs" || key.includes("battleskill")) return "battleSkill";
     if (key === "cs" || key.includes("comboskill")) return "comboSkill";
@@ -242,6 +267,7 @@ function getSimulationOutgoingDamageBonuses(event, element) {
     const sources = [];
     const unquantifiedEffects = [];
     let totalPercent = 0;
+    let multiplicativeMultiplier = 1;
 
     const addBonus = (name, value, options = {}) => {
         const numericValue = Number(value);
@@ -253,6 +279,28 @@ function getSimulationOutgoingDamageBonuses(event, element) {
             name: name || "Damage bonus",
             valuePercent: stackedValue,
             stacks,
+            verified: options.verified === true,
+            sourceUrl: options.sourceUrl || "",
+            icon: options.icon || "",
+            sourceLabel: options.sourceLabel || "",
+            effectKey: options.effectKey || "",
+            triggerId: options.triggerId || "",
+            weaponKey: options.weaponKey || "",
+            startedAt: options.startedAt ?? null,
+            expiresAt: options.expiresAt ?? null,
+            remainingSeconds: options.remainingSeconds ?? null
+        });
+    };
+
+    const addMultiplicativeBonus = (name, value, options = {}) => {
+        const numericValue = Number(value);
+        if (!Number.isFinite(numericValue) || numericValue === 0) return;
+        multiplicativeMultiplier *= Math.max(0, 1 + numericValue / 100);
+        sources.push({
+            name: name || "Multiplicative damage bonus",
+            valuePercent: numericValue,
+            stacks: 1,
+            multiplicative: true,
             verified: options.verified === true,
             sourceUrl: options.sourceUrl || "",
             icon: options.icon || "",
@@ -281,7 +329,24 @@ function getSimulationOutgoingDamageBonuses(event, element) {
         addBonus("Loadout: Arts DMG", loadout.artsDamageBonusPercent, loadoutSource);
     }
 
-    const skillType = getSimulationSkillDamageTypeKey(event?.skillData);
+    const skillData = event?.skillData || {};
+    if (skillData.artsIntensityScaling === true) {
+        addMultiplicativeBonus("Arts Intensity", Number(loadout.artsIntensity) || 0, loadoutSource);
+    }
+    if (skillData.operatorLevelScaling === true) {
+        const operatorLevel = Math.max(1, Number(loadout.operatorLevel) || 90);
+        const levelMultiplier = (391 + operatorLevel) / 392;
+        addMultiplicativeBonus("Operator Level", (levelMultiplier - 1) * 100, loadoutSource);
+    }
+    const staggeredMultiplier = Number(skillData.staggeredDamageMultiplier);
+    const targetIsStaggered = (Array.isArray(event?.activeDebuffsBefore) ? event.activeDebuffsBefore : [])
+        .some(effect => String(effect?.appliesEffect || effect?.id || effect?.name || "")
+            .trim().toLowerCase().replace(/[^a-z0-9]/g, "_") === "stagger");
+    if (targetIsStaggered && Number.isFinite(staggeredMultiplier) && staggeredMultiplier > 0 && staggeredMultiplier !== 1) {
+        addMultiplicativeBonus("Staggered physical status", (staggeredMultiplier - 1) * 100, loadoutSource);
+    }
+
+    const skillType = getSimulationSkillDamageTypeKey(skillData);
     if (skillType) addBonus(`Loadout: ${skillType} DMG`, loadout.skillDamageBonuses?.[skillType], loadoutSource);
     const registries = [
         ...(Array.isArray(event?.activeBuffsBefore) ? event.activeBuffsBefore.map(effect => ({ effect, registry: typeof BUFF_REGISTRY !== "undefined" ? BUFF_REGISTRY : null })) : []),
@@ -290,7 +355,7 @@ function getSimulationOutgoingDamageBonuses(event, element) {
     registries.forEach(({ effect, registry }) => {
         const { key, merged } = getSimulationDamageEffectData(effect, registry);
         if (!isSimulationDamageEffectForSource(merged, sourceOperatorId)) return;
-        const stacks = getSimulationDamageEffectStacks(merged);
+        const stacks = merged.resolvedSkillValueStacks ? 1 : getSimulationDamageEffectStacks(merged);
         const options = {
             stacks,
             verified: merged.verified === true,
@@ -313,6 +378,11 @@ function getSimulationOutgoingDamageBonuses(event, element) {
             quantified = true;
             addBonus(merged.name || merged.passiveName || key, value, options);
         });
+        const multiplicativeValue = getSimulationDamageEffectPercent(merged, ["multiplicativeDamageBonusPercent", "linkBonusPercent"]);
+        if (multiplicativeValue !== null) {
+            quantified = true;
+            addMultiplicativeBonus(merged.name || merged.passiveName || key, multiplicativeValue, options);
+        }
         const looksLikeDamageAmp = key === `${normalizedElement}_amp`
             || key === `${normalizedElement}_damage_up`
             || (!["physical", "neutral"].includes(normalizedElement) && key === "arts_amp")
@@ -322,7 +392,8 @@ function getSimulationOutgoingDamageBonuses(event, element) {
 
     return {
         totalPercent: Math.round(totalPercent * 10) / 10,
-        multiplier: Math.max(0, 1 + totalPercent / 100),
+        multiplier: Math.max(0, 1 + totalPercent / 100) * multiplicativeMultiplier,
+        multiplicativeMultiplier,
         sources,
         unquantifiedEffects
     };
@@ -421,6 +492,43 @@ function getSimulationDamageMitigation(event, element, enemy) {
         }
     });
 
+    (Array.isArray(event?.activeBuffsBefore) ? event.activeBuffsBefore : []).forEach(effect => {
+        const { key, merged } = getSimulationDamageEffectData(
+            effect,
+            typeof BUFF_REGISTRY !== "undefined" ? BUFF_REGISTRY : null
+        );
+        const sourceOperatorId = Number(merged?.sourceOperatorId ?? effect?.sourceOperatorId);
+        if (merged?.target === "self" && Number.isFinite(sourceOperatorId)
+            && sourceOperatorId !== Number(event?.sourceOperatorId ?? event?.skillData?.operatorId)) return;
+        const elements = (Array.isArray(merged?.elements) ? merged.elements : [])
+            .map(value => String(value || "").trim().toLowerCase());
+        if (elements.length && !elements.includes(element)) return;
+        const stacks = getSimulationDamageEffectStacks(merged);
+        const resistanceBonus = getSimulationDamageEffectPercent(merged, ["resistanceMultiplierBonus"]);
+        const resistanceReduction = getSimulationDamageEffectPercent(merged, ["resistanceReductionPercent"]);
+        const contributions = [];
+        if (resistanceBonus !== null) {
+            resistanceMultiplierBonus += resistanceBonus * stacks;
+            contributions.push(`+${Math.round(resistanceBonus * stacks * 1000) / 10}% resistance multiplier`);
+        }
+        if (resistanceReduction !== null) {
+            resistanceMultiplierBonus += (resistanceReduction / 100) * stacks;
+            contributions.push(`-${resistanceReduction * stacks}% resistance`);
+        }
+        if (contributions.length) {
+            sources.push({
+                ...getSimulationDamageEffectSource(
+                    merged,
+                    typeof BUFF_REGISTRY !== "undefined" ? BUFF_REGISTRY : null,
+                    "buff",
+                    event
+                ),
+                name: merged?.name || key,
+                valueLabel: contributions.join(" / ")
+            });
+        }
+    });
+
     const defense = Number(profile.defense ?? 100);
     const effectiveDefense = defense * Math.max(0, 1 - percentDefenseReduction / 100) - flatDefenseReduction;
     const defenseMultiplier = getSimulationDefenseMultiplier(effectiveDefense);
@@ -479,6 +587,15 @@ function getSimulationDamageEffectContext(event, outgoing, mitigation, crit) {
         attackSources.push({
             ...getSimulationDamageEffectSource(effect, null, "buff", event),
             valueLabel: `+${atkPercent}% ATK`
+        });
+    });
+    (event?.activeBuffsBefore || []).forEach(effect => {
+        const atkPercent = Number(effect?.atkPercent);
+        if (!Number.isFinite(atkPercent) || atkPercent === 0) return;
+        const stacks = Math.max(1, Number(effect?.currentStacks ?? effect?.stackCount ?? effect?.stacks ?? 1) || 1);
+        attackSources.push({
+            ...getSimulationDamageEffectSource(effect, typeof BUFF_REGISTRY !== "undefined" ? BUFF_REGISTRY : null, "buff", event),
+            valueLabel: `+${atkPercent * stacks}% ATK${stacks > 1 ? ` (${stacks} stacks)` : ""}`
         });
     });
 

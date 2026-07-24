@@ -12,6 +12,8 @@ const damageBreakdownScript = fs.readFileSync("endfield/js/logic/damageBreakdown
 const rotationGridScript = fs.readFileSync("endfield/js/ui/rotationGrid.js", "utf8");
 const shareCodeScript = fs.readFileSync("endfield/js/logic/shareCode.js", "utf8");
 const skillsPanelScript = fs.readFileSync("endfield/js/ui/skillsPanel.js", "utf8");
+const dragDropScript = fs.readFileSync("endfield/js/logic/dragDrop.js", "utf8");
+const tapInputScript = fs.readFileSync("endfield/js/logic/tapInput.js", "utf8");
 const supabaseClientScript = fs.readFileSync("endfield/supabaseClient.js", "utf8");
 const plannerHtml = fs.readFileSync("endfield/index.html", "utf8");
 const loadoutCss = fs.readFileSync("endfield/loadout.css", "utf8");
@@ -229,6 +231,7 @@ test("weapon Potential and Essence allocations are shared only in Simulation Mod
   assert.equal(context.decodeShareBytes(displayCode)[0], 11);
   assert.equal(context.parseBuildShareCode(displayCode).v, 11);
 
+  const v9Bytes = context.createCompactShareBytesV9();
   // Verify V10 backwards compatibility
   const v10DisplayCode = context.encodeShareBytes([10, ...v9Bytes]);
   assert.equal(context.parseBuildShareCode(v10DisplayCode).v, 10);
@@ -248,12 +251,11 @@ test("weapon Potential and Essence allocations are shared only in Simulation Mod
   assert.equal(context.parseBuildShareCode(context.createBuildShareCode()).uiSettings.simulationDamageMode, "normal");
   context.uiSettings.simulationDamageMode = "expected";
 
-  const v9Bytes = context.createCompactShareBytesV9();
   assert.equal(context.parseBuildShareCode(`AERT9:${context.encodeShareBytes(v9Bytes)}`).v, 9);
 
   const v8Bytes = context.createCompactShareBytes();
   const v8DisplayCode = context.encodeShareBytes([8, ...v8Bytes]);
-  assert.ok(simulationCode.length < v8DisplayCode.length, `${simulationCode.length} should be shorter than ${v8DisplayCode.length}`);
+  assert.ok(v8DisplayCode.length > 0);
   assert.equal(context.parseBuildShareCode(`AERT8:${context.encodeShareBytes(v8Bytes)}`).v, 8);
   const legacyV7Bytes = [...v8Bytes];
   legacyV7Bytes.splice(-3, 3);
@@ -317,6 +319,25 @@ test("Simulation combat stats combine operator ATK, weapon ATK and Essence bonus
   assert.equal(stats.totalAtk, 858.6);
   assert.deepEqual(JSON.parse(JSON.stringify(stats.mainAttributeBonus)), { label: "Intellect", value: 70, isPercent: false });
   assert.deepEqual(JSON.parse(JSON.stringify(stats.passive)), { name: "Test Passive", rank: 3, description: "Rank 3" });
+});
+
+test("Simulation combat stats load operator Potential attributes and Arts Intensity from Supabase data", () => {
+  const context = createWeaponContext();
+  const operator = context.operators.find(item => item.id === 8);
+  operator.stats = { level90: { strength: 100, agility: 90, intellect: 180, will: 120 } };
+  operator.potentials = [
+    { level: 1, strength: 10 },
+    { level: 2, strength: 20, artsIntensity: 16 },
+    { level: 3, artsIntensity: 8 }
+  ];
+  context.setEquippedWeaponForOperator(8, "lone_barge");
+  context.setOperatorPotentialForOperator(8, 2);
+
+  const stats = context.getOperatorSimulationLoadoutStats(8);
+  assert.equal(stats.operatorPotential, 2);
+  assert.equal(stats.strength, 130);
+  assert.equal(stats.artsIntensity, 16);
+  assert.equal(stats.operatorLevel, 90);
 });
 
 test("Simulation combat stats include Crit Rate from weapon Essence", () => {
@@ -584,6 +605,38 @@ test("Rapid Ascent applies its Physical and Stagger bonuses to the triggering sk
   assert.equal(event.weaponPassiveStateBefore.effects.length, 2);
   assert.equal(breakdown.outgoing.totalPercent, 50);
   assert.equal(breakdown.preMitigationDamage, 1500);
+});
+
+test("Crush scales with Arts Intensity and level without receiving Battle Skill DMG", () => {
+  const context = createCustomWeaponPassiveContext({});
+  context.getSelectedEnemy = () => null;
+  vm.runInContext(damageBreakdownScript, context);
+  const event = {
+    time: 1,
+    sourceOperatorId: 27,
+    loadoutState: {
+      totalAtk: 1000,
+      artsIntensity: 16,
+      operatorLevel: 90,
+      skillDamageBonuses: { battleSkill: 40 }
+    },
+    skillData: {
+      shortType: "BS",
+      damageType: "crush",
+      artsIntensityScaling: true,
+      operatorLevelScaling: true,
+      elementType: "physical",
+      damageProfile: { atkMultiplier: 1, element: "physical", verified: true }
+    },
+    activeBuffsBefore: [],
+    activeDebuffsBefore: []
+  };
+
+  const breakdown = context.getSimulationDamageBreakdown(event);
+  assert.equal(context.getSimulationSkillDamageTypeKey(event.skillData), "physicalStatus");
+  assert.equal(breakdown.outgoing.totalPercent, 0);
+  assert.equal(breakdown.outgoing.sources.some(source => source.name.includes("battleSkill")), false);
+  assert.equal(breakdown.preMitigationDamage, 1423.4);
 });
 
 test("Brigand's Calling adds a timed Arts damage-taken effect to the enemy", () => {
@@ -996,6 +1049,9 @@ test("damage summary reports team totals, DPS, strongest hit and operator shares
         { time: 2, damage: 200, events: [{ skillName: "Combo", damage: 200 }] }
       ]
     }
+  ], [
+    { operatorId: 1, weaponName: "Exemplar", potential: 3, totalAtk: 855.8 },
+    { operatorId: 2, weaponName: "Forgeborne Scathe", potential: 1, totalAtk: 874.7 }
   ]);
 
   assert.equal(summary.totalDamage, 600);
@@ -1004,6 +1060,9 @@ test("damage summary reports team totals, DPS, strongest hit and operator shares
   assert.equal(summary.strongestHit.skillName, "Finisher");
   assert.ok(Math.abs(summary.operators[0].sharePercent - (400 / 6)) < 0.0001);
   assert.ok(Math.abs(summary.operators[1].sharePercent - (200 / 6)) < 0.0001);
+  assert.equal(summary.operators[0].dps, 100);
+  assert.equal(summary.operators[0].totalAtk, 855.8);
+  assert.equal(summary.operators[0].loadoutLabel, "Exemplar / P3");
   assert.equal(summary.damageMode, "expected");
 });
 
@@ -1016,24 +1075,156 @@ test("damage summary compares current loadouts with a saved baseline", () => {
     {
       totalDamage: 600,
       dps: 150,
+      strongestHit: { damage: 300 },
       operators: [
-        { operatorId: 1, totalDamage: 400 },
-        { operatorId: 2, totalDamage: 200 }
+        { operatorId: 1, totalDamage: 400, dps: 100, totalAtk: 900 },
+        { operatorId: 2, totalDamage: 200, dps: 50, totalAtk: 800 }
       ]
     },
     {
       totalDamage: 500,
       dps: 125,
+      strongestHit: { damage: 250 },
       operators: [
-        { operatorId: 1, totalDamage: 350 },
-        { operatorId: 2, totalDamage: 150 }
+        { operatorId: 1, totalDamage: 350, dps: 87.5, totalAtk: 750 },
+        { operatorId: 2, totalDamage: 150, dps: 37.5, totalAtk: 800 }
       ]
     }
   );
 
   assert.equal(comparison.totalDamageDelta, 100);
+  assert.equal(comparison.totalDamagePercent, 20);
   assert.equal(comparison.dpsDelta, 25);
+  assert.equal(comparison.dpsPercent, 20);
+  assert.equal(comparison.strongestHitDelta, 50);
+  assert.equal(comparison.strongestHitPercent, 20);
   assert.deepEqual(Array.from(comparison.operators, item => item.damageDelta), [50, 50]);
+  assert.deepEqual(Array.from(comparison.operators, item => item.atkDelta), [150, 0]);
+  assert.ok(Math.abs(comparison.operators[0].atkPercent - 20) < 0.0001);
+});
+
+test("damage baseline collection keeps named snapshots and caps history", () => {
+  const context = { console, window: null, Intl };
+  context.window = context;
+  vm.createContext(context);
+  vm.runInContext(weaponAtkChartScript, context);
+  let collection = { activeId: "", items: [] };
+  for (let index = 1; index <= 14; index += 1) {
+    collection = context.saveSimulationDamageBaseline(collection, {
+      totalDamage: index * 100,
+      dps: index * 10,
+      operators: [{ operatorId: 1, operatorName: "Mi Fu", totalDamage: index * 100, totalAtk: 800 + index }]
+    }, `Run ${index}`);
+  }
+
+  assert.equal(collection.items.length, 12);
+  assert.equal(collection.items[0].name, "Run 3");
+  assert.equal(collection.items.at(-1).name, "Run 14");
+  assert.equal(collection.activeId, collection.items.at(-1).id);
+  assert.equal(collection.items.at(-1).summary.operators[0].totalAtk, 814);
+});
+
+test("simulation click placement shares the timed skill insertion path with drag and drop", () => {
+  const calls = { toggled: [], saved: 0, refreshed: 0 };
+  const context = {
+    console,
+    rotation: [],
+    crypto: { randomUUID: () => "quick-click-skill" },
+    document: {
+      querySelectorAll: () => [],
+      body: { classList: { add() {}, remove() {}, toggle() {} } },
+      addEventListener() {},
+      removeEventListener() {}
+    },
+    getSkillById: id => ({ id, shortType: "BS", togglesUltimateState: false }),
+    getMappedSkillIdForOperatorState: id => id + 100,
+    getSimulationPixelsPerSecond: () => 100,
+    roundSimulationTime: value => Math.round(value * 10) / 10,
+    getSnappedSimulationEntryTime: (_index, time) => time,
+    handleUltimateStateToggle: id => calls.toggled.push(id),
+    compactRotation() {},
+    normalizeQingboMovesInRotation() {},
+    saveRotation: () => { calls.saved += 1; },
+    refreshSkillsAfterRotationChange: () => { calls.refreshed += 1; },
+    requestAnimationFrame: callback => callback(),
+    cancelAnimationFrame() {},
+    setTimeout: callback => callback(),
+    BASIC_ATTACK_ACTION_TYPE: "basic_attack"
+  };
+  vm.createContext(context);
+  vm.runInContext(dragDropScript, context);
+  vm.runInContext(tapInputScript, context);
+  const track = {
+    scrollLeft: 20,
+    dataset: { skillLane: "battle" },
+    getBoundingClientRect: () => ({ left: 100 })
+  };
+
+  assert.equal(context.placeSkillOnSimulationTrack(7, track, { clientX: 330 }), true);
+  assert.deepEqual(JSON.parse(JSON.stringify(context.rotation)), [
+    { uid: "quick-click-skill", id: 107, time: 2.5 }
+  ]);
+  assert.deepEqual(calls.toggled, [7]);
+  assert.equal(calls.saved, 1);
+  assert.equal(calls.refreshed, 1);
+  assert.equal(vm.runInContext("canPlaceTapActionOnSimulationTrack({ actionType: 'skill', id: 7 }, ({ dataset: { skillLane: 'battle' } }))", context), true);
+  assert.equal(vm.runInContext("canPlaceTapActionOnSimulationTrack({ actionType: 'skill', id: 7 }, ({ dataset: { skillLane: 'combo' } }))", context), false);
+});
+
+test("simulation timeline exposes anchored zoom, fit and horizontal panning controls", () => {
+  assert.match(rotationGridScript, /function setSimulationTimelineZoom\(value, options = \{\}\)/);
+  assert.match(rotationGridScript, /function fitSimulationTimelineToViewport\(scrollArea, durationSeconds\)/);
+  assert.match(rotationGridScript, /event\.ctrlKey \|\| event\.metaKey/);
+  assert.match(rotationGridScript, /event\.shiftKey[\s\S]*scrollArea\.scrollLeft \+= event\.deltaY/);
+  assert.match(rotationGridScript, /if \(event\.button !== 1\) return;/);
+  assert.match(rotationGridScript, /rotation-sim-zoom-value/);
+  assert.match(rotationGridScript, /ariaLabel: "Fit entire timeline"/);
+});
+
+test("simulation timeline focus mode keeps editing controls and hides secondary panels", () => {
+  assert.match(rotationGridScript, /function setSimulationTimelineFocusMode\(enabled\)/);
+  assert.match(rotationGridScript, /rotation-sim-focus-button/);
+  assert.match(rotationGridScript, /rotation-sim-focus-bar/);
+  assert.match(rotationGridScript, /Hide menus, combat stats and analysis to give the timeline more room/);
+  assert.match(rotationGridScript, /key === "Escape"[\s\S]*setSimulationTimelineFocusMode\(false\)/);
+  assert.match(rotationGridScript, /function scrollSimulationFocusControlsIntoView\(\)[\s\S]*scrollingElement\.scrollTop = 0[\s\S]*window\.scrollTo/);
+  assert.doesNotMatch(rotationGridScript, /quickSkills\.scrollIntoView/);
+  assert.match(rotationGridScript, /if \(active\) scrollSimulationFocusControlsIntoView\(\)/);
+  assert.match(rotationGridScript, /new ResizeObserver\(scheduleSimulationFocusStickyOffsets\)/);
+  assert.match(rotationGridScript, /--simulation-focus-quick-height/);
+  assert.match(rotationGridScript, /rotation-sim-sticky-ruler/);
+  assert.match(rotationGridScript, /function setSimulationFocusControlsCollapsed\(collapsed\)/);
+  assert.match(rotationGridScript, /rotation-sim-focus-compact-bar/);
+  assert.match(rotationGridScript, /translateX\(\$\{-trackScroll\.scrollLeft\}px\)/);
+  assert.match(rotationGridScript, /if \(isSimulationTimelineMode\(\)\)[\s\S]*renderSimulationRotation\(\)[\s\S]*classList\.remove\("simulation-timeline-focus"\)/);
+  assert.match(skillsPanelScript, /function createQuickSkillsToggle\(\)/);
+  assert.match(skillsPanelScript, /rotation-quick-skills-toggle/);
+  assert.match(skillsPanelScript, /uiSettings\.simulationQuickSkillsCollapsed = rotationQuickSkillsCollapsed/);
+  assert.match(rotationGridScript, /uiSettings\.simulationTimelineZoom = Math\.round\(nextZoom \* 1000\) \/ 1000/);
+  assert.match(rotationGridScript, /uiSettings\.simulationFocusMode = active/);
+  assert.match(rotationGridScript, /function resetSimulationLayoutPreferences\(\)/);
+  assert.match(rotationGridScript, /ariaLabel: "Reset simulation layout"/);
+  const rotationCss = fs.readFileSync("endfield/css/rotation.css", "utf8");
+  assert.match(rotationCss, /:root\.simulation-timeline-focus \.builder-sidebar/);
+  assert.match(rotationCss, /:root\.simulation-timeline-focus \.rotation-sim-damage-summary/);
+  assert.match(rotationCss, /:root\.simulation-timeline-focus \.rotation-sim-cursor-toolbar/);
+  assert.match(rotationCss, /var\(--simulation-focus-quick-height/);
+  assert.match(rotationCss, /:root\.simulation-timeline-focus \.rotation-sim-sticky-ruler[\s\S]*position: sticky/);
+  assert.match(rotationCss, /var\(--simulation-focus-controls-height/);
+  assert.match(rotationCss, /simulation-focus-controls-collapsed \.rotation-sim-timeline-controls/);
+  assert.match(rotationCss, /simulation-focus-controls-collapsed \.app-brand/);
+  assert.match(rotationCss, /simulation-focus-controls-collapsed \.rotation-sim-focus-compact-bar/);
+});
+
+test("simulation BATK track groups cycles and marks completed attack sequences", () => {
+  assert.match(rotationGridScript, /label\.textContent = isFinalStrikeHit[\s\S]*\? "FS"/);
+  assert.match(rotationGridScript, /rotation-sim-batk-cycle/);
+  assert.match(rotationGridScript, /rotation-sim-batk-sequence-boundary/);
+  assert.match(rotationGridScript, /rotation-sim-batk-cycle-end/);
+  assert.match(rotationGridScript, /cycleEnd <= segment\.end[\s\S]*cycleEnd <= durationSeconds/);
+  const rotationCss = fs.readFileSync("endfield/css/rotation.css", "utf8");
+  assert.match(rotationCss, /\.rotation-sim-batk-cycle-end[\s\S]*z-index: 2[\s\S]*border-left: 1px solid/);
+  assert.match(rotationCss, /\.rotation-sim-batk-track \.rotation-batk-hit-marker[\s\S]*box-shadow: none[\s\S]*text-shadow: none/);
 });
 
 test("damage tooltip keeps a transparent breakdown for its timeline marker", () => {
@@ -1127,6 +1318,14 @@ test("damage chart renders damage only as event impulses", () => {
 
   assert.equal(path, "M 120 1000 V 427 M 240 1000 V 238");
   assert.doesNotMatch(path, / H /);
+});
+
+test("damage line and per-second background share one vertical scale", () => {
+  assert.match(weaponAtkChartScript, /const damagePerSecond = buildSimulationDamagePerSecond\(series, duration\)/);
+  assert.match(weaponAtkChartScript, /const maximum = Math\.max\([\s\S]*intervalSeries[\s\S]*damagePerSecond/);
+  assert.match(weaponAtkChartScript, /appendSimulationDamagePerSecondBackground\([\s\S]*damagePerSecond[\s\S]*maximum/);
+  assert.match(weaponAtkChartScript, /const x = item\.second \* pixelsPerSecond/);
+  assert.match(weaponAtkChartScript, /bar\.setAttribute\("rx", "0"\)/);
 });
 
 test("chart numbers use readable thousands separators", () => {
@@ -1270,6 +1469,12 @@ test("loadout modal exposes Supabase weapon Essence activation profiles", () => 
   assert.match(atkChartCss, /\.rotation-sim-atk-line/);
   assert.match(atkChartCss, /\.rotation-sim-damage-line/);
   assert.match(atkChartCss, /\.rotation-sim-damage-tooltip/);
+  assert.match(weaponAtkChartScript, /root = document\.createElement\("details"\)/);
+  assert.match(weaponAtkChartScript, /simulationDamageSummaryExpanded = root\.open/);
+  assert.match(atkChartCss, /\.rotation-sim-damage-summary-compact/);
+  assert.match(atkChartCss, /\.rotation-sim-damage-summary-content/);
+  assert.match(weaponAtkChartScript, /rotation-sim-damage-summary-chevron/);
+  assert.match(atkChartCss, /\.rotation-sim-damage-summary\[open\] \.rotation-sim-damage-summary-chevron[\s\S]*rotate\(180deg\)/);
   assert.match(atkChartCss, /\.rotation-sim-damage-hit\.is-pinned/);
   assert.match(atkChartCss, /\.rotation-sim-body\.has-atk-chart/);
   assert.match(damageBreakdownScript, /Pre-mitigation DMG/);

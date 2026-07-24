@@ -391,6 +391,10 @@ async function initApp() {
             await hydrateDebuffRegistryFromSupabase();
         }
 
+        if (typeof hydrateInflictionMechanicsFromSupabase === "function") {
+            await hydrateInflictionMechanicsFromSupabase();
+        }
+
         if (typeof hydrateBuffRegistryFromSupabase === "function") {
             await hydrateBuffRegistryFromSupabase();
         }
@@ -401,6 +405,22 @@ async function initApp() {
 
         if (typeof hydrateEffectGroupsFromSupabase === "function") {
             await hydrateEffectGroupsFromSupabase();
+        }
+
+        if (typeof hydrateSimulationTriggerEventsFromSupabase === "function") {
+            await hydrateSimulationTriggerEventsFromSupabase();
+        }
+
+        if (typeof hydrateSimulationActionRulesFromSupabase === "function") {
+            await hydrateSimulationActionRulesFromSupabase();
+        }
+
+        if (typeof hydrateOperatorPassiveRulesFromSupabase === "function") {
+            await hydrateOperatorPassiveRulesFromSupabase();
+        }
+
+        if (typeof hydrateOperatorFormsFromSupabase === "function") {
+            await hydrateOperatorFormsFromSupabase();
         }
 
         if (typeof hydrateGearFromSupabase === "function") {

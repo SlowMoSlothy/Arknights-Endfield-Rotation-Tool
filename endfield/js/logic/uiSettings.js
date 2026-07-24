@@ -30,7 +30,11 @@ let uiSettings = {
     simulationSpPerSecond: DEFAULT_SIMULATION_SP_PER_SECOND,
     simulationTimelineDensity: SIMULATION_TIMELINE_DENSITY_OPTIONS.normal,
     simulationDurationSeconds: null,
-    simulationDamageMode: SIMULATION_DAMAGE_MODE_OPTIONS.expected
+    simulationDamageMode: SIMULATION_DAMAGE_MODE_OPTIONS.expected,
+    simulationTimelineZoom: 1,
+    simulationFocusMode: false,
+    simulationFocusControlsCollapsed: false,
+    simulationQuickSkillsCollapsed: false
 };
 
 function loadUiSettings() {
@@ -97,6 +101,18 @@ function applyUiSettings() {
     uiSettings.simulationDurationSeconds = Number.isFinite(simulationDurationSeconds) && simulationDurationSeconds > 0
         ? Math.round(simulationDurationSeconds * 10) / 10
         : null;
+
+    const simulationTimelineZoom = Number(uiSettings.simulationTimelineZoom);
+    uiSettings.simulationTimelineZoom = Number.isFinite(simulationTimelineZoom)
+        ? Math.max(0.2, Math.min(3, simulationTimelineZoom))
+        : 1;
+    uiSettings.simulationFocusMode = Boolean(uiSettings.simulationFocusMode);
+    uiSettings.simulationFocusControlsCollapsed = Boolean(uiSettings.simulationFocusControlsCollapsed);
+    uiSettings.simulationQuickSkillsCollapsed = Boolean(uiSettings.simulationQuickSkillsCollapsed);
+
+    if (typeof applySimulationLayoutPreferences === "function") {
+        applySimulationLayoutPreferences();
+    }
 
     updateSettingsUi();
 }

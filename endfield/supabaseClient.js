@@ -56,6 +56,120 @@ function mapDatabaseSkill(row) {
     };
 }
 
+function normalizeEffectDurationKey(value) {
+    return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "_")
+        .replace(/^_+|_+$/g, "");
+}
+
+function getEffectDurationKey(effect) {
+    if (!isPlainObject(effect)) return "";
+
+    return normalizeEffectDurationKey(
+        effect.id ||
+        effect.appliesEffect ||
+        effect.effect ||
+        effect.key ||
+        effect.name
+    );
+}
+
+function mapDatabaseEffectDurationOverride(row) {
+    return {
+        operatorId: row.operator_id,
+        skillId: row.skill_id,
+        effectType: row.effect_type,
+        effectKey: normalizeEffectDurationKey(row.effect_key),
+        durationSeconds: Number(row.duration_seconds),
+        verified: Boolean(row.verified),
+        sourceUrl: row.source_url || "",
+        sourceNote: row.source_note || ""
+    };
+}
+
+function getEffectDurationOverrideLookupKey(skillId, effectType, effectKey) {
+    return `${skillId || ""}:${effectType || ""}:${effectKey || ""}`;
+}
+
+function createEffectDurationOverrideLookup(overrides) {
+    const lookup = new Map();
+
+    (overrides || []).forEach(override => {
+        if (!override.skillId || !override.effectType || !override.effectKey) return;
+        if (!Number.isFinite(override.durationSeconds) || override.durationSeconds <= 0) return;
+
+        lookup.set(
+            getEffectDurationOverrideLookupKey(override.skillId, override.effectType, override.effectKey),
+            override
+        );
+    });
+
+    return lookup;
+}
+
+function applyEffectDurationOverrideToEffect(effect, effectType, skill, lookup) {
+    if (!isPlainObject(effect) || !skill?.id || !lookup?.size) return effect;
+
+    const effectKey = getEffectDurationKey(effect);
+    const override = lookup.get(getEffectDurationOverrideLookupKey(skill.id, effectType, effectKey));
+    if (!override) return effect;
+
+    return {
+        ...effect,
+        durationSeconds: override.durationSeconds,
+        durationVerified: override.verified,
+        durationSource: "supabase",
+        durationSourceUrl: override.sourceUrl,
+        durationSourceNote: override.sourceNote
+    };
+}
+
+function mapEffectsWithDurationOverrides(effects, effectType, skill, lookup) {
+    if (!Array.isArray(effects)) return effects;
+
+    return effects.map(effect => applyEffectDurationOverrideToEffect(effect, effectType, skill, lookup));
+}
+
+function applyEffectDurationOverridesToSkill(skill, lookup) {
+    if (!skill || !lookup?.size) return skill;
+
+    const nextSkill = {
+        ...skill,
+        buffs: mapEffectsWithDurationOverrides(skill.buffs, "buff", skill, lookup),
+        debuffs: mapEffectsWithDurationOverrides(skill.debuffs, "debuff", skill, lookup)
+    };
+
+    if (Array.isArray(skill.conditionalBuffs)) {
+        nextSkill.conditionalBuffs = skill.conditionalBuffs.map(condition => ({
+            ...condition,
+            buffs: mapEffectsWithDurationOverrides(condition.buffs, "buff", skill, lookup)
+        }));
+    }
+
+    if (Array.isArray(skill.conditionalDebuffs)) {
+        nextSkill.conditionalDebuffs = skill.conditionalDebuffs.map(condition => ({
+            ...condition,
+            debuffs: mapEffectsWithDurationOverrides(condition.debuffs, "debuff", skill, lookup)
+        }));
+    }
+
+    return nextSkill;
+}
+
+function applyEffectDurationOverridesToOperators(operators, overrides) {
+    const lookup = createEffectDurationOverrideLookup(overrides);
+    if (!lookup.size) return operators;
+
+    return operators.map(operator => ({
+        ...operator,
+        skills: Array.isArray(operator.skills)
+            ? operator.skills.map(skill => applyEffectDurationOverridesToSkill(skill, lookup))
+            : operator.skills
+    }));
+}
+
 function mapDatabaseOperator(row, skillRows) {
     const raw = isPlainObject(row.raw_data) ? row.raw_data : {};
 
@@ -92,6 +206,8 @@ function mapDatabaseWeapon(row) {
         rarity: row.rarity ?? raw.rarity,
         mainAttribute: row.main_attribute || raw.mainAttribute,
         secondaryAttribute: row.secondary_attribute || raw.secondaryAttribute,
+        secondaryValue: row.secondary_value ?? raw.secondaryValue ?? null,
+        secondaryIsPercent: row.secondary_is_percent ?? raw.secondaryIsPercent ?? false,
         passiveName: row.passive_name || raw.passiveName,
         icon: row.icon_path || raw.icon || (weaponKey ? `assets/weapons/${weaponKey}.png` : ""),
         baseAtk: row.base_atk ?? raw.baseAtk,
@@ -167,8 +283,33 @@ function mapDatabaseDebuffRegistryEntry(row) {
     };
 }
 
+function mapDatabaseInflictionMechanic(row) {
+    return {
+        key: row.effect_key,
+        value: {
+            effectKey: row.effect_key,
+            name: row.name,
+            element: row.element,
+            durationSeconds: Number(row.duration_seconds),
+            maxStacks: Number(row.max_stacks),
+            burstKey: row.burst_key,
+            burstName: row.burst_name,
+            burstAtkMultiplier: Number(row.burst_atk_multiplier),
+            burstHitCount: Number(row.burst_hit_count) || 1,
+            burstCanCrit: row.burst_can_crit !== false,
+            burstDelaySeconds: Number(row.burst_delay_seconds) || 0,
+            verified: row.verified === true,
+            sourceUrl: row.source_url || "",
+            sourceNote: row.source_note || ""
+        }
+    };
+}
+
 function mapDatabaseBuffRegistryEntry(row) {
     const raw = isPlainObject(row.raw_data) ? row.raw_data : {};
+    const localFallback = typeof BUFF_REGISTRY !== "undefined"
+        ? BUFF_REGISTRY[row.effect_key]
+        : null;
 
     return {
         key: row.effect_key,
@@ -182,7 +323,8 @@ function mapDatabaseBuffRegistryEntry(row) {
             extension: row.extension || raw.extension,
             consumeOnSkillType: row.consume_on_skill_type || raw.consumeOnSkillType,
             consumeStacks: row.consume_stacks ?? raw.consumeStacks,
-            onFullyConsumedEffect: row.on_fully_consumed_effect || raw.onFullyConsumedEffect
+            onFullyConsumedEffect: row.on_fully_consumed_effect || raw.onFullyConsumedEffect,
+            onConsume: raw.onConsume || localFallback?.onConsume
         }
     };
 }
@@ -208,6 +350,113 @@ function mapDatabaseEffectGroup(row) {
     };
 }
 
+function mapDatabaseSimulationTriggerEvent(row) {
+    const raw = isPlainObject(row.raw_data) ? row.raw_data : {};
+    const effects = Array.isArray(row.effects) ? row.effects : (Array.isArray(raw.effects) ? raw.effects : []);
+
+    return {
+        ...raw,
+        id: Number(row.id),
+        eventKey: row.event_key,
+        name: row.name,
+        description: row.description || raw.description || "",
+        type: "Combat Event",
+        shortType: "EVT",
+        elementType: "neutral",
+        icon: row.icon_path || raw.icon || "assets/ui/events/combat_event.svg",
+        iconSmall: row.icon_path || raw.iconSmall || raw.icon || "assets/ui/events/combat_event.svg",
+        cooldown: 0,
+        energy: 0,
+        simulationOnly: true,
+        effects,
+        debuffs: effects.map(effect => ({
+            id: effect.effect,
+            name: effect.name || effect.effect,
+            appliesEffect: effect.effect,
+            persistsForCombo: effect.persistsForCombo === true,
+            transientTrigger: effect.transientTrigger !== false,
+            visible: effect.visible === true
+        }))
+    };
+}
+
+function mapDatabaseSimulationActionRule(row) {
+    const raw = isPlainObject(row.raw_data) ? row.raw_data : {};
+    return {
+        ...raw,
+        ruleKey: row.rule_key,
+        name: row.name,
+        description: row.description || raw.description || "",
+        actionType: row.action_type,
+        actorScope: row.actor_scope || raw.actorScope || "controlled",
+        conditions: isPlainObject(row.conditions) ? row.conditions : (raw.conditions || {}),
+        consumedEffects: Array.isArray(row.consumed_effects) ? row.consumed_effects : (raw.consumedEffects || []),
+        emittedEffects: Array.isArray(row.emitted_effects) ? row.emitted_effects : (raw.emittedEffects || []),
+        actionOverride: row.action_override || raw.actionOverride || null,
+        priority: Number(row.priority || raw.priority || 0),
+        enabled: row.enabled !== false
+    };
+}
+
+function mapDatabaseOperatorPassiveRule(row) {
+    const raw = isPlainObject(row.raw_data) ? row.raw_data : {};
+    return {
+        ...raw,
+        ruleKey: row.rule_key,
+        operatorId: Number(row.operator_id),
+        name: row.name,
+        ruleType: row.rule_type || raw.ruleType || "talent",
+        resolutionType: row.resolution_type || raw.resolutionType,
+        minimumPotential: Number(row.minimum_potential ?? raw.minimumPotential ?? 0),
+        maximumPotential: row.maximum_potential === null || row.maximum_potential === undefined
+            ? (Number.isFinite(Number(raw.maximumPotential)) ? Number(raw.maximumPotential) : null)
+            : Number(row.maximum_potential),
+        conditions: isPlainObject(row.conditions) ? row.conditions : (raw.conditions || {}),
+        trigger: isPlainObject(row.trigger) ? row.trigger : (raw.trigger || {}),
+        effect: isPlainObject(row.effect) ? row.effect : (raw.effect || {}),
+        cooldownSeconds: Number(row.cooldown_seconds ?? raw.cooldownSeconds ?? 0),
+        enabled: row.enabled !== false,
+        verified: row.verified === true,
+        sourceUrl: row.source_url || raw.sourceUrl || "",
+        sourceNote: row.source_note || raw.sourceNote || ""
+    };
+}
+
+function mapDatabaseOperatorForm(row) {
+    const raw = isPlainObject(row.raw_data) ? row.raw_data : {};
+    return {
+        ...raw,
+        formKey: row.form_key,
+        operatorId: Number(row.operator_id),
+        name: row.name,
+        activationSkillId: Number(row.activation_skill_id),
+        durationSeconds: Number(row.duration_seconds),
+        priority: Number(row.priority || 0),
+        icon: row.icon_path || raw.icon || "",
+        visible: row.visible !== false,
+        enabled: row.enabled !== false,
+        verified: row.verified === true,
+        sourceUrl: row.source_url || "",
+        sourceNote: row.source_note || ""
+    };
+}
+
+function mapDatabaseOperatorFormActionVariant(row) {
+    const raw = isPlainObject(row.raw_data) ? row.raw_data : {};
+    return {
+        ...raw,
+        formKey: row.form_key,
+        operatorId: Number(row.operator_id),
+        actionKey: row.action_key,
+        actionOverride: isPlainObject(row.action_override) ? row.action_override : {},
+        priority: Number(row.priority || 0),
+        enabled: row.enabled !== false,
+        verified: row.verified === true,
+        sourceUrl: row.source_url || "",
+        sourceNote: row.source_note || ""
+    };
+}
+
 async function loadRegistryTableFromSupabase(tableName, mapper, label) {
     if (!supabaseClient) {
         throw new Error(`Supabase client is not available. Cannot load ${label}.`);
@@ -228,6 +477,10 @@ async function loadRegistryTableFromSupabase(tableName, mapper, label) {
 
 async function loadDebuffRegistryFromSupabase() {
     return loadRegistryTableFromSupabase("debuff_registry", mapDatabaseDebuffRegistryEntry, "debuff registry");
+}
+
+async function loadInflictionMechanicsFromSupabase() {
+    return loadRegistryTableFromSupabase("infliction_mechanics", mapDatabaseInflictionMechanic, "infliction mechanics");
 }
 
 async function loadBuffRegistryFromSupabase() {
@@ -287,6 +540,27 @@ async function hydrateDebuffRegistryFromSupabase() {
     replaceRegistryObject(DEBUFF_REGISTRY, databaseDebuffs);
 
     console.info(`Debuff registry loaded from Supabase: ${databaseDebuffs.length}`);
+    return true;
+}
+
+async function hydrateInflictionMechanicsFromSupabase() {
+    if (typeof INFLICTION_MECHANICS === "undefined") return false;
+
+    let databaseMechanics = [];
+    try {
+        databaseMechanics = await loadInflictionMechanicsFromSupabase();
+    } catch (error) {
+        console.error("Infliction mechanics could not be loaded from Supabase. Arts Burst simulation is disabled.", error);
+        return false;
+    }
+
+    if (databaseMechanics.length === 0) {
+        console.error("Supabase returned no Infliction mechanics. Arts Burst simulation is disabled.");
+        return false;
+    }
+
+    replaceRegistryObject(INFLICTION_MECHANICS, databaseMechanics);
+    console.info(`Infliction mechanics loaded from Supabase: ${databaseMechanics.length}`);
     return true;
 }
 
@@ -363,6 +637,155 @@ async function hydrateEffectGroupsFromSupabase() {
     return true;
 }
 
+async function loadEffectDurationOverridesFromSupabase() {
+    if (!supabaseClient) {
+        throw new Error("Supabase client is not available. Cannot load effect duration overrides.");
+    }
+
+    const { data, error } = await supabaseClient
+        .from("effect_duration_overrides")
+        .select("*")
+        .eq("game", "arknights_endfield")
+        .order("operator_id", { ascending: true })
+        .order("skill_id", { ascending: true })
+        .order("effect_type", { ascending: true });
+
+    if (error) throw error;
+
+    return Array.isArray(data) ? data.map(mapDatabaseEffectDurationOverride) : [];
+}
+
+async function loadSimulationTriggerEventsFromSupabase() {
+    if (!supabaseClient) {
+        throw new Error("Supabase client is not available. Cannot load simulation trigger events.");
+    }
+
+    const { data, error } = await supabaseClient
+        .from("simulation_trigger_events")
+        .select("*")
+        .eq("game", "arknights_endfield")
+        .eq("enabled", true)
+        .order("sort_order", { ascending: true });
+
+    if (error) throw error;
+    return Array.isArray(data) ? data.map(mapDatabaseSimulationTriggerEvent) : [];
+}
+
+async function hydrateSimulationTriggerEventsFromSupabase() {
+    let databaseEvents = [];
+    try {
+        databaseEvents = await loadSimulationTriggerEventsFromSupabase();
+    } catch (error) {
+        console.info("Simulation trigger events are not available in Supabase yet.", error?.message || error);
+        return false;
+    }
+
+    simulationTriggerEvents = databaseEvents;
+    window.simulationTriggerEvents = simulationTriggerEvents;
+    console.info(`Simulation trigger events loaded from Supabase: ${databaseEvents.length}`);
+    return databaseEvents.length > 0;
+}
+
+async function loadSimulationActionRulesFromSupabase() {
+    if (!supabaseClient) {
+        throw new Error("Supabase client is not available. Cannot load simulation action rules.");
+    }
+
+    const { data, error } = await supabaseClient
+        .from("simulation_action_rules")
+        .select("*")
+        .eq("game", "arknights_endfield")
+        .eq("enabled", true)
+        .order("priority", { ascending: true });
+
+    if (error) throw error;
+    return Array.isArray(data) ? data.map(mapDatabaseSimulationActionRule) : [];
+}
+
+async function hydrateSimulationActionRulesFromSupabase() {
+    let databaseRules = [];
+    try {
+        databaseRules = await loadSimulationActionRulesFromSupabase();
+    } catch (error) {
+        console.info("Simulation action rules are not available in Supabase yet.", error?.message || error);
+        return false;
+    }
+
+    simulationActionRules = databaseRules;
+    window.simulationActionRules = simulationActionRules;
+    console.info(`Simulation action rules loaded from Supabase: ${databaseRules.length}`);
+    return databaseRules.length > 0;
+}
+
+async function loadOperatorPassiveRulesFromSupabase() {
+    if (!supabaseClient) throw new Error("Supabase client is not available. Cannot load operator passive rules.");
+    const { data, error } = await supabaseClient
+        .from("operator_passive_rules")
+        .select("*")
+        .eq("game", "arknights_endfield")
+        .eq("enabled", true)
+        .order("priority", { ascending: true });
+    if (error) throw error;
+    return Array.isArray(data) ? data.map(mapDatabaseOperatorPassiveRule) : [];
+}
+
+async function hydrateOperatorPassiveRulesFromSupabase() {
+    try {
+        operatorPassiveRules = await loadOperatorPassiveRulesFromSupabase();
+        window.operatorPassiveRules = operatorPassiveRules;
+        console.info(`Operator passive rules loaded from Supabase: ${operatorPassiveRules.length}`);
+        return operatorPassiveRules.length > 0;
+    } catch (error) {
+        console.info("Operator passive rules are not available in Supabase yet.", error?.message || error);
+        operatorPassiveRules = [];
+        window.operatorPassiveRules = operatorPassiveRules;
+        return false;
+    }
+}
+
+async function loadOperatorFormsFromSupabase() {
+    if (!supabaseClient) throw new Error("Supabase client is not available. Cannot load operator forms.");
+
+    const [{ data: formRows, error: formError }, { data: variantRows, error: variantError }] = await Promise.all([
+        supabaseClient
+            .from("operator_forms")
+            .select("*")
+            .eq("game", "arknights_endfield")
+            .eq("enabled", true)
+            .order("priority", { ascending: true }),
+        supabaseClient
+            .from("operator_form_action_variants")
+            .select("*")
+            .eq("game", "arknights_endfield")
+            .eq("enabled", true)
+            .order("priority", { ascending: true })
+    ]);
+
+    if (formError) throw formError;
+    if (variantError) throw variantError;
+    return {
+        forms: Array.isArray(formRows) ? formRows.map(mapDatabaseOperatorForm) : [],
+        variants: Array.isArray(variantRows) ? variantRows.map(mapDatabaseOperatorFormActionVariant) : []
+    };
+}
+
+async function hydrateOperatorFormsFromSupabase() {
+    let databaseData;
+    try {
+        databaseData = await loadOperatorFormsFromSupabase();
+    } catch (error) {
+        console.info("Operator forms are not available in Supabase yet.", error?.message || error);
+        return false;
+    }
+
+    operatorForms = databaseData.forms;
+    operatorFormActionVariants = databaseData.variants;
+    window.operatorForms = operatorForms;
+    window.operatorFormActionVariants = operatorFormActionVariants;
+    console.info(`Operator forms loaded from Supabase: ${operatorForms.length}; variants: ${operatorFormActionVariants.length}`);
+    return operatorForms.length > 0;
+}
+
 async function loadOperatorsFromSupabase() {
     if (!supabaseClient) {
         throw new Error("Supabase client is not available. Cannot load operator data.");
@@ -404,7 +827,19 @@ async function loadOperatorsFromSupabase() {
         skillsByOperatorId.get(row.operator_id).push(row);
     });
 
-    return operatorRows.map(row => mapDatabaseOperator(row, skillsByOperatorId.get(row.id) || []));
+    const operators = operatorRows.map(row => mapDatabaseOperator(row, skillsByOperatorId.get(row.id) || []));
+
+    let effectDurationOverrides = [];
+    try {
+        effectDurationOverrides = await loadEffectDurationOverridesFromSupabase();
+    } catch (error) {
+        console.info(
+            "Effect duration overrides are not available in Supabase yet. Using operator skill raw data durations.",
+            error?.message || error
+        );
+    }
+
+    return applyEffectDurationOverridesToOperators(operators, effectDurationOverrides);
 }
 
 async function loadWeaponsFromSupabase() {

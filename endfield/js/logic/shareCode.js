@@ -8,7 +8,9 @@ const BUILD_SHARE_CODE_PREFIX_V7 = "AERT7:";
 const BUILD_SHARE_CODE_PREFIX_V8 = "AERT8:";
 const BUILD_SHARE_CODE_PREFIX_V9 = "AERT9:";
 const BUILD_SHARE_CODE_PREFIX_V10 = "AERT10:";
-const BUILD_SHARE_CODE_PREFIX = "AERT11:";
+const BUILD_SHARE_CODE_PREFIX_V11 = "AERT11:";
+const BUILD_SHARE_CODE_PREFIX_V12 = "AERT12:";
+const BUILD_SHARE_CODE_PREFIX = "AERT13:";
 const BUILD_SHARE_HASH_KEY = "setup";
 const BUILD_SHARE_UI_FLAG_SIMULATION_MODE = 1;
 const BUILD_SHARE_UI_FLAG_HAS_SP_PER_SECOND = 2;
@@ -24,11 +26,13 @@ const BUILD_SHARE_UI_FLAG_MASK_V10 = BUILD_SHARE_UI_FLAG_MASK
 const BUILD_SHARE_MAX_ROTATION_ENTRIES = 240;
 const BUILD_SHARE_MAX_WEAPON_LOADOUTS = 4;
 const BUILD_SHARE_MAX_WEAPON_KEY_LENGTH = 120;
-const BUILD_PERSISTENCE_PAYLOAD_VERSION = 11;
+const BUILD_PERSISTENCE_PAYLOAD_VERSION = 13;
 
 function hasKnownBuildShareCodePrefix(value) {
     return [
         BUILD_SHARE_CODE_PREFIX,
+        BUILD_SHARE_CODE_PREFIX_V12,
+        BUILD_SHARE_CODE_PREFIX_V11,
         BUILD_SHARE_CODE_PREFIX_V10,
         BUILD_SHARE_CODE_PREFIX_V9,
         BUILD_SHARE_CODE_PREFIX_V8,
@@ -198,6 +202,67 @@ function readPackedShareKey(cursor, maxLength = BUILD_SHARE_MAX_WEAPON_KEY_LENGT
         else throw new Error("Share code contains an invalid packed key.");
     }
     throw new Error("Share code contains an invalid key.");
+}
+
+function getShareLoadoutKeyCandidates(slot) {
+    if (slot === "weapon") {
+        return typeof weapons !== "undefined" && Array.isArray(weapons) ? weapons : [];
+    }
+    const category = slot === "kit1" || slot === "kit2" ? "kits" : slot;
+    return typeof GEAR_DATABASE !== "undefined" && Array.isArray(GEAR_DATABASE?.[category])
+        ? GEAR_DATABASE[category]
+        : [];
+}
+
+function hashShareLoadoutKey(value) {
+    let hash = 0x811c9dc5;
+    Array.from(String(value || "")).forEach(char => {
+        hash ^= char.charCodeAt(0);
+        hash = Math.imul(hash, 0x01000193) >>> 0;
+    });
+    return hash >>> 0;
+}
+
+function writeShareUint32(bytes, value) {
+    const number = Number(value) >>> 0;
+    bytes.push(number & 0xff, (number >>> 8) & 0xff, (number >>> 16) & 0xff, (number >>> 24) & 0xff);
+}
+
+function readShareUint32(cursor) {
+    if (cursor.index + 4 > cursor.bytes.length) throw new Error("Share code ended unexpectedly.");
+    const value = (
+        cursor.bytes[cursor.index]
+        | (cursor.bytes[cursor.index + 1] << 8)
+        | (cursor.bytes[cursor.index + 2] << 16)
+        | (cursor.bytes[cursor.index + 3] << 24)
+    ) >>> 0;
+    cursor.index += 4;
+    return value;
+}
+
+function writeHashedShareLoadoutKey(bytes, value, slot) {
+    const key = String(value || "");
+    const hash = hashShareLoadoutKey(key);
+    const matches = getShareLoadoutKeyCandidates(slot)
+        .filter(item => hashShareLoadoutKey(item?.key) === hash);
+    if (matches.length === 1 && String(matches[0]?.key) === key) {
+        writeVarInt(bytes, 1);
+        writeShareUint32(bytes, hash);
+        return;
+    }
+    writeVarInt(bytes, 0);
+    writePackedShareKey(bytes, key);
+}
+
+function readHashedShareLoadoutKey(cursor, slot) {
+    const mode = readVarInt(cursor);
+    if (mode === 0) return readPackedShareKey(cursor);
+    if (mode !== 1) throw new Error("Share code contains an invalid loadout key mode.");
+    const hash = readShareUint32(cursor);
+    const matches = getShareLoadoutKeyCandidates(slot)
+        .filter(item => hashShareLoadoutKey(item?.key) === hash);
+    if (matches.length !== 1) throw new Error("Share code references an unknown or ambiguous loadout key.");
+    return String(matches[0].key);
 }
 
 function getRoundedShareTime(value) {
@@ -577,7 +642,7 @@ function createCompactShareBytesV9() {
     return bytes;
 }
 
-function createCompactShareBytesV11() {
+function createCompactShareBytesWithOptionalLoadouts(loadoutVersion) {
     const bytes = [];
     for (let index = 0; index < 4; index++) {
         const operatorId = Array.isArray(selectedTeam) ? Number(selectedTeam[index]) : NaN;
@@ -654,23 +719,65 @@ function createCompactShareBytesV11() {
         const skill = Math.min(15, Math.max(0, Number(loadout?.weapon?.essence?.skill) || 0));
         const activationBits = (potential - 1) | (primary << 3) | (secondary << 7) | (skill << 11);
 
-        writeVarInt(bytes, Number(operatorId));
-        writePackedShareKey(bytes, loadout?.weapon?.key || "");
-        writeVarInt(bytes, activationBits);
+        const optionalKeys = [
+            loadout?.gloves?.key || "",
+            loadout?.armor?.key || "",
+            loadout?.kit1?.key || "",
+            loadout?.kit2?.key || ""
+        ];
+        const optionalSlotMask = optionalKeys.reduce(
+            (mask, key, index) => key ? mask | (1 << index) : mask,
+            0
+        );
 
-        writePackedShareKey(bytes, loadout?.gloves?.key || "");
-        writePackedShareKey(bytes, loadout?.armor?.key || "");
-        writePackedShareKey(bytes, loadout?.kit1?.key || "");
-        writePackedShareKey(bytes, loadout?.kit2?.key || "");
+        if (loadoutVersion === 13) {
+            const hasActivationData = activationBits !== 0;
+            const loadoutHeader = (Number(operatorId) << 5)
+                | (hasActivationData ? 16 : 0)
+                | optionalSlotMask;
+            writeVarInt(bytes, loadoutHeader);
+            writeHashedShareLoadoutKey(bytes, loadout?.weapon?.key || "", "weapon");
+            if (hasActivationData) writeVarInt(bytes, activationBits);
+            optionalKeys.forEach((key, index) => {
+                if (optionalSlotMask & (1 << index)) {
+                    writeHashedShareLoadoutKey(bytes, key, ["gloves", "armor", "kit1", "kit2"][index]);
+                }
+            });
+        } else {
+            writeVarInt(bytes, Number(operatorId));
+            writePackedShareKey(bytes, loadout?.weapon?.key || "");
+            writeVarInt(bytes, activationBits);
+        }
+
+        if (loadoutVersion === 12) {
+            writeVarInt(bytes, optionalSlotMask);
+            optionalKeys.forEach((key, index) => {
+                if (optionalSlotMask & (1 << index)) writePackedShareKey(bytes, key);
+            });
+        } else if (loadoutVersion === 11) {
+            optionalKeys.forEach(key => writePackedShareKey(bytes, key));
+        }
     });
 
     return bytes;
 }
 
+function createCompactShareBytesV11() {
+    return createCompactShareBytesWithOptionalLoadouts(11);
+}
+
+function createCompactShareBytesV12() {
+    return createCompactShareBytesWithOptionalLoadouts(12);
+}
+
+function createCompactShareBytesV13() {
+    return createCompactShareBytesWithOptionalLoadouts(13);
+}
+
 function createBuildShareCode() {
     const bytes = [];
     writeVarInt(bytes, BUILD_PERSISTENCE_PAYLOAD_VERSION);
-    bytes.push(...createCompactShareBytesV11());
+    bytes.push(...createCompactShareBytesV13());
     return encodeShareBytes(bytes);
 }
 
@@ -767,7 +874,15 @@ function parseBuildShareCode(code) {
     const trimmed = extractBuildShareCode(code);
 
     if (trimmed.startsWith(BUILD_SHARE_CODE_PREFIX)) {
-        return parseCompactBuildShareCodeV11(trimmed.slice(BUILD_SHARE_CODE_PREFIX.length));
+        return parseCompactBuildShareCodeV13(trimmed.slice(BUILD_SHARE_CODE_PREFIX.length));
+    }
+
+    if (trimmed.startsWith(BUILD_SHARE_CODE_PREFIX_V12)) {
+        return parseCompactBuildShareCodeV12(trimmed.slice(BUILD_SHARE_CODE_PREFIX_V12.length));
+    }
+
+    if (trimmed.startsWith(BUILD_SHARE_CODE_PREFIX_V11)) {
+        return parseCompactBuildShareCodeV11(trimmed.slice(BUILD_SHARE_CODE_PREFIX_V11.length));
     }
 
     if (trimmed.startsWith(BUILD_SHARE_CODE_PREFIX_V10)) {
@@ -822,6 +937,8 @@ function parseVersionedDisplayBuildShareCode(code) {
     const encodedPayload = encodeShareBytes(bytes.slice(cursor.index));
 
     switch (version) {
+        case 13: return parseCompactBuildShareCodeV13(encodedPayload);
+        case 12: return parseCompactBuildShareCodeV12(encodedPayload);
         case 11: return parseCompactBuildShareCodeV11(encodedPayload);
         case 10: return parseCompactBuildShareCodeV10(encodedPayload);
         case 9: return parseCompactBuildShareCodeV9(encodedPayload);
@@ -1135,6 +1252,94 @@ function readCompactShareOperatorLoadoutsV11(cursor) {
     return loadouts;
 }
 
+function readCompactShareOperatorLoadoutsV12(cursor) {
+    const count = cursor.index < cursor.bytes.length ? readVarInt(cursor) : 0;
+    if (count > BUILD_SHARE_MAX_WEAPON_LOADOUTS) {
+        throw new Error("Share code contains too many operator loadouts.");
+    }
+
+    const loadouts = {};
+    for (let index = 0; index < count; index++) {
+        const operatorId = readVarInt(cursor);
+        const weaponKey = readPackedShareKey(cursor);
+        const activationBits = readVarInt(cursor);
+        if (activationBits & ~0x7fff) throw new Error("Share code contains invalid weapon activation data.");
+
+        const optionalSlotMask = readVarInt(cursor);
+        if (optionalSlotMask & ~0x0f) throw new Error("Share code contains invalid optional loadout slots.");
+        const optionalKeys = ["", "", "", ""];
+        optionalKeys.forEach((unused, slotIndex) => {
+            if (optionalSlotMask & (1 << slotIndex)) {
+                optionalKeys[slotIndex] = readPackedShareKey(cursor);
+            }
+        });
+
+        if (!weaponKey) continue;
+        loadouts[String(operatorId)] = {
+            weapon: {
+                key: weaponKey,
+                potential: (activationBits & 7) + 1,
+                essence: {
+                    primary: (activationBits >> 3) & 15,
+                    secondary: (activationBits >> 7) & 15,
+                    skill: (activationBits >> 11) & 15
+                }
+            },
+            gloves: optionalKeys[0] ? { key: optionalKeys[0] } : null,
+            armor: optionalKeys[1] ? { key: optionalKeys[1] } : null,
+            kit1: optionalKeys[2] ? { key: optionalKeys[2] } : null,
+            kit2: optionalKeys[3] ? { key: optionalKeys[3] } : null
+        };
+    }
+    return loadouts;
+}
+
+function readCompactShareOperatorLoadoutsV13(cursor) {
+    const count = cursor.index < cursor.bytes.length ? readVarInt(cursor) : 0;
+    if (count > BUILD_SHARE_MAX_WEAPON_LOADOUTS) {
+        throw new Error("Share code contains too many operator loadouts.");
+    }
+
+    const loadouts = {};
+    for (let index = 0; index < count; index++) {
+        const loadoutHeader = readVarInt(cursor);
+        const operatorId = loadoutHeader >> 5;
+        const optionalSlotMask = loadoutHeader & 15;
+        const hasActivationData = (loadoutHeader & 16) !== 0;
+        const weaponKey = readHashedShareLoadoutKey(cursor, "weapon");
+        const activationBits = hasActivationData ? readVarInt(cursor) : 0;
+        if (activationBits & ~0x7fff) throw new Error("Share code contains invalid weapon activation data.");
+
+        const optionalKeys = ["", "", "", ""];
+        optionalKeys.forEach((unused, slotIndex) => {
+            if (optionalSlotMask & (1 << slotIndex)) {
+                optionalKeys[slotIndex] = readHashedShareLoadoutKey(
+                    cursor,
+                    ["gloves", "armor", "kit1", "kit2"][slotIndex]
+                );
+            }
+        });
+
+        if (!weaponKey) continue;
+        loadouts[String(operatorId)] = {
+            weapon: {
+                key: weaponKey,
+                potential: (activationBits & 7) + 1,
+                essence: {
+                    primary: (activationBits >> 3) & 15,
+                    secondary: (activationBits >> 7) & 15,
+                    skill: (activationBits >> 11) & 15
+                }
+            },
+            gloves: optionalKeys[0] ? { key: optionalKeys[0] } : null,
+            armor: optionalKeys[1] ? { key: optionalKeys[1] } : null,
+            kit1: optionalKeys[2] ? { key: optionalKeys[2] } : null,
+            kit2: optionalKeys[3] ? { key: optionalKeys[3] } : null
+        };
+    }
+    return loadouts;
+}
+
 function readCompactShareOperatorLoadoutsV9(cursor) {
     const count = cursor.index < cursor.bytes.length ? readVarInt(cursor) : 0;
     if (count > BUILD_SHARE_MAX_WEAPON_LOADOUTS) {
@@ -1209,6 +1414,52 @@ function parseCompactBuildShareCodeV11(encoded) {
 
     return {
         v: 11,
+        team,
+        rotation: importedRotation,
+        operatorUltimateStates: importedUltimateStates,
+        operatorLoadouts: importedOperatorLoadouts,
+        enemyId,
+        uiSettings: uiSettingsPayload
+    };
+}
+
+function parseCompactBuildShareCodeV12(encoded) {
+    const bytes = decodeShareBytes(encoded.replace(/\s/g, ""));
+    const cursor = { bytes, index: 0 };
+    const team = readCompactShareTeam(cursor);
+    const importedRotation = readCompactShareRotationV9(cursor);
+    const importedUltimateStates = readCompactShareUltimateStates(cursor);
+    const uiSettingsPayload = readCompactShareUiSettingsV10(cursor);
+    const hasCustomEnemy = readVarInt(cursor) === 1;
+    const enemyId = hasCustomEnemy ? readPackedShareKey(cursor) : "training_dummy";
+    const importedOperatorLoadouts = readCompactShareOperatorLoadoutsV12(cursor);
+    assertCompactShareFullyRead(cursor);
+
+    return {
+        v: 12,
+        team,
+        rotation: importedRotation,
+        operatorUltimateStates: importedUltimateStates,
+        operatorLoadouts: importedOperatorLoadouts,
+        enemyId,
+        uiSettings: uiSettingsPayload
+    };
+}
+
+function parseCompactBuildShareCodeV13(encoded) {
+    const bytes = decodeShareBytes(encoded.replace(/\s/g, ""));
+    const cursor = { bytes, index: 0 };
+    const team = readCompactShareTeam(cursor);
+    const importedRotation = readCompactShareRotationV9(cursor);
+    const importedUltimateStates = readCompactShareUltimateStates(cursor);
+    const uiSettingsPayload = readCompactShareUiSettingsV10(cursor);
+    const hasCustomEnemy = readVarInt(cursor) === 1;
+    const enemyId = hasCustomEnemy ? readPackedShareKey(cursor) : "training_dummy";
+    const importedOperatorLoadouts = readCompactShareOperatorLoadoutsV13(cursor);
+    assertCompactShareFullyRead(cursor);
+
+    return {
+        v: 13,
         team,
         rotation: importedRotation,
         operatorUltimateStates: importedUltimateStates,
@@ -1637,6 +1888,8 @@ function applyBuildShareCode(code) {
 
     compactRotation();
     ensureSlotCount(rotation.filter(entry => entry !== null).length + 1);
+    if (typeof normalizeQingboMovesInRotation === "function") normalizeQingboMovesInRotation();
+    if (typeof syncQingboMoveStateFromRotation === "function") syncQingboMoveStateFromRotation();
 
     saveTeam();
     localStorage.setItem("rotation", JSON.stringify(rotation));

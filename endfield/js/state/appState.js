@@ -4,6 +4,11 @@ let activeSlotIndex = null;
 let operators = [];
 let weapons = [];
 let weaponEssenceProfiles = [];
+let simulationTriggerEvents = [];
+let simulationActionRules = [];
+let operatorPassiveRules = [];
+let operatorForms = [];
+let operatorFormActionVariants = [];
 let operatorLoadouts = {};
 
 let skillSourceSortables = [];

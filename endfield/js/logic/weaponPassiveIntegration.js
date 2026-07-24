@@ -25,6 +25,102 @@
         return bonuses.join(", ") || "Conditional effect";
     }
 
+    function getBasicAttackHitMultiplier(hit) {
+        const explicitMultiplier = Number(hit?.hitMultiplier);
+        if (Number.isFinite(explicitMultiplier) && explicitMultiplier > 0) return explicitMultiplier;
+        const sequenceTotal = Number(hit?.atkMultiplierTotal);
+        const sequenceHitCount = Math.max(1, Number(hit?.sequenceHitCount) || 1);
+        return Number.isFinite(sequenceTotal) && sequenceTotal > 0
+            ? sequenceTotal / sequenceHitCount
+            : 0;
+    }
+
+    function getSimulationEffectsBeforeTime(events, time) {
+        const latest = [...(Array.isArray(events) ? events : [])]
+            .filter(event => Number(event?.time) < Number(time) - 0.0001)
+            .sort((left, right) => (Number(right.time) || 0) - (Number(left.time) || 0) || (Number(right.order) || 0) - (Number(left.order) || 0))[0];
+        return {
+            activeBuffsBefore: Array.isArray(latest?.activeBuffs) ? latest.activeBuffs.map(effect => ({ ...effect })) : [],
+            activeDebuffsBefore: Array.isArray(latest?.activeDebuffs) ? latest.activeDebuffs.map(effect => ({ ...effect })) : []
+        };
+    }
+
+    function createSimulationBasicAttackDamageEvents(attackData, duration, leaderId, passiveTimeline, segments = null) {
+        const teamLoadouts = passiveTimeline?.atkSource?.teamLoadouts || [];
+        const leaderLoadout = teamLoadouts.find(loadout => Number(loadout?.operatorId) === Number(leaderId)) || null;
+        const effectHistory = passiveTimeline?.atkSource?.effectHistory || [];
+        const events = [];
+        const attackSegments = Array.isArray(segments) && segments.length > 0
+            ? segments
+            : [{ start: 0, end: duration, attackData }];
+
+        attackSegments.forEach(segment => {
+            const segmentAttack = segment.attackData;
+            if (!segmentAttack?.hasBasicAttackConfig || typeof getBasicAttackHitTimeline !== "function") return;
+            const secondsPerSlot = typeof getTimelineSecondsPerSlot === "function"
+                ? getTimelineSecondsPerSlot(segmentAttack)
+                : 1;
+            const cycleDuration = typeof getBasicAttackCycleDuration === "function"
+                ? getBasicAttackCycleDuration(segmentAttack, secondsPerSlot)
+                : 0;
+            if (!Number.isFinite(cycleDuration) || cycleDuration <= 0) return;
+            const hitTimeline = getBasicAttackHitTimeline(segmentAttack);
+
+            for (let localCycleStart = 0; segment.start + localCycleStart <= segment.end; localCycleStart += cycleDuration) {
+                const cycleStart = segment.start + localCycleStart;
+            hitTimeline.forEach(hit => {
+                const time = Math.round((cycleStart + Number(hit?.time || 0)) * 1000) / 1000;
+                const atkMultiplier = getBasicAttackHitMultiplier(hit);
+                if (time > segment.end + 0.0001 || time > duration + 0.0001 || atkMultiplier <= 0) return;
+
+                const isFinalStrike = hit?.isFinalStrike === true;
+                const activePassiveEffects = effectHistory.filter(effect => (
+                    Number(effect?.targetOperatorId) === Number(leaderId)
+                    && Number(effect?.startedAt) <= time + 0.0001
+                    && Number(effect?.expiresAt) > time + 0.0001
+                ));
+                const weaponPassiveStateBefore = typeof getSimulationWeaponPassiveState === "function"
+                    ? getSimulationWeaponPassiveState(activePassiveEffects, leaderId, leaderLoadout)
+                    : null;
+                const sequenceLabel = isFinalStrike
+                    ? "Final Strike"
+                    : `SEQ ${Number(hit?.sequenceIndex) || 1}${Number(hit?.sequenceHitCount || 1) > 1 ? ` Hit ${Number(hit?.hitInSequence) || 1}` : ""}`;
+                const effectState = getSimulationEffectsBeforeTime(passiveTimeline?.events, time);
+                events.push({
+                    kind: "basic-attack",
+                    time,
+                    order: -50 + ((Number(hit?.hit) || 0) / 1000),
+                    sourceOperatorId: Number(leaderId),
+                    loadoutState: leaderLoadout,
+                    weaponPassiveStateBefore,
+                    ...effectState,
+                    skillData: {
+                        id: `basic-attack-${Number(leaderId)}-${Number(hit?.sequenceIndex) || 1}-${Number(hit?.hitInSequence) || 1}`,
+                        operatorId: Number(leaderId),
+                        name: `${segmentAttack.operator || "Operator"} BATK ${sequenceLabel}${segment.form ? ` · ${segment.form.name}` : ""}`,
+                        type: isFinalStrike ? "Final Strike" : "Basic Attack",
+                        shortType: isFinalStrike ? "FS" : "BA",
+                        elementType: segmentAttack.elementType || "neutral",
+                        icon: segmentAttack.icon,
+                        iconSmall: segmentAttack.iconSmall,
+                        damageProfile: {
+                            atkMultiplier,
+                            flatDamage: 0,
+                            hitCount: 1,
+                            element: segmentAttack.elementType || "neutral",
+                            verified: true,
+                            sourceUrl: "",
+                            canCrit: true
+                        }
+                    },
+                    basicAttackHit: { ...hit, cycleStart, atkMultiplier, formKey: segment.form?.formKey || null }
+                });
+            });
+            }
+        });
+        return events;
+    }
+
     if (typeof originalLoadoutEnrichment !== "function") return;
 
     window.getSimulationSourceOperatorId = function getPassiveAwareSourceOperatorId(skillData) {
@@ -57,12 +153,18 @@
             Math.ceil(maxEventTime + 2),
             Math.ceil(cooldownEndTime + 1),
             Math.ceil(firstCycle + 1),
-            Number.isFinite(configuredDuration) && configuredDuration > 0 ? configuredDuration : 0
+            Number.isFinite(configuredDuration) && configuredDuration > 0 ? configuredDuration : 20
         );
-        const finalStrikeTimes = typeof getSimulationFinalStrikeTimes === "function"
-            ? getSimulationFinalStrikeTimes(attackData, duration)
-            : [];
         const leaderId = Array.isArray(selectedTeam) ? selectedTeam[0] : null;
+        const finalStrikeTimes = typeof getSimulationFinalStrikeTimes === "function"
+            ? getSimulationFinalStrikeTimes(
+                attackData,
+                duration,
+                typeof getBasicAttackFormSegments === "function"
+                    ? getBasicAttackFormSegments(leaderId, duration, window.__simulationOperatorFormIntervals || [])
+                    : null
+            )
+            : [];
         const passiveTimeline = enrichSimulationSkillEventsWithWeaponPassives(
             enrichedEvents,
             finalStrikeTimes,
@@ -81,9 +183,22 @@
         const damageEvents = typeof enrichSimulationSkillEventsWithDamageBreakdown === "function"
             ? enrichSimulationSkillEventsWithDamageBreakdown(passiveTimeline.events)
             : passiveTimeline.events;
+        const basicAttackDamageEvents = createSimulationBasicAttackDamageEvents(
+            attackData,
+            duration,
+            leaderId,
+            passiveTimeline,
+            typeof getBasicAttackFormSegments === "function"
+                ? getBasicAttackFormSegments(leaderId, duration, window.__simulationOperatorFormIntervals || [])
+                : null
+        );
+        if (typeof enrichSimulationSkillEventsWithDamageBreakdown === "function") {
+            enrichSimulationSkillEventsWithDamageBreakdown(basicAttackDamageEvents);
+        }
         window.__simulationDamageTimeline = typeof buildSimulationDamageTimeline === "function"
-            ? buildSimulationDamageTimeline(damageEvents)
+            ? buildSimulationDamageTimeline([...damageEvents, ...basicAttackDamageEvents])
             : [];
+        window.__simulationBasicAttackDamageEvents = basicAttackDamageEvents;
         return damageEvents;
     };
 

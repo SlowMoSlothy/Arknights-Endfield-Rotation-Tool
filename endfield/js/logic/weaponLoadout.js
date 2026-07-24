@@ -2,6 +2,8 @@ const OPERATOR_LOADOUT_STORAGE_KEY = "operatorLoadouts";
 const LEGACY_WEAPON_LOADOUT_STORAGE_KEY = "operatorWeaponLoadouts";
 const DEFAULT_WEAPON_POTENTIAL = 1;
 const MAX_WEAPON_POTENTIAL = 5;
+const DEFAULT_OPERATOR_POTENTIAL = 0;
+const MAX_OPERATOR_POTENTIAL = 5;
 const ESSENCE_CHANNEL_KEYS = ["primary", "secondary", "skill"];
 const LOADOUT_SLOT_KEYS = ["weapon", "gloves", "armor", "kit1", "kit2"];
 
@@ -25,6 +27,10 @@ function normalizeBoundedInteger(value, minimum, maximum, fallback = minimum) {
 
 function normalizeWeaponPotential(value) {
     return normalizeBoundedInteger(value, DEFAULT_WEAPON_POTENTIAL, MAX_WEAPON_POTENTIAL, DEFAULT_WEAPON_POTENTIAL);
+}
+
+function normalizeOperatorPotential(value) {
+    return normalizeBoundedInteger(value, DEFAULT_OPERATOR_POTENTIAL, MAX_OPERATOR_POTENTIAL, DEFAULT_OPERATOR_POTENTIAL);
 }
 
 function createEmptyEssenceAllocation() {
@@ -169,6 +175,11 @@ function getOperatorSimulationLoadoutStats(operatorId) {
     let agilityBonus = 0;
     let intellectBonus = 0;
     let willBonus = 0;
+    let hpPercentBonus = 0;
+    let flatHpBonus = 0;
+    let treatmentEffectPercent = 0;
+    let gearDefense = 0;
+    let artsIntensity = 0;
     const operatorBaseCritRatePercent = Number(
         operator.baseCritRatePercent ?? operator.baseCriticalRatePercent ?? operator.critRatePercent
     );
@@ -234,6 +245,21 @@ function getOperatorSimulationLoadoutStats(operatorId) {
             return;
         }
 
+        if (labelKey.includes("artsintensity")) {
+            artsIntensity += value;
+            return;
+        }
+
+        if (labelKey.includes("hp") && stat.isPercent) {
+            hpPercentBonus += value;
+            return;
+        }
+
+        if (labelKey.includes("treatment") || labelKey.includes("healing")) {
+            treatmentEffectPercent += value;
+            return;
+        }
+
         const elementKey = Object.keys(elementDamageBonuses).find(element => (
             labelKey.includes(element) && (labelKey.includes("damage") || labelKey.includes("dmg"))
         ));
@@ -281,6 +307,7 @@ function getOperatorSimulationLoadoutStats(operatorId) {
     const equippedGearItems = [equippedGloves, equippedArmor, equippedKit1, equippedKit2].filter(Boolean);
 
     equippedGearItems.forEach(gear => {
+        gearDefense += Number(gear.defValue) || 0;
         if (gear.setKey) {
             equippedSets[gear.setKey] = (equippedSets[gear.setKey] || 0) + 1;
         }
@@ -302,6 +329,8 @@ function getOperatorSimulationLoadoutStats(operatorId) {
                 allDamageBonusPercent += val;
             } else if (labelKey.includes("artsdmg") || labelKey.includes("artsdamage")) {
                 artsDamageBonusPercent += val;
+            } else if (labelKey.includes("artsintensity")) {
+                artsIntensity += val;
             } else if (labelKey.includes("strength")) {
                 strengthBonus += val;
             } else if (labelKey.includes("agility")) {
@@ -310,6 +339,10 @@ function getOperatorSimulationLoadoutStats(operatorId) {
                 intellectBonus += val;
             } else if (labelKey.includes("will")) {
                 willBonus += val;
+            } else if (labelKey.includes("hpbonus%") || labelKey.includes("maxhp%")) {
+                hpPercentBonus += val;
+            } else if (labelKey.includes("treatmenteffect") || labelKey.includes("healingeffect")) {
+                treatmentEffectPercent += val;
             } else if (labelKey.includes("mainattribute%")) {
                 mainAttributePercentBonus += val;
             } else {
@@ -349,6 +382,7 @@ function getOperatorSimulationLoadoutStats(operatorId) {
                     elementDamageBonuses.physical += 24;
                     break;
                 case "eternal_xiranite":
+                    flatHpBonus += 1000;
                     allDamageBonusPercent += 16;
                     break;
                 case "hot_work":
@@ -362,6 +396,7 @@ function getOperatorSimulationLoadoutStats(operatorId) {
                     artsDamageBonusPercent += 20;
                     break;
                 case "lynx":
+                    treatmentEffectPercent += 20;
                     break;
                 case "mi_security":
                     critRateBonusPercent += 10;
@@ -411,12 +446,25 @@ function getOperatorSimulationLoadoutStats(operatorId) {
         }
     });
 
+    // Operator-potential stat bonuses come from the Supabase operator payload.
+    const operatorPotential = normalizeOperatorPotential(loadout.operatorPotential);
+    (Array.isArray(operator.potentials) ? operator.potentials : []).forEach(potential => {
+        if (Number(potential?.level) > operatorPotential) return;
+        strengthBonus += Number(potential?.strength) || 0;
+        agilityBonus += Number(potential?.agility) || 0;
+        intellectBonus += Number(potential?.intellect) || 0;
+        willBonus += Number(potential?.will) || 0;
+        artsIntensity += Number(potential?.artsIntensity) || 0;
+    });
+
     // Calculate final attributes and ATK scaling
     const statsLevel90 = operator.stats?.level90 || {};
     let strength = (Number(statsLevel90.strength) || 0) + strengthBonus;
     let agility = (Number(statsLevel90.agility) || 0) + agilityBonus;
     let intellect = (Number(statsLevel90.intellect) || 0) + intellectBonus;
     let will = (Number(statsLevel90.will) || 0) + willBonus;
+    const baseMaxHp = Number(statsLevel90.hp ?? operator.maxHp ?? operator.baseHp) || 0;
+    const maxHp = Math.round((baseMaxHp + flatHpBonus) * (1 + hpPercentBonus / 100) * 10) / 10;
 
     // Apply Main Attribute % bonus from gear if present
     if (operatorMainAttribute && mainAttributePercentBonus > 0) {
@@ -492,6 +540,18 @@ function getOperatorSimulationLoadoutStats(operatorId) {
         attackBeforePercent,
         attributeBonus,
         totalAtk,
+        baseMaxHp,
+        hpPercentBonus,
+        flatHpBonus,
+        maxHp,
+        strength,
+        agility,
+        intellect,
+        will,
+        artsIntensity,
+        operatorLevel: 90,
+        treatmentEffectPercent,
+        defense: Math.round(gearDefense * 10) / 10,
         baseCritRatePercent,
         baseCritDamagePercent,
         critRateBonusPercent,
@@ -508,6 +568,7 @@ function getOperatorSimulationLoadoutStats(operatorId) {
         damageBonusVerified: passiveStaticBonuses.verified === true || activation?.profile?.verified === true || weapon.damageBonusVerified === true,
         damageBonusSourceUrl: passiveStaticBonuses.sourceUrl || activation?.profile?.sourceUrl || weapon.damageBonusSourceUrl || "",
         potential: activation?.potential || normalizeWeaponPotential(loadout.weapon?.potential),
+        operatorPotential,
         mainAttributeBonus,
         primary: activation?.primary || null,
         secondary: activation?.secondary || null,
@@ -667,6 +728,7 @@ function getCompatibleWeaponsForOperator(operatorOrId) {
 
 function createEmptyOperatorLoadout() {
     return {
+        operatorPotential: DEFAULT_OPERATOR_POTENTIAL,
         weapon: null,
         gloves: null,
         armor: null,
@@ -720,6 +782,7 @@ function normalizeOperatorLoadouts(value) {
         );
 
         normalized[String(operator.id)] = {
+            operatorPotential: normalizeOperatorPotential(rawLoadout?.operatorPotential),
             weapon: weapon || null,
             gloves: normalizeGearLoadoutEntry(rawLoadout?.gloves, "gloves"),
             armor: normalizeGearLoadoutEntry(rawLoadout?.armor, "armor"),
@@ -791,7 +854,10 @@ function setEquippedWeaponForOperator(operatorId, weaponKey) {
 
     const key = String(weaponKey || "").trim();
     if (!key) {
-        delete operatorLoadouts[String(operator.id)];
+        operatorLoadouts[String(operator.id)] = {
+            ...getOperatorLoadout(operator.id),
+            weapon: null
+        };
         saveOperatorLoadouts();
         return true;
     }
@@ -813,6 +879,18 @@ function setEquippedWeaponForOperator(operatorId, weaponKey) {
                 ? normalizeWeaponEssenceAllocation(current.weapon.essence, weapon, potential)
                 : createEmptyEssenceAllocation()
         }
+    };
+    saveOperatorLoadouts();
+    return true;
+}
+
+function setOperatorPotentialForOperator(operatorId, potential) {
+    if (!isWeaponLoadoutSimulationMode()) return false;
+    const operator = getWeaponLoadoutOperator(operatorId);
+    if (!operator) return false;
+    operatorLoadouts[String(operator.id)] = {
+        ...getOperatorLoadout(operator.id),
+        operatorPotential: normalizeOperatorPotential(potential)
     };
     saveOperatorLoadouts();
     return true;
@@ -1200,6 +1278,45 @@ function renderLoadoutWeaponList(operator) {
             attack.append(attackLabel, attackValue);
             meta.append(attack);
 
+            // Show Essence substats from the essence profile (primary + secondary)
+            const ep = weapon.essenceProfile;
+            if (ep) {
+                const operatorMainAttr = String(operator.mainAttribute || "").trim().toLowerCase();
+                const attrAbbr = {
+                    "strength": "STR", "intellect": "INT", "agility": "AGI",
+                    "will": "WIL", "main attribute": "MAIN", "attack": "ATK",
+                    "dmg": "DMG", "heat dmg": "HEAT", "cryo dmg": "CRYO",
+                    "electric dmg": "ELEC", "physical dmg": "PHYS",
+                    "crit rate": "CRIT", "hp": "HP", "arts": "ARTS"
+                };
+                const makeEssenceBadge = (label, values, isPercent) => {
+                    if (!label || !Array.isArray(values) || !values.length) return null;
+                    const badge = document.createElement("span");
+                    badge.className = "loadout-weapon-atk-badge";
+                    const badgeLabel = document.createElement("small");
+                    const labelKey = String(label).toLowerCase().replace(/\s*boost\s*/i, "").trim();
+                    badgeLabel.textContent = attrAbbr[labelKey] || label.substring(0, 4).toUpperCase();
+                    const badgeVal = document.createElement("strong");
+                    const maxVal = values[values.length - 1];
+                    badgeVal.textContent = isPercent ? `+${maxVal}%` : `+${maxVal}`;
+                    // Yellow highlight if label matches operator main attribute (like gear chips)
+                    const isMainMatch = operatorMainAttr && (
+                        labelKey === operatorMainAttr ||
+                        labelKey === "main attribute"
+                    );
+                    if (isMainMatch) {
+                        badge.style.borderColor = "rgba(248, 245, 70, 0.65)";
+                        badge.style.color = "#F8F546";
+                    }
+                    badge.append(badgeLabel, badgeVal);
+                    return badge;
+                };
+                const primBadge = makeEssenceBadge(ep.primaryLabel, ep.primaryValues, ep.primaryIsPercent);
+                if (primBadge) meta.append(primBadge);
+                const secBadge = makeEssenceBadge(ep.secondaryLabel, ep.secondaryValues, ep.secondaryIsPercent);
+                if (secBadge) meta.append(secBadge);
+            }
+
             copy.appendChild(title);
             copy.appendChild(stars);
             copy.appendChild(meta);
@@ -1394,6 +1511,36 @@ function createWeaponPotentialControl(operatorId, activation) {
         button.setAttribute("aria-pressed", String(potential === activation.potential));
         button.addEventListener("click", () => {
             if (!setWeaponPotentialForOperator(operatorId, potential)) return;
+            renderOperatorLoadoutModal();
+            refreshOperatorLoadoutSurfaces();
+        });
+        options.appendChild(button);
+    }
+    root.append(copy, options);
+    return root;
+}
+
+function createOperatorPotentialControl(operatorId) {
+    const current = getOperatorLoadout(operatorId).operatorPotential;
+    const root = document.createElement("div");
+    root.className = "loadout-potential-control";
+    const copy = document.createElement("div");
+    const label = document.createElement("strong");
+    label.textContent = "Operator Potential";
+    const hint = document.createElement("span");
+    hint.textContent = "Activates Potential rules loaded from Supabase.";
+    copy.append(label, hint);
+
+    const options = document.createElement("div");
+    options.className = "loadout-potential-options";
+    for (let potential = 0; potential <= MAX_OPERATOR_POTENTIAL; potential++) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = `P${potential}`;
+        button.classList.toggle("active", potential === current);
+        button.setAttribute("aria-pressed", String(potential === current));
+        button.addEventListener("click", () => {
+            if (!setOperatorPotentialForOperator(operatorId, potential)) return;
             renderOperatorLoadoutModal();
             refreshOperatorLoadoutSurfaces();
         });
@@ -1714,7 +1861,12 @@ function renderLoadoutWeaponDetails(operator) {
     stats.className = "loadout-detail-stats";
     appendLoadoutDetailRow(stats, "Level", Number.isFinite(Number(weapon.baseStatsLevel)) ? String(Number(weapon.baseStatsLevel)) : "-");
     appendLoadoutDetailRow(stats, "Main", weapon.mainAttribute || "-");
-    appendLoadoutDetailRow(stats, "Secondary", weapon.secondaryAttribute || "-");
+    const secAttrDisplay = weapon.secondaryAttribute
+        ? (weapon.secondaryValue != null
+            ? `${weapon.secondaryAttribute} ${weapon.secondaryIsPercent ? `+${weapon.secondaryValue}%` : `+${weapon.secondaryValue}`}`
+            : weapon.secondaryAttribute)
+        : "-";
+    appendLoadoutDetailRow(stats, "Secondary", secAttrDisplay);
     panel.appendChild(stats);
 
     if (weapon.passiveName) {
@@ -1742,6 +1894,7 @@ function renderLoadoutWeaponDetails(operator) {
     essenceHeading.appendChild(essenceLabel);
     essenceHeading.appendChild(essenceHint);
     essenceSection.appendChild(essenceHeading);
+    essenceSection.appendChild(createOperatorPotentialControl(operator.id));
 
     if (activation) {
         const essenceRanks = getWeaponEssenceRankSummary(activation);
