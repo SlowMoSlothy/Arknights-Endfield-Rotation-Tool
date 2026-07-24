@@ -48,6 +48,95 @@ function shouldConsumeDebuffFromEffectMap(skillData, value, effectMap) {
     return Number(effectMap?.[effectName] || 0) >= requiredStacks;
 }
 
+function getPhysicalStatusEffectKey(effect) {
+    return normalizeComboEffectKey(effect?.appliesEffect || effect?.effect || effect?.id || effect?.name);
+}
+
+function getPhysicalStatusStackCount(effectState, effectName) {
+    const key = normalizeComboEffectKey(effectName);
+    if (Array.isArray(effectState)) {
+        const effect = effectState.find(candidate => getPhysicalStatusEffectKey(candidate) === key);
+        return Math.max(0, Number(effect?.currentStacks ?? effect?.stackCount ?? effect?.stacks ?? 0) || 0);
+    }
+    return Math.max(0, Number(effectState?.[key] || 0));
+}
+
+function resolveSimulationPhysicalStatusSkill(skillData, effectState = {}) {
+    const config = skillData?.physicalStatusResolution;
+    if (!config || typeof config !== "object" || Array.isArray(config)) return skillData;
+
+    const vulnerableEffect = normalizeComboEffectKey(config.vulnerableEffect || "vulnerable");
+    const statusEffect = normalizeComboEffectKey(config.statusEffect);
+    if (!vulnerableEffect || !statusEffect) return skillData;
+
+    const vulnerableStacksBefore = getPhysicalStatusStackCount(effectState, vulnerableEffect);
+    const vulnerabilityMode = normalizeComboEffectKey(config.vulnerabilityMode || "consume");
+    const baseDebuffs = (Array.isArray(skillData.debuffs) ? skillData.debuffs : [])
+        .filter(effect => ![vulnerableEffect, statusEffect].includes(getPhysicalStatusEffectKey(effect)));
+    const baseConsumed = (Array.isArray(skillData.consumeDebuffs) ? skillData.consumeDebuffs : [])
+        .filter(effect => normalizeComboEffectKey(getConsumedDebuffEffectName(effect)) !== vulnerableEffect);
+    const application = config.vulnerableApplication || {};
+    const createVulnerableApplication = () => ({
+        id: vulnerableEffect,
+        name: application.name || "Vulnerable",
+        appliesEffect: vulnerableEffect,
+        persistsForCombo: true,
+        visible: application.visible !== false,
+        stackable: true,
+        stacksApplied: Math.max(1, Number(application.stacksApplied) || 1),
+        maxStacks: Math.max(1, Number(application.maxStacks) || 4),
+        iconBase: application.iconBase
+    });
+
+    if (vulnerableStacksBefore <= 0) {
+        return {
+            ...skillData,
+            consumeDebuffs: baseConsumed,
+            debuffs: [...baseDebuffs, createVulnerableApplication()],
+            physicalStatusState: { statusEffect, vulnerableEffect, vulnerableStacksBefore: 0, convertedToVulnerable: true }
+        };
+    }
+
+    const statusDefinition = config.statusApplication || {};
+    const statusApplication = {
+        id: statusEffect,
+        name: statusDefinition.name || config.statusName || statusEffect,
+        appliesEffect: statusEffect,
+        persistsForCombo: false,
+        visible: statusDefinition.visible !== false,
+        iconBase: statusDefinition.iconBase
+    };
+
+    if (vulnerabilityMode === "stack") {
+        return {
+            ...skillData,
+            consumeDebuffs: baseConsumed,
+            debuffs: [...baseDebuffs, statusApplication, createVulnerableApplication()],
+            physicalStatusState: {
+                statusEffect,
+                vulnerableEffect,
+                vulnerableStacksBefore,
+                addedStacks: Math.max(1, Number(application.stacksApplied) || 1),
+                consumedStacks: 0,
+                convertedToVulnerable: false
+            }
+        };
+    }
+
+    return {
+        ...skillData,
+        consumeDebuffs: [...baseConsumed, { effect: vulnerableEffect, minStacks: 1 }],
+        debuffs: [...baseDebuffs, statusApplication],
+        physicalStatusState: {
+            statusEffect,
+            vulnerableEffect,
+            vulnerableStacksBefore,
+            consumedStacks: config.consumeAllVulnerable === false ? 1 : vulnerableStacksBefore,
+            convertedToVulnerable: false
+        }
+    };
+}
+
 function addConsumedDebuffTriggersForSkill(skillData, effectMap, contextEffectMap = effectMap) {
     if (!Array.isArray(skillData?.consumeDebuffs)) return;
 
@@ -56,9 +145,11 @@ function addConsumedDebuffTriggersForSkill(skillData, effectMap, contextEffectMa
         if (!effectName || !shouldConsumeDebuffFromEffectMap(skillData, value, contextEffectMap)) return;
 
         const consumedEffectName = `${effectName}_consumed`;
-        if (Number(effectMap[consumedEffectName] || 0) <= 0) {
-            addAmountToEffectMap(effectMap, consumedEffectName, 1);
-        }
+        const consumedStacks = Math.max(1, Number(contextEffectMap?.[effectName] || 0));
+        effectMap[consumedEffectName] = Math.max(
+            Number(effectMap[consumedEffectName] || 0),
+            consumedStacks
+        );
     });
 }
 
@@ -71,11 +162,98 @@ function addTransientSkillTypeTriggers(skillData, effectMap) {
     if (type === "combo skill") addAmountToEffectMap(effectMap, "combo_skill", 1);
     if (type === "battle skill") addAmountToEffectMap(effectMap, "battle_skill", 1);
     if (type === "ultimate") addAmountToEffectMap(effectMap, "ultimate", 1);
+    if (type === "arts burst") addAmountToEffectMap(effectMap, "arts_burst", 1);
 }
 
 function normalizeComboEffectKey(value) {
     return String(value || "").trim().toLowerCase().replace(/\s+/g, "_");
 }
+
+function simulationActionRuleConditionMatches(condition, effectMap) {
+    if (typeof condition === "string") {
+        return Number(effectMap?.[normalizeComboEffectKey(condition)] || 0) >= 1;
+    }
+    if (!condition || typeof condition !== "object") return true;
+
+    if (Array.isArray(condition.anyOf)) {
+        return condition.anyOf.some(option => simulationActionRuleConditionMatches(option, effectMap));
+    }
+    if (Array.isArray(condition.allOf)) {
+        return condition.allOf.every(option => simulationActionRuleConditionMatches(option, effectMap));
+    }
+    if (Array.isArray(condition.noneOf)) {
+        return condition.noneOf.every(option => !simulationActionRuleConditionMatches(option, effectMap));
+    }
+
+    const effectName = normalizeComboEffectKey(
+        condition.effect || condition.buff || condition.debuff || condition.appliesEffect
+    );
+    if (!effectName) return true;
+    return Number(effectMap?.[effectName] || 0) >= Number(condition.minStacks || 1);
+}
+
+function resolveSimulationActionRules(rules, action, effectMap = {}) {
+    const nextEffectMap = { ...(effectMap || {}) };
+    const emittedEffects = {};
+    const matchedRules = [];
+    let actionOverride = null;
+
+    const orderedRules = (Array.isArray(rules) ? rules : [])
+        .filter(rule => rule && rule.enabled !== false)
+        .sort((left, right) => Number(left.priority || 0) - Number(right.priority || 0));
+
+    for (const rule of orderedRules) {
+        if (normalizeComboEffectKey(rule.actionType) !== normalizeComboEffectKey(action?.actionType)) continue;
+        if (!simulationActionRuleConditionMatches(rule.conditions, nextEffectMap)) continue;
+
+        matchedRules.push(rule);
+        (Array.isArray(rule.consumedEffects) ? rule.consumedEffects : []).forEach(value => {
+            const effectName = normalizeComboEffectKey(
+                typeof value === "string" ? value : value?.effect || value?.id || value?.name
+            );
+            if (!effectName) return;
+            const amount = Math.max(1, Number(typeof value === "object" ? value.amount || 1 : 1));
+            const remaining = Number(nextEffectMap[effectName] || 0) - amount;
+            if (remaining > 0) nextEffectMap[effectName] = remaining;
+            else delete nextEffectMap[effectName];
+        });
+
+        (Array.isArray(rule.emittedEffects) ? rule.emittedEffects : []).forEach(effect => {
+            const effectName = normalizeComboEffectKey(
+                typeof effect === "string" ? effect : effect?.effect || effect?.appliesEffect || effect?.id
+            );
+            if (!effectName) return;
+            const amount = Math.max(1, Number(typeof effect === "object" ? effect.amount || effect.stacksApplied || 1 : 1));
+            addAmountToEffectMap(emittedEffects, effectName, amount, effect?.maxStacks || null);
+            if (effect?.persistsForCombo === true) {
+                addAmountToEffectMap(nextEffectMap, effectName, amount, effect.maxStacks || null);
+            }
+        });
+
+        if (rule.actionOverride) actionOverride = normalizeComboEffectKey(rule.actionOverride);
+        if (rule.stopAfterMatch === true) break;
+    }
+
+    return { effectMap: nextEffectMap, emittedEffects, matchedRules, actionOverride };
+}
+
+function normalizeComboTriggerDefinitions(skillData) {
+    const configuredTriggers = skillData?.comboTriggers;
+
+    if (Array.isArray(configuredTriggers)) return configuredTriggers;
+    if (typeof configuredTriggers === "string" && configuredTriggers.trim()) {
+        return [{ effect: configuredTriggers.trim(), minStacks: 1 }];
+    }
+    if (configuredTriggers && typeof configuredTriggers === "object") {
+        return [configuredTriggers];
+    }
+    if (typeof skillData?.comboTrigger === "string" && skillData.comboTrigger.trim()) {
+        return [{ effect: skillData.comboTrigger.trim(), minStacks: 1 }];
+    }
+
+    return [];
+}
+
 function skillConsumesComboEffect(skillData, effectName) {
     const registryEntry = BUFF_REGISTRY?.[effectName];
     if (!registryEntry?.consumeOnSkillType) return false;
@@ -251,6 +429,10 @@ function applySkillEffectsToComboMap(
     includeTransientTriggers = false,
     contextEffectMap = effectMap
 ) {
+    if (typeof resolveSimulationAttributeVariant === "function") {
+        skillData = resolveSimulationAttributeVariant(skillData, skillData?.operatorId);
+    }
+    skillData = resolveSimulationPhysicalStatusSkill(skillData, contextEffectMap);
     const transientComboTriggerEffects = new Set([
         "final_strike",
         "combo_skill",
@@ -275,7 +457,7 @@ function applySkillEffectsToComboMap(
 
         const isTransientTrigger =
             includeTransientTriggers &&
-            transientComboTriggerEffects.has(effect.appliesEffect);
+            (effect.transientTrigger === true || transientComboTriggerEffects.has(effect.appliesEffect));
 
         if (effect.persistsForCombo === false && !isTransientTrigger) return;
 
@@ -339,6 +521,11 @@ function collectEffectsFromSkill(skillData, contextEffectMap = {}) {
     const effectMap = {};
     if (!skillData) return effectMap;
 
+    if (typeof resolveSimulationAttributeVariant === "function") {
+        skillData = resolveSimulationAttributeVariant(skillData, skillData?.operatorId);
+    }
+    skillData = resolveSimulationPhysicalStatusSkill(skillData, contextEffectMap);
+
     applySkillEffectsToComboMap(skillData, effectMap, false, true, contextEffectMap);
     addConsumedDebuffTriggersForSkill(skillData, effectMap, contextEffectMap);
     addTransientSkillTypeTriggers(skillData, effectMap);
@@ -380,12 +567,13 @@ function getComboSkillsFromEffects(effectMap, sourceOperatorId) {
     for (const op of activeOperators) {
         const isSameOperator = op.id === sourceOperatorId;
 
-        for (const skill of op.skills) {
+        for (const baseSkill of op.skills) {
+            const skill = typeof resolveSimulationAttributeVariant === "function"
+                ? resolveSimulationAttributeVariant(baseSkill, op.id)
+                : baseSkill;
             if (isSameOperator && !skill.allowSelfTrigger) continue;
 
-            const triggers = Array.isArray(skill.comboTriggers)
-                ? skill.comboTriggers
-                : (skill.comboTrigger ? [{ effect: skill.comboTrigger, minStacks: 1 }] : []);
+            const triggers = normalizeComboTriggerDefinitions(skill);
 
             if (triggers.length === 0) continue;
 

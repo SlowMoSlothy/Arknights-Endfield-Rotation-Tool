@@ -464,12 +464,23 @@
 
     .rotation-sim-labels,
     .rotation-sim-body {
-        grid-template-rows: 24px 104px 58px 122px 56px 60px;
+        --rotation-sim-row-ruler: 24px;
+        --rotation-sim-row-battle: 96px;
+        --rotation-sim-row-events: 96px;
+        --rotation-sim-row-sp: 58px;
+        --rotation-sim-row-atk: 84px;
+        --rotation-sim-row-damage: 92px;
+        --rotation-sim-row-buffs: 48px;
+        --rotation-sim-row-debuffs: 48px;
+        --rotation-sim-row-combo: 122px;
+        --rotation-sim-row-combo-cooldown: 56px;
+        --rotation-sim-row-batk: 60px;
+        grid-template-rows: 24px 96px 58px 48px 48px 122px 56px 60px;
         row-gap: 12px;
     }
 
     .rotation-sim-skill-track {
-        min-height: 104px;
+        min-height: 96px;
     }
 
     .rotation-sim-skill-track.is-combo-skill {

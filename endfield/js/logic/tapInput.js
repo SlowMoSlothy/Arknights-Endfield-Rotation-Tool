@@ -47,6 +47,20 @@ function canPlaceTapActionInSlot(action, slotEl) {
     return !lane || (lane === "skill" && getTapActionLane(action) === "skill");
 }
 
+function getTapSimulationActionLane(action) {
+    if (!action || action.actionType === BASIC_ATTACK_ACTION_TYPE) return "batk";
+    const skill = getSkillById(action.id);
+    if (!skill) return "battle";
+    return typeof getSimulationSkillLane === "function"
+        ? getSimulationSkillLane(skill)
+        : (String(skill.shortType || "").toLowerCase() === "cs" ? "combo" : "battle");
+}
+
+function canPlaceTapActionOnSimulationTrack(action, track) {
+    return action?.actionType !== BASIC_ATTACK_ACTION_TYPE
+        && track?.dataset?.skillLane === getTapSimulationActionLane(action);
+}
+
 function toggleMobileTooltip(skillEl) {
     const uid = skillEl.dataset.uid;
 
@@ -163,6 +177,8 @@ function handleTapInput(e) {
         return;
     }
 
+    if (rotationSkillEl) return;
+
     const skillEl = e.target.closest(".skill-small");
     if (skillEl) {
         e.preventDefault();
@@ -190,6 +206,21 @@ function handleTapInput(e) {
         closeSlotMenu();
         updateSelectedUI();
         updateSelectedSlotsUI();
+        return;
+    }
+
+    const simulationTrack = e.target.closest(".rotation-sim-skill-drop-track");
+    if (simulationTrack && selectedSkill) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!canPlaceTapActionOnSimulationTrack(selectedSkill, simulationTrack)) return;
+        if (typeof placeSkillOnSimulationTrack === "function"
+            && placeSkillOnSimulationTrack(selectedSkill.id, simulationTrack, e)) {
+            selectedSkill = null;
+            closeSlotMenu();
+            updateSelectedUI();
+            updateSelectedSlotsUI();
+        }
         return;
     }
 
@@ -292,6 +323,13 @@ function updateSelectedUI() {
         const action = getTapActionFromSkillElement(el);
         el.classList.toggle("selected", !!selectedSkill && getSelectedTapActionKey(selectedSkill) === getSelectedTapActionKey(action));
     });
+    const quickHint = document.querySelector(".rotation-quick-skills-heading span");
+    if (quickHint) {
+        const skill = selectedSkill?.id ? getSkillById(selectedSkill.id) : null;
+        quickHint.textContent = skill
+            ? `${skill.name}: click the ${getTapSimulationActionLane(selectedSkill)} lane`
+            : "Select a skill or drag it to the timeline";
+    }
 }
 
 function updateSelectedSlotsUI() {
@@ -299,6 +337,13 @@ function updateSelectedSlotsUI() {
         const canPlace = !!selectedSkill && canPlaceTapActionInSlot(selectedSkill, slot);
         slot.classList.toggle("tap-target", canPlace);
         slot.classList.toggle("tap-target-blocked", !!selectedSkill && !canPlace);
+    });
+    const simulationSelected = !!selectedSkill && uiSettings?.timelineMode === "simulation";
+    document.body.classList.toggle("simulation-tap-active", simulationSelected);
+    document.querySelectorAll(".rotation-sim-skill-drop-track").forEach(track => {
+        const canPlace = simulationSelected && canPlaceTapActionOnSimulationTrack(selectedSkill, track);
+        track.classList.toggle("is-tap-target", canPlace);
+        track.classList.toggle("is-invalid-tap-target", simulationSelected && !canPlace);
     });
 }
 

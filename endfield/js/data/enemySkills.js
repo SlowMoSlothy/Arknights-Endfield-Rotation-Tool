@@ -7,6 +7,32 @@ const enemies = [
     bossDummy
 ];
 
+const DEFAULT_ENEMY_COMBAT_PROFILE = Object.freeze({
+    defense: 100,
+    resistanceMultipliers: Object.freeze({
+        physical: 1,
+        heat: 1,
+        cryo: 1,
+        electric: 1,
+        nature: 1,
+        neutral: 1
+    }),
+    sourceLabel: "Endfield default enemy defense",
+    sourceUrl: "https://endfield.wiki.gg/wiki/Damage_calculation"
+});
+
+function getEnemyCombatProfile(enemy = getSelectedEnemy()) {
+    const configured = enemy?.combatProfile || {};
+    return {
+        ...DEFAULT_ENEMY_COMBAT_PROFILE,
+        ...configured,
+        resistanceMultipliers: {
+            ...DEFAULT_ENEMY_COMBAT_PROFILE.resistanceMultipliers,
+            ...(configured.resistanceMultipliers || {})
+        }
+    };
+}
+
 let selectedEnemyId = localStorage.getItem("selectedEnemyId") || "training_dummy";
 let enemySkillSourceSortable = null;
 
@@ -46,3 +72,5 @@ function getEnemyBySkillId(skillId) {
     }
     return null;
 }
+
+window.getEnemyCombatProfile = getEnemyCombatProfile;

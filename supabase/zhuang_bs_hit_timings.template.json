@@ -1,0 +1,67 @@
+{
+  "operator": "Zhuang",
+  "skill": "Mantra of Sundering",
+  "skillId": 902,
+  "measurement": {
+    "timeUnit": "seconds",
+    "timingMode": "absolute_from_skill_input",
+    "decimalSeparator": ".",
+    "recommendedPrecision": 3,
+    "sourceFps": null,
+    "notes": "Zeit 0.000 ist der Frame, in dem der Battle Skill ausgelöst wird. hitTimings enthält für jeden sichtbaren Thunder-Strike-Treffer den absoluten Zeitpunkt in Sekunden. duration ist der Zeitpunkt, an dem Zhuang wieder handeln kann."
+  },
+  "rules": {
+    "strikeCountSource": "active_sunderblades_after_creation",
+    "regularStrikeMultiplier": 1,
+    "finalStrikeMultiplier": 6,
+    "finalStrikeIndex": "last",
+    "ultimateOnlyFinalStrikeEffect": "electric_infliction"
+  },
+  "timingsByStrikeCount": {
+    "1": {
+      "duration": null,
+      "hitTimings": [null],
+      "notes": ""
+    },
+    "2": {
+      "duration": null,
+      "hitTimings": [null, null],
+      "notes": ""
+    },
+    "3": {
+      "duration": null,
+      "hitTimings": [null, null, null],
+      "notes": ""
+    },
+    "4": {
+      "duration": null,
+      "hitTimings": [null, null, null, null],
+      "notes": ""
+    },
+    "5": {
+      "duration": null,
+      "hitTimings": [null, null, null, null, null],
+      "notes": ""
+    },
+    "6": {
+      "duration": null,
+      "hitTimings": [null, null, null, null, null, null],
+      "notes": ""
+    },
+    "7": {
+      "duration": null,
+      "hitTimings": [null, null, null, null, null, null, null],
+      "notes": ""
+    },
+    "8": {
+      "duration": null,
+      "hitTimings": [null, null, null, null, null, null, null, null],
+      "notes": ""
+    },
+    "9": {
+      "duration": null,
+      "hitTimings": [null, null, null, null, null, null, null, null, null],
+      "notes": ""
+    }
+  }
+}

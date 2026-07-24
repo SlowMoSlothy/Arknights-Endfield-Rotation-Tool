@@ -391,6 +391,10 @@ async function initApp() {
             await hydrateDebuffRegistryFromSupabase();
         }
 
+        if (typeof hydrateInflictionMechanicsFromSupabase === "function") {
+            await hydrateInflictionMechanicsFromSupabase();
+        }
+
         if (typeof hydrateBuffRegistryFromSupabase === "function") {
             await hydrateBuffRegistryFromSupabase();
         }
@@ -403,12 +407,37 @@ async function initApp() {
             await hydrateEffectGroupsFromSupabase();
         }
 
+        if (typeof hydrateSimulationTriggerEventsFromSupabase === "function") {
+            await hydrateSimulationTriggerEventsFromSupabase();
+        }
+
+        if (typeof hydrateSimulationActionRulesFromSupabase === "function") {
+            await hydrateSimulationActionRulesFromSupabase();
+        }
+
+        if (typeof hydrateOperatorPassiveRulesFromSupabase === "function") {
+            await hydrateOperatorPassiveRulesFromSupabase();
+        }
+
+        if (typeof hydrateOperatorFormsFromSupabase === "function") {
+            await hydrateOperatorFormsFromSupabase();
+        }
+
+        if (typeof hydrateGearFromSupabase === "function") {
+            await hydrateGearFromSupabase();
+        }
+
         if (typeof hydrateOperatorsFromSupabase === "function") {
             await hydrateOperatorsFromSupabase();
         }
 
+        if (typeof hydrateEnemyCombatProfilesFromSupabase === "function") {
+            await hydrateEnemyCombatProfilesFromSupabase();
+        }
+
         loadOperatorUltimateStates();
         loadTeam();
+        if (typeof loadOperatorLoadouts === "function") loadOperatorLoadouts();
         loadRotation();
         const loadedSharedBuild = loadBuildShareCodeFromUrl();
         if (!loadedSharedBuild) {
@@ -419,6 +448,7 @@ async function initApp() {
         renderOperatorList();
 
         initUiSettings();
+        if (typeof initOperatorLoadoutModal === "function") initOperatorLoadoutModal();
         initEnemyPanel();
         initRotationSaveMenu();
         if (typeof initCommunityRotations === "function") initCommunityRotations();

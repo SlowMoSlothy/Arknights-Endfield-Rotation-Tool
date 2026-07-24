@@ -129,70 +129,21 @@ function getNextQingboMoveInSequence(op, currentSkill) {
     return getNextQingboMoveForSkill(op, currentSkill) || getFirstQingboMove(op);
 }
 
-function normalizeQingboMovesInRotation() {
-    if (!Array.isArray(rotation)) return false;
-
-    const expectedMoveByOperatorId = {};
-    let changed = false;
-    const useSimulationOrder = typeof isSimulationTimelineMode === "function" && isSimulationTimelineMode();
-    const rotationItems = rotation
-        .map((entry, index) => ({ entry, index }))
-        .filter(item => item.entry);
-
-    if (useSimulationOrder) {
-        rotationItems.sort((left, right) => {
-            const leftTime = typeof getRotationEntryTime === "function"
-                ? getRotationEntryTime(left.entry, left.index, 0)
-                : Number(left.entry?.time || 0);
-            const rightTime = typeof getRotationEntryTime === "function"
-                ? getRotationEntryTime(right.entry, right.index, 0)
-                : Number(right.entry?.time || 0);
-            return (leftTime - rightTime) || (left.index - right.index);
-        });
-    }
-
-    rotationItems.forEach(({ entry }) => {
-        if (!entry) return;
-
-        const skillData = typeof getSkillById === "function" ? getSkillById(entry.id) : null;
-        if (!isQingboTriplexMove(skillData)) return;
-
-        const op = typeof getOperatorBySkillId === "function" ? getOperatorBySkillId(entry.id) : null;
-        if (!op) return;
-
-        const expectedMove = expectedMoveByOperatorId[op.id] || getFirstQingboMove(op);
-        if (!expectedMove) return;
-
-        if (entry.id !== expectedMove.id) {
-            entry.id = expectedMove.id;
-            changed = true;
-        }
-
-        expectedMoveByOperatorId[op.id] = getNextQingboMoveInSequence(op, expectedMove) || expectedMove;
-    });
-
-    return changed;
-}
-
-function syncQingboMoveStateFromRotation() {
-    if (!Array.isArray(rotation)) return;
-
+function resolveQingboRotationMoveState(normalizeEntries = false) {
     const nextMoveByOperatorId = {};
-    const useSimulationOrder = typeof isSimulationTimelineMode === "function" && isSimulationTimelineMode();
+    const persistentEffectMap = {};
+    let changed = false;
+    if (!Array.isArray(rotation)) return { nextMoveByOperatorId, changed };
 
     if (typeof operators !== "undefined" && Array.isArray(operators)) {
         operators.forEach(op => {
-            const qingboMoves = getQingboMovesForOperator(op);
-            if (qingboMoves.length > 1) {
-                nextMoveByOperatorId[op.id] = qingboMoves[0].id;
-            }
+            const firstMove = getFirstQingboMove(op);
+            if (firstMove) nextMoveByOperatorId[op.id] = firstMove.id;
         });
     }
 
-    const rotationItems = rotation
-        .map((entry, index) => ({ entry, index }))
-        .filter(item => item.entry);
-
+    const useSimulationOrder = typeof isSimulationTimelineMode === "function" && isSimulationTimelineMode();
+    const rotationItems = rotation.map((entry, index) => ({ entry, index })).filter(item => item.entry);
     if (useSimulationOrder) {
         rotationItems.sort((left, right) => {
             const leftTime = typeof getRotationEntryTime === "function"
@@ -206,19 +157,56 @@ function syncQingboMoveStateFromRotation() {
     }
 
     rotationItems.forEach(({ entry }) => {
-        if (!entry) return;
-
-        const skillData = typeof getSkillById === "function" ? getSkillById(entry.id) : null;
-        if (!isQingboTriplexMove(skillData)) return;
-
-        const op = typeof getOperatorBySkillId === "function" ? getOperatorBySkillId(entry.id) : null;
+        let skillData = typeof getSkillById === "function" ? getSkillById(entry.id) : null;
+        if (!skillData) return;
+        const op = typeof getOperatorBySkillId === "function" ? getOperatorBySkillId(skillData.id) : null;
         if (!op) return;
 
-        const nextMove = getNextQingboMoveInSequence(op, skillData);
-        if (nextMove) {
-            nextMoveByOperatorId[op.id] = nextMove.id;
+        if (isQingboTriplexMove(skillData)) {
+            const expectedMove = getQingboMovesForOperator(op).find(move => move.id === nextMoveByOperatorId[op.id])
+                || getFirstQingboMove(op);
+            if (expectedMove && skillData.id !== expectedMove.id) {
+                if (normalizeEntries) {
+                    entry.id = expectedMove.id;
+                    changed = true;
+                }
+                skillData = expectedMove;
+            }
+
+            const requiredStacks = Number(skillData?.requiresConsumedVulnerableStacks);
+            const consumedEffect = normalizeComboEffectKey(
+                skillData?.requiredConsumedEffect || skillData?.physicalStatusResolution?.vulnerableEffect || "vulnerable"
+            );
+            const stacksBefore = Math.max(0, Number(persistentEffectMap[consumedEffect]) || 0);
+            const nextMoveNumber = Number.isFinite(requiredStacks) && requiredStacks > 0
+                ? (stacksBefore >= requiredStacks ? Number(skillData.nextQingboMove) : Number(skillData.fallbackQingboMove || 1))
+                : Number(skillData.nextQingboMove);
+            const nextMove = getQingboMoveByNumber(op, nextMoveNumber) || getFirstQingboMove(op);
+            if (nextMove) nextMoveByOperatorId[op.id] = nextMove.id;
+        }
+
+        if (typeof applySkillEffectsToComboMap === "function") {
+            applySkillEffectsToComboMap(skillData, persistentEffectMap, true, false, persistentEffectMap);
+        }
+        if (typeof consumeStackedComboEffectsForSkill === "function") {
+            consumeStackedComboEffectsForSkill(skillData, persistentEffectMap, persistentEffectMap);
+        }
+
+        if (!isQingboTriplexMove(skillData) && Number.isFinite(Number(skillData.nextQingboMove))) {
+            const shortcutMove = getQingboMoveByNumber(op, Number(skillData.nextQingboMove));
+            if (shortcutMove) nextMoveByOperatorId[op.id] = shortcutMove.id;
         }
     });
+
+    return { nextMoveByOperatorId, changed };
+}
+
+function normalizeQingboMovesInRotation() {
+    return resolveQingboRotationMoveState(true).changed;
+}
+
+function syncQingboMoveStateFromRotation() {
+    const { nextMoveByOperatorId } = resolveQingboRotationMoveState(false);
 
     Object.entries(nextMoveByOperatorId).forEach(([operatorId, skillId]) => {
         qingboSkillMoveState[operatorId] = skillId;
@@ -483,6 +471,92 @@ function createAddOperatorCard(index) {
     return button;
 }
 
+function getWeaponLoadoutSummary(weapon) {
+    if (!weapon) return "No weapon equipped";
+
+    const details = [];
+    const level = Number(weapon.baseStatsLevel);
+    const attack = Number(weapon.baseAtk);
+    if (Number.isFinite(level)) details.push(`Lv. ${level}`);
+    if (Number.isFinite(attack)) details.push(`${attack} ATK`);
+    if (weapon.passiveName) details.push(weapon.passiveName);
+    return details.join(" / ") || "Equipped";
+}
+
+function createWeaponLoadoutControl(op) {
+    const control = document.createElement("div");
+    control.className = "operator-weapon-loadout";
+
+    const icon = document.createElement("span");
+    icon.className = "operator-weapon-loadout-icon";
+    icon.setAttribute("aria-hidden", "true");
+    icon.innerHTML = `
+        <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M14.5 4.5l5 5"></path>
+            <path d="M13 6l5 5L9 20H4v-5z"></path>
+            <path d="M11 8l5 5"></path>
+        </svg>
+    `;
+
+    const label = document.createElement("label");
+    label.className = "operator-weapon-loadout-label";
+    label.textContent = "Weapon";
+
+    const select = document.createElement("select");
+    select.className = "operator-weapon-loadout-select";
+    select.setAttribute("aria-label", `Equip weapon for ${op.name}`);
+
+    const emptyOption = document.createElement("option");
+    emptyOption.value = "";
+    emptyOption.textContent = "No weapon";
+    select.appendChild(emptyOption);
+
+    const compatibleWeapons = typeof getCompatibleWeaponsForOperator === "function"
+        ? getCompatibleWeaponsForOperator(op)
+        : [];
+    compatibleWeapons.forEach(weapon => {
+        const option = document.createElement("option");
+        option.value = String(weapon.key);
+        option.textContent = `${weapon.name} (${Number(weapon.rarity) || "?"}-star)`;
+        select.appendChild(option);
+    });
+
+    const equippedKey = typeof getEquippedWeaponKey === "function"
+        ? getEquippedWeaponKey(op.id)
+        : null;
+    select.value = equippedKey || "";
+    select.disabled = compatibleWeapons.length === 0;
+
+    const summary = document.createElement("div");
+    summary.className = "operator-weapon-loadout-summary";
+    const updateSummary = () => {
+        const weapon = typeof getWeaponByKey === "function" ? getWeaponByKey(select.value) : null;
+        summary.textContent = compatibleWeapons.length === 0
+            ? "No compatible weapons"
+            : getWeaponLoadoutSummary(weapon);
+        control.classList.toggle("equipped", Boolean(weapon));
+        select.title = weapon
+            ? `${weapon.name}: ${getWeaponLoadoutSummary(weapon)}`
+            : summary.textContent;
+    };
+    updateSummary();
+
+    select.addEventListener("click", event => event.stopPropagation());
+    select.addEventListener("change", event => {
+        event.stopPropagation();
+        if (typeof setEquippedWeaponForOperator === "function") {
+            setEquippedWeaponForOperator(op.id, select.value);
+        }
+        updateSummary();
+    });
+
+    label.appendChild(select);
+    control.appendChild(icon);
+    control.appendChild(label);
+    control.appendChild(summary);
+    return control;
+}
+
 function renderSkills() {
     const list = document.getElementById("skillList");
     if (!list) return;
@@ -553,10 +627,141 @@ function renderSkills() {
         opRow.appendChild(swapBtn);
         card.appendChild(opRow);
         operatorWrapper.appendChild(card);
+        if (uiSettings?.timelineMode === "simulation") {
+            operatorWrapper.appendChild(createWeaponLoadoutControl(op));
+        }
         operatorWrapper.appendChild(skillRow);
         wrapper.appendChild(operatorWrapper);
     });
     list.appendChild(wrapper);
+    renderRotationQuickSkills();
+}
+
+function createQuickSkillSource(skill, operator) {
+    const item = document.createElement("div");
+    item.className = "skill skill-small rotation-quick-skill";
+    item.dataset.id = String(skill.id);
+    item.dataset.largeIcon = skill.icon;
+    const skillData = { ...skill, operator: operator.name };
+    if (typeof getSimulationSkillLane === "function") {
+        item.dataset.skillLane = getSimulationSkillLane(skillData);
+    }
+    item.appendChild(createSkillIcon(skillData, { size: "small", useSmallIcon: true }));
+    attachSkillTooltipEvents(item, skillData);
+    return item;
+}
+
+let rotationQuickSkillsCollapsed = false;
+
+function createQuickSkillsToggle() {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "rotation-quick-skills-toggle";
+    button.innerHTML = `
+        <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+            <path d="M4 12.5 10 6.5l6 6"></path>
+        </svg>`;
+
+    const sync = () => {
+        button.setAttribute("aria-expanded", String(!rotationQuickSkillsCollapsed));
+        button.setAttribute("aria-label", rotationQuickSkillsCollapsed ? "Expand quick skills" : "Collapse quick skills");
+        button.title = rotationQuickSkillsCollapsed ? "Expand quick skills" : "Collapse quick skills";
+    };
+    sync();
+    button.addEventListener("click", () => {
+        rotationQuickSkillsCollapsed = !rotationQuickSkillsCollapsed;
+        if (typeof uiSettings !== "undefined") {
+            uiSettings.simulationQuickSkillsCollapsed = rotationQuickSkillsCollapsed;
+            if (typeof saveUiSettings === "function") saveUiSettings();
+        }
+        const dock = button.closest(".rotation-quick-skills");
+        dock?.classList.toggle("is-collapsed", rotationQuickSkillsCollapsed);
+        const content = dock?.querySelector(".rotation-quick-skills-content");
+        if (content) content.hidden = rotationQuickSkillsCollapsed;
+        sync();
+        window.scheduleSimulationFocusStickyOffsets?.();
+    });
+    return button;
+}
+
+function renderRotationQuickSkills() {
+    const dock = document.getElementById("rotationQuickSkills");
+    if (!dock) return;
+    dock.replaceChildren();
+    const isSimulation = uiSettings?.timelineMode === "simulation";
+    rotationQuickSkillsCollapsed = Boolean(uiSettings?.simulationQuickSkillsCollapsed);
+    dock.hidden = !isSimulation;
+    if (!isSimulation) return;
+
+    const heading = document.createElement("div");
+    heading.className = "rotation-quick-skills-heading";
+    const title = document.createElement("strong");
+    title.textContent = "Quick Skills";
+    const hint = document.createElement("span");
+    hint.textContent = "Drag directly to the timeline";
+    heading.append(title, hint);
+
+    const content = document.createElement("div");
+    content.className = "rotation-quick-skills-content";
+    content.hidden = rotationQuickSkillsCollapsed;
+
+    const eventGroups = document.createElement("div");
+    eventGroups.className = "rotation-quick-skills-events";
+
+    const groups = document.createElement("div");
+    groups.className = "rotation-quick-skills-groups";
+
+    if (Array.isArray(simulationTriggerEvents) && simulationTriggerEvents.length > 0) {
+        const eventGroup = document.createElement("div");
+        eventGroup.className = "rotation-quick-skill-group is-combat-events";
+        const eventName = document.createElement("span");
+        eventName.className = "rotation-quick-skill-name";
+        eventName.textContent = "Combat Events";
+        const eventRow = document.createElement("div");
+        eventRow.className = "skill-row rotation-quick-skill-row";
+        const eventSource = { name: "Combat Event" };
+        simulationTriggerEvents.forEach(eventData => {
+            eventRow.appendChild(createQuickSkillSource(eventData, eventSource));
+        });
+        eventGroup.append(eventName, eventRow);
+        eventGroups.appendChild(eventGroup);
+    }
+
+    selectedTeam.forEach(operatorId => {
+        const operator = operators.find(candidate => candidate.id === operatorId);
+        if (!operator) return;
+        const skills = getDisplaySkillsForOperator(operator)
+            .map(entry => entry.skill)
+            .filter(skill => !isFinalStrikeSkillForPanel(skill));
+        if (!skills.length) return;
+
+        const group = document.createElement("div");
+        group.className = "rotation-quick-skill-group";
+        const name = document.createElement("span");
+        name.className = "rotation-quick-skill-name";
+        name.textContent = operator.name;
+        const row = document.createElement("div");
+        row.className = "skill-row rotation-quick-skill-row";
+        skills.forEach(skill => row.appendChild(createQuickSkillSource(skill, operator)));
+        group.append(name, row);
+        groups.appendChild(group);
+    });
+
+    if (!groups.childElementCount && !eventGroups.childElementCount) {
+        dock.hidden = true;
+        return;
+    }
+    if (eventGroups.childElementCount) content.appendChild(eventGroups);
+    if (groups.childElementCount) content.appendChild(groups);
+    groups.addEventListener("wheel", event => {
+        if (groups.scrollWidth <= groups.clientWidth || Math.abs(event.deltaX) >= Math.abs(event.deltaY)) return;
+        event.preventDefault();
+        groups.scrollLeft += event.deltaY;
+    }, { passive: false });
+    const toggle = createQuickSkillsToggle();
+    dock.classList.toggle("is-collapsed", rotationQuickSkillsCollapsed);
+    dock.append(heading, content, toggle);
+    window.scheduleSimulationFocusStickyOffsets?.();
 }
 
 function isFinalStrikeSkillForPanel(skill) {
@@ -572,6 +777,10 @@ function getSkillById(id) {
     }
     const enemySkill = getEnemySkillById(id);
     if (enemySkill) return enemySkill;
+    const simulationEvent = Array.isArray(simulationTriggerEvents)
+        ? simulationTriggerEvents.find(eventData => Number(eventData.id) === Number(id))
+        : null;
+    if (simulationEvent) return { ...simulationEvent, operator: "Combat Event" };
     return null;
 }
 

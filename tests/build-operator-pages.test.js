@@ -9,6 +9,7 @@ import {
   createIndexPage,
   createOperatorPage,
   fetchSkillsForOperators,
+  getBasicAttackTimeline,
   normalizeAssetPath,
   validateOperators,
   writeGeneratedOutput
@@ -43,6 +44,7 @@ function operator(overrides = {}) {
     base_agility: 11,
     base_intellect: 15,
     base_will: 14,
+    raw_data: {},
     sort_order: 1,
     ...overrides
   };
@@ -156,7 +158,19 @@ test("generated pages use placeholders when an operator image is missing", () =>
 });
 
 test("operator pages render the compact rotation overview without redundant fields", () => {
-  const entry = operator();
+  const entry = operator({
+    raw_data: {
+      basicAttack: {
+        name: "Measured Combo",
+        cycleDuration: 2.5,
+        sequences: [
+          { sequenceIndex: 1, duration: 0.75 },
+          { sequenceIndex: 2, duration: 1.25 },
+          { sequenceIndex: 3, kind: "final_strike", duration: 0.5 }
+        ]
+      }
+    }
+  });
   const skills = new Map([
     [
       entry.id,
@@ -248,6 +262,14 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.doesNotMatch(page, /class="subtitle"/);
   assert.match(page, /class="section-nav"/);
   assert.match(page, /href="#rotation-profile">Overview/);
+  assert.match(page, /href="#batk">BATK/);
+  assert.match(page, /id="batk"/);
+  assert.match(page, /<h2>Measured Combo<\/h2>/);
+  assert.match(page, /<span>Total duration<\/span><strong>2\.5s<\/strong>/);
+  assert.match(page, /SEQ 1: 0\.75s/);
+  assert.match(page, /SEQ 2: 1\.25s/);
+  assert.match(page, /FS: 0\.5s/);
+  assert.match(page, /--segment-duration:0\.75/);
   assert.match(page, /href="#related">Related/);
   assert.match(page, /id="related"/);
   assert.match(page, /class="related-avatar-frame"/);
@@ -266,6 +288,29 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.doesNotMatch(page, /<section class="meta-strip">/);
   assert.doesNotMatch(page, /<span class="stat-label">Ultimate<\/span>/);
   assert.doesNotMatch(page, /-webkit-line-clamp/);
+});
+
+test("BATK timing falls back to summed sequence durations and supports missing data", () => {
+  const timeline = getBasicAttackTimeline(operator({
+    raw_data: {
+      basicAttack: {
+        sequences: [
+          { label: "A1", durationSeconds: 0.4 },
+          { label: "A2", durationSeconds: 0.6 }
+        ]
+      }
+    }
+  }));
+
+  assert.equal(timeline.totalDuration, 1);
+  assert.deepEqual(timeline.sequences, [
+    { label: "A1", duration: 0.4 },
+    { label: "A2", duration: 0.6 }
+  ]);
+
+  const page = createOperatorPage(operator(), [operator()], new Map());
+  assert.match(page, /id="batk"/);
+  assert.match(page, /No Basic Attack sequence timing is available/);
 });
 
 test("writeGeneratedOutput replaces output and sitemap without leaving temporary files", () => {

@@ -23,7 +23,8 @@ function cleanupDragArtifacts() {
         "drag-in-progress",
         "simulation-drop-active",
         "simulation-drop-lane-battle",
-        "simulation-drop-lane-combo"
+        "simulation-drop-lane-combo",
+        "simulation-drop-lane-event"
     );
     currentSimulationDropLane = null;
 }
@@ -32,7 +33,7 @@ let currentSimulationDropLane = null;
 
 function getDraggedSimulationLane(item) {
     const existingLane = item?.dataset?.skillLane;
-    if (existingLane === "battle" || existingLane === "combo") return existingLane;
+    if (existingLane === "battle" || existingLane === "combo" || existingLane === "event") return existingLane;
 
     const skillId = parseInt(item?.dataset?.id, 10);
     const skillData = Number.isNaN(skillId) ? null : getSkillById(skillId);
@@ -53,6 +54,7 @@ function beginDrag(item) {
     document.body.classList.add("drag-in-progress", "simulation-drop-active");
     document.body.classList.toggle("simulation-drop-lane-battle", currentSimulationDropLane === "battle");
     document.body.classList.toggle("simulation-drop-lane-combo", currentSimulationDropLane === "combo");
+    document.body.classList.toggle("simulation-drop-lane-event", currentSimulationDropLane === "event");
     addSimulationDropGuideListeners();
 }
 
@@ -281,6 +283,39 @@ function canDropOnSimulationTrack(track, item = null) {
     return targetTrack?.dataset?.skillLane === dropLane;
 }
 
+function placeSkillOnSimulationTrack(skillId, simulationTrack, event) {
+    const draggedId = parseInt(skillId, 10);
+    if (!draggedId || !simulationTrack) return false;
+
+    const originalSkill = getSkillById(draggedId);
+    if (!originalSkill) return false;
+    let finalSkillId = draggedId;
+    if (!originalSkill.togglesUltimateState) {
+        finalSkillId = getMappedSkillIdForOperatorState(draggedId);
+    }
+
+    const time = getSimulationDropTime(simulationTrack, event);
+    rotation.push({
+        uid: crypto.randomUUID(),
+        id: finalSkillId,
+        time
+    });
+    const newIndex = rotation.length - 1;
+    if (typeof getSnappedSimulationEntryTime === "function") {
+        rotation[newIndex].time = getSnappedSimulationEntryTime(newIndex, time);
+    }
+    handleUltimateStateToggle(draggedId);
+    compactRotation();
+    if (typeof normalizeQingboMovesInRotation === "function") {
+        normalizeQingboMovesInRotation();
+    }
+    saveRotation();
+    if (typeof refreshSkillsAfterRotationChange === "function") {
+        refreshSkillsAfterRotationChange();
+    }
+    return true;
+}
+
 function addSimulationDropGuideListeners() {
     removeSimulationDropGuideListeners();
     document.addEventListener("pointermove", updateSimulationDropGuideFromEvent, true);
@@ -328,7 +363,7 @@ function initSkillDragDrop() {
 
     cleanupDragArtifacts();
 
-    document.querySelectorAll("#skillList .skill-row").forEach(row => {
+    document.querySelectorAll("#skillList .skill-row, #rotationQuickSkills .skill-row").forEach(row => {
         skillSourceSortables.push(createSourceSortable(row));
     });
 }
@@ -397,33 +432,7 @@ function initRotationDragDrop() {
                     const draggedId = parseInt(evt.item.dataset.id, 10);
                     evt.item.remove();
                     if (!draggedId) return;
-
-                    const originalSkill = getSkillById(draggedId);
-                    let finalSkillId = draggedId;
-                    if (!originalSkill?.togglesUltimateState) {
-                        finalSkillId = getMappedSkillIdForOperatorState(draggedId);
-                    }
-
-                    const time = getSimulationDropTime(simulationTrack, evt.originalEvent);
-
-                    rotation.push({
-                        uid: crypto.randomUUID(),
-                        id: finalSkillId,
-                        time
-                    });
-                    const newIndex = rotation.length - 1;
-                    if (typeof getSnappedSimulationEntryTime === "function") {
-                        rotation[newIndex].time = getSnappedSimulationEntryTime(newIndex, time);
-                    }
-                    handleUltimateStateToggle(draggedId);
-                    compactRotation();
-                    if (typeof normalizeQingboMovesInRotation === "function") {
-                        normalizeQingboMovesInRotation();
-                    }
-                    saveRotation();
-                    if (typeof refreshSkillsAfterRotationChange === "function") {
-                        refreshSkillsAfterRotationChange();
-                    }
+                    placeSkillOnSimulationTrack(draggedId, simulationTrack, evt.originalEvent);
                 }
             });
             slotSortables.push(sortable);

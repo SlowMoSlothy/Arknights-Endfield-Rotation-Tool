@@ -73,7 +73,37 @@ const BUFF_REGISTRY = {
         maxStacks: 0,
         extension: "png",
         consumeOnSkillType: "final_strike",
-        consumeStacks: 1
+        consumeStacks: 1,
+        onConsume: {
+            replacesSkillDamage: true,
+            id: "last_rite_mirage",
+            name: "Last Rite's Mirage",
+            operatorId: 20,
+            type: "Triggered Effect",
+            shortType: "PROC",
+            elementType: "cryo",
+            icon: "assets/operators/avatars/Last_Rite.png",
+            iconSmall: "assets/operators/skills/lastrite/bs_small.png",
+            damageProfile: {
+                atkMultiplier: 1.42,
+                flatDamage: 0,
+                hitCount: 1,
+                element: "cryo",
+                verified: true,
+                sourceUrl: "https://endfield.wiki.gg/wiki/Last_Rite",
+                canCrit: true
+            },
+            debuffs: [{
+                id: "cryo_infliction",
+                name: "Cryo Infliction",
+                appliesEffect: "cryo_infliction",
+                persistsForCombo: true,
+                visible: true,
+                stackable: true,
+                stacksApplied: 1,
+                maxStacks: 4
+            }]
+        }
     }
     ,
     shield: {
@@ -102,7 +132,13 @@ const BUFF_REGISTRY = {
         iconBase: "assets/buffs/rossi/crit_buff",
         stackable: false,
         maxStacks: 0,
-        extension: "png"
+        extension: "png",
+        critRatePercent: 15,
+        critDamagePercent: 30,
+        durationSeconds: 15,
+        target: "self",
+        verified: true,
+        sourceUrl: "https://endfield.wiki.gg/wiki/Rossi"
     }
 };
 

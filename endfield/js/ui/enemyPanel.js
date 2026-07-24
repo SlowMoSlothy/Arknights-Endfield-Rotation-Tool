@@ -15,6 +15,30 @@ function getEnemyType(enemy) {
     return enemy.enemyType || enemy.elementType || "neutral";
 }
 
+function getEnemyCombatMeta(enemy) {
+    if (typeof getEnemyCombatProfile !== "function") return "";
+    const profile = getEnemyCombatProfile(enemy);
+    const resistanceSummary = Object.entries(profile.resistanceMultipliers || {})
+        .filter(([element, multiplier]) => element !== "neutral" && Number(multiplier) !== 1)
+        .map(([element, multiplier]) => `${element.toUpperCase()} ${Math.round(Number(multiplier) * 100)}%`)
+        .join(" / ");
+    return `DEF ${profile.defense} / ${resistanceSummary || "Neutral resistance"} / ${profile.verified ? "Verified" : "Unverified"}`;
+}
+
+function renderEnemySelectionControl() {
+    const button = document.getElementById("selectEnemyBtn");
+    const name = document.getElementById("selectedEnemyName");
+    const meta = document.getElementById("selectedEnemyMeta");
+    const enemy = getSelectedEnemy();
+    if (!button || !enemy) return;
+
+    button.classList.remove("enemy-rank-normal", "enemy-rank-elite", "enemy-rank-boss");
+    button.classList.add(`enemy-rank-${getEnemyRank(enemy)}`);
+    if (name) name.textContent = enemy.name;
+    if (meta) meta.textContent = getEnemyCombatMeta(enemy).replace(/ \/ (Verified|Unverified)$/, "");
+    button.setAttribute("aria-label", `Choose enemy. Current profile: ${enemy.name}`);
+}
+
 function collectEnemyEffects() {
     const effectMap = new Map();
 
@@ -69,6 +93,7 @@ function renderEnemyEffects() {
 }
 
 function renderEnemySkillBar() {
+    renderEnemySelectionControl();
     if (!isEnemyPanelEnabled()) return;
 
     const container = document.getElementById("enemySkillBar");
@@ -85,7 +110,7 @@ function renderEnemySkillBar() {
         <img class="enemy-card-icon" src="${enemy.icon}" alt="${enemy.name}">
         <div class="enemy-card-info">
             <div class="enemy-card-name">${enemy.name}</div>
-            <div class="enemy-card-meta">${getEnemyRank(enemy).toUpperCase()} · ${getEnemyType(enemy).toUpperCase()}</div>
+            <div class="enemy-card-meta">${getEnemyRank(enemy).toUpperCase()} / ${getEnemyType(enemy).toUpperCase()} / ${getEnemyCombatMeta(enemy)}</div>
         </div>
     `;
     container.appendChild(header);
@@ -132,7 +157,7 @@ function renderEnemyModal() {
             <img class="enemy-select-icon" src="${enemy.icon}" alt="${enemy.name}">
             <div class="enemy-select-text">
                 <div class="settings-option-title">${enemy.name}</div>
-                <div class="enemy-select-meta">${getEnemyRank(enemy).toUpperCase()} · ${getEnemyType(enemy).toUpperCase()}</div>
+                <div class="enemy-select-meta">${getEnemyRank(enemy).toUpperCase()} / ${getEnemyType(enemy).toUpperCase()} / ${getEnemyCombatMeta(enemy)}</div>
                 <div style="font-size:12px;opacity:.8;">${enemy.description || ""}</div>
             </div>
         `;
@@ -140,7 +165,9 @@ function renderEnemyModal() {
         btn.addEventListener("click", () => {
             setSelectedEnemy(enemy.id);
             closeEnemyModal();
+            renderEnemySelectionControl();
             renderEnemySkillBar();
+            if (typeof renderRotation === "function") renderRotation();
         });
 
         list.appendChild(btn);
@@ -181,9 +208,9 @@ function applyEnemyPanelVisibility() {
 }
 
 function initEnemyPanel() {
-    if (!applyEnemyPanelVisibility()) return;
-
+    applyEnemyPanelVisibility();
     document.getElementById("selectEnemyBtn")?.addEventListener("click", openEnemyModal);
     document.getElementById("closeEnemyModalBtn")?.addEventListener("click", closeEnemyModal);
+    renderEnemySelectionControl();
     renderEnemySkillBar();
 }

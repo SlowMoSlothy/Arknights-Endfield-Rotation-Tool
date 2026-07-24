@@ -2,20 +2,43 @@ const BUILD_SHARE_CODE_PREFIX_V1 = "AERT1:";
 const BUILD_SHARE_CODE_PREFIX_V2 = "AERT2:";
 const BUILD_SHARE_CODE_PREFIX_V3 = "AERT3:";
 const BUILD_SHARE_CODE_PREFIX_V4 = "AERT4:";
-const BUILD_SHARE_CODE_PREFIX = "AERT5:";
+const BUILD_SHARE_CODE_PREFIX_V5 = "AERT5:";
+const BUILD_SHARE_CODE_PREFIX_V6 = "AERT6:";
+const BUILD_SHARE_CODE_PREFIX_V7 = "AERT7:";
+const BUILD_SHARE_CODE_PREFIX_V8 = "AERT8:";
+const BUILD_SHARE_CODE_PREFIX_V9 = "AERT9:";
+const BUILD_SHARE_CODE_PREFIX_V10 = "AERT10:";
+const BUILD_SHARE_CODE_PREFIX_V11 = "AERT11:";
+const BUILD_SHARE_CODE_PREFIX_V12 = "AERT12:";
+const BUILD_SHARE_CODE_PREFIX = "AERT13:";
 const BUILD_SHARE_HASH_KEY = "setup";
 const BUILD_SHARE_UI_FLAG_SIMULATION_MODE = 1;
 const BUILD_SHARE_UI_FLAG_HAS_SP_PER_SECOND = 2;
 const BUILD_SHARE_UI_FLAG_HAS_SIMULATION_DURATION = 4;
+const BUILD_SHARE_UI_FLAG_DAMAGE_MODE_NORMAL = 8;
+const BUILD_SHARE_UI_FLAG_DAMAGE_MODE_CRITICAL = 16;
 const BUILD_SHARE_UI_FLAG_MASK = BUILD_SHARE_UI_FLAG_SIMULATION_MODE
     | BUILD_SHARE_UI_FLAG_HAS_SP_PER_SECOND
     | BUILD_SHARE_UI_FLAG_HAS_SIMULATION_DURATION;
+const BUILD_SHARE_UI_FLAG_MASK_V10 = BUILD_SHARE_UI_FLAG_MASK
+    | BUILD_SHARE_UI_FLAG_DAMAGE_MODE_NORMAL
+    | BUILD_SHARE_UI_FLAG_DAMAGE_MODE_CRITICAL;
 const BUILD_SHARE_MAX_ROTATION_ENTRIES = 240;
-const BUILD_PERSISTENCE_PAYLOAD_VERSION = 5;
+const BUILD_SHARE_MAX_WEAPON_LOADOUTS = 4;
+const BUILD_SHARE_MAX_WEAPON_KEY_LENGTH = 120;
+const BUILD_PERSISTENCE_PAYLOAD_VERSION = 13;
 
 function hasKnownBuildShareCodePrefix(value) {
     return [
         BUILD_SHARE_CODE_PREFIX,
+        BUILD_SHARE_CODE_PREFIX_V12,
+        BUILD_SHARE_CODE_PREFIX_V11,
+        BUILD_SHARE_CODE_PREFIX_V10,
+        BUILD_SHARE_CODE_PREFIX_V9,
+        BUILD_SHARE_CODE_PREFIX_V8,
+        BUILD_SHARE_CODE_PREFIX_V7,
+        BUILD_SHARE_CODE_PREFIX_V6,
+        BUILD_SHARE_CODE_PREFIX_V5,
         BUILD_SHARE_CODE_PREFIX_V4,
         BUILD_SHARE_CODE_PREFIX_V3,
         BUILD_SHARE_CODE_PREFIX_V2,
@@ -82,6 +105,164 @@ function readVarInt(cursor) {
     }
 
     throw new Error("Share code ended unexpectedly.");
+}
+
+function writeShareString(bytes, value) {
+    const codePoints = Array.from(String(value || ""));
+    writeVarInt(bytes, codePoints.length);
+    codePoints.forEach(char => writeVarInt(bytes, char.codePointAt(0)));
+}
+
+function readShareString(cursor, maxLength = BUILD_SHARE_MAX_WEAPON_KEY_LENGTH) {
+    const length = readVarInt(cursor);
+    if (length > maxLength) throw new Error("Share code contains an invalid string.");
+
+    const codePoints = [];
+    for (let index = 0; index < length; index++) {
+        codePoints.push(readVarInt(cursor));
+    }
+    return String.fromCodePoint(...codePoints);
+}
+
+function writeSignedVarInt(bytes, value) {
+    const integer = Math.trunc(Number(value) || 0);
+    writeVarInt(bytes, integer >= 0 ? integer * 2 : (-integer * 2) - 1);
+}
+
+function readSignedVarInt(cursor) {
+    const encoded = readVarInt(cursor);
+    return encoded % 2 === 0 ? encoded / 2 : -((encoded + 1) / 2);
+}
+
+// Stable 5-bit alphabet for database keys. Unlike a table index, this remains
+// decodable when new weapons are added or their database order changes.
+function writePackedShareKey(bytes, value) {
+    const key = String(value || "").toLowerCase();
+    if (key.length > BUILD_SHARE_MAX_WEAPON_KEY_LENGTH) {
+        throw new Error("Share code contains an invalid key.");
+    }
+
+    let buffer = 0;
+    let bitCount = 0;
+    const writeBits = (bits, width) => {
+        buffer = (buffer << width) | bits;
+        bitCount += width;
+        while (bitCount >= 8) {
+            bitCount -= 8;
+            bytes.push((buffer >> bitCount) & 0xff);
+            buffer &= (1 << bitCount) - 1;
+        }
+    };
+
+    Array.from(key).forEach(char => {
+        if (char >= "a" && char <= "z") {
+            writeBits(char.charCodeAt(0) - 96, 5);
+        } else if (char === "_") {
+            writeBits(27, 5);
+        } else if (char === "-") {
+            writeBits(28, 5);
+        } else if (char >= "0" && char <= "9") {
+            writeBits(29, 5);
+            writeBits(Number(char), 4);
+        } else {
+            const code = char.charCodeAt(0);
+            if (code > 0xff) throw new Error("Share code key contains unsupported characters.");
+            writeBits(30, 5);
+            writeBits(code, 8);
+        }
+    });
+    writeBits(0, 5);
+    if (bitCount > 0) bytes.push((buffer << (8 - bitCount)) & 0xff);
+}
+
+function readPackedShareKey(cursor, maxLength = BUILD_SHARE_MAX_WEAPON_KEY_LENGTH) {
+    let buffer = 0;
+    let bitCount = 0;
+    const readBits = width => {
+        while (bitCount < width) {
+            if (cursor.index >= cursor.bytes.length) throw new Error("Share code ended unexpectedly.");
+            buffer = (buffer << 8) | cursor.bytes[cursor.index++];
+            bitCount += 8;
+        }
+        bitCount -= width;
+        const value = (buffer >> bitCount) & ((1 << width) - 1);
+        buffer &= (1 << bitCount) - 1;
+        return value;
+    };
+
+    let key = "";
+    while (key.length <= maxLength) {
+        const token = readBits(5);
+        if (token === 0) return key;
+        if (token >= 1 && token <= 26) key += String.fromCharCode(96 + token);
+        else if (token === 27) key += "_";
+        else if (token === 28) key += "-";
+        else if (token === 29) key += String(readBits(4));
+        else if (token === 30) key += String.fromCharCode(readBits(8));
+        else throw new Error("Share code contains an invalid packed key.");
+    }
+    throw new Error("Share code contains an invalid key.");
+}
+
+function getShareLoadoutKeyCandidates(slot) {
+    if (slot === "weapon") {
+        return typeof weapons !== "undefined" && Array.isArray(weapons) ? weapons : [];
+    }
+    const category = slot === "kit1" || slot === "kit2" ? "kits" : slot;
+    return typeof GEAR_DATABASE !== "undefined" && Array.isArray(GEAR_DATABASE?.[category])
+        ? GEAR_DATABASE[category]
+        : [];
+}
+
+function hashShareLoadoutKey(value) {
+    let hash = 0x811c9dc5;
+    Array.from(String(value || "")).forEach(char => {
+        hash ^= char.charCodeAt(0);
+        hash = Math.imul(hash, 0x01000193) >>> 0;
+    });
+    return hash >>> 0;
+}
+
+function writeShareUint32(bytes, value) {
+    const number = Number(value) >>> 0;
+    bytes.push(number & 0xff, (number >>> 8) & 0xff, (number >>> 16) & 0xff, (number >>> 24) & 0xff);
+}
+
+function readShareUint32(cursor) {
+    if (cursor.index + 4 > cursor.bytes.length) throw new Error("Share code ended unexpectedly.");
+    const value = (
+        cursor.bytes[cursor.index]
+        | (cursor.bytes[cursor.index + 1] << 8)
+        | (cursor.bytes[cursor.index + 2] << 16)
+        | (cursor.bytes[cursor.index + 3] << 24)
+    ) >>> 0;
+    cursor.index += 4;
+    return value;
+}
+
+function writeHashedShareLoadoutKey(bytes, value, slot) {
+    const key = String(value || "");
+    const hash = hashShareLoadoutKey(key);
+    const matches = getShareLoadoutKeyCandidates(slot)
+        .filter(item => hashShareLoadoutKey(item?.key) === hash);
+    if (matches.length === 1 && String(matches[0]?.key) === key) {
+        writeVarInt(bytes, 1);
+        writeShareUint32(bytes, hash);
+        return;
+    }
+    writeVarInt(bytes, 0);
+    writePackedShareKey(bytes, key);
+}
+
+function readHashedShareLoadoutKey(cursor, slot) {
+    const mode = readVarInt(cursor);
+    if (mode === 0) return readPackedShareKey(cursor);
+    if (mode !== 1) throw new Error("Share code contains an invalid loadout key mode.");
+    const hash = readShareUint32(cursor);
+    const matches = getShareLoadoutKeyCandidates(slot)
+        .filter(item => hashShareLoadoutKey(item?.key) === hash);
+    if (matches.length !== 1) throw new Error("Share code references an unknown or ambiguous loadout key.");
+    return String(matches[0].key);
 }
 
 function getRoundedShareTime(value) {
@@ -204,6 +385,17 @@ function createBuildPersistenceRotationEntry(entry) {
 
 function createBuildPersistencePayloadFromShareCode(shareCode, options = {}) {
     const sharePayload = parseBuildShareCode(shareCode);
+    const sharedOperatorLoadouts = sharePayload.operatorLoadouts
+        || Object.fromEntries(Object.entries(sharePayload.operatorWeaponLoadouts || {}).map(([operatorId, weaponKey]) => [
+            operatorId,
+            {
+                weapon: { key: weaponKey, potential: 1, essence: { primary: 0, secondary: 0, skill: 0 } },
+                gloves: null,
+                armor: null,
+                kit1: null,
+                kit2: null
+            }
+        ]));
     const teamOperatorIds = Array.isArray(sharePayload.team)
         ? sharePayload.team.map(Number).filter(operatorId => Number.isFinite(operatorId) && getBuildPersistenceOperator(operatorId))
         : [];
@@ -234,12 +426,21 @@ function createBuildPersistencePayloadFromShareCode(shareCode, options = {}) {
             [timestampKey]: timestamp,
             timelineMode: sharePayload.uiSettings?.timelineMode || "slot",
             uiSettings: sharePayload.uiSettings || {},
+            enemyId: sharePayload.enemyId || "training_dummy",
             operatorUltimateStates: sharePayload.operatorUltimateStates || {},
+            operatorLoadouts: sharedOperatorLoadouts,
             team: teamOperators.map(operator => ({
                 id: operator.id,
                 name: operator.name,
                 elementType: operator.elementType || "",
-                operatorClass: operator.operatorClass || ""
+                operatorClass: operator.operatorClass || "",
+                weaponKey: sharedOperatorLoadouts?.[String(operator.id)]?.weapon?.key || null,
+                weaponPotential: sharedOperatorLoadouts?.[String(operator.id)]?.weapon?.potential || null,
+                weaponEssence: sharedOperatorLoadouts?.[String(operator.id)]?.weapon?.essence || null,
+                glovesKey: sharedOperatorLoadouts?.[String(operator.id)]?.gloves?.key || null,
+                armorKey: sharedOperatorLoadouts?.[String(operator.id)]?.armor?.key || null,
+                kit1Key: sharedOperatorLoadouts?.[String(operator.id)]?.kit1?.key || null,
+                kit2Key: sharedOperatorLoadouts?.[String(operator.id)]?.kit2?.key || null
             })),
             rotation: rotationPayload
         }
@@ -264,6 +465,9 @@ function getShareableUiSettings(shareableRotation = getShareableRotation()) {
 
     const settings = {
         timelineMode,
+        simulationDamageMode: ["normal", "expected", "critical"].includes(uiSettings?.simulationDamageMode)
+            ? uiSettings.simulationDamageMode
+            : "expected",
         simulationSpPerSecond: Number.isFinite(spPerSecond) && spPerSecond >= 0
             ? Math.round(spPerSecond * 10) / 10
             : fallbackSpPerSecond
@@ -328,7 +532,6 @@ function createCompactShareBytes() {
     if (Number.isFinite(Number(shareableUiSettings.simulationDurationSeconds))) {
         uiFlags |= BUILD_SHARE_UI_FLAG_HAS_SIMULATION_DURATION;
     }
-
     writeVarInt(bytes, uiFlags);
     if (uiFlags & BUILD_SHARE_UI_FLAG_HAS_SP_PER_SECOND) {
         writeVarInt(bytes, Math.max(0, Math.round(Number(shareableUiSettings.simulationSpPerSecond) * 10)));
@@ -337,11 +540,256 @@ function createCompactShareBytes() {
         writeVarInt(bytes, Math.max(0, Math.round(Number(shareableUiSettings.simulationDurationSeconds) * 10)));
     }
 
+    const operatorLoadouts = typeof getShareableOperatorLoadouts === "function"
+        ? getShareableOperatorLoadouts()
+        : {};
+    const weaponEntries = Object.entries(operatorLoadouts).slice(0, BUILD_SHARE_MAX_WEAPON_LOADOUTS);
+    writeVarInt(bytes, weaponEntries.length);
+    weaponEntries.forEach(([operatorId, loadout]) => {
+        writeVarInt(bytes, Number(operatorId));
+        writeShareString(bytes, loadout?.weapon?.key || "");
+        writeVarInt(bytes, Number(loadout?.weapon?.potential) || 1);
+        writeVarInt(bytes, Number(loadout?.weapon?.essence?.primary) || 0);
+        writeVarInt(bytes, Number(loadout?.weapon?.essence?.secondary) || 0);
+        writeVarInt(bytes, Number(loadout?.weapon?.essence?.skill) || 0);
+    });
+
     return bytes;
 }
 
+function createCompactShareBytesV9() {
+    const bytes = [];
+    for (let index = 0; index < 4; index++) {
+        const operatorId = Array.isArray(selectedTeam) ? Number(selectedTeam[index]) : NaN;
+        writeVarInt(bytes, Number.isFinite(operatorId) && operatorId >= 0 ? operatorId + 1 : 0);
+    }
+
+    const shareableRotation = getShareableRotation();
+    writeVarInt(bytes, shareableRotation.length);
+    let previousTimeTenths = 0;
+    shareableRotation.forEach(entry => {
+        if (!entry) {
+            writeVarInt(bytes, 0);
+            return;
+        }
+
+        const time = Number(entry.time);
+        const hasTime = Number.isFinite(time);
+        if (entry.type === BASIC_ATTACK_ACTION_TYPE) {
+            writeVarInt(bytes, 2 | (hasTime ? 8 : 0));
+            writeVarInt(bytes, Number(entry.operatorId) + 1);
+            writeVarInt(bytes, Number(entry.hitCount) || DEFAULT_BASIC_ATTACK_HITS);
+            writeVarInt(bytes, Number(entry.finalHitCount) || DEFAULT_BASIC_ATTACK_FINAL_HITS);
+        } else {
+            writeVarInt(bytes, 1 | (entry.autoInserted === true ? 4 : 0) | (hasTime ? 8 : 0));
+            writeVarInt(bytes, Number(entry.id));
+        }
+
+        if (hasTime) {
+            const timeTenths = Math.max(0, Math.round(time * 10));
+            writeSignedVarInt(bytes, timeTenths - previousTimeTenths);
+            previousTimeTenths = timeTenths;
+        }
+    });
+
+    const activeUltimateStateIds = getActiveUltimateStateIds();
+    writeVarInt(bytes, activeUltimateStateIds.length);
+    activeUltimateStateIds.forEach(operatorId => writeVarInt(bytes, operatorId));
+
+    const shareableUiSettings = getShareableUiSettings(shareableRotation);
+    const fallbackSpPerSecond = typeof DEFAULT_SIMULATION_SP_PER_SECOND !== "undefined"
+        ? Number(DEFAULT_SIMULATION_SP_PER_SECOND)
+        : 8;
+    let uiFlags = shareableUiSettings.timelineMode === "simulation" ? BUILD_SHARE_UI_FLAG_SIMULATION_MODE : 0;
+    if (Number(shareableUiSettings.simulationSpPerSecond) !== fallbackSpPerSecond) {
+        uiFlags |= BUILD_SHARE_UI_FLAG_HAS_SP_PER_SECOND;
+    }
+    if (Number.isFinite(Number(shareableUiSettings.simulationDurationSeconds))) {
+        uiFlags |= BUILD_SHARE_UI_FLAG_HAS_SIMULATION_DURATION;
+    }
+    if (shareableUiSettings.simulationDamageMode === "normal") uiFlags |= BUILD_SHARE_UI_FLAG_DAMAGE_MODE_NORMAL;
+    if (shareableUiSettings.simulationDamageMode === "critical") uiFlags |= BUILD_SHARE_UI_FLAG_DAMAGE_MODE_CRITICAL;
+    writeVarInt(bytes, uiFlags);
+    if (uiFlags & BUILD_SHARE_UI_FLAG_HAS_SP_PER_SECOND) {
+        writeVarInt(bytes, Math.max(0, Math.round(Number(shareableUiSettings.simulationSpPerSecond) * 10)));
+    }
+    if (uiFlags & BUILD_SHARE_UI_FLAG_HAS_SIMULATION_DURATION) {
+        writeVarInt(bytes, Math.max(0, Math.round(Number(shareableUiSettings.simulationDurationSeconds) * 10)));
+    }
+
+    const enemyId = typeof getSelectedEnemy === "function" ? String(getSelectedEnemy()?.id || "") : "";
+    const hasCustomEnemy = Boolean(enemyId && enemyId !== "training_dummy");
+    writeVarInt(bytes, hasCustomEnemy ? 1 : 0);
+    if (hasCustomEnemy) writePackedShareKey(bytes, enemyId);
+
+    const operatorLoadouts = typeof getShareableOperatorLoadouts === "function"
+        ? getShareableOperatorLoadouts()
+        : {};
+    const weaponEntries = Object.entries(operatorLoadouts).slice(0, BUILD_SHARE_MAX_WEAPON_LOADOUTS);
+    writeVarInt(bytes, weaponEntries.length);
+    weaponEntries.forEach(([operatorId, loadout]) => {
+        const potential = Math.min(5, Math.max(1, Number(loadout?.weapon?.potential) || 1));
+        const primary = Math.min(15, Math.max(0, Number(loadout?.weapon?.essence?.primary) || 0));
+        const secondary = Math.min(15, Math.max(0, Number(loadout?.weapon?.essence?.secondary) || 0));
+        const skill = Math.min(15, Math.max(0, Number(loadout?.weapon?.essence?.skill) || 0));
+        const activationBits = (potential - 1) | (primary << 3) | (secondary << 7) | (skill << 11);
+
+        writeVarInt(bytes, Number(operatorId));
+        writePackedShareKey(bytes, loadout?.weapon?.key || "");
+        writeVarInt(bytes, activationBits);
+    });
+
+    return bytes;
+}
+
+function createCompactShareBytesWithOptionalLoadouts(loadoutVersion) {
+    const bytes = [];
+    for (let index = 0; index < 4; index++) {
+        const operatorId = Array.isArray(selectedTeam) ? Number(selectedTeam[index]) : NaN;
+        writeVarInt(bytes, Number.isFinite(operatorId) && operatorId >= 0 ? operatorId + 1 : 0);
+    }
+
+    const shareableRotation = getShareableRotation();
+    writeVarInt(bytes, shareableRotation.length);
+    let previousTimeTenths = 0;
+    shareableRotation.forEach(entry => {
+        if (!entry) {
+            writeVarInt(bytes, 0);
+            return;
+        }
+
+        const time = Number(entry.time);
+        const hasTime = Number.isFinite(time);
+        if (entry.type === BASIC_ATTACK_ACTION_TYPE) {
+            writeVarInt(bytes, 2 | (hasTime ? 8 : 0));
+            writeVarInt(bytes, Number(entry.operatorId) + 1);
+            writeVarInt(bytes, Number(entry.hitCount) || DEFAULT_BASIC_ATTACK_HITS);
+            writeVarInt(bytes, Number(entry.finalHitCount) || DEFAULT_BASIC_ATTACK_FINAL_HITS);
+        } else {
+            writeVarInt(bytes, 1 | (entry.autoInserted === true ? 4 : 0) | (hasTime ? 8 : 0));
+            writeVarInt(bytes, Number(entry.id));
+        }
+
+        if (hasTime) {
+            const timeTenths = Math.max(0, Math.round(time * 10));
+            writeSignedVarInt(bytes, timeTenths - previousTimeTenths);
+            previousTimeTenths = timeTenths;
+        }
+    });
+
+    const activeUltimateStateIds = getActiveUltimateStateIds();
+    writeVarInt(bytes, activeUltimateStateIds.length);
+    activeUltimateStateIds.forEach(operatorId => writeVarInt(bytes, operatorId));
+
+    const shareableUiSettings = getShareableUiSettings(shareableRotation);
+    const fallbackSpPerSecond = typeof DEFAULT_SIMULATION_SP_PER_SECOND !== "undefined"
+        ? Number(DEFAULT_SIMULATION_SP_PER_SECOND)
+        : 8;
+    let uiFlags = shareableUiSettings.timelineMode === "simulation" ? BUILD_SHARE_UI_FLAG_SIMULATION_MODE : 0;
+    if (Number(shareableUiSettings.simulationSpPerSecond) !== fallbackSpPerSecond) {
+        uiFlags |= BUILD_SHARE_UI_FLAG_HAS_SP_PER_SECOND;
+    }
+    if (Number.isFinite(Number(shareableUiSettings.simulationDurationSeconds))) {
+        uiFlags |= BUILD_SHARE_UI_FLAG_HAS_SIMULATION_DURATION;
+    }
+    if (shareableUiSettings.simulationDamageMode === "normal") uiFlags |= BUILD_SHARE_UI_FLAG_DAMAGE_MODE_NORMAL;
+    if (shareableUiSettings.simulationDamageMode === "critical") uiFlags |= BUILD_SHARE_UI_FLAG_DAMAGE_MODE_CRITICAL;
+    writeVarInt(bytes, uiFlags);
+    if (uiFlags & BUILD_SHARE_UI_FLAG_HAS_SP_PER_SECOND) {
+        writeVarInt(bytes, Math.max(0, Math.round(Number(shareableUiSettings.simulationSpPerSecond) * 10)));
+    }
+    if (uiFlags & BUILD_SHARE_UI_FLAG_HAS_SIMULATION_DURATION) {
+        writeVarInt(bytes, Math.max(0, Math.round(Number(shareableUiSettings.simulationDurationSeconds) * 10)));
+    }
+
+    const enemyId = typeof getSelectedEnemy === "function" ? String(getSelectedEnemy()?.id || "") : "";
+    const hasCustomEnemy = Boolean(enemyId && enemyId !== "training_dummy");
+    writeVarInt(bytes, hasCustomEnemy ? 1 : 0);
+    if (hasCustomEnemy) writePackedShareKey(bytes, enemyId);
+
+    const operatorLoadouts = typeof getShareableOperatorLoadouts === "function"
+        ? getShareableOperatorLoadouts()
+        : {};
+    const weaponEntries = Object.entries(operatorLoadouts).slice(0, BUILD_SHARE_MAX_WEAPON_LOADOUTS);
+    writeVarInt(bytes, weaponEntries.length);
+    weaponEntries.forEach(([operatorId, loadout]) => {
+        const potential = Math.min(5, Math.max(1, Number(loadout?.weapon?.potential) || 1));
+        const primary = Math.min(15, Math.max(0, Number(loadout?.weapon?.essence?.primary) || 0));
+        const secondary = Math.min(15, Math.max(0, Number(loadout?.weapon?.essence?.secondary) || 0));
+        const skill = Math.min(15, Math.max(0, Number(loadout?.weapon?.essence?.skill) || 0));
+        const activationBits = (potential - 1) | (primary << 3) | (secondary << 7) | (skill << 11);
+
+        const optionalKeys = [
+            loadout?.gloves?.key || "",
+            loadout?.armor?.key || "",
+            loadout?.kit1?.key || "",
+            loadout?.kit2?.key || ""
+        ];
+        const optionalSlotMask = optionalKeys.reduce(
+            (mask, key, index) => key ? mask | (1 << index) : mask,
+            0
+        );
+
+        if (loadoutVersion === 13) {
+            const hasActivationData = activationBits !== 0;
+            const loadoutHeader = (Number(operatorId) << 5)
+                | (hasActivationData ? 16 : 0)
+                | optionalSlotMask;
+            writeVarInt(bytes, loadoutHeader);
+            writeHashedShareLoadoutKey(bytes, loadout?.weapon?.key || "", "weapon");
+            if (hasActivationData) writeVarInt(bytes, activationBits);
+            optionalKeys.forEach((key, index) => {
+                if (optionalSlotMask & (1 << index)) {
+                    writeHashedShareLoadoutKey(bytes, key, ["gloves", "armor", "kit1", "kit2"][index]);
+                }
+            });
+        } else {
+            writeVarInt(bytes, Number(operatorId));
+            writePackedShareKey(bytes, loadout?.weapon?.key || "");
+            writeVarInt(bytes, activationBits);
+        }
+
+        if (loadoutVersion === 12) {
+            writeVarInt(bytes, optionalSlotMask);
+            optionalKeys.forEach((key, index) => {
+                if (optionalSlotMask & (1 << index)) writePackedShareKey(bytes, key);
+            });
+        } else if (loadoutVersion === 11) {
+            optionalKeys.forEach(key => writePackedShareKey(bytes, key));
+        }
+    });
+
+    return bytes;
+}
+
+function createCompactShareBytesV11() {
+    return createCompactShareBytesWithOptionalLoadouts(11);
+}
+
+function createCompactShareBytesV12() {
+    return createCompactShareBytesWithOptionalLoadouts(12);
+}
+
+function createCompactShareBytesV13() {
+    return createCompactShareBytesWithOptionalLoadouts(13);
+}
+
 function createBuildShareCode() {
-    return `${BUILD_SHARE_CODE_PREFIX}${encodeShareBytes(createCompactShareBytes())}`;
+    const bytes = [];
+    writeVarInt(bytes, BUILD_PERSISTENCE_PAYLOAD_VERSION);
+    bytes.push(...createCompactShareBytesV13());
+    return encodeShareBytes(bytes);
+}
+
+function getDisplayBuildShareCode(code = createBuildShareCode()) {
+    const trimmed = String(code || "").trim();
+    if (!trimmed.startsWith(BUILD_SHARE_CODE_PREFIX)) return trimmed;
+
+    const payloadBytes = decodeShareBytes(trimmed.slice(BUILD_SHARE_CODE_PREFIX.length));
+    const displayBytes = [];
+    writeVarInt(displayBytes, BUILD_PERSISTENCE_PAYLOAD_VERSION);
+    displayBytes.push(...payloadBytes);
+    return encodeShareBytes(displayBytes);
 }
 
 function getBuildShareBaseUrl() {
@@ -355,7 +803,7 @@ function getBuildShareBaseUrl() {
 }
 
 function createBuildShareLink() {
-    const code = createBuildShareCode();
+    const code = getDisplayBuildShareCode();
     return `${getBuildShareBaseUrl()}#${BUILD_SHARE_HASH_KEY}=${encodeURIComponent(code)}`;
 }
 
@@ -364,7 +812,7 @@ async function copyBuildShareCode() {
         return false;
     }
 
-    const code = createBuildShareCode();
+    const code = getDisplayBuildShareCode();
 
     try {
         await navigator.clipboard.writeText(code);
@@ -426,7 +874,39 @@ function parseBuildShareCode(code) {
     const trimmed = extractBuildShareCode(code);
 
     if (trimmed.startsWith(BUILD_SHARE_CODE_PREFIX)) {
-        return parseCompactBuildShareCodeV5(trimmed.slice(BUILD_SHARE_CODE_PREFIX.length));
+        return parseCompactBuildShareCodeV13(trimmed.slice(BUILD_SHARE_CODE_PREFIX.length));
+    }
+
+    if (trimmed.startsWith(BUILD_SHARE_CODE_PREFIX_V12)) {
+        return parseCompactBuildShareCodeV12(trimmed.slice(BUILD_SHARE_CODE_PREFIX_V12.length));
+    }
+
+    if (trimmed.startsWith(BUILD_SHARE_CODE_PREFIX_V11)) {
+        return parseCompactBuildShareCodeV11(trimmed.slice(BUILD_SHARE_CODE_PREFIX_V11.length));
+    }
+
+    if (trimmed.startsWith(BUILD_SHARE_CODE_PREFIX_V10)) {
+        return parseCompactBuildShareCodeV10(trimmed.slice(BUILD_SHARE_CODE_PREFIX_V10.length));
+    }
+
+    if (trimmed.startsWith(BUILD_SHARE_CODE_PREFIX_V9)) {
+        return parseCompactBuildShareCodeV9(trimmed.slice(BUILD_SHARE_CODE_PREFIX_V9.length));
+    }
+
+    if (trimmed.startsWith(BUILD_SHARE_CODE_PREFIX_V8)) {
+        return parseCompactBuildShareCodeV8(trimmed.slice(BUILD_SHARE_CODE_PREFIX_V8.length));
+    }
+
+    if (trimmed.startsWith(BUILD_SHARE_CODE_PREFIX_V7)) {
+        return parseCompactBuildShareCodeV7(trimmed.slice(BUILD_SHARE_CODE_PREFIX_V7.length));
+    }
+
+    if (trimmed.startsWith(BUILD_SHARE_CODE_PREFIX_V6)) {
+        return parseCompactBuildShareCodeV6(trimmed.slice(BUILD_SHARE_CODE_PREFIX_V6.length));
+    }
+
+    if (trimmed.startsWith(BUILD_SHARE_CODE_PREFIX_V5)) {
+        return parseCompactBuildShareCodeV5(trimmed.slice(BUILD_SHARE_CODE_PREFIX_V5.length));
     }
 
     if (trimmed.startsWith(BUILD_SHARE_CODE_PREFIX_V4)) {
@@ -441,7 +921,36 @@ function parseBuildShareCode(code) {
         return parseCompactBuildShareCodeV2(trimmed.slice(BUILD_SHARE_CODE_PREFIX_V2.length));
     }
 
-    return parseLegacyBuildShareCode(trimmed);
+    // Public codes store the version inside the compact payload instead of
+    // exposing it as a readable AERT prefix.
+    try {
+        return parseVersionedDisplayBuildShareCode(trimmed);
+    } catch (error) {
+        return parseLegacyBuildShareCode(trimmed);
+    }
+}
+
+function parseVersionedDisplayBuildShareCode(code) {
+    const bytes = decodeShareBytes(code.replace(/\s/g, ""));
+    const cursor = { bytes, index: 0 };
+    const version = readVarInt(cursor);
+    const encodedPayload = encodeShareBytes(bytes.slice(cursor.index));
+
+    switch (version) {
+        case 13: return parseCompactBuildShareCodeV13(encodedPayload);
+        case 12: return parseCompactBuildShareCodeV12(encodedPayload);
+        case 11: return parseCompactBuildShareCodeV11(encodedPayload);
+        case 10: return parseCompactBuildShareCodeV10(encodedPayload);
+        case 9: return parseCompactBuildShareCodeV9(encodedPayload);
+        case 8: return parseCompactBuildShareCodeV8(encodedPayload);
+        case 7: return parseCompactBuildShareCodeV7(encodedPayload);
+        case 6: return parseCompactBuildShareCodeV6(encodedPayload);
+        case 5: return parseCompactBuildShareCodeV5(encodedPayload);
+        case 4: return parseCompactBuildShareCodeV4(encodedPayload);
+        case 3: return parseCompactBuildShareCode(encodedPayload);
+        case 2: return parseCompactBuildShareCodeV2(encodedPayload);
+        default: throw new Error("Unsupported hidden share code version.");
+    }
 }
 
 function parseLegacyBuildShareCode(code) {
@@ -549,10 +1058,497 @@ function readCompactShareUiSettingsV5(cursor) {
     return uiSettingsPayload;
 }
 
+function readCompactShareUiSettingsV10(cursor) {
+    const uiFlags = cursor.index < cursor.bytes.length ? readVarInt(cursor) : 0;
+    if (uiFlags & ~BUILD_SHARE_UI_FLAG_MASK_V10) {
+        throw new Error("Unsupported share code UI settings.");
+    }
+    if ((uiFlags & BUILD_SHARE_UI_FLAG_DAMAGE_MODE_NORMAL) && (uiFlags & BUILD_SHARE_UI_FLAG_DAMAGE_MODE_CRITICAL)) {
+        throw new Error("Share code contains conflicting damage modes.");
+    }
+
+    const uiSettingsPayload = {
+        timelineMode: (uiFlags & BUILD_SHARE_UI_FLAG_SIMULATION_MODE) ? "simulation" : "slot",
+        simulationDamageMode: (uiFlags & BUILD_SHARE_UI_FLAG_DAMAGE_MODE_NORMAL)
+            ? "normal"
+            : (uiFlags & BUILD_SHARE_UI_FLAG_DAMAGE_MODE_CRITICAL) ? "critical" : "expected"
+    };
+    if (uiFlags & BUILD_SHARE_UI_FLAG_HAS_SP_PER_SECOND) {
+        uiSettingsPayload.simulationSpPerSecond = readVarInt(cursor) / 10;
+    }
+    if (uiFlags & BUILD_SHARE_UI_FLAG_HAS_SIMULATION_DURATION) {
+        uiSettingsPayload.simulationDurationSeconds = readVarInt(cursor) / 10;
+    }
+    if (!Object.prototype.hasOwnProperty.call(uiSettingsPayload, "simulationSpPerSecond")) {
+        uiSettingsPayload.simulationSpPerSecond = typeof DEFAULT_SIMULATION_SP_PER_SECOND !== "undefined"
+            ? Number(DEFAULT_SIMULATION_SP_PER_SECOND)
+            : 8;
+    }
+    return uiSettingsPayload;
+}
+
+function readCompactShareWeaponLoadouts(cursor) {
+    const count = cursor.index < cursor.bytes.length ? readVarInt(cursor) : 0;
+    if (count > BUILD_SHARE_MAX_WEAPON_LOADOUTS) {
+        throw new Error("Share code contains too many weapon loadouts.");
+    }
+
+    const loadouts = {};
+    for (let index = 0; index < count; index++) {
+        const operatorId = readVarInt(cursor);
+        const weaponKey = readShareString(cursor);
+        if (weaponKey) loadouts[String(operatorId)] = weaponKey;
+    }
+    return loadouts;
+}
+
+function readCompactShareOperatorLoadoutsV7(cursor) {
+    const count = cursor.index < cursor.bytes.length ? readVarInt(cursor) : 0;
+    if (count > BUILD_SHARE_MAX_WEAPON_LOADOUTS) {
+        throw new Error("Share code contains too many operator loadouts.");
+    }
+
+    const loadouts = {};
+    for (let index = 0; index < count; index++) {
+        const operatorId = readVarInt(cursor);
+        const weaponKey = readShareString(cursor);
+        const essence = readVarInt(cursor);
+        if (!weaponKey) continue;
+        loadouts[String(operatorId)] = {
+            weapon: {
+                key: weaponKey,
+                essence
+            },
+            gloves: null,
+            armor: null,
+            kit1: null,
+            kit2: null
+        };
+    }
+    return loadouts;
+}
+
+function readCompactShareOperatorLoadoutsV8(cursor) {
+    const count = cursor.index < cursor.bytes.length ? readVarInt(cursor) : 0;
+    if (count > BUILD_SHARE_MAX_WEAPON_LOADOUTS) {
+        throw new Error("Share code contains too many operator loadouts.");
+    }
+
+    const loadouts = {};
+    for (let index = 0; index < count; index++) {
+        const operatorId = readVarInt(cursor);
+        const weaponKey = readShareString(cursor);
+        const potential = readVarInt(cursor);
+        const primary = readVarInt(cursor);
+        const secondary = readVarInt(cursor);
+        const skill = readVarInt(cursor);
+        if (!weaponKey) continue;
+        loadouts[String(operatorId)] = {
+            weapon: {
+                key: weaponKey,
+                potential,
+                essence: { primary, secondary, skill }
+            },
+            gloves: null,
+            armor: null,
+            kit1: null,
+            kit2: null
+        };
+    }
+    return loadouts;
+}
+
+function readCompactShareRotationV9(cursor) {
+    const rotationLength = readVarInt(cursor);
+    if (rotationLength > BUILD_SHARE_MAX_ROTATION_ENTRIES) {
+        throw new Error("Share code contains too many rotation entries.");
+    }
+
+    const importedRotation = [];
+    let previousTimeTenths = 0;
+    for (let index = 0; index < rotationLength; index++) {
+        const header = readVarInt(cursor);
+        const entryType = header & 3;
+        const hasTime = (header & 8) !== 0;
+        if (header & ~15) throw new Error("Unsupported compact rotation flags.");
+        if (entryType === 0) {
+            importedRotation.push(null);
+            continue;
+        }
+
+        let entry;
+        if (entryType === 1) {
+            entry = {
+                type: "skill",
+                id: readVarInt(cursor),
+                autoInserted: (header & 4) !== 0
+            };
+        } else if (entryType === 2) {
+            entry = {
+                type: BASIC_ATTACK_ACTION_TYPE,
+                operatorId: readVarInt(cursor) - 1,
+                hitCount: readVarInt(cursor),
+                finalHitCount: readVarInt(cursor)
+            };
+        } else {
+            throw new Error("Unsupported rotation entry type.");
+        }
+
+        if (hasTime) {
+            previousTimeTenths += readSignedVarInt(cursor);
+            if (previousTimeTenths < 0) throw new Error("Share code contains an invalid rotation time.");
+            entry.time = Math.round(previousTimeTenths) / 10;
+        }
+        importedRotation.push(entry);
+    }
+    return importedRotation;
+}
+
+function readCompactShareUiSettingsV9(cursor) {
+    const settings = readCompactShareUiSettingsV5(cursor);
+    if (!Object.prototype.hasOwnProperty.call(settings, "simulationSpPerSecond")) {
+        settings.simulationSpPerSecond = typeof DEFAULT_SIMULATION_SP_PER_SECOND !== "undefined"
+            ? Number(DEFAULT_SIMULATION_SP_PER_SECOND)
+            : 8;
+    }
+    return settings;
+}
+
+function readCompactShareOperatorLoadoutsV11(cursor) {
+    const count = cursor.index < cursor.bytes.length ? readVarInt(cursor) : 0;
+    if (count > BUILD_SHARE_MAX_WEAPON_LOADOUTS) {
+        throw new Error("Share code contains too many operator loadouts.");
+    }
+
+    const loadouts = {};
+    for (let index = 0; index < count; index++) {
+        const operatorId = readVarInt(cursor);
+        const weaponKey = readPackedShareKey(cursor);
+        const activationBits = readVarInt(cursor);
+        if (activationBits & ~0x7fff) throw new Error("Share code contains invalid weapon activation data.");
+
+        const glovesKey = readPackedShareKey(cursor);
+        const armorKey = readPackedShareKey(cursor);
+        const kit1Key = readPackedShareKey(cursor);
+        const kit2Key = readPackedShareKey(cursor);
+
+        if (!weaponKey) continue;
+        loadouts[String(operatorId)] = {
+            weapon: {
+                key: weaponKey,
+                potential: (activationBits & 7) + 1,
+                essence: {
+                    primary: (activationBits >> 3) & 15,
+                    secondary: (activationBits >> 7) & 15,
+                    skill: (activationBits >> 11) & 15
+                }
+            },
+            gloves: glovesKey ? { key: glovesKey } : null,
+            armor: armorKey ? { key: armorKey } : null,
+            kit1: kit1Key ? { key: kit1Key } : null,
+            kit2: kit2Key ? { key: kit2Key } : null
+        };
+    }
+    return loadouts;
+}
+
+function readCompactShareOperatorLoadoutsV12(cursor) {
+    const count = cursor.index < cursor.bytes.length ? readVarInt(cursor) : 0;
+    if (count > BUILD_SHARE_MAX_WEAPON_LOADOUTS) {
+        throw new Error("Share code contains too many operator loadouts.");
+    }
+
+    const loadouts = {};
+    for (let index = 0; index < count; index++) {
+        const operatorId = readVarInt(cursor);
+        const weaponKey = readPackedShareKey(cursor);
+        const activationBits = readVarInt(cursor);
+        if (activationBits & ~0x7fff) throw new Error("Share code contains invalid weapon activation data.");
+
+        const optionalSlotMask = readVarInt(cursor);
+        if (optionalSlotMask & ~0x0f) throw new Error("Share code contains invalid optional loadout slots.");
+        const optionalKeys = ["", "", "", ""];
+        optionalKeys.forEach((unused, slotIndex) => {
+            if (optionalSlotMask & (1 << slotIndex)) {
+                optionalKeys[slotIndex] = readPackedShareKey(cursor);
+            }
+        });
+
+        if (!weaponKey) continue;
+        loadouts[String(operatorId)] = {
+            weapon: {
+                key: weaponKey,
+                potential: (activationBits & 7) + 1,
+                essence: {
+                    primary: (activationBits >> 3) & 15,
+                    secondary: (activationBits >> 7) & 15,
+                    skill: (activationBits >> 11) & 15
+                }
+            },
+            gloves: optionalKeys[0] ? { key: optionalKeys[0] } : null,
+            armor: optionalKeys[1] ? { key: optionalKeys[1] } : null,
+            kit1: optionalKeys[2] ? { key: optionalKeys[2] } : null,
+            kit2: optionalKeys[3] ? { key: optionalKeys[3] } : null
+        };
+    }
+    return loadouts;
+}
+
+function readCompactShareOperatorLoadoutsV13(cursor) {
+    const count = cursor.index < cursor.bytes.length ? readVarInt(cursor) : 0;
+    if (count > BUILD_SHARE_MAX_WEAPON_LOADOUTS) {
+        throw new Error("Share code contains too many operator loadouts.");
+    }
+
+    const loadouts = {};
+    for (let index = 0; index < count; index++) {
+        const loadoutHeader = readVarInt(cursor);
+        const operatorId = loadoutHeader >> 5;
+        const optionalSlotMask = loadoutHeader & 15;
+        const hasActivationData = (loadoutHeader & 16) !== 0;
+        const weaponKey = readHashedShareLoadoutKey(cursor, "weapon");
+        const activationBits = hasActivationData ? readVarInt(cursor) : 0;
+        if (activationBits & ~0x7fff) throw new Error("Share code contains invalid weapon activation data.");
+
+        const optionalKeys = ["", "", "", ""];
+        optionalKeys.forEach((unused, slotIndex) => {
+            if (optionalSlotMask & (1 << slotIndex)) {
+                optionalKeys[slotIndex] = readHashedShareLoadoutKey(
+                    cursor,
+                    ["gloves", "armor", "kit1", "kit2"][slotIndex]
+                );
+            }
+        });
+
+        if (!weaponKey) continue;
+        loadouts[String(operatorId)] = {
+            weapon: {
+                key: weaponKey,
+                potential: (activationBits & 7) + 1,
+                essence: {
+                    primary: (activationBits >> 3) & 15,
+                    secondary: (activationBits >> 7) & 15,
+                    skill: (activationBits >> 11) & 15
+                }
+            },
+            gloves: optionalKeys[0] ? { key: optionalKeys[0] } : null,
+            armor: optionalKeys[1] ? { key: optionalKeys[1] } : null,
+            kit1: optionalKeys[2] ? { key: optionalKeys[2] } : null,
+            kit2: optionalKeys[3] ? { key: optionalKeys[3] } : null
+        };
+    }
+    return loadouts;
+}
+
+function readCompactShareOperatorLoadoutsV9(cursor) {
+    const count = cursor.index < cursor.bytes.length ? readVarInt(cursor) : 0;
+    if (count > BUILD_SHARE_MAX_WEAPON_LOADOUTS) {
+        throw new Error("Share code contains too many operator loadouts.");
+    }
+
+    const loadouts = {};
+    for (let index = 0; index < count; index++) {
+        const operatorId = readVarInt(cursor);
+        const weaponKey = readPackedShareKey(cursor);
+        const activationBits = readVarInt(cursor);
+        if (activationBits & ~0x7fff) throw new Error("Share code contains invalid weapon activation data.");
+        if (!weaponKey) continue;
+        loadouts[String(operatorId)] = {
+            weapon: {
+                key: weaponKey,
+                potential: (activationBits & 7) + 1,
+                essence: {
+                    primary: (activationBits >> 3) & 15,
+                    secondary: (activationBits >> 7) & 15,
+                    skill: (activationBits >> 11) & 15
+                }
+            },
+            gloves: null,
+            armor: null,
+            kit1: null,
+            kit2: null
+        };
+    }
+    return loadouts;
+}
 function assertCompactShareFullyRead(cursor) {
     if (cursor.index !== cursor.bytes.length) {
         throw new Error("Share code contains unsupported trailing data.");
     }
+}
+
+function parseCompactBuildShareCodeV9(encoded) {
+    const bytes = decodeShareBytes(encoded.replace(/\s/g, ""));
+    const cursor = { bytes, index: 0 };
+    const team = readCompactShareTeam(cursor);
+    const importedRotation = readCompactShareRotationV9(cursor);
+    const importedUltimateStates = readCompactShareUltimateStates(cursor);
+    const uiSettingsPayload = readCompactShareUiSettingsV9(cursor);
+    const hasCustomEnemy = readVarInt(cursor) === 1;
+    const enemyId = hasCustomEnemy ? readPackedShareKey(cursor) : "training_dummy";
+    const importedOperatorLoadouts = readCompactShareOperatorLoadoutsV9(cursor);
+    assertCompactShareFullyRead(cursor);
+
+    return {
+        v: 9,
+        team,
+        rotation: importedRotation,
+        operatorUltimateStates: importedUltimateStates,
+        operatorLoadouts: importedOperatorLoadouts,
+        enemyId,
+        uiSettings: uiSettingsPayload
+    };
+}
+
+function parseCompactBuildShareCodeV11(encoded) {
+    const bytes = decodeShareBytes(encoded.replace(/\s/g, ""));
+    const cursor = { bytes, index: 0 };
+    const team = readCompactShareTeam(cursor);
+    const importedRotation = readCompactShareRotationV9(cursor);
+    const importedUltimateStates = readCompactShareUltimateStates(cursor);
+    const uiSettingsPayload = readCompactShareUiSettingsV10(cursor);
+    const hasCustomEnemy = readVarInt(cursor) === 1;
+    const enemyId = hasCustomEnemy ? readPackedShareKey(cursor) : "training_dummy";
+    const importedOperatorLoadouts = readCompactShareOperatorLoadoutsV11(cursor);
+    assertCompactShareFullyRead(cursor);
+
+    return {
+        v: 11,
+        team,
+        rotation: importedRotation,
+        operatorUltimateStates: importedUltimateStates,
+        operatorLoadouts: importedOperatorLoadouts,
+        enemyId,
+        uiSettings: uiSettingsPayload
+    };
+}
+
+function parseCompactBuildShareCodeV12(encoded) {
+    const bytes = decodeShareBytes(encoded.replace(/\s/g, ""));
+    const cursor = { bytes, index: 0 };
+    const team = readCompactShareTeam(cursor);
+    const importedRotation = readCompactShareRotationV9(cursor);
+    const importedUltimateStates = readCompactShareUltimateStates(cursor);
+    const uiSettingsPayload = readCompactShareUiSettingsV10(cursor);
+    const hasCustomEnemy = readVarInt(cursor) === 1;
+    const enemyId = hasCustomEnemy ? readPackedShareKey(cursor) : "training_dummy";
+    const importedOperatorLoadouts = readCompactShareOperatorLoadoutsV12(cursor);
+    assertCompactShareFullyRead(cursor);
+
+    return {
+        v: 12,
+        team,
+        rotation: importedRotation,
+        operatorUltimateStates: importedUltimateStates,
+        operatorLoadouts: importedOperatorLoadouts,
+        enemyId,
+        uiSettings: uiSettingsPayload
+    };
+}
+
+function parseCompactBuildShareCodeV13(encoded) {
+    const bytes = decodeShareBytes(encoded.replace(/\s/g, ""));
+    const cursor = { bytes, index: 0 };
+    const team = readCompactShareTeam(cursor);
+    const importedRotation = readCompactShareRotationV9(cursor);
+    const importedUltimateStates = readCompactShareUltimateStates(cursor);
+    const uiSettingsPayload = readCompactShareUiSettingsV10(cursor);
+    const hasCustomEnemy = readVarInt(cursor) === 1;
+    const enemyId = hasCustomEnemy ? readPackedShareKey(cursor) : "training_dummy";
+    const importedOperatorLoadouts = readCompactShareOperatorLoadoutsV13(cursor);
+    assertCompactShareFullyRead(cursor);
+
+    return {
+        v: 13,
+        team,
+        rotation: importedRotation,
+        operatorUltimateStates: importedUltimateStates,
+        operatorLoadouts: importedOperatorLoadouts,
+        enemyId,
+        uiSettings: uiSettingsPayload
+    };
+}
+
+function parseCompactBuildShareCodeV10(encoded) {
+    const bytes = decodeShareBytes(encoded.replace(/\s/g, ""));
+    const cursor = { bytes, index: 0 };
+    const team = readCompactShareTeam(cursor);
+    const importedRotation = readCompactShareRotationV9(cursor);
+    const importedUltimateStates = readCompactShareUltimateStates(cursor);
+    const uiSettingsPayload = readCompactShareUiSettingsV10(cursor);
+    const hasCustomEnemy = readVarInt(cursor) === 1;
+    const enemyId = hasCustomEnemy ? readPackedShareKey(cursor) : "training_dummy";
+    const importedOperatorLoadouts = readCompactShareOperatorLoadoutsV9(cursor);
+    assertCompactShareFullyRead(cursor);
+
+    return {
+        v: 10,
+        team,
+        rotation: importedRotation,
+        operatorUltimateStates: importedUltimateStates,
+        operatorLoadouts: importedOperatorLoadouts,
+        enemyId,
+        uiSettings: uiSettingsPayload
+    };
+}
+
+function parseCompactBuildShareCodeV8(encoded) {
+    const bytes = decodeShareBytes(encoded.replace(/\s/g, ""));
+    const cursor = { bytes, index: 0 };
+    const team = readCompactShareTeam(cursor);
+    const importedRotation = readCompactShareRotation(cursor);
+    const importedUltimateStates = readCompactShareUltimateStates(cursor);
+    const uiSettingsPayload = readCompactShareUiSettingsV5(cursor);
+    const importedOperatorLoadouts = readCompactShareOperatorLoadoutsV8(cursor);
+    assertCompactShareFullyRead(cursor);
+
+    return {
+        v: 8,
+        team,
+        rotation: importedRotation,
+        operatorUltimateStates: importedUltimateStates,
+        operatorLoadouts: importedOperatorLoadouts,
+        uiSettings: uiSettingsPayload
+    };
+}
+function parseCompactBuildShareCodeV7(encoded) {
+    const bytes = decodeShareBytes(encoded.replace(/\s/g, ""));
+    const cursor = { bytes, index: 0 };
+    const team = readCompactShareTeam(cursor);
+    const importedRotation = readCompactShareRotation(cursor);
+    const importedUltimateStates = readCompactShareUltimateStates(cursor);
+    const uiSettingsPayload = readCompactShareUiSettingsV5(cursor);
+    const importedOperatorLoadouts = readCompactShareOperatorLoadoutsV7(cursor);
+    assertCompactShareFullyRead(cursor);
+
+    return {
+        v: 7,
+        team,
+        rotation: importedRotation,
+        operatorUltimateStates: importedUltimateStates,
+        operatorLoadouts: importedOperatorLoadouts,
+        uiSettings: uiSettingsPayload
+    };
+}
+
+function parseCompactBuildShareCodeV6(encoded) {
+    const bytes = decodeShareBytes(encoded.replace(/\s/g, ""));
+    const cursor = { bytes, index: 0 };
+    const team = readCompactShareTeam(cursor);
+    const importedRotation = readCompactShareRotation(cursor);
+    const importedUltimateStates = readCompactShareUltimateStates(cursor);
+    const uiSettingsPayload = readCompactShareUiSettingsV5(cursor);
+    const importedWeaponLoadouts = readCompactShareWeaponLoadouts(cursor);
+    assertCompactShareFullyRead(cursor);
+
+    return {
+        v: 6,
+        team,
+        rotation: importedRotation,
+        operatorUltimateStates: importedUltimateStates,
+        operatorWeaponLoadouts: importedWeaponLoadouts,
+        uiSettings: uiSettingsPayload
+    };
 }
 
 function parseCompactBuildShareCodeV5(encoded) {
@@ -856,6 +1852,11 @@ function applyImportedUiSettings(payload) {
         changed = true;
     }
 
+    if (["normal", "expected", "critical"].includes(importedSettings.simulationDamageMode)) {
+        uiSettings.simulationDamageMode = importedSettings.simulationDamageMode;
+        changed = true;
+    }
+
     if (!changed) return;
     if (typeof saveUiSettings === "function") saveUiSettings();
     if (typeof applyUiSettings === "function") applyUiSettings();
@@ -870,10 +1871,25 @@ function applyBuildShareCode(code) {
         ? payload.operatorUltimateStates
         : {};
     activeSlotIndex = null;
+    if (
+        payload.enemyId
+        && typeof setSelectedEnemy === "function"
+        && (typeof enemies === "undefined" || !Array.isArray(enemies) || enemies.some(enemy => enemy.id === payload.enemyId))
+    ) {
+        setSelectedEnemy(payload.enemyId);
+    }
     applyImportedUiSettings(payload);
+    if (typeof applyImportedOperatorLoadouts === "function") {
+        applyImportedOperatorLoadouts(
+            payload.operatorLoadouts || payload.operatorWeaponLoadouts || {},
+            selectedTeam
+        );
+    }
 
     compactRotation();
     ensureSlotCount(rotation.filter(entry => entry !== null).length + 1);
+    if (typeof normalizeQingboMovesInRotation === "function") normalizeQingboMovesInRotation();
+    if (typeof syncQingboMoveStateFromRotation === "function") syncQingboMoveStateFromRotation();
 
     saveTeam();
     localStorage.setItem("rotation", JSON.stringify(rotation));
@@ -883,6 +1899,7 @@ function applyBuildShareCode(code) {
     if (typeof renderOperatorList === "function") renderOperatorList();
     if (typeof renderSelectedOperators === "function") renderSelectedOperators();
     if (typeof renderSkills === "function") renderSkills();
+    if (typeof renderEnemySkillBar === "function") renderEnemySkillBar();
     if (typeof renderRotation === "function") renderRotation();
     if (typeof initSkillDragDrop === "function") initSkillDragDrop();
 }
