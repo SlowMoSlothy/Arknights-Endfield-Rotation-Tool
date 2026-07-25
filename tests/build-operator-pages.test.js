@@ -8,6 +8,7 @@ import {
   createSupabaseClient,
   createIndexPage,
   createOperatorPage,
+  fetchBasicAttackFormVariants,
   fetchSkillsForOperators,
   getBasicAttackTimeline,
   normalizeAssetPath,
@@ -118,6 +119,55 @@ test("fetchSkillsForOperators filters by operator IDs and paginates results", as
       { type: "range", from: 1000, to: 1999 }
     ]
   );
+});
+
+test("fetchBasicAttackFormVariants loads enabled Basic Attack overrides", async () => {
+  const calls = [];
+  const query = {
+    select() {
+      return this;
+    },
+    eq(column, value) {
+      calls.push({ type: "eq", column, value });
+      return this;
+    },
+    in(column, values) {
+      calls.push({ type: "in", column, values });
+      return this;
+    },
+    order() {
+      return this;
+    },
+    async range() {
+      return {
+        data: [{ operator_id: 9, form_key: "empyrean_of_truth", action_key: "basic_attack" }],
+        error: null
+      };
+    }
+  };
+  const supabase = {
+    from(table) {
+      assert.equal(table, "operator_form_action_variants");
+      return query;
+    }
+  };
+
+  const variants = await fetchBasicAttackFormVariants(supabase, [9]);
+
+  assert.equal(variants.length, 1);
+  assert.deepEqual(
+    calls.filter((call) => call.type === "eq"),
+    [
+      { type: "eq", column: "game", value: "arknights_endfield" },
+      { type: "eq", column: "action_key", value: "basic_attack" },
+      { type: "eq", column: "enabled", value: true }
+    ]
+  );
+  assert.deepEqual(calls.find((call) => call.type === "in"), {
+    type: "in",
+    column: "operator_id",
+    values: [9]
+  });
 });
 
 test("generated pages use placeholders when an operator image is missing", () => {
@@ -326,6 +376,49 @@ test("BATK timing falls back to summed sequence durations and supports missing d
   assert.match(page, /No Basic Attack sequence timing is available/);
   assert.match(page, /class="batk-status is-unverified"/);
   assert.match(page, /data-label="Not verified"/);
+});
+
+test("operator pages render an additional Ultimate-form BATK timeline", () => {
+  const entry = operator({
+    id: 9,
+    slug: "zhuang",
+    name: "Zhuang",
+    raw_data: {
+      basicAttack: {
+        name: "Jolting Arts",
+        cycleDuration: 1,
+        timingVerified: true,
+        sequences: [
+          { label: "FS", kind: "final_strike", duration: 1, hitCount: 1, hitTimings: [0.8] }
+        ]
+      }
+    }
+  });
+  const formVariants = new Map([[
+    9,
+    [{
+      form_key: "empyrean_of_truth",
+      action_override: {
+        name: "Jolting Arts Â· Empyrean of Truth",
+        cycleDuration: 3,
+        timingVerified: false,
+        sequences: [
+          { label: "SEQ 1", duration: 0.8, hitCount: 1, hitTimings: [0.6] },
+          { label: "SEQ 2", duration: 1, hitCount: 1, hitTimings: [0.75] },
+          { label: "FS", kind: "final_strike", duration: 1.2, hitCount: 1, hitTimings: [1] }
+        ]
+      }
+    }]
+  ]]);
+
+  const page = createOperatorPage(entry, [entry], new Map(), formVariants);
+
+  assert.match(page, /Ultimate form BATK/);
+  assert.match(page, /Jolting Arts · Empyrean of Truth/);
+  assert.match(page, /<span>Total duration<\/span><strong>3s<\/strong>/);
+  assert.match(page, /class="panel batk-section batk-form-section"/);
+  assert.equal((page.match(/class="panel batk-section/g) || []).length, 2);
+  assert.match(page, /class="batk-status is-unverified"/);
 });
 
 test("writeGeneratedOutput replaces output and sitemap without leaving temporary files", () => {
