@@ -272,6 +272,7 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /FS: 0\.5s/);
   assert.match(page, /--segment-duration:0\.75/);
   assert.match(page, /class="batk-segment-duration">0\.75s<\/strong>/);
+  assert.match(page, /class="batk-segment-body"/);
   assert.match(page, /class="batk-hit-track"/);
   assert.match(page, /SEQ 1 hit 1: 0\.25s/);
   assert.match(page, /SEQ 1 hit 2: 0\.5s/);
