@@ -279,6 +279,7 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /style="left:33\.333%"/);
   assert.doesNotMatch(page, /class="batk-sequence-list"/);
   assert.match(page, /class="batk-status is-verified"/);
+  assert.match(page, /class="batk-title-row"/);
   assert.match(page, /data-label="Verified"/);
   assert.ok(page.indexOf('id="stats"') < page.indexOf('id="batk"'));
   assert.match(page, /href="#related">Related/);
