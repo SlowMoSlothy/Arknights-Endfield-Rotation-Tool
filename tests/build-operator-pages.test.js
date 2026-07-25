@@ -299,6 +299,8 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /class="portrait-media"/);
   assert.match(page, /aspect-ratio:1/);
   assert.match(page, /backdrop-filter:blur\(15px\) saturate\(135%\)/);
+  assert.match(page, /\.operator-page \.top\{z-index:100\}/);
+  assert.match(page, /\.operator-page \.portrait-card\{z-index:0;isolation:isolate\}/);
   assert.match(page, /\.portrait-media:before/);
   assert.match(page, /object-position:center bottom/);
   assert.match(page, /Database ID: OPERATOR_MI_FU/);
