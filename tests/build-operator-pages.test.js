@@ -476,6 +476,7 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /class="batk-hit-track"/);
   assert.match(page, /SEQ 1 hit 1: 0\.25s/);
   assert.match(page, /SEQ 1 hit 2: 0\.5s/);
+  assert.match(page, /class="batk-hit is-left-edge" style="left:33\.333%"/);
   assert.match(page, /class="batk-hit-tooltip"/);
   assert.match(page, /\.batk-track-scroll\{padding-top:64px;margin-top:-64px\}/);
   assert.match(page, /<small>BATK TIME<\/small><strong>0\.25s<\/strong>/);

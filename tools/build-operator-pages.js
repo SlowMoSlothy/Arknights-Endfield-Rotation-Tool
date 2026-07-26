@@ -559,7 +559,7 @@ function basicAttackTimelineSectionMarkup(timeline, {
 }) {
   const totalLabel = formatDurationSeconds(timeline.totalDuration);
   let sequenceStartTime = 0;
-  const segmentMarkup = timeline.sequences.map((sequence) => {
+  const segmentMarkup = timeline.sequences.map((sequence, sequenceIndex) => {
     const durationLabel = formatDurationSeconds(sequence.duration);
     const width = Math.max(0.001, sequence.duration);
     const hitMarkup = sequence.hitTimings.map((hitTime, hitIndex) => {
@@ -569,7 +569,7 @@ function basicAttackTimelineSectionMarkup(timeline, {
         : String(hitIndex + 1);
       const sequenceTimeLabel = formatDurationSeconds(hitTime);
       const totalTimeLabel = formatDurationSeconds(sequenceStartTime + hitTime);
-      const edgeClass = position < 28
+      const edgeClass = (sequenceIndex === 0 && hitIndex === 0) || position < 28
         ? " is-left-edge"
         : (position > 72 ? " is-right-edge" : "");
       const accessibleLabel = `${sequence.label} hit ${hitIndex + 1}: ${sequenceTimeLabel} from sequence start, ${totalTimeLabel} from BATK start`;
