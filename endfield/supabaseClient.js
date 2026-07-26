@@ -11,6 +11,67 @@ function isPlainObject(value) {
     return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
+function mapNumericArray(value) {
+    return Array.isArray(value)
+        ? value.map(item => Number(item)).filter(Number.isFinite)
+        : [];
+}
+
+function getBasicAttackConfigKey(operatorId, formKey = "base") {
+    return `${Number(operatorId)}:${String(formKey || "base")}`;
+}
+
+function buildBasicAttackConfigs(sequenceRows) {
+    const grouped = new Map();
+
+    (sequenceRows || []).forEach(row => {
+        const key = getBasicAttackConfigKey(row.operator_id, row.form_key);
+        if (!grouped.has(key)) grouped.set(key, []);
+        grouped.get(key).push(row);
+    });
+
+    const configs = new Map();
+    grouped.forEach((rows, key) => {
+        rows.sort((left, right) => Number(left.sequence_index) - Number(right.sequence_index));
+        const first = rows[0];
+        const summedDuration = rows.reduce((total, row) => total + (Number(row.duration_seconds) || 0), 0);
+        const configuredCycleDuration = Number(first.cycle_duration_seconds);
+        const updatedAt = rows
+            .map(row => row.updated_at)
+            .filter(Boolean)
+            .sort()
+            .at(-1) || "";
+
+        configs.set(key, {
+            name: first.attack_name || "Basic Attack",
+            cycleDuration: configuredCycleDuration > 0 ? configuredCycleDuration : summedDuration,
+            timingVerified: rows.length > 0 && rows.every(row => row.verified === true),
+            iconSmall: first.icon_path || "",
+            description: first.description || "",
+            updatedAt,
+            sequences: rows.map(row => ({
+                sequenceIndex: Number(row.sequence_index),
+                label: row.label || undefined,
+                kind: row.kind || "normal",
+                duration: Number(row.duration_seconds),
+                hitCount: Number(row.hit_count) || 0,
+                hitTimings: mapNumericArray(row.hit_timings),
+                hitTimingMode: row.hit_timing_mode || "absolute",
+                hitMultipliers: mapNumericArray(row.hit_multipliers),
+                atkMultiplierTotal: Number(row.atk_multiplier_total) || 0,
+                staggerMultiplier: Number(row.stagger_multiplier) || 0,
+                eventHitIndex: row.event_hit_index === null || row.event_hit_index === undefined
+                    ? undefined
+                    : Number(row.event_hit_index),
+                endsCycle: row.ends_cycle === true,
+                emits: Array.isArray(row.emits) ? row.emits : []
+            }))
+        });
+    });
+
+    return configs;
+}
+
 function mapDatabaseSkill(row) {
     const raw = isPlainObject(row.raw_data) ? row.raw_data : {};
     const rawDamageProfile = isPlainObject(raw.damageProfile) ? raw.damageProfile : null;
@@ -52,6 +113,16 @@ function mapDatabaseSkill(row) {
         description: row.description || raw.description,
         comboTrigger: row.combo_trigger || raw.comboTrigger,
         comboTriggerMode: row.combo_trigger_mode || raw.comboTriggerMode,
+        durationSeconds: row.duration_seconds ?? raw.durationSeconds ?? raw.duration,
+        hitTimings: mapNumericArray(row.hit_timings).length > 0
+            ? mapNumericArray(row.hit_timings)
+            : mapNumericArray(raw.hitTimings),
+        hitTimingMode: row.hit_timing_mode || raw.hitTimingMode || "absolute",
+        effectTimings: mapNumericArray(row.effect_timings).length > 0
+            ? mapNumericArray(row.effect_timings)
+            : mapNumericArray(raw.effectTimings),
+        formKey: row.form_key || raw.formKey || "base",
+        variantKey: row.variant_key || raw.variantKey || "base",
         damageProfile
     };
 }
@@ -170,7 +241,7 @@ function applyEffectDurationOverridesToOperators(operators, overrides) {
     }));
 }
 
-function mapDatabaseOperator(row, skillRows) {
+function mapDatabaseOperator(row, skillRows, basicAttackConfig = null) {
     const raw = isPlainObject(row.raw_data) ? row.raw_data : {};
 
     return {
@@ -190,6 +261,7 @@ function mapDatabaseOperator(row, skillRows) {
         baseStatsLevel: row.base_stats_level ?? raw.baseStatsLevel,
         mainAttribute: row.main_attribute || raw.mainAttribute,
         secondaryAttribute: row.secondary_attribute || raw.secondaryAttribute,
+        basicAttack: basicAttackConfig || raw.basicAttack || raw.basic_attack,
         skills: skillRows.map(mapDatabaseSkill)
     };
 }
@@ -746,7 +818,11 @@ async function hydrateOperatorPassiveRulesFromSupabase() {
 async function loadOperatorFormsFromSupabase() {
     if (!supabaseClient) throw new Error("Supabase client is not available. Cannot load operator forms.");
 
-    const [{ data: formRows, error: formError }, { data: variantRows, error: variantError }] = await Promise.all([
+    const [
+        { data: formRows, error: formError },
+        { data: variantRows, error: variantError },
+        basicAttackRows
+    ] = await Promise.all([
         supabaseClient
             .from("operator_forms")
             .select("*")
@@ -758,15 +834,71 @@ async function loadOperatorFormsFromSupabase() {
             .select("*")
             .eq("game", "arknights_endfield")
             .eq("enabled", true)
-            .order("priority", { ascending: true })
+            .order("priority", { ascending: true }),
+        loadBasicAttackSequencesFromSupabase()
     ]);
 
     if (formError) throw formError;
     if (variantError) throw variantError;
+    const mappedVariants = Array.isArray(variantRows)
+        ? variantRows.map(mapDatabaseOperatorFormActionVariant)
+        : [];
+    const basicAttackConfigs = buildBasicAttackConfigs(basicAttackRows);
+
+    basicAttackConfigs.forEach((config, key) => {
+        const [operatorIdValue, ...formParts] = key.split(":");
+        const formKey = formParts.join(":");
+        if (!formKey || formKey === "base") return;
+
+        const existing = mappedVariants.find(variant =>
+            Number(variant.operatorId) === Number(operatorIdValue)
+            && variant.formKey === formKey
+            && variant.actionKey === "basic_attack"
+        );
+        if (existing) {
+            existing.actionOverride = config;
+            return;
+        }
+
+        mappedVariants.push({
+            formKey,
+            operatorId: Number(operatorIdValue),
+            actionKey: "basic_attack",
+            actionOverride: config,
+            priority: 0,
+            enabled: true,
+            verified: config.timingVerified === true,
+            sourceUrl: "",
+            sourceNote: "operator_basic_attack_sequences"
+        });
+    });
+
     return {
         forms: Array.isArray(formRows) ? formRows.map(mapDatabaseOperatorForm) : [],
-        variants: Array.isArray(variantRows) ? variantRows.map(mapDatabaseOperatorFormActionVariant) : []
+        variants: mappedVariants
     };
+}
+
+async function loadBasicAttackSequencesFromSupabase(operatorIds = null) {
+    if (!supabaseClient) {
+        throw new Error("Supabase client is not available. Cannot load Basic Attack sequences.");
+    }
+
+    let query = supabaseClient
+        .from("operator_basic_attack_sequences")
+        .select("*")
+        .eq("game", "arknights_endfield")
+        .order("operator_id", { ascending: true })
+        .order("form_key", { ascending: true })
+        .order("sequence_index", { ascending: true });
+
+    if (Array.isArray(operatorIds) && operatorIds.length > 0) {
+        query = query.in("operator_id", operatorIds);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
 }
 
 async function hydrateOperatorFormsFromSupabase() {
@@ -807,12 +939,18 @@ async function loadOperatorsFromSupabase() {
     }
 
     const operatorIds = operatorRows.map(row => row.id);
-    const { data: skillRows, error: skillError } = await supabaseClient
-        .from("operator_skills")
-        .select("*")
-        .in("operator_id", operatorIds)
-        .order("operator_id", { ascending: true })
-        .order("slot_index", { ascending: true });
+    const [
+        { data: skillRows, error: skillError },
+        basicAttackRows
+    ] = await Promise.all([
+        supabaseClient
+            .from("operator_skills")
+            .select("*")
+            .in("operator_id", operatorIds)
+            .order("operator_id", { ascending: true })
+            .order("slot_index", { ascending: true }),
+        loadBasicAttackSequencesFromSupabase(operatorIds)
+    ]);
 
     if (skillError) {
         throw skillError;
@@ -827,7 +965,12 @@ async function loadOperatorsFromSupabase() {
         skillsByOperatorId.get(row.operator_id).push(row);
     });
 
-    const operators = operatorRows.map(row => mapDatabaseOperator(row, skillsByOperatorId.get(row.id) || []));
+    const basicAttackConfigs = buildBasicAttackConfigs(basicAttackRows);
+    const operators = operatorRows.map(row => mapDatabaseOperator(
+        row,
+        skillsByOperatorId.get(row.id) || [],
+        basicAttackConfigs.get(getBasicAttackConfigKey(row.id, "base")) || null
+    ));
 
     let effectDurationOverrides = [];
     try {

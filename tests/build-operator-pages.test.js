@@ -5,18 +5,22 @@ import path from "node:path";
 import test from "node:test";
 
 import {
+  buildBasicAttackConfig,
   createSupabaseClient,
   createIndexPage,
   createOperatorPage,
+  fetchBasicAttackSequences,
   fetchBasicAttackFormVariants,
   fetchSkillsForOperators,
   getBasicAttackTimeline,
+  groupBasicAttackSequences,
   normalizeAssetPath,
   validateOperators,
   writeGeneratedOutput
 } from "../tools/build-operator-pages.js";
 
 const checkedInOperatorIndex = fs.readFileSync("endfield/operators/index.html", "utf8");
+const actionTimingMigration = fs.readFileSync("supabase/operator_action_timings.sql", "utf8");
 
 test("checked-in operator index contains no unresolved merge conflicts", () => {
   assert.doesNotMatch(checkedInOperatorIndex, /^(?:<<<<<<<|=======|>>>>>>>)/m);
@@ -121,6 +125,15 @@ test("fetchSkillsForOperators filters by operator IDs and paginates results", as
   );
 });
 
+test("action timing migration normalizes BATKs and known delayed skill timings", () => {
+  assert.match(actionTimingMigration, /create table if not exists public\.operator_basic_attack_sequences/);
+  assert.match(actionTimingMigration, /operator_form_action_variants/);
+  assert.match(actionTimingMigration, /delayedFollowUp,delaySeconds/);
+  assert.match(actionTimingMigration, /manualSequence,automaticDelaySeconds/);
+  assert.match(actionTimingMigration, /Public read operator basic attack sequences/);
+  assert.match(actionTimingMigration, /operator_basic_attack_sequences_set_updated_at/);
+});
+
 test("fetchBasicAttackFormVariants loads enabled Basic Attack overrides", async () => {
   const calls = [];
   const query = {
@@ -168,6 +181,141 @@ test("fetchBasicAttackFormVariants loads enabled Basic Attack overrides", async 
     column: "operator_id",
     values: [9]
   });
+});
+
+test("fetchBasicAttackSequences loads normalized BATK rows", async () => {
+  const calls = [];
+  const query = {
+    select() {
+      return this;
+    },
+    eq(column, value) {
+      calls.push({ type: "eq", column, value });
+      return this;
+    },
+    in(column, values) {
+      calls.push({ type: "in", column, values });
+      return this;
+    },
+    order() {
+      return this;
+    },
+    async range() {
+      return {
+        data: [{
+          operator_id: 9,
+          form_key: "base",
+          attack_name: "Jolting Arts",
+          sequence_index: 1,
+          duration_seconds: 0.667,
+          hit_count: 2,
+          hit_timings: [0.3, 0.383]
+        }],
+        error: null
+      };
+    }
+  };
+  const supabase = {
+    from(table) {
+      assert.equal(table, "operator_basic_attack_sequences");
+      return query;
+    }
+  };
+
+  const rows = await fetchBasicAttackSequences(supabase, [9]);
+
+  assert.equal(rows.length, 1);
+  assert.deepEqual(calls.find((call) => call.type === "eq"), {
+    type: "eq",
+    column: "game",
+    value: "arknights_endfield"
+  });
+  assert.deepEqual(calls.find((call) => call.type === "in"), {
+    type: "in",
+    column: "operator_id",
+    values: [9]
+  });
+});
+
+test("normalized BATK rows create separate base and form configurations", () => {
+  const shared = {
+    operator_id: 9,
+    attack_name: "Jolting Arts",
+    hit_timing_mode: "absolute",
+    hit_multipliers: [],
+    atk_multiplier_total: 1,
+    stagger_multiplier: 0,
+    ends_cycle: false,
+    emits: [],
+    verified: true,
+    updated_at: "2026-07-26T12:00:00.000Z"
+  };
+  const rows = [
+    {
+      ...shared,
+      form_key: "base",
+      sequence_index: 1,
+      duration_seconds: 0.667,
+      cycle_duration_seconds: 1,
+      hit_count: 2,
+      hit_timings: [0.3, 0.383]
+    },
+    {
+      ...shared,
+      form_key: "empyrean_of_truth",
+      attack_name: "Jolting Arts · Empyrean of Truth",
+      sequence_index: 1,
+      duration_seconds: 0.8,
+      cycle_duration_seconds: 0.8,
+      hit_count: 1,
+      hit_timings: [0.6]
+    }
+  ];
+
+  const base = buildBasicAttackConfig([rows[0]]);
+  const grouped = groupBasicAttackSequences(rows);
+
+  assert.equal(base.name, "Jolting Arts");
+  assert.equal(base.updatedAt, "2026-07-26T12:00:00.000Z");
+  assert.deepEqual(base.sequences[0].hitTimings, [0.3, 0.383]);
+  assert.equal(grouped.baseByOperator.get(9).cycleDuration, 1);
+  assert.equal(
+    grouped.formsByOperator.get(9)[0].action_override.name,
+    "Jolting Arts · Empyrean of Truth"
+  );
+});
+
+test("normalized BATK config takes precedence over legacy operator raw_data", () => {
+  const timeline = getBasicAttackTimeline(operator({
+    basicAttack: {
+      name: "Normalized BATK",
+      sequences: [{ duration: 0.5, hitCount: 1, hitTimings: [0.25] }]
+    },
+    raw_data: {
+      basicAttack: {
+        name: "Legacy BATK",
+        sequences: [{ duration: 2, hitCount: 1, hitTimings: [1] }]
+      }
+    }
+  }));
+
+  assert.equal(timeline.name, "Normalized BATK");
+  assert.equal(timeline.totalDuration, 0.5);
+});
+
+test("BATK timeline displays its latest Supabase update date", () => {
+  const entry = operator({
+    basicAttack: {
+      name: "Current BATK",
+      updatedAt: "2026-07-26T12:00:00.000Z",
+      sequences: [{ duration: 1, hitCount: 1, hitTimings: [0.5] }]
+    }
+  });
+
+  const page = createOperatorPage(entry, [entry], new Map());
+
+  assert.match(page, /<span>Last updated<\/span><strong>26 Jul 2026, 12:00 UTC<\/strong>/);
+  assert.match(page, /class="batk-updated"/);
 });
 
 test("generated pages use placeholders when an operator image is missing", () => {

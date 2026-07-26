@@ -441,13 +441,28 @@ function formatDurationSeconds(value) {
   return `${rounded.toFixed(3).replace(/\.?0+$/, "")}s`;
 }
 
+function formatUpdatedDate(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+    timeZone: "UTC"
+  }).format(date) + " UTC";
+}
+
 export function getBasicAttackTimeline(operator) {
   const rawData = isPlainObject(operator?.raw_data) ? operator.raw_data : {};
   const basicAttack = [
-    rawData.basicAttack,
-    rawData.basic_attack,
     operator?.basicAttack,
-    operator?.basic_attack
+    operator?.basic_attack,
+    rawData.basicAttack,
+    rawData.basic_attack
   ].find(isPlainObject);
 
   if (!basicAttack) return null;
@@ -526,6 +541,7 @@ export function getBasicAttackTimeline(operator) {
     name: formatValue(basicAttack.name, "Basic Attack"),
     sequences,
     totalDuration,
+    updatedAt: basicAttack.updatedAt || "",
     verified: detailsComplete && timingVerification === true
   };
 }
@@ -571,6 +587,7 @@ function basicAttackTimelineSectionMarkup(timeline, {
         <h2>${escapeHtml(timeline.name)}</h2>
       </div>
       <div class="batk-heading-meta">
+        ${timeline.updatedAt ? `<div class="batk-updated"><span>Last updated</span><strong>${escapeHtml(formatUpdatedDate(timeline.updatedAt))}</strong></div>` : ""}
         <div class="batk-total"><span>Total duration</span><strong>${escapeHtml(totalLabel)}</strong></div>
       </div>
     </div>
@@ -737,6 +754,7 @@ function baseStyles() {
     @media(max-width:760px){.operator-page .nav{height:58px;padding:0;flex-direction:row;align-items:center;gap:9px}.operator-page .brand{flex:0 0 auto;gap:8px;font-size:.88rem}.operator-page .mark{width:32px;height:32px;border-radius:7px}.operator-page .tool-name{min-width:0;margin-left:auto;padding-left:9px;border-left:1px solid rgba(160,170,169,.25);font-size:.7rem;white-space:nowrap}.operator-page .tool-name-full{display:none}.operator-page .tool-name-short{display:inline}.operator-page .breadcrumbs{margin-bottom:10px}.operator-page .section-nav{margin-bottom:14px}.operator-page .rotation-guide-label{font-size:.3em}.operator-page .hero-stats{max-width:none}.operator-page .overview-section{padding:16px}.operator-page .overview-section .profile-heading p{text-align:left}.operator-page footer{display:block}.operator-page .database-ref{display:block;margin-top:5px}}
     @media(max-width:520px){.operator-page .brand{font-size:.82rem}.operator-page .tool-name{font-size:.66rem}.operator-page .hero-stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.operator-page .hero-stats .stat{padding-left:30px}.operator-page .hero-stats .stat-icon{left:9px}.operator-page .overview-section .profile-card{min-height:auto}}
     .operator-page .portrait-media{position:absolute;left:20px;right:10px;top:50%;z-index:1;aspect-ratio:1;overflow:hidden;border:1px solid rgba(216,224,220,.38);border-radius:13px;background:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.035) 32%,rgba(15,19,20,.58)),radial-gradient(circle at 50% 22%,rgba(248,245,70,.13),transparent 48%),linear-gradient(155deg,rgba(42,50,51,.32),rgba(15,19,20,.64));box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 0 0 1px rgba(255,255,255,.055),inset 0 -42px 60px rgba(0,0,0,.22),0 16px 34px rgba(0,0,0,.28);backdrop-filter:blur(15px) saturate(135%);-webkit-backdrop-filter:blur(15px) saturate(135%);transform:translateY(-43%)}.operator-page .portrait-media:before{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.28),rgba(255,255,255,.07) 22%,transparent 42%),linear-gradient(110deg,transparent 18%,rgba(255,255,255,.12) 24%,transparent 32%);mix-blend-mode:screen;opacity:.72}.operator-page .portrait-media:after{content:"";position:absolute;inset:auto 0 0;height:24%;z-index:3;pointer-events:none;background:linear-gradient(180deg,transparent,rgba(16,20,21,.34))}.operator-page .portrait-media .portrait{left:50%;top:auto;bottom:0;z-index:1;width:100%;height:100%;max-width:none;max-height:none;object-fit:contain;object-position:center bottom;transform:translateX(-50%);filter:drop-shadow(0 16px 18px rgba(0,0,0,.42))}.operator-page .portrait-media .portrait-placeholder{position:absolute;inset:12%;width:auto;aspect-ratio:auto;transform:none}.operator-page .portrait-card:before,.operator-page .portrait-card:after{z-index:4}.operator-page .portrait-card .barcode{z-index:5}
+    .batk-updated{min-width:118px;text-align:right}.batk-updated span{display:block;color:var(--silver);font-size:.62rem;font-weight:900;letter-spacing:.09em;text-transform:uppercase}.batk-updated strong{display:block;margin-top:4px;color:#f4f5ed;font-size:.78rem}
     .operator-page .top{z-index:100}.operator-page .portrait-card{z-index:0;isolation:isolate}
     @media(min-width:1001px){.operator-page .portrait-media{left:16px;right:8px;border-radius:10px}}
     @media(min-width:761px) and (max-width:1000px){.operator-page .portrait-media{left:16px;right:8px;border-radius:10px}}
@@ -1179,6 +1197,91 @@ function chunkValues(values, chunkSize) {
   return chunks;
 }
 
+function numericArray(value) {
+  return Array.isArray(value)
+    ? value.map((item) => Number(item)).filter(Number.isFinite)
+    : [];
+}
+
+export function buildBasicAttackConfig(sequenceRows) {
+  const rows = [...(sequenceRows || [])]
+    .sort((left, right) => Number(left.sequence_index) - Number(right.sequence_index));
+  if (rows.length === 0) return null;
+
+  const first = rows[0];
+  const summedDuration = rows.reduce(
+    (total, row) => total + (Number(row.duration_seconds) || 0),
+    0
+  );
+  const configuredCycleDuration = Number(first.cycle_duration_seconds);
+  const updatedAt = rows
+    .map((row) => row.updated_at)
+    .filter(Boolean)
+    .sort()
+    .at(-1) || "";
+
+  return {
+    name: first.attack_name || "Basic Attack",
+    cycleDuration: configuredCycleDuration > 0 ? configuredCycleDuration : summedDuration,
+    timingVerified: rows.every((row) => row.verified === true),
+    iconSmall: first.icon_path || "",
+    description: first.description || "",
+    updatedAt,
+    sequences: rows.map((row) => ({
+      sequenceIndex: Number(row.sequence_index),
+      label: row.label || undefined,
+      kind: row.kind || "normal",
+      duration: Number(row.duration_seconds),
+      hitCount: Number(row.hit_count) || 0,
+      hitTimings: numericArray(row.hit_timings),
+      hitTimingMode: row.hit_timing_mode || "absolute",
+      hitMultipliers: numericArray(row.hit_multipliers),
+      atkMultiplierTotal: Number(row.atk_multiplier_total) || 0,
+      staggerMultiplier: Number(row.stagger_multiplier) || 0,
+      eventHitIndex: row.event_hit_index === null || row.event_hit_index === undefined
+        ? undefined
+        : Number(row.event_hit_index),
+      endsCycle: row.ends_cycle === true,
+      emits: Array.isArray(row.emits) ? row.emits : []
+    }))
+  };
+}
+
+export function groupBasicAttackSequences(sequenceRows) {
+  const rowGroups = new Map();
+  for (const row of sequenceRows || []) {
+    const key = `${row.operator_id}:${row.form_key || "base"}`;
+    if (!rowGroups.has(key)) rowGroups.set(key, []);
+    rowGroups.get(key).push(row);
+  }
+
+  const baseByOperator = new Map();
+  const formsByOperator = new Map();
+  for (const [key, rows] of rowGroups) {
+    const [operatorIdValue, ...formParts] = key.split(":");
+    const operatorId = Number(operatorIdValue);
+    const formKey = formParts.join(":") || "base";
+    const config = buildBasicAttackConfig(rows);
+    if (!config) continue;
+
+    if (formKey === "base") {
+      baseByOperator.set(operatorId, config);
+      continue;
+    }
+
+    if (!formsByOperator.has(operatorId)) formsByOperator.set(operatorId, []);
+    formsByOperator.get(operatorId).push({
+      operator_id: operatorId,
+      form_key: formKey,
+      action_key: "basic_attack",
+      action_override: config,
+      verified: config.timingVerified === true
+    });
+  }
+
+  return { baseByOperator, formsByOperator };
+}
+
 export async function fetchSkillsForOperators(supabase, operatorIds) {
   const skills = [];
 
@@ -1203,6 +1306,12 @@ export async function fetchSkillsForOperators(supabase, operatorIds) {
           description,
           combo_trigger,
           combo_trigger_mode,
+          duration_seconds,
+          hit_timings,
+          hit_timing_mode,
+          effect_timings,
+          form_key,
+          variant_key,
           raw_data
         `)
         .in("operator_id", idChunk)
@@ -1223,6 +1332,59 @@ export async function fetchSkillsForOperators(supabase, operatorIds) {
   }
 
   return skills;
+}
+
+export async function fetchBasicAttackSequences(supabase, operatorIds) {
+  const sequences = [];
+
+  for (const idChunk of chunkValues(operatorIds, OPERATOR_ID_CHUNK_SIZE)) {
+    let offset = 0;
+
+    while (true) {
+      const { data, error } = await supabase
+        .from("operator_basic_attack_sequences")
+        .select(`
+          operator_id,
+          form_key,
+          attack_name,
+          sequence_index,
+          label,
+          kind,
+          duration_seconds,
+          cycle_duration_seconds,
+          hit_count,
+          hit_timings,
+          hit_timing_mode,
+          hit_multipliers,
+          atk_multiplier_total,
+          stagger_multiplier,
+          event_hit_index,
+          ends_cycle,
+          emits,
+          icon_path,
+          description,
+          verified,
+          updated_at
+        `)
+        .eq("game", "arknights_endfield")
+        .in("operator_id", idChunk)
+        .order("operator_id", { ascending: true })
+        .order("form_key", { ascending: true })
+        .order("sequence_index", { ascending: true })
+        .range(offset, offset + SKILL_PAGE_SIZE - 1);
+
+      if (error) {
+        throw new Error(`Supabase Fehler bei operator_basic_attack_sequences: ${error.message}`);
+      }
+
+      const page = data || [];
+      sequences.push(...page);
+      if (page.length < SKILL_PAGE_SIZE) break;
+      offset += SKILL_PAGE_SIZE;
+    }
+  }
+
+  return sequences;
 }
 
 export async function fetchBasicAttackFormVariants(supabase, operatorIds) {
@@ -1378,9 +1540,9 @@ export async function build({ supabase = createSupabaseClient() } = {}) {
 
   validateOperators(operators);
   const operatorIds = operators.map((operator) => operator.id);
-  const [skills, basicAttackFormVariants] = await Promise.all([
+  const [skills, basicAttackSequences] = await Promise.all([
     fetchSkillsForOperators(supabase, operatorIds),
-    fetchBasicAttackFormVariants(supabase, operatorIds)
+    fetchBasicAttackSequences(supabase, operatorIds)
   ]);
 
   const skillsByOperator = new Map();
@@ -1389,12 +1551,11 @@ export async function build({ supabase = createSupabaseClient() } = {}) {
     skillsByOperator.get(skill.operator_id).push(skill);
   }
 
-  const basicAttackFormsByOperator = new Map();
-  for (const variant of basicAttackFormVariants || []) {
-    if (!basicAttackFormsByOperator.has(variant.operator_id)) {
-      basicAttackFormsByOperator.set(variant.operator_id, []);
-    }
-    basicAttackFormsByOperator.get(variant.operator_id).push(variant);
+  const { baseByOperator, formsByOperator: basicAttackFormsByOperator } =
+    groupBasicAttackSequences(basicAttackSequences);
+  for (const operator of operators) {
+    const basicAttack = baseByOperator.get(Number(operator.id));
+    if (basicAttack) operator.basicAttack = basicAttack;
   }
 
   writeGeneratedOutput({ operators, skillsByOperator, basicAttackFormsByOperator });
