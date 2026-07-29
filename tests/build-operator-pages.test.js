@@ -479,6 +479,9 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /class="batk-hit is-left-edge" style="left:33\.333%"/);
   assert.match(page, /class="batk-hit-tooltip"/);
   assert.match(page, /\.batk-track-scroll\{padding-top:64px;margin-top:-64px\}/);
+  assert.match(page, /class="batk-mobile-hint" aria-hidden="true"><span>Swipe timeline<\/span>/);
+  assert.match(page, /\.operator-page \.batk-track-scroll\{scroll-snap-type:x proximity/);
+  assert.match(page, /\.operator-page \.batk-track\{min-width:560px;height:108px\}/);
   assert.match(page, /<small>BATK TIME<\/small><strong>0\.25s<\/strong>/);
   assert.match(page, /tabindex="0" aria-label="SEQ 2 hit 1: 0\.75s from sequence start, 1\.5s from BATK start"/);
   assert.doesNotMatch(page, /class="batk-segment"[^>]* title=/);
