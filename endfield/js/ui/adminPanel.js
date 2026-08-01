@@ -543,8 +543,21 @@ function createAdminOperatorVisibilityCard(operator) {
     const operatorId = String(operator?.id || "");
     const isVisible = operator?.is_visible !== false;
     const isBusy = adminPanelState.operatorActionIds.has(operatorId);
+    const elementType = String(operator?.element_type || operator?.elementType || "neutral").toLowerCase();
+    const operatorClass = operator?.operator_class || operator?.operatorClass || "";
     const card = document.createElement("article");
-    card.className = `admin-visibility-card${isVisible ? " is-visible" : " is-hidden"}${isBusy ? " is-busy" : ""}`;
+    card.className = `admin-visibility-card operator-card operator-element-${elementType}${isVisible ? " selected is-visible" : " is-hidden"}${isBusy ? " is-busy" : ""}`;
+    card.tabIndex = isBusy ? -1 : 0;
+    card.setAttribute("role", "switch");
+    card.setAttribute("aria-checked", isVisible ? "true" : "false");
+    card.setAttribute("aria-busy", isBusy ? "true" : "false");
+    card.setAttribute(
+        "aria-label",
+        `${operator?.name || "Operator"}: ${isVisible ? "shown" : "hidden"}. Click to ${isVisible ? "hide" : "show"}.`
+    );
+    card.title = isBusy
+        ? "Saving..."
+        : `Click to ${isVisible ? "hide" : "show"} ${operator?.name || "operator"}`;
 
     const avatar = createAdminOperatorAvatar({
         ...operator,
@@ -552,35 +565,36 @@ function createAdminOperatorVisibilityCard(operator) {
     });
     avatar.classList.add("admin-visibility-avatar");
 
-    const copy = document.createElement("div");
-    copy.className = "admin-visibility-copy";
-    copy.append(
-        createAdminTextElement("h3", "admin-visibility-name", operator?.name || "Operator"),
-        createAdminTextElement(
-            "p",
-            "admin-visibility-meta",
-            [
-                operator?.star ? `${operator.star} star` : "",
-                formatAdminLabel(operator?.operator_class),
-                formatAdminLabel(operator?.element_type)
-            ].filter(Boolean).join(" - ")
-        )
-    );
+    const cardOperator = {
+        ...operator,
+        operatorClass,
+        elementType
+    };
+    const meta = typeof createOperatorCardMeta === "function"
+        ? createOperatorCardMeta(cardOperator, elementType)
+        : createAdminTextElement("div", "operator-card-meta", `${operator?.star || "-"} ★`);
+
+    const name = createAdminTextElement("div", "operator-name", operator?.name || "Operator");
 
     const state = createAdminTextElement(
         "span",
         `admin-visibility-state ${isVisible ? "is-visible" : "is-hidden"}`,
-        isVisible ? "Shown" : "Hidden"
+        isBusy ? "…" : (isVisible ? "✓" : "—")
     );
+    state.setAttribute("aria-hidden", "true");
 
-    const action = createAdminActionButton(
-        isBusy ? "Saving..." : (isVisible ? "Hide operator" : "Show operator"),
-        () => setAdminOperatorVisibility(operator.id, !isVisible),
-        { primary: !isVisible, danger: isVisible, disabled: isBusy }
-    );
-    action.classList.add("admin-visibility-action");
+    const toggleVisibility = () => {
+        if (isBusy) return;
+        setAdminOperatorVisibility(operator.id, !isVisible);
+    };
+    card.addEventListener("click", toggleVisibility);
+    card.addEventListener("keydown", event => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        toggleVisibility();
+    });
 
-    card.append(avatar, copy, state, action);
+    card.append(meta, avatar, name, state);
     return card;
 }
 
@@ -894,7 +908,7 @@ async function setAdminOperatorVisibility(operatorId, shouldBeVisible) {
                 : item
         ));
         setAdminReviewStatus(
-            `${operator?.name || "Operator"} is now ${shouldBeVisible ? "shown" : "hidden"}. The planner updates after reload; static operator pages update with the next page build.`,
+            `${operator?.name || "Operator"}: ${shouldBeVisible ? "shown" : "hidden"}. Planner: reload; operator pages: next build.`,
             "is-success"
         );
     } catch (error) {

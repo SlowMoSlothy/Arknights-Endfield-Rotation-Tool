@@ -21,14 +21,16 @@ test("admin panel controls operator visibility through the secured Supabase RPC"
   assert.match(adminScript, /id: "operators"/);
   assert.match(adminScript, /\.from\("operators"\)/);
   assert.match(adminScript, /client\.rpc\("set_operator_visibility"/);
-  assert.match(adminScript, /Hide operator/);
-  assert.match(adminScript, /Show operator/);
+  assert.match(adminScript, /setAdminOperatorVisibility\(operator\.id, !isVisible\)/);
+  assert.match(adminScript, /aria-checked/);
 });
 
-test("operator visibility cards use a compact responsive grid", () => {
+test("operator visibility cards reuse the compact selectable operator-card grid", () => {
   assert.match(adminScript, /classList\.toggle\("is-operators"/);
-  assert.match(adminStyles, /\.admin-review-list\.is-operators\s*\{[^}]*minmax\(220px, 1fr\)/s);
-  assert.match(adminStyles, /@media \(max-width: 520px\)[\s\S]*\.admin-review-list\.is-operators\s*\{\s*grid-template-columns: 1fr/);
+  assert.match(adminScript, /operator-card operator-element-/);
+  assert.match(adminScript, /setAttribute\("role", "switch"\)/);
+  assert.match(adminStyles, /\.admin-review-list\.is-operators\s*\{[^}]*repeat\(auto-fill, 100px\)/s);
+  assert.match(adminStyles, /@media \(max-width: 520px\)[\s\S]*repeat\(auto-fill, 86px\)/);
 });
 
 test("planner excludes hidden operators while treating legacy rows as visible", () => {
