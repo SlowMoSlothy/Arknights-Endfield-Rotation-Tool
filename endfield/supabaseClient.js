@@ -253,6 +253,7 @@ function mapDatabaseOperator(row, skillRows, basicAttackConfig = null) {
         operatorClass: row.operator_class || raw.operatorClass,
         sortOrder: row.sort_order ?? raw.sortOrder,
         icon: row.icon_path || raw.icon,
+        isVisible: row.is_visible !== false,
         canEnterUltimateState: row.can_enter_ultimate_state ?? raw.canEnterUltimateState,
         elementType: row.element_type || raw.elementType,
         weaponType: row.weapon_type || raw.weaponType,
@@ -938,7 +939,12 @@ async function loadOperatorsFromSupabase() {
         throw new Error("Supabase returned no operator data.");
     }
 
-    const operatorIds = operatorRows.map(row => row.id);
+    const visibleOperatorRows = operatorRows.filter(row => row.is_visible !== false);
+    if (visibleOperatorRows.length === 0) {
+        throw new Error("Supabase returned no visible operator data.");
+    }
+
+    const operatorIds = visibleOperatorRows.map(row => row.id);
     const [
         { data: skillRows, error: skillError },
         basicAttackRows
@@ -966,7 +972,7 @@ async function loadOperatorsFromSupabase() {
     });
 
     const basicAttackConfigs = buildBasicAttackConfigs(basicAttackRows);
-    const operators = operatorRows.map(row => mapDatabaseOperator(
+    const operators = visibleOperatorRows.map(row => mapDatabaseOperator(
         row,
         skillsByOperatorId.get(row.id) || [],
         basicAttackConfigs.get(getBasicAttackConfigKey(row.id, "base")) || null

@@ -12,6 +12,7 @@ import {
   fetchBasicAttackSequences,
   fetchBasicAttackFormVariants,
   fetchSkillsForOperators,
+  filterVisibleOperators,
   getBasicAttackTimeline,
   groupBasicAttackSequences,
   normalizeAssetPath,
@@ -77,6 +78,14 @@ test("validateOperators rejects unsafe and duplicate slugs", () => {
     () => validateOperators([operator(), operator({ id: 2 })]),
     /Doppelter Operator-Slug/
   );
+});
+
+test("operator page builds exclude rows hidden by the admin visibility flag", () => {
+  const visible = operator({ id: 1, slug: "visible", is_visible: true });
+  const hidden = operator({ id: 2, slug: "hidden", is_visible: false });
+  const legacy = operator({ id: 3, slug: "legacy" });
+
+  assert.deepEqual(filterVisibleOperators([visible, hidden, legacy]), [visible, legacy]);
 });
 
 test("fetchSkillsForOperators filters by operator IDs and paginates results", async () => {

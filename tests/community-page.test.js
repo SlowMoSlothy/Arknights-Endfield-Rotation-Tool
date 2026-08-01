@@ -21,6 +21,7 @@ test("community page keeps planner loading and legacy links available", () => {
   assert.match(communityScript, /increment_community_rotation_view/);
   assert.match(communityScript, /Community rotation link copied/);
   assert.match(communityHtml, /id="pageToast"/);
+  assert.match(communityScript, /filter\(row => row\.is_visible !== false\)/);
   assert.match(plannerCommunityScript, /COMMUNITY_PAGE_PATH = "community\/"/);
   assert.match(plannerCommunityScript, /window\.location\.replace\(getCommunityPageUrl/);
 });

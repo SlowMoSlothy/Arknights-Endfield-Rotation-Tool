@@ -547,7 +547,7 @@ async function loadData() {
     const [operatorResult, skillResult, rotationResult] = await Promise.all([
       supabaseClient
         .from("operators")
-        .select("id,name,star,operator_class,element_type,icon_path")
+        .select("*")
         .eq("game", "arknights_endfield"),
       supabaseClient
         .from("operator_skills")
@@ -567,7 +567,7 @@ async function loadData() {
     if (skillResult.error) throw skillResult.error;
     if (rotationResult.error) throw rotationResult.error;
 
-    list(operatorResult.data).forEach(row => {
+    list(operatorResult.data).filter(row => row.is_visible !== false).forEach(row => {
       communityPageState.operators.set(Number(row.id), {
         id: Number(row.id),
         name: row.name,

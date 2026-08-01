@@ -103,6 +103,12 @@ export function validateOperators(operators) {
   return operators;
 }
 
+export function filterVisibleOperators(operators) {
+  return Array.isArray(operators)
+    ? operators.filter(operator => operator?.is_visible !== false)
+    : [];
+}
+
 function classIconPath(operatorClass) {
   const key = normalizeKey(operatorClass);
   const fileMap = {
@@ -1527,30 +1533,9 @@ export function writeGeneratedOutput({
 }
 
 export async function build({ supabase = createSupabaseClient() } = {}) {
-  const { data: operators, error: operatorError } = await supabase
+  const { data: operatorRows, error: operatorError } = await supabase
     .from("operators")
-    .select(`
-      id,
-      game,
-      slug,
-      name,
-      star,
-      operator_class,
-      element_type,
-      icon_path,
-      weapon_type,
-      main_attribute,
-      secondary_attribute,
-      base_hp,
-      base_atk,
-      base_stats_level,
-      base_strength,
-      base_agility,
-      base_intellect,
-      base_will,
-      raw_data,
-      sort_order
-    `)
+    .select("*")
     .eq("game", "arknights_endfield")
     .order("sort_order", { ascending: true });
 
@@ -1558,6 +1543,7 @@ export async function build({ supabase = createSupabaseClient() } = {}) {
     throw new Error(`Supabase Fehler bei operators: ${operatorError.message}`);
   }
 
+  const operators = filterVisibleOperators(operatorRows);
   validateOperators(operators);
   const operatorIds = operators.map((operator) => operator.id);
   const [skills, basicAttackSequences] = await Promise.all([

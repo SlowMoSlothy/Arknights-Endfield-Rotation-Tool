@@ -22,6 +22,14 @@ const ADMIN_REVIEW_TABS = [
         loadingMessage: "Fetching hidden or rejected submissions.",
         emptyTitle: "No rejected rotations",
         emptyMessage: "Rejected submissions and hidden rotations will appear here."
+    },
+    {
+        id: "operators",
+        label: "Operators",
+        loadingTitle: "Loading operators",
+        loadingMessage: "Fetching public visibility settings from Supabase.",
+        emptyTitle: "No operators found",
+        emptyMessage: "No Endfield operators are available in Supabase."
     }
 ];
 
@@ -29,6 +37,7 @@ const adminPanelState = {
     session: null,
     isAdmin: false,
     rotations: [],
+    operators: [],
     activeTab: "pending",
     loaded: false,
     loading: false,
@@ -36,6 +45,7 @@ const adminPanelState = {
     reviewError: "",
     detailRotationId: "",
     actionIds: new Set(),
+    operatorActionIds: new Set(),
     authStatus: "",
     authStatusClass: "",
     reviewStatus: "",
@@ -335,6 +345,13 @@ function renderAdminDetailPanel() {
     const panel = document.getElementById("adminDetailPanel");
     if (!panel) return;
 
+    if (adminPanelState.activeTab === "operators") {
+        adminPanelState.detailRotationId = "";
+        panel.replaceChildren();
+        panel.hidden = true;
+        return;
+    }
+
     const row = getActiveAdminDetailRow();
     panel.replaceChildren();
 
@@ -522,6 +539,51 @@ function getAdminRowActions(row, isBusy, isActive = false) {
     return actions;
 }
 
+function createAdminOperatorVisibilityCard(operator) {
+    const operatorId = String(operator?.id || "");
+    const isVisible = operator?.is_visible !== false;
+    const isBusy = adminPanelState.operatorActionIds.has(operatorId);
+    const card = document.createElement("article");
+    card.className = `admin-visibility-card${isVisible ? " is-visible" : " is-hidden"}${isBusy ? " is-busy" : ""}`;
+
+    const avatar = createAdminOperatorAvatar({
+        ...operator,
+        icon: operator?.icon_path || operator?.icon || ""
+    });
+    avatar.classList.add("admin-visibility-avatar");
+
+    const copy = document.createElement("div");
+    copy.className = "admin-visibility-copy";
+    copy.append(
+        createAdminTextElement("h3", "admin-visibility-name", operator?.name || "Operator"),
+        createAdminTextElement(
+            "p",
+            "admin-visibility-meta",
+            [
+                operator?.star ? `${operator.star} star` : "",
+                formatAdminLabel(operator?.operator_class),
+                formatAdminLabel(operator?.element_type)
+            ].filter(Boolean).join(" - ")
+        )
+    );
+
+    const state = createAdminTextElement(
+        "span",
+        `admin-visibility-state ${isVisible ? "is-visible" : "is-hidden"}`,
+        isVisible ? "Shown" : "Hidden"
+    );
+
+    const action = createAdminActionButton(
+        isBusy ? "Saving..." : (isVisible ? "Hide operator" : "Show operator"),
+        () => setAdminOperatorVisibility(operator.id, !isVisible),
+        { primary: !isVisible, danger: isVisible, disabled: isBusy }
+    );
+    action.classList.add("admin-visibility-action");
+
+    card.append(avatar, copy, state, action);
+    return card;
+}
+
 function renderAdminReviewList() {
     const list = document.getElementById("adminReviewList");
     if (!list) return;
@@ -540,38 +602,47 @@ function renderAdminReviewList() {
     }
 
     if (adminPanelState.reviewError) {
+        const isOperatorTab = adminPanelState.activeTab === "operators";
         setAdminListState(list, {
             type: "error",
-            title: "Review queue unavailable",
+            title: isOperatorTab ? "Operator settings unavailable" : "Review queue unavailable",
             message: adminPanelState.reviewError,
             actionLabel: "Try again",
-            action: fetchAdminPendingRotations
+            action: fetchAdminActiveContent
         });
         return;
     }
 
     if (!adminPanelState.loaded) {
+        const isOperatorTab = adminPanelState.activeTab === "operators";
         setAdminListState(list, {
-            title: "Ready for review",
-            message: "Pending rotations will appear here after the first refresh."
+            title: isOperatorTab ? "Ready to manage operators" : "Ready for review",
+            message: isOperatorTab
+                ? "Operator visibility settings will appear here after the first refresh."
+                : "Pending rotations will appear here after the first refresh."
         });
         return;
     }
 
-    if (!adminPanelState.rotations.length) {
+    const isOperatorTab = adminPanelState.activeTab === "operators";
+    const entries = isOperatorTab ? adminPanelState.operators : adminPanelState.rotations;
+
+    if (!entries.length) {
         const activeTab = getActiveAdminTab();
         setAdminListState(list, {
             type: "empty",
             title: activeTab.emptyTitle,
             message: activeTab.emptyMessage,
             actionLabel: "Refresh",
-            action: fetchAdminReviewRotations
+            action: fetchAdminActiveContent
         });
         return;
     }
 
-    adminPanelState.rotations.forEach(row => {
-        list.appendChild(createAdminReviewCard(row));
+    entries.forEach(row => {
+        list.appendChild(isOperatorTab
+            ? createAdminOperatorVisibilityCard(row)
+            : createAdminReviewCard(row));
     });
 }
 
@@ -629,6 +700,10 @@ async function refreshAdminSession({ loadPending = true } = {}) {
 
         adminPanelState.session = data?.session || null;
         adminPanelState.isAdmin = false;
+        adminPanelState.rotations = [];
+        adminPanelState.operators = [];
+        adminPanelState.actionIds.clear();
+        adminPanelState.operatorActionIds.clear();
         adminPanelState.reviewError = "";
 
         if (!adminPanelState.session) {
@@ -649,7 +724,7 @@ async function refreshAdminSession({ loadPending = true } = {}) {
 
         setAdminAuthStatus("");
         if (loadPending) {
-            await fetchAdminReviewRotations();
+            await fetchAdminActiveContent();
         }
     } catch (error) {
         console.error("Admin session check failed:", error);
@@ -732,8 +807,47 @@ async function fetchAdminReviewRotations() {
     }
 }
 
+async function fetchAdminOperators() {
+    const client = getAdminSupabaseClient();
+    if (!client || !adminPanelState.isAdmin) return;
+
+    adminPanelState.loading = true;
+    adminPanelState.loaded = false;
+    adminPanelState.reviewError = "";
+    setAdminReviewStatus("");
+    renderAdminReviewList();
+
+    try {
+        const { data, error } = await client
+            .from("operators")
+            .select("*")
+            .eq("game", "arknights_endfield")
+            .order("sort_order", { ascending: true })
+            .order("name", { ascending: true });
+
+        if (error) throw error;
+
+        adminPanelState.operators = Array.isArray(data) ? data : [];
+        adminPanelState.loaded = true;
+    } catch (error) {
+        console.error("Admin operator visibility could not be loaded:", error);
+        adminPanelState.loaded = true;
+        adminPanelState.operators = [];
+        adminPanelState.reviewError = "Operator visibility could not be loaded. Run supabase/operator_visibility_admin.sql and refresh.";
+    } finally {
+        adminPanelState.loading = false;
+        renderAdminReviewList();
+    }
+}
+
+async function fetchAdminActiveContent() {
+    return adminPanelState.activeTab === "operators"
+        ? fetchAdminOperators()
+        : fetchAdminReviewRotations();
+}
+
 async function fetchAdminPendingRotations() {
-    return fetchAdminReviewRotations();
+    return fetchAdminActiveContent();
 }
 
 function setAdminReviewTab(tabId) {
@@ -742,11 +856,56 @@ function setAdminReviewTab(tabId) {
     adminPanelState.activeTab = tabId;
     adminPanelState.detailRotationId = "";
     adminPanelState.rotations = [];
+    adminPanelState.operators = [];
+    adminPanelState.actionIds.clear();
+    adminPanelState.operatorActionIds.clear();
     adminPanelState.loaded = false;
     adminPanelState.reviewError = "";
     setAdminReviewStatus("");
     renderAdminPanel();
-    fetchAdminReviewRotations();
+    fetchAdminActiveContent();
+}
+
+async function setAdminOperatorVisibility(operatorId, shouldBeVisible) {
+    const client = getAdminSupabaseClient();
+    if (!client || !operatorId) return;
+
+    const id = String(operatorId);
+    const operator = adminPanelState.operators.find(item => String(item.id) === id);
+    adminPanelState.operatorActionIds.add(id);
+    setAdminReviewStatus(`${shouldBeVisible ? "Showing" : "Hiding"} ${operator?.name || "operator"}...`);
+    renderAdminReviewList();
+
+    try {
+        const { data, error } = await client.rpc("set_operator_visibility", {
+            target_operator_id: Number(operatorId),
+            should_be_visible: shouldBeVisible === true
+        });
+
+        if (error) throw error;
+        if (!Array.isArray(data) || data.length === 0) {
+            throw new Error("Supabase did not update the operator.");
+        }
+
+        adminPanelState.operators = adminPanelState.operators.map(item => (
+            String(item.id) === id
+                ? { ...item, is_visible: shouldBeVisible === true, updated_at: data[0]?.updated_at || item.updated_at }
+                : item
+        ));
+        setAdminReviewStatus(
+            `${operator?.name || "Operator"} is now ${shouldBeVisible ? "shown" : "hidden"}. The planner updates after reload; static operator pages update with the next page build.`,
+            "is-success"
+        );
+    } catch (error) {
+        console.error("Operator visibility update failed:", error);
+        setAdminReviewStatus(
+            error?.message || "Operator visibility could not be saved. Run supabase/operator_visibility_admin.sql and check admin access.",
+            "is-error"
+        );
+    } finally {
+        adminPanelState.operatorActionIds.delete(id);
+        renderAdminReviewList();
+    }
 }
 
 async function signInAdmin(event) {
@@ -802,6 +961,7 @@ async function signOutAdmin() {
     adminPanelState.session = null;
     adminPanelState.isAdmin = false;
     adminPanelState.rotations = [];
+    adminPanelState.operators = [];
     adminPanelState.loaded = false;
     adminPanelState.reviewError = "";
     adminPanelState.detailRotationId = "";
@@ -997,6 +1157,9 @@ function initAdminPanel() {
             adminPanelState.session = session || null;
             adminPanelState.isAdmin = false;
             adminPanelState.rotations = [];
+            adminPanelState.operators = [];
+            adminPanelState.actionIds.clear();
+            adminPanelState.operatorActionIds.clear();
             adminPanelState.loaded = false;
             adminPanelState.detailRotationId = "";
             setAdminAuthStatus("");

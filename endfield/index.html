@@ -680,12 +680,12 @@
   <div id="adminModal" class="settings-modal admin-modal">
     <div class="settings-dialog admin-dialog">
       <div class="settings-header">
-        <h2 class="settings-title">Admin Review</h2>
-        <button id="closeAdminPanelBtn" class="settings-close" type="button" aria-label="Close admin review">&times;</button>
+        <h2 class="settings-title">Admin Control</h2>
+        <button id="closeAdminPanelBtn" class="settings-close" type="button" aria-label="Close admin control">&times;</button>
       </div>
 
       <section id="adminLoginPanel" class="admin-login-panel">
-        <p class="admin-intro">Sign in with your Supabase admin account to review submitted rotations.</p>
+        <p class="admin-intro">Sign in with your Supabase admin account to review rotations and manage public operator visibility.</p>
         <form id="adminLoginForm" class="admin-login-form">
           <label class="admin-field">
             <span>Email</span>
@@ -715,7 +715,7 @@
             <button id="adminSignOutBtn" class="admin-secondary-btn" type="button">Sign out</button>
           </div>
         </div>
-        <div id="adminReviewTabs" class="admin-review-tabs" role="tablist" aria-label="Review status"></div>
+        <div id="adminReviewTabs" class="admin-review-tabs" role="tablist" aria-label="Admin sections"></div>
         <div id="adminReviewStatus" class="admin-status"></div>
         <div id="adminDetailPanel" class="admin-detail-panel" hidden></div>
         <div id="adminReviewList" class="admin-review-list"></div>
@@ -847,7 +847,7 @@
   <script src="js/ui/communityRotations.js"></script>
   <script src="js/ui/operatorGallery.js?v=2"></script>
   <script src="js/ui/myRotations.js"></script>
-  <script src="js/ui/adminPanel.js"></script>
+  <script src="js/ui/adminPanel.js?v=2"></script>
   <script src="js/main.js?v=5"></script>
 </body>
 

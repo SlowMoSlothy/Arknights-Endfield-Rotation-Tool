@@ -12,6 +12,7 @@ create table if not exists public.operators (
     weapon_type text not null,
     icon_path text not null,
     can_enter_ultimate_state boolean not null default false,
+    is_visible boolean not null default true,
     sort_order integer not null default 0,
     raw_data jsonb not null default '{}'::jsonb,
     created_at timestamptz not null default now(),
@@ -29,6 +30,7 @@ alter table public.operators add column if not exists element_type text;
 alter table public.operators add column if not exists weapon_type text;
 alter table public.operators add column if not exists icon_path text;
 alter table public.operators add column if not exists can_enter_ultimate_state boolean not null default false;
+alter table public.operators add column if not exists is_visible boolean not null default true;
 
 alter table public.operators add column if not exists sort_order integer not null default 0;
 alter table public.operators add column if not exists raw_data jsonb not null default '{}'::jsonb;
