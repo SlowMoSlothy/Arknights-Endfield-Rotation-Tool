@@ -7,6 +7,7 @@ const schema = fs.readFileSync("supabase/schema.sql", "utf8");
 const adminScript = fs.readFileSync("endfield/js/ui/adminPanel.js", "utf8");
 const adminStyles = fs.readFileSync("endfield/css/admin.css", "utf8");
 const plannerLoader = fs.readFileSync("endfield/supabaseClient.js", "utf8");
+const plannerHtml = fs.readFileSync("endfield/index.html", "utf8");
 
 test("operator visibility migration is rerunnable and preserves existing public operators", () => {
   assert.match(migration, /add column if not exists is_visible boolean not null default true/i);
@@ -23,6 +24,14 @@ test("admin panel controls operator visibility through the secured Supabase RPC"
   assert.match(adminScript, /client\.rpc\("set_operator_visibility"/);
   assert.match(adminScript, /setAdminOperatorVisibility\(operator\.id, !isVisible\)/);
   assert.match(adminScript, /aria-checked/);
+});
+
+test("admin session header displays the Supabase username instead of the email address", () => {
+  assert.match(plannerHtml, /id="adminUserName"/);
+  assert.doesNotMatch(plannerHtml, /id="adminUserEmail"/);
+  assert.match(adminScript, /\.from\("user_profiles"\)/);
+  assert.match(adminScript, /\.select\("username"\)/);
+  assert.match(adminScript, /adminPanelState\.username \|\| getAdminFallbackUsername\(\)/);
 });
 
 test("operator visibility cards reuse the compact selectable operator-card grid", () => {

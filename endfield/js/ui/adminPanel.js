@@ -36,6 +36,7 @@ const ADMIN_REVIEW_TABS = [
 const adminPanelState = {
     session: null,
     isAdmin: false,
+    username: "",
     rotations: [],
     operators: [],
     activeTab: "pending",
@@ -55,6 +56,34 @@ const adminPanelState = {
 
 function getAdminSupabaseClient() {
     return typeof supabaseClient !== "undefined" ? supabaseClient : null;
+}
+
+function getAdminFallbackUsername(session = adminPanelState.session) {
+    const metadataUsername = String(session?.user?.user_metadata?.username || "").trim();
+    if (metadataUsername) return metadataUsername;
+
+    const emailPrefix = String(session?.user?.email || "").split("@")[0].trim();
+    return emailPrefix || "Admin";
+}
+
+async function loadAdminUsername(client) {
+    adminPanelState.username = getAdminFallbackUsername();
+    const userId = adminPanelState.session?.user?.id;
+    if (!client || !userId) return;
+
+    try {
+        const { data, error } = await client
+            .from("user_profiles")
+            .select("username")
+            .eq("user_id", userId)
+            .maybeSingle();
+
+        if (error) throw error;
+        const username = String(data?.username || "").trim();
+        if (username) adminPanelState.username = username;
+    } catch (error) {
+        console.warn("Admin username could not be loaded; using the account fallback.", error);
+    }
 }
 
 function createAdminTextElement(tagName, className, text) {
@@ -664,7 +693,7 @@ function renderAdminReviewList() {
 function renderAdminPanel() {
     const loginPanel = document.getElementById("adminLoginPanel");
     const reviewPanel = document.getElementById("adminReviewPanel");
-    const userEmail = document.getElementById("adminUserEmail");
+    const userName = document.getElementById("adminUserName");
     const signOutButton = document.getElementById("adminLoginSignOutBtn");
     const loginButton = document.getElementById("adminLoginButton");
 
@@ -672,7 +701,7 @@ function renderAdminPanel() {
 
     if (loginPanel) loginPanel.hidden = canReview;
     if (reviewPanel) reviewPanel.hidden = !canReview;
-    if (userEmail) userEmail.textContent = adminPanelState.session?.user?.email || "Admin";
+    if (userName) userName.textContent = adminPanelState.username || getAdminFallbackUsername();
     if (signOutButton) signOutButton.hidden = !adminPanelState.session || canReview;
     if (loginButton) loginButton.disabled = adminPanelState.checkingAuth;
 
@@ -715,6 +744,7 @@ async function refreshAdminSession({ loadPending = true } = {}) {
 
         adminPanelState.session = data?.session || null;
         adminPanelState.isAdmin = false;
+        adminPanelState.username = getAdminFallbackUsername(adminPanelState.session);
         adminPanelState.rotations = [];
         adminPanelState.operators = [];
         adminPanelState.actionIds.clear();
@@ -737,6 +767,7 @@ async function refreshAdminSession({ loadPending = true } = {}) {
             return;
         }
 
+        await loadAdminUsername(client);
         setAdminAuthStatus("");
         if (loadPending) {
             await fetchAdminActiveContent();
@@ -975,6 +1006,7 @@ async function signOutAdmin() {
 
     adminPanelState.session = null;
     adminPanelState.isAdmin = false;
+    adminPanelState.username = "";
     adminPanelState.rotations = [];
     adminPanelState.operators = [];
     adminPanelState.loaded = false;
@@ -1171,6 +1203,7 @@ function initAdminPanel() {
         client.auth.onAuthStateChange((_event, session) => {
             adminPanelState.session = session || null;
             adminPanelState.isAdmin = false;
+            adminPanelState.username = getAdminFallbackUsername(session);
             adminPanelState.rotations = [];
             adminPanelState.operators = [];
             adminPanelState.actionIds.clear();
