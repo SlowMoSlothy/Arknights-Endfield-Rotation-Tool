@@ -588,6 +588,7 @@ function renderAdminReviewList() {
     const list = document.getElementById("adminReviewList");
     if (!list) return;
 
+    list.classList.toggle("is-operators", adminPanelState.activeTab === "operators");
     list.innerHTML = "";
 
     if (adminPanelState.loading) {
