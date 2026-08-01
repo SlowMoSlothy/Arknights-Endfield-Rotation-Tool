@@ -1813,6 +1813,7 @@ function renderLoadoutWeaponDetails(operator) {
     heroIdentity.className = "loadout-detail-identity";
     heroIdentity.appendChild(createLoadoutWeaponIcon("large", weapon));
     const headingCopy = document.createElement("div");
+    headingCopy.className = "loadout-detail-heading-copy";
     const rarity = document.createElement("span");
     rarity.className = "loadout-weapon-rarity is-large";
     rarity.textContent = getWeaponRarityStars(weapon);

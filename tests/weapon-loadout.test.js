@@ -1438,6 +1438,8 @@ test("loadout modal exposes Supabase weapon Essence activation profiles", () => 
   assert.match(loadoutCss, /\.loadout-potential-options button[^}]*place-items: center/);
   assert.match(loadoutCss, /\.loadout-weapon-atk-badge/);
   assert.match(loadoutCss, /\.loadout-detail-row\.is-attack/);
+  assert.match(loadoutCss, /\.loadout-detail-heading h3[^}]*overflow-wrap: anywhere[^}]*white-space: normal/);
+  assert.equal((weaponLoadoutScript.match(/headingCopy\.className = "loadout-detail-heading-copy"/g) || []).length, 2);
   assert.match(loadoutCss, /\.loadout-attack-breakdown/);
   assert.match(loadoutCss, /\.loadout-weapon-list[^}]*padding: 3px/);
   assert.match(weaponLoadoutScript, /attack\.className = "loadout-weapon-atk-badge"/);
