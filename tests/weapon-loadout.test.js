@@ -1503,5 +1503,16 @@ test("loadout modal exposes Supabase weapon Essence activation profiles", () => 
   const weaponIconFiles = fs.readdirSync("endfield/assets/weapons").filter(file => file.endsWith(".png"));
   assert.equal(weaponIconFiles.length, 76);
   weaponIconFiles.forEach(file => assert.ok(fs.statSync(`endfield/assets/weapons/${file}`).size > 100));
+  const gearCatalogMigration = fs.readFileSync("supabase/gear_catalog_complete.sql", "utf8");
+  const gearIconPaths = [...gearCatalogMigration.matchAll(/'assets\/gear\/([^']+\.png)'/g)].map(match => match[1]);
+  assert.equal(gearIconPaths.length, 243);
+  assert.equal(new Set(gearIconPaths).size, 243);
+  assert.equal((gearCatalogMigration.match(/'armor'/g) || []).length, 73);
+  assert.equal((gearCatalogMigration.match(/'gloves'/g) || []).length, 65);
+  assert.equal((gearCatalogMigration.match(/'kits'/g) || []).length, 105);
+  assert.match(gearCatalogMigration, /qingbo_positioning_kit/);
+  assert.match(gearCatalogMigration, /redeemer_armor/);
+  assert.match(gearCatalogMigration, /rift_trekker_gloves/);
+  gearIconPaths.forEach(file => assert.ok(fs.statSync(`endfield/assets/gear/${file}`).size > 100));
   assert.doesNotMatch(loadoutCss, /\.loadout-essence-btn/);
 });
