@@ -287,6 +287,19 @@ def build_migration(items: list[dict]) -> str:
 
 begin;
 
+alter table public.gear_sets enable row level security;
+alter table public.gear_items enable row level security;
+
+drop policy if exists "Public read gear items" on public.gear_items;
+create policy "Public read gear items"
+    on public.gear_items
+    for select
+    to anon, authenticated
+    using (true);
+
+grant select on public.gear_sets to anon, authenticated;
+grant select on public.gear_items to anon, authenticated;
+
 insert into public.gear_sets (set_key, name, description)
 values
 {',\n'.join(set_rows)}

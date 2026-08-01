@@ -4,6 +4,19 @@
 
 begin;
 
+alter table public.gear_sets enable row level security;
+alter table public.gear_items enable row level security;
+
+drop policy if exists "Public read gear items" on public.gear_items;
+create policy "Public read gear items"
+    on public.gear_items
+    for select
+    to anon, authenticated
+    using (true);
+
+grant select on public.gear_sets to anon, authenticated;
+grant select on public.gear_items to anon, authenticated;
+
 insert into public.gear_sets (set_key, name, description)
 values
     ('aburrey_legacy', 'Aburrey''s Legacy', '3-piece set effect: Wearer''s Skill DMG +24%. When the wearer casts a battle skill, combo skill, or ultimate, the wearer gains ATK +5% for 15s. The buff from each of the three skill types is unique and does not stack with itself.'),

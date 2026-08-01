@@ -49,6 +49,15 @@ create policy "Public read gear sets"
     for select
     using (true);
 
+create policy "Public read gear items"
+    on public.gear_items
+    for select
+    to anon, authenticated
+    using (true);
+
+grant select on public.gear_sets to anon, authenticated;
+grant select on public.gear_items to anon, authenticated;
+
 -- 6. Insert Gear Sets
 insert into public.gear_sets (set_key, name, description) values
     ('aic_light', 'AIC Light Set Bonus', '3-Piece: Wearer''s HP +500. When the wearer defeats an enemy, ATK +20 for 5s.'),

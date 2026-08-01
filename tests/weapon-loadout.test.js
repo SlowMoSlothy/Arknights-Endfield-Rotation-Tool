@@ -1513,6 +1513,9 @@ test("loadout modal exposes Supabase weapon Essence activation profiles", () => 
   assert.match(gearCatalogMigration, /qingbo_positioning_kit/);
   assert.match(gearCatalogMigration, /redeemer_armor/);
   assert.match(gearCatalogMigration, /rift_trekker_gloves/);
+  assert.match(gearCatalogMigration, /create policy "Public read gear items"[\s\S]*to anon, authenticated[\s\S]*using \(true\)/);
+  assert.match(gearCatalogMigration, /grant select on public\.gear_items to anon, authenticated/);
+  assert.equal((gearCatalogMigration.match(/'gloves', 'Hot Work (?:Gauntlets(?: T1)?|Gloves|Hands PPE)'/g) || []).length, 4);
   gearIconPaths.forEach(file => assert.ok(fs.statSync(`endfield/assets/gear/${file}`).size > 100));
   assert.doesNotMatch(loadoutCss, /\.loadout-essence-btn/);
 });
