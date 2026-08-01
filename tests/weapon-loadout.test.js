@@ -1493,8 +1493,13 @@ test("loadout modal exposes Supabase weapon Essence activation profiles", () => 
   assert.match(supabaseClientScript, /from\("weapon_essence_profiles"\)/);
   assert.match(supabaseClientScript, /mapDatabaseWeaponEssenceProfile/);
   assert.match(supabaseClientScript, /assets\/weapons\/\$\{weaponKey\}\.png/);
+  const weaponCatalogMigration = fs.readFileSync("supabase/weapon_catalog_complete.sql", "utf8");
+  assert.equal((weaponCatalogMigration.match(/'arknights_endfield'/g) || []).length, 76);
+  assert.equal((weaponCatalogMigration.match(/Level 90 stat progression/g) || []).length, 76);
+  assert.match(weaponCatalogMigration, /type_42_solemn_phalanx/);
+  assert.match(weaponCatalogMigration, /blessing_of_lustrous_carmine/);
   const weaponIconFiles = fs.readdirSync("endfield/assets/weapons").filter(file => file.endsWith(".png"));
-  assert.equal(weaponIconFiles.length, 29);
+  assert.equal(weaponIconFiles.length, 76);
   weaponIconFiles.forEach(file => assert.ok(fs.statSync(`endfield/assets/weapons/${file}`).size > 100));
   assert.doesNotMatch(loadoutCss, /\.loadout-essence-btn/);
 });
