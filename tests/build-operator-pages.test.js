@@ -362,6 +362,7 @@ test("generated pages use placeholders when an operator image is missing", () =>
   assert.match(index, /data-class="supporter"/);
   assert.match(index, /class="tile-chip tile-class-chip"/);
   assert.match(index, /class="tile-chip tile-element-chip element-nature"/);
+  assert.match(index, /\.tile-chips\{display:flex;flex-wrap:nowrap/);
   assert.match(index, />Supporter<\/span><\/span>/);
   assert.match(index, />Nature<\/span><\/span>/);
   assert.match(index, /\.tile-element-chip\.element-heat\{--element-color:#ff6b4a/);
