@@ -28,6 +28,8 @@ test("checked-in operator index contains no unresolved merge conflicts", () => {
   assert.doesNotMatch(checkedInOperatorIndex, /\uFFFD/);
   assert.match(checkedInOperatorIndex, /Open Rotation Tool ↗/);
   assert.match(checkedInOperatorIndex, /class="tile-stars">★★★★/);
+  assert.match(checkedInOperatorIndex, /class="tile-chips"/);
+  assert.match(checkedInOperatorIndex, /class="tile-chip tile-element-chip element-heat"/);
 });
 
 function operator(overrides = {}) {
@@ -358,6 +360,12 @@ test("generated pages use placeholders when an operator image is missing", () =>
   assert.match(index, /name="sort"/);
   assert.match(index, /data-name="mi fu"/);
   assert.match(index, /data-class="supporter"/);
+  assert.match(index, /class="tile-chip tile-class-chip"/);
+  assert.match(index, /class="tile-chip tile-element-chip element-nature"/);
+  assert.match(index, />Supporter<\/span><\/span>/);
+  assert.match(index, />Nature<\/span><\/span>/);
+  assert.match(index, /\.tile-element-chip\.element-heat\{--element-color:#ff6b4a/);
+  assert.doesNotMatch(index, /<p>Supporter · Nature<\/p>/);
   assert.match(index, /id="operator-count">1 Operator/);
   assert.match(index, /No operators match the selected filters/);
   assert.match(index, /new Intl\.Collator/);
