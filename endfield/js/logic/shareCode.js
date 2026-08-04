@@ -12,6 +12,10 @@ const BUILD_SHARE_CODE_PREFIX_V11 = "AERT11:";
 const BUILD_SHARE_CODE_PREFIX_V12 = "AERT12:";
 const BUILD_SHARE_CODE_PREFIX = "AERT13:";
 const BUILD_SHARE_HASH_KEY = "setup";
+const BUILD_SHORT_SHARE_HASH_KEY = "share";
+const BUILD_SHORT_SHARE_CODE_PATTERN = /^[A-Z0-9]{6}$/i;
+const BUILD_SHARE_TYPE_ROTATION = "rotation";
+const BUILD_SHARE_TYPE_SIMULATION = "simulation";
 const BUILD_SHARE_UI_FLAG_SIMULATION_MODE = 1;
 const BUILD_SHARE_UI_FLAG_HAS_SP_PER_SECOND = 2;
 const BUILD_SHARE_UI_FLAG_HAS_SIMULATION_DURATION = 4;
@@ -802,9 +806,127 @@ function getBuildShareBaseUrl() {
         : builderWatermarkUrl;
 }
 
-function createBuildShareLink() {
-    const code = getDisplayBuildShareCode();
-    return `${getBuildShareBaseUrl()}#${BUILD_SHARE_HASH_KEY}=${encodeURIComponent(code)}`;
+function getCurrentBuildShareType() {
+    return typeof uiSettings !== "undefined" && uiSettings?.timelineMode === "simulation"
+        ? BUILD_SHARE_TYPE_SIMULATION
+        : BUILD_SHARE_TYPE_ROTATION;
+}
+
+function getBuildShareTypeLabel(shareType) {
+    return shareType === BUILD_SHARE_TYPE_SIMULATION ? "Simulation" : "Slot Mode rotation";
+}
+
+function normalizeShortBuildShareCode(value) {
+    const normalized = String(value || "").trim().toUpperCase();
+    return BUILD_SHORT_SHARE_CODE_PATTERN.test(normalized) ? normalized : "";
+}
+
+function extractShortBuildShareCode(input) {
+    const trimmed = String(input || "").trim();
+    if (!trimmed) return "";
+
+    const directCode = normalizeShortBuildShareCode(trimmed);
+    if (directCode) return directCode;
+
+    try {
+        const url = new URL(trimmed);
+        const searchCode = normalizeShortBuildShareCode(url.searchParams.get(BUILD_SHORT_SHARE_HASH_KEY));
+        if (searchCode) return searchCode;
+
+        const hash = url.hash.replace(/^#/, "");
+        const hashCode = normalizeShortBuildShareCode(
+            new URLSearchParams(hash).get(BUILD_SHORT_SHARE_HASH_KEY)
+        );
+        if (hashCode) return hashCode;
+    } catch (error) {
+        // Plain short codes and hash fragments are handled below.
+    }
+
+    if (trimmed.startsWith(`${BUILD_SHORT_SHARE_HASH_KEY}=`)) {
+        return normalizeShortBuildShareCode(
+            new URLSearchParams(trimmed).get(BUILD_SHORT_SHARE_HASH_KEY)
+        );
+    }
+
+    return "";
+}
+
+async function createStoredBuildShare() {
+    if (typeof supabaseClient === "undefined" || !supabaseClient?.rpc) {
+        throw new Error("The short share-code service is unavailable.");
+    }
+
+    const sharePayload = getDisplayBuildShareCode();
+    const shareType = getCurrentBuildShareType();
+    const operatorIds = Array.from(new Set(
+        (typeof selectedTeam !== "undefined" && Array.isArray(selectedTeam) ? selectedTeam : [])
+            .filter(operatorId => operatorId !== null && operatorId !== undefined && operatorId !== "")
+            .map(Number)
+            .filter(Number.isInteger)
+    ));
+    const { data, error } = await supabaseClient.rpc("create_rotation_share", {
+        p_share_type: shareType,
+        p_share_payload: sharePayload,
+        p_format_version: BUILD_PERSISTENCE_PAYLOAD_VERSION,
+        p_operator_ids: operatorIds
+    });
+
+    if (error) throw error;
+
+    const result = Array.isArray(data) ? data[0] : data;
+    const shortCode = normalizeShortBuildShareCode(result?.short_code);
+    if (!shortCode || result?.share_type !== shareType) {
+        throw new Error("Supabase returned an invalid short share code.");
+    }
+
+    return { shortCode, shareType, sharePayload };
+}
+
+async function createBuildShareLink() {
+    const storedShare = await createStoredBuildShare();
+    return `${getBuildShareBaseUrl()}#${BUILD_SHORT_SHARE_HASH_KEY}=${storedShare.shortCode}`;
+}
+
+async function resolveStoredBuildShare(shortCode) {
+    if (typeof supabaseClient === "undefined" || !supabaseClient?.rpc) {
+        throw new Error("The short share-code service is unavailable.");
+    }
+
+    const normalizedCode = normalizeShortBuildShareCode(shortCode);
+    if (!normalizedCode) throw new Error("Invalid short share code.");
+
+    const { data, error } = await supabaseClient.rpc("resolve_rotation_share", {
+        p_short_code: normalizedCode
+    });
+    if (error) throw error;
+
+    const result = Array.isArray(data) ? data[0] : data;
+    const shareType = result?.share_type;
+    if (![BUILD_SHARE_TYPE_ROTATION, BUILD_SHARE_TYPE_SIMULATION].includes(shareType)) {
+        throw new Error("The stored share type is invalid.");
+    }
+
+    const sharePayload = String(result?.share_payload || "");
+    const parsedPayload = parseBuildShareCode(sharePayload);
+    const embeddedType = parsedPayload?.uiSettings?.timelineMode === "simulation"
+        ? BUILD_SHARE_TYPE_SIMULATION
+        : BUILD_SHARE_TYPE_ROTATION;
+    if (embeddedType !== shareType) {
+        throw new Error("The stored share type does not match its planner data.");
+    }
+
+    return { shortCode: normalizedCode, shareType, sharePayload };
+}
+
+async function resolveBuildShareInput(input) {
+    const shortCode = extractShortBuildShareCode(input);
+    if (shortCode) return resolveStoredBuildShare(shortCode);
+
+    return {
+        shortCode: "",
+        shareType: null,
+        sharePayload: extractBuildShareCode(input)
+    };
 }
 
 async function copyBuildShareCode() {
@@ -812,14 +934,14 @@ async function copyBuildShareCode() {
         return false;
     }
 
-    const code = getDisplayBuildShareCode();
-
     try {
-        await navigator.clipboard.writeText(code);
-        alert(`Share code copied (${code.length} characters).`);
+        const storedShare = await createStoredBuildShare();
+        await navigator.clipboard.writeText(storedShare.shortCode);
+        alert(`${getBuildShareTypeLabel(storedShare.shareType)} share code copied: ${storedShare.shortCode}`);
     } catch (error) {
-        console.warn("Clipboard copy failed, falling back to prompt:", error);
-        prompt("Copy share code:", code);
+        console.error("Short share-code copy failed:", error);
+        alert("The short share code could not be created. Please try again.");
+        return false;
     }
 
     return true;
@@ -830,14 +952,14 @@ async function copyBuildShareLink() {
         return false;
     }
 
-    const link = createBuildShareLink();
-
     try {
+        const link = await createBuildShareLink();
         await navigator.clipboard.writeText(link);
         alert("Share link copied.");
     } catch (error) {
-        console.warn("Clipboard copy failed, falling back to prompt:", error);
-        prompt("Copy share link:", link);
+        console.error("Short share-link copy failed:", error);
+        alert("The short share link could not be created. Please try again.");
+        return false;
     }
 
     return true;
@@ -1733,6 +1855,9 @@ function parseCompactBuildShareCodeV2(encoded) {
 
 function getBuildShareCodeFromUrl() {
     const searchParams = new URLSearchParams(window.location.search);
+    const queryShortCode = normalizeShortBuildShareCode(searchParams.get(BUILD_SHORT_SHARE_HASH_KEY));
+    if (queryShortCode) return queryShortCode;
+
     const queryCode = searchParams.get(BUILD_SHARE_HASH_KEY);
     if (queryCode) return queryCode;
 
@@ -1744,15 +1869,19 @@ function getBuildShareCodeFromUrl() {
     }
 
     const hashParams = new URLSearchParams(hash);
+    const shortCode = normalizeShortBuildShareCode(hashParams.get(BUILD_SHORT_SHARE_HASH_KEY));
+    if (shortCode) return shortCode;
+
     return hashParams.get(BUILD_SHARE_HASH_KEY);
 }
 
-function loadBuildShareCodeFromUrl() {
+async function loadBuildShareCodeFromUrl() {
     const code = getBuildShareCodeFromUrl();
     if (!code) return false;
 
     try {
-        applyBuildShareCode(decodeURIComponent(code));
+        const resolvedShare = await resolveBuildShareInput(decodeURIComponent(code));
+        applyBuildShareCode(resolvedShare.sharePayload);
         return true;
     } catch (error) {
         console.error("Share link import failed:", error);
@@ -1904,13 +2033,17 @@ function applyBuildShareCode(code) {
     if (typeof initSkillDragDrop === "function") initSkillDragDrop();
 }
 
-function loadBuildShareCode() {
+async function loadBuildShareCode() {
     const code = prompt("Paste share code or share link:");
     if (!code) return;
 
     try {
-        applyBuildShareCode(code);
-        alert("Team and rotation loaded.");
+        const resolvedShare = await resolveBuildShareInput(code);
+        applyBuildShareCode(resolvedShare.sharePayload);
+        const modeLabel = resolvedShare.shareType
+            ? `${getBuildShareTypeLabel(resolvedShare.shareType)} `
+            : "";
+        alert(`${modeLabel}team and rotation loaded.`);
     } catch (error) {
         console.error("Share code import failed:", error);
         alert("The share code could not be loaded.");

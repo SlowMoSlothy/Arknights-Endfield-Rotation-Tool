@@ -22,6 +22,7 @@ import {
 
 const checkedInOperatorIndex = fs.readFileSync("endfield/operators/index.html", "utf8");
 const actionTimingMigration = fs.readFileSync("supabase/operator_action_timings.sql", "utf8");
+const operatorSharesScript = fs.readFileSync("endfield/js/ui/operatorShares.js", "utf8");
 
 test("checked-in operator index contains no unresolved merge conflicts", () => {
   assert.doesNotMatch(checkedInOperatorIndex, /^(?:<<<<<<<|=======|>>>>>>>)/m);
@@ -482,6 +483,14 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /class="section-nav"/);
   assert.match(page, /href="#rotation-profile">Overview/);
   assert.match(page, /href="#batk">BATK/);
+  assert.match(page, /data-operator-share-browser data-operator-id="1" data-operator-name="Mi Fu"/);
+  assert.match(page, /data-share-type="rotation"/);
+  assert.match(page, /data-share-count="rotation"/);
+  assert.match(page, /data-share-type="simulation"/);
+  assert.match(page, /data-share-count="simulation"/);
+  assert.match(page, /id="operator-share-results" hidden/);
+  assert.match(page, /js\/ui\/operatorShares\.js\?v=1/);
+  assert.match(page, /\.operator-share-list\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(page, /id="batk"/);
   assert.match(page, /<h2>Measured Combo<\/h2>/);
   assert.match(page, /<span>Total duration<\/span><strong>2\.5s<\/strong>/);
@@ -529,6 +538,15 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.doesNotMatch(page, /<section class="meta-strip">/);
   assert.doesNotMatch(page, /<span class="stat-label">Ultimate<\/span>/);
   assert.doesNotMatch(page, /-webkit-line-clamp/);
+});
+
+test("operator share browser loads live counts and safe public share cards", () => {
+  assert.match(operatorSharesScript, /rpc\("get_operator_share_summary"/);
+  assert.match(operatorSharesScript, /rpc\("list_operator_shares"/);
+  assert.match(operatorSharesScript, /p_operator_id:\s*operatorId/);
+  assert.match(operatorSharesScript, /open\.href = `\/endfield\/#share=/);
+  assert.match(operatorSharesScript, /list\.replaceChildren/);
+  assert.doesNotMatch(operatorSharesScript, /innerHTML/);
 });
 
 test("BATK timing falls back to summed sequence durations and supports missing data", () => {

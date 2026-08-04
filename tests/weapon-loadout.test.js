@@ -208,7 +208,7 @@ test("weapon rarity renders as stars instead of a numeric star label", () => {
   assert.doesNotMatch(weaponLoadoutScript, /\$\{Number\(weapon\.rarity\)[^\n]*-star/);
 });
 
-test("weapon Potential and Essence allocations are shared only in Simulation Mode", () => {
+test("weapon Potential and Essence allocations are shared only in Simulation Mode", async () => {
   const context = createWeaponContext();
   context.rotation = [{ id: 801, type: "skill", time: 0 }];
   context.operatorUltimateStates = {};
@@ -216,6 +216,36 @@ test("weapon Potential and Essence allocations are shared only in Simulation Mod
   context.BASIC_ATTACK_ACTION_TYPE = "basic_attack";
   context.btoa = value => Buffer.from(value, "binary").toString("base64");
   context.atob = value => Buffer.from(value, "base64").toString("binary");
+  context.URL = URL;
+  context.URLSearchParams = URLSearchParams;
+  const shareRpcCalls = [];
+  context.supabaseClient = {
+    async rpc(name, params) {
+      shareRpcCalls.push({ name, params });
+      if (name === "create_rotation_share") {
+        return {
+          data: {
+            short_code: params.p_share_type === "simulation" ? "SIM123" : "ROT123",
+            share_type: params.p_share_type,
+            format_version: params.p_format_version
+          },
+          error: null
+        };
+      }
+      if (name === "resolve_rotation_share") {
+        return {
+          data: {
+            short_code: params.p_short_code,
+            share_type: "simulation",
+            share_payload: context.createBuildShareCode(),
+            format_version: 13
+          },
+          error: null
+        };
+      }
+      return { data: null, error: new Error("Unexpected RPC") };
+    }
+  };
 
   vm.runInContext(shareCodeScript, context);
   context.setEquippedWeaponForOperator(8, "lone_barge");
@@ -236,9 +266,18 @@ test("weapon Potential and Essence allocations are shared only in Simulation Mod
   const v10DisplayCode = context.encodeShareBytes([10, ...v9Bytes]);
   assert.equal(context.parseBuildShareCode(v10DisplayCode).v, 10);
   context.location = { protocol: "https:", origin: "https://rotationforge.gg", pathname: "/endfield/" };
-  const shareLink = context.createBuildShareLink();
-  assert.match(shareLink, /^https:\/\/rotationforge\.gg\/endfield\/#setup=/);
+  const shareLink = await context.createBuildShareLink();
+  assert.equal(shareLink, "https://rotationforge.gg/endfield/#share=SIM123");
   assert.doesNotMatch(shareLink, /AERT\d+/);
+  assert.equal(shareRpcCalls[0].name, "create_rotation_share");
+  assert.equal(shareRpcCalls[0].params.p_share_type, "simulation");
+  assert.equal(shareRpcCalls[0].params.p_format_version, 13);
+  assert.deepEqual(Array.from(shareRpcCalls[0].params.p_operator_ids), [8]);
+
+  const resolvedShare = await context.resolveBuildShareInput("https://rotationforge.gg/endfield/#share=sim123");
+  assert.equal(resolvedShare.shortCode, "SIM123");
+  assert.equal(resolvedShare.shareType, "simulation");
+  assert.equal(context.parseBuildShareCode(resolvedShare.sharePayload).uiSettings.timelineMode, "simulation");
   assert.equal(simulationPayload.operatorLoadouts[8].weapon.key, "lone_barge");
   assert.equal(simulationPayload.operatorLoadouts[8].weapon.potential, 5);
   assert.deepEqual(JSON.parse(JSON.stringify(simulationPayload.operatorLoadouts[8].weapon.essence)), { primary: 4, secondary: 3, skill: 2 });
@@ -268,6 +307,11 @@ test("weapon Potential and Essence allocations are shared only in Simulation Mod
   const slotCode = context.createBuildShareCode();
   const slotPayload = context.parseBuildShareCode(slotCode);
   assert.deepEqual(JSON.parse(JSON.stringify(slotPayload.operatorLoadouts)), {});
+  const rotationShare = await context.createStoredBuildShare();
+  assert.equal(rotationShare.shortCode, "ROT123");
+  assert.equal(rotationShare.shareType, "rotation");
+  assert.equal(shareRpcCalls.at(-1).params.p_share_type, "rotation");
+  assert.deepEqual(Array.from(shareRpcCalls.at(-1).params.p_operator_ids), [8]);
 
   const v8SlotBytes = context.createCompactShareBytes();
   const legacyV6Payload = context.parseBuildShareCode(`AERT6:${context.encodeShareBytes(v8SlotBytes)}`);

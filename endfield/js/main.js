@@ -439,7 +439,7 @@ async function initApp() {
         loadTeam();
         if (typeof loadOperatorLoadouts === "function") loadOperatorLoadouts();
         loadRotation();
-        const loadedSharedBuild = loadBuildShareCodeFromUrl();
+        const loadedSharedBuild = await loadBuildShareCodeFromUrl();
         if (!loadedSharedBuild) {
             consumeLeaderOperatorFromUrl();
         }

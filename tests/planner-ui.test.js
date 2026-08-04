@@ -8,6 +8,7 @@ const rotationCss = fs.readFileSync("endfield/css/rotation.css", "utf8");
 const rotationGridScript = fs.readFileSync("endfield/js/ui/rotationGrid.js", "utf8");
 const weaponAtkChartScript = fs.readFileSync("endfield/js/ui/weaponAtkChart.js", "utf8");
 const uiSettingsScript = fs.readFileSync("endfield/js/logic/uiSettings.js", "utf8");
+const shortShareMigration = fs.readFileSync("supabase/rotation_share_codes.sql", "utf8");
 
 test("planner exposes a visible timeline mode switch in the rotation toolbar", () => {
   assert.match(plannerHtml, /class="rotation-actions"[^>]*aria-label="Rotation actions"/);
@@ -16,6 +17,23 @@ test("planner exposes a visible timeline mode switch in the rotation toolbar", (
   assert.match(plannerHtml, /class="rotation-mode-switch-btn"[^>]*data-setting="timelineMode"[\s\S]*data-value="slot"/);
   assert.doesNotMatch(plannerHtml, /Rotation Mode/);
   assert.doesNotMatch(plannerHtml, /class="settings-option-btn settings-mode-btn"[^>]*data-setting="timelineMode"/);
+});
+
+test("short share codes are unique, mode-aware and accessible only through validated RPCs", () => {
+  assert.match(shortShareMigration, /create table if not exists public\.rotation_share_codes/);
+  assert.match(shortShareMigration, /short_code varchar\(6\) not null unique/);
+  assert.match(shortShareMigration, /share_type in \('rotation', 'simulation'\)/);
+  assert.match(shortShareMigration, /alter table public\.rotation_share_codes enable row level security/);
+  assert.match(shortShareMigration, /revoke all on table public\.rotation_share_codes from anon, authenticated/);
+  assert.match(shortShareMigration, /operator_ids integer\[\]/);
+  assert.match(shortShareMigration, /create function public\.create_rotation_share/);
+  assert.match(shortShareMigration, /create or replace function public\.resolve_rotation_share/);
+  assert.match(shortShareMigration, /create or replace function public\.get_operator_share_summary/);
+  assert.match(shortShareMigration, /create or replace function public\.list_operator_shares/);
+  assert.match(shortShareMigration, /using gin \(operator_ids\)/);
+  assert.match(shortShareMigration, /share\.operator_ids @> array\[p_operator_id\]/);
+  assert.match(shortShareMigration, /grant execute on function public\.get_operator_share_summary/);
+  assert.match(plannerHtml, /shareCode\.js\?v=9/);
 });
 
 test("timeline mode switch has active styling and accessible pressed state", () => {
