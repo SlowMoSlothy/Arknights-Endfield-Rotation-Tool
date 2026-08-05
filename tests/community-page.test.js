@@ -23,6 +23,9 @@ test("Discover separates rotation and simulation shares", () => {
   assert.match(communityScript, /share\.share_type === discoverState\.type/);
   assert.match(communityScript, /#share=\$\{encodeURIComponent\(share\.short_code\)\}/);
   assert.match(communityScript, /mode-chip mode-\$\{share\.share_type\}/);
+  assert.match(communityScript, /item\.setAttribute\("role", "link"\)/);
+  assert.match(communityScript, /event\.target\.closest\("a, button, input, select, textarea"\)/);
+  assert.match(communityScript, /window\.location\.href = plannerUrl\(share\)/);
 });
 
 test("Discover reads public short shares through a restricted RPC", () => {

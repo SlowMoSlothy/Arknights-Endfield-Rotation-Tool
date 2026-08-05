@@ -166,6 +166,9 @@ async function copyShare(share, button) {
 function card(share) {
   const item = create("article", "rotation-card");
   item.dataset.shareType = share.share_type;
+  item.tabIndex = 0;
+  item.setAttribute("role", "link");
+  item.setAttribute("aria-label", `Open ${share.title || share.short_code} in Rotation Tool`);
   item.appendChild(teamStrip(share));
 
   const meta = create("div", "share-meta");
@@ -197,6 +200,20 @@ function card(share) {
   copy.addEventListener("click", () => copyShare(share, copy));
   footer.appendChild(copy);
   item.appendChild(footer);
+
+  const openShare = () => {
+    window.location.href = plannerUrl(share);
+  };
+  item.addEventListener("click", event => {
+    if (event.target.closest("a, button, input, select, textarea")) return;
+    openShare();
+  });
+  item.addEventListener("keydown", event => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    if (event.target !== item) return;
+    event.preventDefault();
+    openShare();
+  });
   return item;
 }
 
