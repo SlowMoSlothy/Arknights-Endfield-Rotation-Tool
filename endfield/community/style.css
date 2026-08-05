@@ -187,9 +187,55 @@ h1 {
   line-height: 1.45;
 }
 
+.share-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 6px;
+  border: 1px solid rgba(160, 170, 169, 0.20);
+  border-radius: 10px;
+  background: rgba(18, 23, 24, 0.72);
+}
+
+.share-tab {
+  min-height: 42px;
+  border: 1px solid rgba(160, 170, 169, 0.22);
+  border-radius: 8px;
+  color: #d9dedb;
+  background: rgba(126, 128, 124, 0.10);
+  font-size: 0.78rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.share-tab strong {
+  display: inline-grid;
+  min-width: 23px;
+  min-height: 23px;
+  margin-left: 7px;
+  place-items: center;
+  border-radius: 999px;
+  color: var(--muted);
+  background: rgba(7, 9, 10, 0.38);
+  font-size: 0.68rem;
+}
+
+.share-tab.is-active {
+  color: var(--yellow);
+  border-color: rgba(248, 245, 70, 0.62);
+  background: linear-gradient(135deg, rgba(248, 245, 70, 0.14), rgba(101, 113, 54, 0.18));
+  box-shadow: inset 0 -2px 0 var(--yellow);
+}
+
+.share-tab.is-active strong {
+  color: #202526;
+  background: var(--yellow);
+}
+
 .toolbar {
   display: grid;
-  grid-template-columns: auto minmax(220px, 1fr) repeat(3, minmax(125px, auto)) auto auto;
+  grid-template-columns: auto minmax(190px, 1fr) repeat(4, minmax(115px, auto)) auto auto;
   gap: 8px;
   align-items: end;
   margin-bottom: 12px;
@@ -312,6 +358,24 @@ h1 {
     linear-gradient(145deg, rgba(25, 31, 32, 0.18), rgba(15, 19, 20, 0.68));
 }
 
+.team-member {
+  min-width: 0;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+}
+
+.team-member-name {
+  width: 100%;
+  overflow: hidden;
+  color: #d9dedb;
+  font-size: 0.58rem;
+  font-weight: 800;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .operator-avatar,
 .operator-placeholder {
   width: 100%;
@@ -340,6 +404,46 @@ h1 {
   align-items: flex-start;
   justify-content: space-between;
   gap: 10px;
+}
+
+.share-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.mode-chip,
+.share-code {
+  min-height: 22px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 0.58rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mode-chip {
+  color: var(--yellow);
+  border: 1px solid rgba(248, 245, 70, 0.42);
+  background: rgba(248, 245, 70, 0.08);
+}
+
+.mode-simulation {
+  color: #69d9ff;
+  border-color: rgba(71, 199, 242, 0.54);
+  background: rgba(31, 170, 220, 0.10);
+}
+
+.share-code {
+  color: #eef1ed;
+  border: 1px solid rgba(160, 170, 169, 0.25);
+  background: rgba(7, 9, 10, 0.30);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: 0.13em;
 }
 
 .card-title-wrap {
@@ -558,6 +662,12 @@ h1 {
   font-weight: 850;
   text-transform: uppercase;
 }
+
+.chip-heat { color: #ff7668; border-color: rgba(239, 75, 67, 0.5); }
+.chip-cryo { color: #75c8ff; border-color: rgba(90, 184, 255, 0.5); }
+.chip-electric { color: #f6dc54; border-color: rgba(240, 211, 74, 0.5); }
+.chip-nature { color: #77df91; border-color: rgba(88, 209, 122, 0.5); }
+.chip-physical { color: #d4d7d6; border-color: rgba(190, 194, 193, 0.48); }
 
 .card-footer {
   display: flex;

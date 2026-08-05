@@ -1,19 +1,17 @@
-const communityPageState = {
-  rotations: [],
+const discoverState = {
+  shares: [],
   operators: new Map(),
-  skills: new Map(),
-  profiles: new Map(),
-  likedIds: new Set(),
+  type: "rotation",
   search: "",
+  operatorId: 0,
   element: "all",
   operatorClass: "all",
   sort: "newest",
-  operatorId: null,
-  detailId: "",
+  rotationCount: 0,
+  simulationCount: 0,
   loading: false
 };
 
-const LIKES_STORAGE_KEY = "aertLikedCommunityRotations";
 let toastTimeout = 0;
 
 function list(value) {
@@ -35,13 +33,6 @@ function label(value) {
     .replace(/\b\w/g, letter => letter.toUpperCase());
 }
 
-function assetUrl(path) {
-  const value = text(path);
-  if (!value) return "";
-  if (/^(?:https?:)?\/\//i.test(value) || value.startsWith("/")) return value;
-  return `../${value.replace(/^\.?\//, "")}`;
-}
-
 function create(tag, className = "", content = "") {
   const element = document.createElement(tag);
   if (className) element.className = className;
@@ -49,51 +40,27 @@ function create(tag, className = "", content = "") {
   return element;
 }
 
-function readLikedIds() {
-  try {
-    return new Set(JSON.parse(localStorage.getItem(LIKES_STORAGE_KEY) || "[]").map(String));
-  } catch {
-    return new Set();
-  }
-}
-
-function saveLikedIds() {
-  localStorage.setItem(LIKES_STORAGE_KEY, JSON.stringify([...communityPageState.likedIds].slice(-500)));
+function assetUrl(path) {
+  const value = text(path);
+  if (!value) return "";
+  if (/^(?:https?:)?\/\//i.test(value) || value.startsWith("/")) return value;
+  return `../${value.replace(/^\.?\//, "")}`;
 }
 
 function getOperator(id) {
-  return communityPageState.operators.get(Number(id)) || null;
+  return discoverState.operators.get(Number(id)) || null;
 }
 
-function getSkill(id) {
-  return communityPageState.skills.get(Number(id)) || null;
+function getTeam(share) {
+  return list(share.operator_ids).map(getOperator).filter(Boolean);
 }
 
-function getTeam(row) {
-  return list(row.team_operator_ids).map(getOperator).filter(Boolean);
+function getElements(share) {
+  return [...new Set(getTeam(share).map(operator => normalize(operator.elementType)).filter(Boolean))];
 }
 
-function getSkills(row) {
-  return list(row.rotation_skill_ids).map(getSkill).filter(Boolean);
-}
-
-function getAuthor(row) {
-  const profile = communityPageState.profiles.get(text(row.submitted_by));
-  return text(profile?.username || row.author_name || "Anonymous") || "Anonymous";
-}
-
-function getElements(row) {
-  const values = list(row.element_types).length
-    ? list(row.element_types)
-    : getTeam(row).map(operator => operator.elementType);
-  return [...new Set(values.map(text).filter(Boolean))];
-}
-
-function getClasses(row) {
-  const values = list(row.operator_classes).length
-    ? list(row.operator_classes)
-    : getTeam(row).map(operator => operator.operatorClass);
-  return [...new Set(values.map(text).filter(Boolean))];
+function getClasses(share) {
+  return [...new Set(getTeam(share).map(operator => normalize(operator.operatorClass)).filter(Boolean))];
 }
 
 function formatDate(value) {
@@ -106,17 +73,13 @@ function formatDate(value) {
   }).format(date);
 }
 
-function plannerUrl(row) {
-  return row?.share_code
-    ? `../#setup=${encodeURIComponent(row.share_code)}`
-    : "../";
+function plannerUrl(share) {
+  return `../#share=${encodeURIComponent(share.short_code)}`;
 }
 
-function rotationLink(row) {
-  const url = new URL(window.location.href);
-  url.search = "";
-  url.hash = "";
-  url.searchParams.set("community", row.id);
+function shareLink(share) {
+  const url = new URL("../", window.location.href);
+  url.hash = `share=${encodeURIComponent(share.short_code)}`;
   return url.href;
 }
 
@@ -130,122 +93,41 @@ function avatar(operator) {
   return image;
 }
 
-function normalizeSkillElement(elementType) {
-  const key = text(elementType).toLowerCase();
-  const aliases = {
-    heat: "heat",
-    fire: "heat",
-    burn: "heat",
-    cryo: "cryo",
-    ice: "cryo",
-    frost: "cryo",
-    electric: "electric",
-    electro: "electric",
-    thunder: "electric",
-    lightning: "electric",
-    nature: "nature",
-    plant: "nature",
-    poison: "nature",
-    physical: "physical",
-    neutral: "physical"
-  };
-  return aliases[key] || "neutral";
-}
-
-function skillIcon(skill) {
-  const element = normalizeSkillElement(skill?.elementType);
-  const fillMode = text(skill?.type).toLowerCase() === "ultimate" ? "full" : "half";
-  const root = create("span", `ef-skill-icon ef-element-${element} ef-fill-${fillMode}`);
-  root.title = skill?.name || "Skill";
-
-  const fill = create("span", "ef-skill-fill");
-  const glyphWrap = create("span", "ef-skill-glyph-wrap");
-  const ring = create("span", "ef-skill-ring");
-  const path = skill?.iconSmall || skill?.icon;
-  if (path) {
-    const image = create("img", "ef-skill-glyph");
-    image.src = assetUrl(path);
-    image.alt = skill?.name || "Skill";
-    image.loading = "lazy";
-    image.addEventListener("error", () => {
-      image.replaceWith(create("span", "ef-skill-fallback", skill?.shortType || "?"));
-    }, { once: true });
-    glyphWrap.appendChild(image);
-  } else {
-    glyphWrap.appendChild(create("span", "ef-skill-fallback", skill?.shortType || "?"));
-  }
-
-  root.append(fill, glyphWrap, ring);
-  return root;
-}
-
-function teamStrip(row) {
+function teamStrip(share) {
   const strip = create("div", "team-strip");
-  const team = getTeam(row);
+  const team = getTeam(share);
   for (let index = 0; index < 4; index += 1) {
-    strip.appendChild(team[index] ? avatar(team[index]) : create("span", "operator-placeholder", "?"));
+    const cell = create("div", "team-member");
+    if (team[index]) {
+      cell.append(avatar(team[index]), create("span", "team-member-name", team[index].name));
+    } else {
+      cell.appendChild(create("span", "operator-placeholder", "?"));
+    }
+    strip.appendChild(cell);
   }
   return strip;
 }
 
-function preview(row, expanded = false) {
-  const wrapper = create("div", expanded ? "detail-skills" : "rotation-preview");
-  const skills = getSkills(row);
-  const visible = expanded ? skills : skills.slice(0, 6);
-
-  if (!visible.length) {
-    wrapper.appendChild(create("span", "preview-more", `${list(row.rotation_skill_ids).length} actions`));
-    return wrapper;
-  }
-
-  visible.forEach((skill, index) => {
-    if (index) wrapper.appendChild(create("span", "preview-arrow", "→"));
-    if (expanded) {
-      const item = create("span", "detail-skill");
-      item.append(skillIcon(skill), create("span", "", skill.name || "Skill"));
-      wrapper.appendChild(item);
-    } else {
-      wrapper.appendChild(skillIcon(skill));
-    }
-  });
-
-  if (!expanded && skills.length > visible.length) {
-    wrapper.appendChild(create("span", "preview-more", `+${skills.length - visible.length}`));
-  }
-  return wrapper;
-}
-
-function chips(row) {
+function chipRow(share) {
   const wrapper = create("div", "chip-row");
-  [...getElements(row), ...getClasses(row)].slice(0, 8).forEach(value => {
-    wrapper.appendChild(create("span", "chip", label(value)));
+  [...getElements(share), ...getClasses(share)].slice(0, 8).forEach(value => {
+    wrapper.appendChild(create("span", `chip chip-${normalize(value)}`, label(value)));
   });
   return wrapper;
-}
-
-function actionButton(className, content, handler) {
-  const button = create("button", className, content);
-  button.type = "button";
-  button.addEventListener("click", event => {
-    event.stopPropagation();
-    handler(button);
-  });
-  return button;
 }
 
 function showToast(message, type = "success") {
   const toast = document.getElementById("pageToast");
   if (!toast) return;
-
   window.clearTimeout(toastTimeout);
   toast.textContent = message;
   toast.className = `page-toast is-visible is-${type}`;
   toastTimeout = window.setTimeout(() => {
     toast.className = "page-toast";
-  }, 2600);
+  }, 2400);
 }
 
-function copyTextFallback(value) {
+function copyFallback(value) {
   const input = document.createElement("textarea");
   input.value = value;
   input.setAttribute("readonly", "");
@@ -253,7 +135,6 @@ function copyTextFallback(value) {
   input.style.opacity = "0";
   document.body.appendChild(input);
   input.select();
-
   let copied = false;
   try {
     copied = document.execCommand("copy");
@@ -263,217 +144,107 @@ function copyTextFallback(value) {
   return copied;
 }
 
-async function copyLink(row, button) {
-  const url = rotationLink(row);
-  const originalLabel = button?.textContent || "Copy link";
-
+async function copyShare(share, button) {
+  const value = shareLink(share);
   try {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(url);
-    } else if (!copyTextFallback(url)) {
-      throw new Error("Clipboard API is unavailable.");
-    }
-
-    if (button) {
-      button.textContent = "Copied";
-      button.classList.add("is-copied");
-      window.setTimeout(() => {
-        button.textContent = originalLabel;
-        button.classList.remove("is-copied");
-      }, 1800);
-    }
-    showToast("Community rotation link copied.");
+    if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(value);
+    else if (!copyFallback(value)) throw new Error("Clipboard API unavailable");
+    button.textContent = "Copied";
+    button.classList.add("is-copied");
+    window.setTimeout(() => {
+      button.textContent = "Copy";
+      button.classList.remove("is-copied");
+    }, 1600);
+    showToast(`${share.short_code} copied.`);
   } catch (error) {
-    console.warn("Community link could not be copied:", error);
-    window.prompt("Copy community rotation link:", url);
+    console.warn("Share link could not be copied:", error);
+    window.prompt("Copy share link:", value);
     showToast("Copy the displayed link manually.", "info");
   }
 }
 
-async function likeRotation(row, button) {
-  const id = text(row.id);
-  if (!id || communityPageState.likedIds.has(id) || !supabaseClient) return;
-  button.disabled = true;
-  try {
-    const { data, error } = await supabaseClient.rpc("increment_community_rotation_like", {
-      target_rotation_id: row.id
-    });
-    if (error) throw error;
-    row.likes_count = Number.isFinite(Number(data)) ? Number(data) : Number(row.likes_count || 0) + 1;
-    communityPageState.likedIds.add(id);
-    saveLikedIds();
-    render();
-  } catch (error) {
-    console.warn("Community rotation could not be liked:", error);
-    button.disabled = false;
-  }
-}
-
-async function markViewed(row) {
-  if (!supabaseClient || row.viewed) return;
-  row.viewed = true;
-  try {
-    const { data, error } = await supabaseClient.rpc("increment_community_rotation_view", {
-      target_rotation_id: row.id
-    });
-    if (error) throw error;
-    row.view_count = Number.isFinite(Number(data)) ? Number(data) : Number(row.view_count || 0) + 1;
-    render();
-  } catch (error) {
-    console.warn("Community rotation view could not be updated:", error);
-  }
-}
-
-function card(row) {
+function card(share) {
   const item = create("article", "rotation-card");
-  item.tabIndex = 0;
-  item.setAttribute("role", "button");
-  item.setAttribute("aria-label", `Show details for ${row.title || "community rotation"}`);
-  item.appendChild(teamStrip(row));
+  item.dataset.shareType = share.share_type;
+  item.appendChild(teamStrip(share));
+
+  const meta = create("div", "share-meta");
+  meta.append(
+    create("span", `mode-chip mode-${share.share_type}`, share.share_type === "simulation" ? "Simulation" : "Rotation"),
+    create("code", "share-code", share.short_code)
+  );
 
   const head = create("div", "card-head");
   const titleWrap = create("div", "card-title-wrap");
   titleWrap.append(
-    create("h2", "card-title", row.title || "Untitled rotation"),
-    create("div", "author", getAuthor(row)),
-    create("div", "date", formatDate(row.created_at))
+    create("h2", "card-title", share.title || "Untitled share"),
+    create("div", "author", text(share.author_name) || "Anonymous"),
+    create("div", "date", formatDate(share.created_at))
   );
-  const planner = create("a", "planner-link", "Open ↗");
-  planner.href = plannerUrl(row);
-  planner.addEventListener("click", event => event.stopPropagation());
-  head.append(titleWrap, planner);
-  item.append(head, preview(row));
+  const open = create("a", "planner-link", "Open ↗");
+  open.href = plannerUrl(share);
+  head.append(titleWrap, open);
 
-  if (text(row.description)) item.appendChild(create("p", "description", row.description));
-  item.appendChild(chips(row));
+  item.append(meta, head);
+  if (text(share.description)) item.appendChild(create("p", "description", share.description));
+  item.appendChild(chipRow(share));
 
   const footer = create("div", "card-footer");
-  footer.appendChild(create(
-    "span",
-    "stats",
-    `${list(row.rotation_skill_ids).length} actions · ${Number(row.view_count) || 0} views`
-  ));
-  const actions = create("div", "card-actions");
-  actions.append(
-    actionButton("detail-button", "Details", () => openDetail(row.id)),
-    actionButton("copy-button", "Copy link", button => copyLink(row, button))
-  );
-  const liked = communityPageState.likedIds.has(text(row.id));
-  const like = actionButton(`like-button${liked ? " is-liked" : ""}`, `${liked ? "Liked" : "Like"} ${Number(row.likes_count) || 0}`, () => likeRotation(row, like));
-  like.disabled = liked;
-  actions.appendChild(like);
-  footer.appendChild(actions);
+  const teamCount = list(share.operator_ids).length;
+  footer.appendChild(create("span", "stats", `${teamCount} operator${teamCount === 1 ? "" : "s"}`));
+  const copy = create("button", "copy-button", "Copy");
+  copy.type = "button";
+  copy.addEventListener("click", () => copyShare(share, copy));
+  footer.appendChild(copy);
   item.appendChild(footer);
-
-  const show = () => openDetail(row.id);
-  item.addEventListener("click", show);
-  item.addEventListener("keydown", event => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    event.preventDefault();
-    show();
-  });
   return item;
 }
 
-function detailOperator(operator) {
-  const item = create("div", "detail-operator");
-  item.append(avatar(operator), create("strong", "", operator?.name || "Operator"));
-  return item;
-}
-
-function detailSection(title, child) {
-  const section = create("section", "detail-section");
-  section.append(create("h3", "", title), child);
-  return section;
-}
-
-function openDetail(id, updateUrl = true) {
-  const row = communityPageState.rotations.find(item => text(item.id) === text(id));
-  const panel = document.getElementById("detailPanel");
-  if (!row || !panel) return;
-
-  communityPageState.detailId = text(row.id);
-  panel.replaceChildren();
-  panel.hidden = false;
-
-  const head = create("div", "detail-head");
-  const heading = create("div");
-  heading.append(
-    create("h2", "", row.title || "Untitled rotation"),
-    create("div", "author", `${getAuthor(row)} · ${formatDate(row.created_at)}`)
-  );
-  head.append(heading, actionButton("detail-close", "Close", closeDetail));
-
-  const layout = create("div", "detail-layout");
-  const left = create("div");
-  const team = create("div", "detail-team");
-  getTeam(row).forEach(operator => team.appendChild(detailOperator(operator)));
-  left.append(detailSection("Team", team), detailSection("Skill order", preview(row, true)));
-
-  const right = create("div");
-  right.append(
-    detailSection("Notes", create("p", "detail-notes", text(row.description) || "No notes were provided.")),
-    detailSection("Tags", chips(row))
-  );
-  layout.append(left, right);
-
-  const actions = create("div", "detail-actions");
-  const planner = create("a", "planner-link", "Open in Rotation Tool ↗");
-  planner.href = plannerUrl(row);
-  actions.append(
-    planner,
-    actionButton("copy-button", "Copy link", button => copyLink(row, button))
-  );
-
-  panel.append(head, layout, actions);
-  if (updateUrl) {
-    const url = new URL(window.location.href);
-    url.searchParams.set("community", row.id);
-    history.replaceState(null, "", url);
-  }
-  markViewed(row);
-  panel.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-function closeDetail() {
-  communityPageState.detailId = "";
-  const panel = document.getElementById("detailPanel");
-  if (panel) {
-    panel.hidden = true;
-    panel.replaceChildren();
-  }
-  const url = new URL(window.location.href);
-  url.searchParams.delete("community");
-  history.replaceState(null, "", url);
-}
-
-function searchText(row) {
+function searchableText(share) {
   return [
-    row.title,
-    row.description,
-    getAuthor(row),
-    ...getTeam(row).map(operator => operator.name),
-    ...getElements(row),
-    ...getClasses(row)
+    share.title,
+    share.description,
+    share.author_name,
+    share.short_code,
+    ...getTeam(share).map(operator => operator.name),
+    ...getElements(share),
+    ...getClasses(share)
   ].join(" ").toLowerCase();
 }
 
-function filteredRows() {
-  const query = normalize(communityPageState.search);
-  const rows = communityPageState.rotations.filter(row => {
-    const teamIds = list(row.team_operator_ids).map(Number);
-    return (!query || searchText(row).includes(query))
-      && (!communityPageState.operatorId || teamIds.includes(communityPageState.operatorId))
-      && (communityPageState.element === "all" || getElements(row).map(normalize).includes(communityPageState.element))
-      && (communityPageState.operatorClass === "all" || getClasses(row).map(normalize).includes(communityPageState.operatorClass));
+function filteredShares() {
+  const query = normalize(discoverState.search);
+  const rows = discoverState.shares.filter(share => {
+    const ids = list(share.operator_ids).map(Number);
+    return share.share_type === discoverState.type
+      && (!query || searchableText(share).includes(query))
+      && (!discoverState.operatorId || ids.includes(discoverState.operatorId))
+      && (discoverState.element === "all" || getElements(share).includes(discoverState.element))
+      && (discoverState.operatorClass === "all" || getClasses(share).includes(discoverState.operatorClass));
   });
 
   return rows.sort((a, b) => {
-    if (communityPageState.sort === "oldest") return new Date(a.created_at) - new Date(b.created_at);
-    if (communityPageState.sort === "views") return Number(b.view_count || 0) - Number(a.view_count || 0);
-    if (communityPageState.sort === "likes") return Number(b.likes_count || 0) - Number(a.likes_count || 0);
-    if (communityPageState.sort === "skills") return list(b.rotation_skill_ids).length - list(a.rotation_skill_ids).length;
+    if (discoverState.sort === "oldest") return new Date(a.created_at) - new Date(b.created_at);
+    if (discoverState.sort === "title") return text(a.title).localeCompare(text(b.title));
     return new Date(b.created_at) - new Date(a.created_at);
+  });
+}
+
+function updateUrl() {
+  const url = new URL(window.location.href);
+  url.searchParams.set("type", discoverState.type);
+  if (discoverState.operatorId) url.searchParams.set("operator", String(discoverState.operatorId));
+  else url.searchParams.delete("operator");
+  history.replaceState(null, "", url);
+}
+
+function renderTabs() {
+  document.getElementById("rotationTabCount").textContent = discoverState.rotationCount;
+  document.getElementById("simulationTabCount").textContent = discoverState.simulationCount;
+  document.querySelectorAll("[data-share-type]").forEach(button => {
+    const active = button.dataset.shareType === discoverState.type;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-selected", String(active));
   });
 }
 
@@ -484,161 +255,126 @@ function render() {
   const status = document.getElementById("rotationStatus");
   if (!grid || !empty || !count || !status) return;
 
+  renderTabs();
   grid.replaceChildren();
-  if (communityPageState.loading) {
-    grid.appendChild(create("div", "state-card", "Loading approved community rotations..."));
-    count.textContent = "Community builds";
-    status.textContent = "Loading approved rotations";
+  if (discoverState.loading) {
+    grid.appendChild(create("div", "state-card", "Loading public shares..."));
+    count.textContent = "Public shares";
+    status.textContent = "Loading rotations and simulations";
     empty.hidden = true;
     return;
   }
 
-  const rows = filteredRows();
-  count.textContent = `${rows.length} Rotation${rows.length === 1 ? "" : "s"}`;
-  status.textContent = rows.length === communityPageState.rotations.length
-    ? "Approved community builds"
-    : `${rows.length} of ${communityPageState.rotations.length} shown`;
-  rows.forEach(row => grid.appendChild(card(row)));
-  empty.hidden = rows.length > 0;
+  const shares = filteredShares();
+  const typeLabel = discoverState.type === "simulation" ? "Simulation" : "Rotation";
+  const totalForType = discoverState.type === "simulation" ? discoverState.simulationCount : discoverState.rotationCount;
+  count.textContent = `${shares.length} ${typeLabel}${shares.length === 1 ? "" : "s"}`;
+  status.textContent = shares.length === totalForType ? "Public planner shares" : `${shares.length} of ${totalForType} shown`;
+  shares.forEach(share => grid.appendChild(card(share)));
+  empty.hidden = shares.length > 0;
 }
 
-function fillSelect(select, values, allLabel) {
+function fillSelect(select, values, allLabel, formatter = label) {
   select.replaceChildren(new Option(allLabel, "all"));
-  [...new Set(values.map(normalize).filter(Boolean))]
-    .sort((a, b) => label(a).localeCompare(label(b)))
-    .forEach(value => select.add(new Option(label(value), value)));
+  values.forEach(value => select.add(new Option(formatter(value), String(value))));
 }
 
 function fillFilters() {
-  fillSelect(
-    document.getElementById("elementFilter"),
-    communityPageState.rotations.flatMap(getElements),
-    "All elements"
-  );
-  fillSelect(
-    document.getElementById("classFilter"),
-    communityPageState.rotations.flatMap(getClasses),
-    "All classes"
-  );
-}
-
-async function fetchProfiles(rows) {
-  const userIds = [...new Set(rows.map(row => text(row.submitted_by)).filter(Boolean))];
-  if (!userIds.length) return;
-  const { data, error } = await supabaseClient
-    .from("user_profiles")
-    .select("user_id,username,avatar_url")
-    .in("user_id", userIds);
-  if (error) throw error;
-  list(data).forEach(profile => communityPageState.profiles.set(text(profile.user_id), profile));
+  const operators = [...discoverState.operators.values()]
+    .filter(operator => discoverState.shares.some(share => list(share.operator_ids).map(Number).includes(operator.id)))
+    .sort((a, b) => a.name.localeCompare(b.name));
+  fillSelect(document.getElementById("operatorFilter"), operators.map(operator => operator.id), "All operators", id => getOperator(id)?.name || id);
+  fillSelect(document.getElementById("elementFilter"), [...new Set(operators.map(operator => normalize(operator.elementType)).filter(Boolean))].sort(), "All elements");
+  fillSelect(document.getElementById("classFilter"), [...new Set(operators.map(operator => normalize(operator.operatorClass)).filter(Boolean))].sort(), "All classes");
+  document.getElementById("operatorFilter").value = discoverState.operatorId ? String(discoverState.operatorId) : "all";
 }
 
 async function loadData() {
-  communityPageState.loading = true;
+  discoverState.loading = true;
   render();
   if (!supabaseClient) {
-    communityPageState.loading = false;
+    discoverState.loading = false;
+    document.getElementById("rotationGrid").replaceChildren(create("div", "state-card", "The share directory is unavailable."));
     document.getElementById("rotationStatus").textContent = "Database unavailable";
-    document.getElementById("rotationGrid").replaceChildren(create("div", "state-card", "Community rotations could not be loaded."));
     return;
   }
 
   try {
-    const [operatorResult, skillResult, rotationResult] = await Promise.all([
-      supabaseClient
-        .from("operators")
-        .select("*")
-        .eq("game", "arknights_endfield"),
-      supabaseClient
-        .from("operator_skills")
-        .select("id,name,operator_id,skill_type,short_type,element_type,icon_path,icon_small_path"),
-      supabaseClient
-        .from("community_rotations")
-        .select("id,title,description,author_name,submitted_by,share_code,team_operator_ids,rotation_skill_ids,element_types,operator_classes,likes_count,view_count,created_at")
-        .eq("game", "arknights_endfield")
-        .eq("is_public", true)
-        .eq("is_approved", true)
-        .eq("is_hidden", false)
-        .order("created_at", { ascending: false })
-        .limit(100)
+    const [operatorResult, shareResult] = await Promise.all([
+      supabaseClient.from("operators").select("id,name,operator_class,element_type,icon_path,is_visible").eq("game", "arknights_endfield"),
+      supabaseClient.rpc("list_public_rotation_shares", { p_limit: 500 })
     ]);
-
     if (operatorResult.error) throw operatorResult.error;
-    if (skillResult.error) throw skillResult.error;
-    if (rotationResult.error) throw rotationResult.error;
+    if (shareResult.error) throw shareResult.error;
 
     list(operatorResult.data).filter(row => row.is_visible !== false).forEach(row => {
-      communityPageState.operators.set(Number(row.id), {
+      discoverState.operators.set(Number(row.id), {
         id: Number(row.id),
-        name: row.name,
-        star: row.star,
+        name: text(row.name) || "Operator",
         operatorClass: row.operator_class,
         elementType: row.element_type,
         icon: row.icon_path
       });
     });
-    list(skillResult.data).forEach(row => {
-      communityPageState.skills.set(Number(row.id), {
-        id: Number(row.id),
-        name: row.name,
-        operatorId: Number(row.operator_id),
-        type: row.skill_type,
-        shortType: row.short_type,
-        elementType: row.element_type,
-        icon: row.icon_path,
-        iconSmall: row.icon_small_path
-      });
-    });
-    communityPageState.rotations = list(rotationResult.data);
-    await fetchProfiles(communityPageState.rotations);
+    discoverState.shares = list(shareResult.data?.items);
+    discoverState.rotationCount = Number(shareResult.data?.rotation_count) || 0;
+    discoverState.simulationCount = Number(shareResult.data?.simulation_count) || 0;
     fillFilters();
   } catch (error) {
-    console.error("Community page could not be loaded:", error);
-    communityPageState.rotations = [];
-    document.getElementById("rotationStatus").textContent = "Database unavailable";
+    console.error("Discover page could not be loaded:", error);
+    discoverState.shares = [];
+    discoverState.rotationCount = 0;
+    discoverState.simulationCount = 0;
+    document.getElementById("rotationStatus").textContent = "Database migration required";
   } finally {
-    communityPageState.loading = false;
+    discoverState.loading = false;
     render();
   }
-
-  if (communityPageState.detailId) openDetail(communityPageState.detailId, false);
 }
 
 function resetFilters() {
-  communityPageState.search = "";
-  communityPageState.element = "all";
-  communityPageState.operatorClass = "all";
-  communityPageState.sort = "newest";
-  communityPageState.operatorId = null;
+  discoverState.search = "";
+  discoverState.operatorId = 0;
+  discoverState.element = "all";
+  discoverState.operatorClass = "all";
+  discoverState.sort = "newest";
   document.getElementById("communityToolbar").reset();
-  const url = new URL(window.location.href);
-  url.searchParams.delete("operator");
-  history.replaceState(null, "", url);
+  updateUrl();
   render();
 }
 
 function init() {
-  communityPageState.likedIds = readLikedIds();
   const params = new URLSearchParams(window.location.search);
-  communityPageState.detailId = text(params.get("community"));
+  discoverState.type = params.get("type") === "simulation" ? "simulation" : "rotation";
   const operatorId = Number(params.get("operator"));
-  communityPageState.operatorId = Number.isFinite(operatorId) && operatorId > 0 ? operatorId : null;
+  discoverState.operatorId = Number.isInteger(operatorId) && operatorId > 0 ? operatorId : 0;
 
+  document.querySelectorAll("[data-share-type]").forEach(button => {
+    button.addEventListener("click", () => {
+      discoverState.type = button.dataset.shareType;
+      updateUrl();
+      render();
+    });
+  });
   document.getElementById("searchInput").addEventListener("input", event => {
-    communityPageState.search = event.target.value;
-    communityPageState.operatorId = null;
+    discoverState.search = event.target.value;
+    render();
+  });
+  document.getElementById("operatorFilter").addEventListener("change", event => {
+    discoverState.operatorId = event.target.value === "all" ? 0 : Number(event.target.value);
+    updateUrl();
     render();
   });
   document.getElementById("elementFilter").addEventListener("change", event => {
-    communityPageState.element = event.target.value;
+    discoverState.element = event.target.value;
     render();
   });
   document.getElementById("classFilter").addEventListener("change", event => {
-    communityPageState.operatorClass = event.target.value;
+    discoverState.operatorClass = event.target.value;
     render();
   });
   document.getElementById("sortSelect").addEventListener("change", event => {
-    communityPageState.sort = event.target.value;
+    discoverState.sort = event.target.value;
     render();
   });
   document.getElementById("resetFilters").addEventListener("click", resetFilters);

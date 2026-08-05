@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Arknights: Endfield Community Rotations | RotationForge</title>
-  <meta name="description" content="Browse approved Arknights: Endfield community rotations, compare teams and skill order, and load shared builds into the RotationForge planner.">
+  <title>Arknights: Endfield Discover | RotationForge</title>
+  <meta name="description" content="Discover public Arknights: Endfield rotations and simulations and open them directly in the RotationForge planner.">
   <link rel="canonical" href="https://rotationforge.gg/endfield/community/">
   <link rel="icon" type="image/png" href="/favicon-flat.png">
-  <meta property="og:title" content="Arknights: Endfield Community Rotations">
-  <meta property="og:description" content="Browse and load approved Arknights: Endfield rotations shared by the RotationForge community.">
+  <meta property="og:title" content="Arknights: Endfield Discover">
+  <meta property="og:description" content="Browse public Arknights: Endfield rotations and simulations shared with RotationForge.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://rotationforge.gg/endfield/community/">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <header class="top">
@@ -31,23 +31,36 @@
     <nav class="breadcrumbs" aria-label="Breadcrumb">
       <a href="/">Home</a>
       <span>›</span>
-      <strong>Community Rotations</strong>
+      <strong>Discover</strong>
     </nav>
 
     <section class="hero" aria-labelledby="pageTitle">
-      <span class="eyebrow">RotationForge Community</span>
-      <h1 id="pageTitle">Arknights: Endfield Community Rotations</h1>
-      <p>Browse approved team rotations, compare operator lineups and skill order, then open a shared build directly in the planner.</p>
+      <span class="eyebrow">RotationForge Discover</span>
+      <h1 id="pageTitle">Rotations &amp; Simulations</h1>
+      <p>Browse public planner shares, compare their operator lineups and open any build directly with its six-character code.</p>
     </section>
 
-    <form id="communityToolbar" class="toolbar" aria-label="Filter and sort community rotations">
+    <div class="share-tabs" role="tablist" aria-label="Share type">
+      <button id="rotationTab" class="share-tab is-active" type="button" role="tab" aria-selected="true" data-share-type="rotation">
+        Rotations <strong id="rotationTabCount">0</strong>
+      </button>
+      <button id="simulationTab" class="share-tab" type="button" role="tab" aria-selected="false" data-share-type="simulation">
+        Simulations <strong id="simulationTabCount">0</strong>
+      </button>
+    </div>
+
+    <form id="communityToolbar" class="toolbar" aria-label="Filter and sort public shares">
       <div class="summary" aria-live="polite">
-        <strong id="rotationCount">Community builds</strong>
-        <span id="rotationStatus">Loading approved rotations</span>
+        <strong id="rotationCount">Public shares</strong>
+        <span id="rotationStatus">Loading shares</span>
       </div>
       <label class="control search-control">
         <span>Search</span>
-        <input id="searchInput" type="search" placeholder="Rotation, author, operator">
+        <input id="searchInput" type="search" placeholder="Title, author, code, operator">
+      </label>
+      <label class="control">
+        <span>Operator</span>
+        <select id="operatorFilter"><option value="all">All operators</option></select>
       </label>
       <label class="control">
         <span>Element</span>
@@ -62,9 +75,7 @@
         <select id="sortSelect">
           <option value="newest">Newest</option>
           <option value="oldest">Oldest</option>
-          <option value="views">Most viewed</option>
-          <option value="likes">Most liked</option>
-          <option value="skills">Most skills</option>
+          <option value="title">Title A-Z</option>
         </select>
       </label>
       <button id="resetFilters" class="filter-reset" type="button">Reset</button>
@@ -72,13 +83,13 @@
     </form>
 
     <section id="detailPanel" class="detail-panel" hidden aria-live="polite"></section>
-    <section id="rotationGrid" class="rotation-grid" aria-label="Community rotations"></section>
-    <div id="emptyState" class="empty-state" hidden>No matching rotations found.</div>
+    <section id="rotationGrid" class="rotation-grid" aria-label="Public planner shares"></section>
+    <div id="emptyState" class="empty-state" hidden>No matching shares found.</div>
   </main>
 
   <footer>
     <span>RotationForge is an unofficial fan-made tool for Arknights: Endfield.</span>
-    <a href="../">Create and submit a rotation in the planner</a>
+    <a href="../">Create a rotation or simulation</a>
   </footer>
 
   <div id="pageToast" class="page-toast" role="status" aria-live="polite" aria-atomic="true"></div>
@@ -87,13 +98,13 @@
     {
       "@context": "https://schema.org",
       "@type": "CollectionPage",
-      "name": "Arknights: Endfield Community Rotations",
+      "name": "Arknights: Endfield Rotations and Simulations",
       "url": "https://rotationforge.gg/endfield/community/",
-      "description": "Approved Arknights: Endfield team rotations shared by the RotationForge community."
+      "description": "Public Arknights: Endfield rotations and simulations shared with RotationForge."
     }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../supabaseClient.js?v=2"></script>
-  <script src="community-page.js?v=3"></script>
+  <script src="community-page.js?v=4"></script>
 </body>
 </html>

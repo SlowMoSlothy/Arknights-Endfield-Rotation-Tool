@@ -489,7 +489,7 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /data-share-type="simulation"/);
   assert.match(page, /data-share-count="simulation"/);
   assert.match(page, /id="operator-share-results" hidden/);
-  assert.match(page, /js\/ui\/operatorShares\.js\?v=1/);
+  assert.match(page, /js\/ui\/operatorShares\.js\?v=2/);
   assert.match(page, /\.operator-share-list\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(page, /id="batk"/);
   assert.match(page, /<h2>Measured Combo<\/h2>/);

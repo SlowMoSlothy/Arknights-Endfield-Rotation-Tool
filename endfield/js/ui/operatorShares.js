@@ -45,16 +45,21 @@
         copy.className = "operator-share-card-copy";
 
         const title = document.createElement("strong");
-        title.textContent = `${typeLabel(item.share_type, true)} ${item.short_code}`;
+        title.textContent = item.title || `${typeLabel(item.share_type, true)} ${item.short_code}`;
+
+        const description = document.createElement("span");
+        description.className = "operator-share-card-description";
+        description.textContent = String(item.description || "").trim();
+        description.hidden = !description.textContent;
 
         const team = document.createElement("span");
         const names = Array.isArray(item.operator_names) ? item.operator_names.filter(Boolean) : [];
         team.textContent = names.length > 0 ? names.join(" · ") : operatorName;
 
         const meta = document.createElement("small");
-        meta.textContent = `Created ${readableDate(item.created_at)}`;
+        meta.textContent = `By ${item.author_name || "Anonymous"} · ${readableDate(item.created_at)} · ${item.short_code}`;
 
-        copy.append(title, team, meta);
+        copy.append(title, description, team, meta);
 
         const open = document.createElement("a");
         open.className = "operator-share-open";

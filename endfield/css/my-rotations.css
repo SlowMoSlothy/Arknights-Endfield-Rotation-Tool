@@ -23,6 +23,128 @@
     width: min(620px, calc(100vw - 32px));
 }
 
+.share-metadata-author-preview {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    align-items: center;
+    gap: 3px 10px;
+    border: 1px solid rgba(160,170,169,0.18);
+    border-radius: 10px;
+    background: rgba(7,9,10,0.46);
+    padding: 10px 12px;
+}
+
+.share-metadata-author-preview > span {
+    color: #A0AAA9;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+}
+
+.share-metadata-author-preview > strong {
+    min-width: 0;
+    color: #F8F546;
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.share-metadata-author-preview > small {
+    grid-column: 1 / -1;
+    color: rgba(242,242,242,0.58);
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.my-rotations-field em {
+    color: rgba(242,242,242,0.45);
+    font-size: 9px;
+    font-style: normal;
+    letter-spacing: 0.08em;
+}
+
+.share-metadata-card {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin: 10px 0 14px;
+    border: 1px solid rgba(248,245,70,0.30);
+    border-radius: 14px;
+    background:
+        linear-gradient(100deg, rgba(248,245,70,0.11), rgba(7,9,10,0.64) 52%),
+        rgba(18,20,22,0.92);
+    padding: 12px 14px;
+    box-shadow: inset 3px 0 0 rgba(248,245,70,0.82);
+}
+
+.share-metadata-card[hidden] {
+    display: none !important;
+}
+
+.share-metadata-card-copy {
+    min-width: 0;
+    display: grid;
+    gap: 4px;
+}
+
+.share-metadata-card-kicker {
+    color: #F8F546;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.share-metadata-card-copy > strong {
+    color: #fff;
+    font-size: 16px;
+    line-height: 1.15;
+}
+
+.share-metadata-card-copy > p {
+    margin: 1px 0;
+    color: rgba(242,242,242,0.72);
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.4;
+    white-space: pre-wrap;
+}
+
+.share-metadata-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    color: rgba(242,242,242,0.56);
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.share-metadata-card-meta b {
+    color: rgba(242,242,242,0.88);
+}
+
+.share-metadata-card-close {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 auto;
+    border: 1px solid rgba(160,170,169,0.25);
+    border-radius: 50%;
+    background: rgba(7,9,10,0.46);
+    color: rgba(242,242,242,0.76);
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.share-metadata-card-close:hover {
+    border-color: rgba(248,245,70,0.55);
+    color: #F8F546;
+}
+
 .my-rotations-auth-panel,
 .my-rotations-content-panel {
     min-height: 0;

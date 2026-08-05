@@ -1109,7 +1109,7 @@ export function createOperatorPage(
   </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/endfield/supabaseClient.js?v=14"></script>
-  <script src="/endfield/js/ui/operatorShares.js?v=1"></script>
+  <script src="/endfield/js/ui/operatorShares.js?v=2"></script>
   ${operatorHeadingScript()}
 </body>
 </html>`;

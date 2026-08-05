@@ -227,6 +227,10 @@ test("weapon Potential and Essence allocations are shared only in Simulation Mod
           data: {
             short_code: params.p_share_type === "simulation" ? "SIM123" : "ROT123",
             share_type: params.p_share_type,
+            title: params.p_title,
+            description: params.p_description,
+            author_name: "TestPilot",
+            created_at: "2026-08-05T12:00:00Z",
             format_version: params.p_format_version
           },
           error: null
@@ -238,6 +242,10 @@ test("weapon Potential and Essence allocations are shared only in Simulation Mod
             short_code: params.p_short_code,
             share_type: "simulation",
             share_payload: context.createBuildShareCode(),
+            title: "Boss opener",
+            description: "Perfect timing",
+            author_name: "TestPilot",
+            created_at: "2026-08-05T12:00:00Z",
             format_version: 13
           },
           error: null
@@ -266,17 +274,22 @@ test("weapon Potential and Essence allocations are shared only in Simulation Mod
   const v10DisplayCode = context.encodeShareBytes([10, ...v9Bytes]);
   assert.equal(context.parseBuildShareCode(v10DisplayCode).v, 10);
   context.location = { protocol: "https:", origin: "https://rotationforge.gg", pathname: "/endfield/" };
-  const shareLink = await context.createBuildShareLink();
+  const shareLink = await context.createBuildShareLink({ title: "Boss opener", description: "Perfect timing" });
   assert.equal(shareLink, "https://rotationforge.gg/endfield/#share=SIM123");
   assert.doesNotMatch(shareLink, /AERT\d+/);
   assert.equal(shareRpcCalls[0].name, "create_rotation_share");
   assert.equal(shareRpcCalls[0].params.p_share_type, "simulation");
   assert.equal(shareRpcCalls[0].params.p_format_version, 13);
   assert.deepEqual(Array.from(shareRpcCalls[0].params.p_operator_ids), [8]);
+  assert.equal(shareRpcCalls[0].params.p_title, "Boss opener");
+  assert.equal(shareRpcCalls[0].params.p_description, "Perfect timing");
 
   const resolvedShare = await context.resolveBuildShareInput("https://rotationforge.gg/endfield/#share=sim123");
   assert.equal(resolvedShare.shortCode, "SIM123");
   assert.equal(resolvedShare.shareType, "simulation");
+  assert.equal(resolvedShare.title, "Boss opener");
+  assert.equal(resolvedShare.description, "Perfect timing");
+  assert.equal(resolvedShare.authorName, "TestPilot");
   assert.equal(context.parseBuildShareCode(resolvedShare.sharePayload).uiSettings.timelineMode, "simulation");
   assert.equal(simulationPayload.operatorLoadouts[8].weapon.key, "lone_barge");
   assert.equal(simulationPayload.operatorLoadouts[8].weapon.potential, 5);
@@ -307,7 +320,7 @@ test("weapon Potential and Essence allocations are shared only in Simulation Mod
   const slotCode = context.createBuildShareCode();
   const slotPayload = context.parseBuildShareCode(slotCode);
   assert.deepEqual(JSON.parse(JSON.stringify(slotPayload.operatorLoadouts)), {});
-  const rotationShare = await context.createStoredBuildShare();
+  const rotationShare = await context.createStoredBuildShare({ title: "Slot opener", description: "" });
   assert.equal(rotationShare.shortCode, "ROT123");
   assert.equal(rotationShare.shareType, "rotation");
   assert.equal(shareRpcCalls.at(-1).params.p_share_type, "rotation");

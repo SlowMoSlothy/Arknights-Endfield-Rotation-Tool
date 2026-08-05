@@ -171,7 +171,7 @@
                 <path d="M14.5 15c2.8.2 4.8 1.9 6 5"></path>
               </svg>
             </span>
-            <span class="sidebar-command-label">Community Rotations</span>
+            <span class="sidebar-command-label">Discover</span>
             <span class="sidebar-command-signal"></span>
           </a>
           <button id="openOperatorGalleryBtn" class="sidebar-command" type="button" hidden>
@@ -299,8 +299,6 @@
                   </button>
                   <div id="rotationSaveMenu" class="rotation-save-menu" role="menu" hidden>
                     <button type="button" role="menuitem" onclick="saveRotationInMyRotations()">My rotations</button>
-                    <button type="button" role="menuitem" onclick="saveRotationInCommunity()">Community
-                      Rotations</button>
                   </div>
                 </span>
                 <span class="rotation-action-tooltip-host" data-action-tooltip="Import short or legacy share code">
@@ -324,6 +322,20 @@
                   </button>
                 </span>
               </div>
+              <aside id="shareMetadataCard" class="share-metadata-card" aria-live="polite" hidden>
+                <div class="share-metadata-card-copy">
+                  <span id="shareMetadataCardType" class="share-metadata-card-kicker">Shared Rotation</span>
+                  <strong id="shareMetadataCardTitle">Shared build</strong>
+                  <p id="shareMetadataCardDescription" hidden></p>
+                  <div class="share-metadata-card-meta">
+                    <span>By <b id="shareMetadataCardAuthor">Anonymous</b></span>
+                    <span id="shareMetadataCardCode"></span>
+                    <span id="shareMetadataCardCreated"></span>
+                  </div>
+                </div>
+                <button id="dismissShareMetadataCardBtn" class="share-metadata-card-close" type="button"
+                  aria-label="Hide share details">&times;</button>
+              </aside>
               <div class="rotation-skills-dock">
                 <h3>Skills</h3>
                 <div id="skillList" class="skills-panel"></div>
@@ -492,8 +504,8 @@
       </div>
 
       <section id="myRotationsAuthPanel" class="my-rotations-auth-panel">
-        <p id="myRotationsIntro" class="my-rotations-intro">Create an account or sign in to save private rotations and
-          submit them for Community review later.</p>
+        <p id="myRotationsIntro" class="my-rotations-intro">Create an account or sign in to save private rotations. Use
+          the Share button to publish a rotation or simulation in Discover.</p>
         <form id="myRotationsAuthForm" class="my-rotations-form">
           <label class="my-rotations-field">
             <span>Email</span>
@@ -622,6 +634,41 @@
         <div class="my-rotations-actions">
           <button id="cancelRotationQuickSaveBtn" class="my-secondary-btn" type="button">Cancel</button>
           <button id="submitRotationQuickSaveBtn" class="my-primary-btn" type="submit">Save Rotation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="shareMetadataModal" class="settings-modal my-rotations-modal" aria-hidden="true">
+    <div class="settings-dialog rotation-quick-save-dialog share-metadata-dialog" role="dialog" aria-modal="true"
+      aria-labelledby="shareMetadataModalTitle">
+      <div class="settings-header">
+        <h2 id="shareMetadataModalTitle" class="settings-title">Create Share</h2>
+        <button id="closeShareMetadataModalBtn" class="settings-close" type="button"
+          aria-label="Close create share">&times;</button>
+      </div>
+
+      <p id="shareMetadataIntro" class="my-rotations-intro">Add a short title before creating the share code.</p>
+      <form id="shareMetadataForm" class="rotation-quick-save-form">
+        <label class="my-rotations-field">
+          <span>Short title</span>
+          <input id="shareMetadataTitleInput" type="text" minlength="3" maxlength="60" required
+            placeholder="Boss opener">
+        </label>
+        <label class="my-rotations-field">
+          <span>Description <em>Optional</em></span>
+          <textarea id="shareMetadataDescriptionInput" maxlength="500" rows="3"
+            placeholder="Notes about timing, team or loadout"></textarea>
+        </label>
+        <div class="share-metadata-author-preview">
+          <span>Author</span>
+          <strong id="shareMetadataAuthorPreview">Anonymous</strong>
+          <small id="shareMetadataAuthorHint">Signed-out shares are published as Anonymous.</small>
+        </div>
+        <div id="shareMetadataStatus" class="my-rotations-status"></div>
+        <div class="my-rotations-actions">
+          <button id="cancelShareMetadataBtn" class="my-secondary-btn" type="button">Cancel</button>
+          <button id="submitShareMetadataBtn" class="my-primary-btn" type="submit">Create &amp; Copy</button>
         </div>
       </form>
     </div>
@@ -784,20 +831,12 @@
   </section>
   <footer class="site-footer">
     <span>&copy; 2026 RotationForge</span>
-    <span>App Version 2.15.12</span>
+    <span>App Version 2.15.14</span>
     <span>Fan-made tool, not affiliated with Gryphline or Hypergryph.</span>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabaseClient.js?v=14"></script>
-
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="js/utils/tooltipFormatter.js"></script>
-  <script src="js/data/debuffRegistry.js"></script>
-  <script src="js/data/buffRegistry.js"></script>
-  <script src="js/data/effectGroups.js"></script>
-  <script src="js/data/reactionRules.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -824,7 +863,7 @@
     <script src="js/logic/sustainEngine.js?v=1"></script>
   <script src="js/logic/weaponPassiveSimulation.js?v=4"></script>
     <script src="js/logic/damageBreakdown.js?v=11"></script>
-    <script src="js/logic/shareCode.js?v=9"></script>
+    <script src="js/logic/shareCode.js?v=10"></script>
   <script src="js/logic/export.js"></script>
   <script src="js/logic/snakeLayout.js"></script>
   <script src="js/logic/reactionEngine.js"></script>

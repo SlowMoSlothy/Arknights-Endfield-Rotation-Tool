@@ -851,11 +851,161 @@ function extractShortBuildShareCode(input) {
     return "";
 }
 
-async function createStoredBuildShare() {
+let pendingShareMetadataRequest = null;
+
+function normalizeBuildShareMetadata(metadata = {}) {
+    const title = String(metadata.title || "").trim().replace(/\s+/g, " ");
+    const description = String(metadata.description || "").trim();
+    if (title.length < 3 || title.length > 60) {
+        throw new Error("The share title must contain between 3 and 60 characters.");
+    }
+    if (description.length > 500) {
+        throw new Error("The share description must not exceed 500 characters.");
+    }
+    return { title, description };
+}
+
+function getStoredShareMetadata(result, fallback = {}) {
+    return {
+        title: String(result?.title || fallback.title || "Shared build"),
+        description: String(result?.description || fallback.description || ""),
+        authorName: String(result?.author_name || "Anonymous"),
+        createdAt: result?.created_at || null
+    };
+}
+
+async function getShareAuthorPreview() {
+    if (typeof supabaseClient === "undefined" || !supabaseClient?.auth?.getSession) return "Anonymous";
+
+    try {
+        const { data } = await supabaseClient.auth.getSession();
+        const user = data?.session?.user;
+        if (!user) return "Anonymous";
+
+        if (supabaseClient?.from) {
+            const { data: profile } = await supabaseClient
+                .from("user_profiles")
+                .select("username")
+                .eq("user_id", user.id)
+                .maybeSingle();
+            const profileName = String(profile?.username || "").trim();
+            if (profileName) return profileName;
+        }
+
+        return String(user.user_metadata?.username || "").trim() || "Anonymous";
+    } catch (error) {
+        console.warn("Share author preview could not be loaded:", error);
+        return "Anonymous";
+    }
+}
+
+function closeShareMetadataModal(result = null) {
+    const modal = typeof document !== "undefined" ? document.getElementById("shareMetadataModal") : null;
+    modal?.classList.remove("open");
+    modal?.setAttribute("aria-hidden", "true");
+    if (pendingShareMetadataRequest) {
+        const resolve = pendingShareMetadataRequest;
+        pendingShareMetadataRequest = null;
+        resolve(result);
+    }
+}
+
+async function requestBuildShareMetadata() {
+    if (typeof document === "undefined") return null;
+    const modal = document.getElementById("shareMetadataModal");
+    const form = document.getElementById("shareMetadataForm");
+    const titleInput = document.getElementById("shareMetadataTitleInput");
+    const descriptionInput = document.getElementById("shareMetadataDescriptionInput");
+    const authorPreview = document.getElementById("shareMetadataAuthorPreview");
+    const intro = document.getElementById("shareMetadataIntro");
+    if (!modal || !form || !titleInput || !descriptionInput) return null;
+
+    if (pendingShareMetadataRequest) closeShareMetadataModal(null);
+    titleInput.value = "";
+    descriptionInput.value = "";
+    const status = document.getElementById("shareMetadataStatus");
+    if (status) status.textContent = "";
+    if (intro) intro.textContent = `Add a short title for this ${getBuildShareTypeLabel(getCurrentBuildShareType()).toLowerCase()}.`;
+    if (authorPreview) authorPreview.textContent = "Loading...";
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+
+    getShareAuthorPreview().then(author => {
+        if (authorPreview && modal.classList.contains("open")) authorPreview.textContent = author;
+    });
+
+    window.setTimeout(() => titleInput.focus(), 0);
+    return new Promise(resolve => {
+        pendingShareMetadataRequest = resolve;
+    });
+}
+
+function initShareMetadataUi() {
+    if (typeof document === "undefined") return;
+    const modal = document.getElementById("shareMetadataModal");
+    const form = document.getElementById("shareMetadataForm");
+    const cancel = document.getElementById("cancelShareMetadataBtn");
+    const close = document.getElementById("closeShareMetadataModalBtn");
+    const dismiss = document.getElementById("dismissShareMetadataCardBtn");
+
+    form?.addEventListener("submit", event => {
+        event.preventDefault();
+        try {
+            const metadata = normalizeBuildShareMetadata({
+                title: document.getElementById("shareMetadataTitleInput")?.value,
+                description: document.getElementById("shareMetadataDescriptionInput")?.value
+            });
+            closeShareMetadataModal(metadata);
+        } catch (error) {
+            const status = document.getElementById("shareMetadataStatus");
+            if (status) status.textContent = error.message;
+        }
+    });
+    cancel?.addEventListener("click", () => closeShareMetadataModal(null));
+    close?.addEventListener("click", () => closeShareMetadataModal(null));
+    modal?.addEventListener("click", event => {
+        if (event.target === modal) closeShareMetadataModal(null);
+    });
+    dismiss?.addEventListener("click", () => {
+        const card = document.getElementById("shareMetadataCard");
+        if (card) card.hidden = true;
+    });
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape" && modal?.classList.contains("open")) closeShareMetadataModal(null);
+    });
+}
+
+function showBuildShareMetadata(share) {
+    if (typeof document === "undefined" || !share?.shortCode) return;
+    const card = document.getElementById("shareMetadataCard");
+    if (!card) return;
+
+    const description = String(share.description || "").trim();
+    const created = share.createdAt ? new Date(share.createdAt) : null;
+    document.getElementById("shareMetadataCardType").textContent = `Shared ${getBuildShareTypeLabel(share.shareType)}`;
+    document.getElementById("shareMetadataCardTitle").textContent = share.title || "Shared build";
+    document.getElementById("shareMetadataCardAuthor").textContent = share.authorName || "Anonymous";
+    document.getElementById("shareMetadataCardCode").textContent = `Code ${share.shortCode}`;
+    document.getElementById("shareMetadataCardCreated").textContent = created && !Number.isNaN(created.getTime())
+        ? created.toLocaleString()
+        : "";
+    const descriptionElement = document.getElementById("shareMetadataCardDescription");
+    descriptionElement.textContent = description;
+    descriptionElement.hidden = !description;
+    card.hidden = false;
+}
+
+if (typeof document !== "undefined") {
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initShareMetadataUi);
+    else initShareMetadataUi();
+}
+
+async function createStoredBuildShare(metadata) {
     if (typeof supabaseClient === "undefined" || !supabaseClient?.rpc) {
         throw new Error("The short share-code service is unavailable.");
     }
 
+    const normalizedMetadata = normalizeBuildShareMetadata(metadata);
     const sharePayload = getDisplayBuildShareCode();
     const shareType = getCurrentBuildShareType();
     const operatorIds = Array.from(new Set(
@@ -868,7 +1018,9 @@ async function createStoredBuildShare() {
         p_share_type: shareType,
         p_share_payload: sharePayload,
         p_format_version: BUILD_PERSISTENCE_PAYLOAD_VERSION,
-        p_operator_ids: operatorIds
+        p_operator_ids: operatorIds,
+        p_title: normalizedMetadata.title,
+        p_description: normalizedMetadata.description
     });
 
     if (error) throw error;
@@ -879,11 +1031,16 @@ async function createStoredBuildShare() {
         throw new Error("Supabase returned an invalid short share code.");
     }
 
-    return { shortCode, shareType, sharePayload };
+    return {
+        shortCode,
+        shareType,
+        sharePayload,
+        ...getStoredShareMetadata(result, normalizedMetadata)
+    };
 }
 
-async function createBuildShareLink() {
-    const storedShare = await createStoredBuildShare();
+async function createBuildShareLink(metadata) {
+    const storedShare = await createStoredBuildShare(metadata);
     return `${getBuildShareBaseUrl()}#${BUILD_SHORT_SHARE_HASH_KEY}=${storedShare.shortCode}`;
 }
 
@@ -915,7 +1072,12 @@ async function resolveStoredBuildShare(shortCode) {
         throw new Error("The stored share type does not match its planner data.");
     }
 
-    return { shortCode: normalizedCode, shareType, sharePayload };
+    return {
+        shortCode: normalizedCode,
+        shareType,
+        sharePayload,
+        ...getStoredShareMetadata(result)
+    };
 }
 
 async function resolveBuildShareInput(input) {
@@ -935,8 +1097,11 @@ async function copyBuildShareCode() {
     }
 
     try {
-        const storedShare = await createStoredBuildShare();
+        const metadata = await requestBuildShareMetadata();
+        if (!metadata) return false;
+        const storedShare = await createStoredBuildShare(metadata);
         await navigator.clipboard.writeText(storedShare.shortCode);
+        showBuildShareMetadata(storedShare);
         alert(`${getBuildShareTypeLabel(storedShare.shareType)} share code copied: ${storedShare.shortCode}`);
     } catch (error) {
         console.error("Short share-code copy failed:", error);
@@ -953,8 +1118,12 @@ async function copyBuildShareLink() {
     }
 
     try {
-        const link = await createBuildShareLink();
+        const metadata = await requestBuildShareMetadata();
+        if (!metadata) return false;
+        const storedShare = await createStoredBuildShare(metadata);
+        const link = `${getBuildShareBaseUrl()}#${BUILD_SHORT_SHARE_HASH_KEY}=${storedShare.shortCode}`;
         await navigator.clipboard.writeText(link);
+        showBuildShareMetadata(storedShare);
         alert("Share link copied.");
     } catch (error) {
         console.error("Short share-link copy failed:", error);
@@ -1882,6 +2051,7 @@ async function loadBuildShareCodeFromUrl() {
     try {
         const resolvedShare = await resolveBuildShareInput(decodeURIComponent(code));
         applyBuildShareCode(resolvedShare.sharePayload);
+        if (resolvedShare.shortCode) showBuildShareMetadata(resolvedShare);
         return true;
     } catch (error) {
         console.error("Share link import failed:", error);
@@ -2040,10 +2210,14 @@ async function loadBuildShareCode() {
     try {
         const resolvedShare = await resolveBuildShareInput(code);
         applyBuildShareCode(resolvedShare.sharePayload);
+        if (resolvedShare.shortCode) showBuildShareMetadata(resolvedShare);
         const modeLabel = resolvedShare.shareType
             ? `${getBuildShareTypeLabel(resolvedShare.shareType)} `
             : "";
-        alert(`${modeLabel}team and rotation loaded.`);
+        const shareLabel = resolvedShare.title
+            ? `“${resolvedShare.title}” by ${resolvedShare.authorName || "Anonymous"}`
+            : `${modeLabel}team and rotation`;
+        alert(`${shareLabel} loaded.`);
     } catch (error) {
         console.error("Share code import failed:", error);
         alert("The share code could not be loaded.");

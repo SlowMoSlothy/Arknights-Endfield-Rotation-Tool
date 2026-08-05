@@ -5,38 +5,45 @@ import test from "node:test";
 const plannerHtml = fs.readFileSync("endfield/index.html", "utf8");
 const communityHtml = fs.readFileSync("endfield/community/index.html", "utf8");
 const communityScript = fs.readFileSync("endfield/community/community-page.js", "utf8");
-const plannerCommunityScript = fs.readFileSync("endfield/js/ui/communityRotations.js", "utf8");
+const shortShareMigration = fs.readFileSync("supabase/rotation_share_codes.sql", "utf8");
 
-test("community rotations use a standalone page instead of a planner modal", () => {
+test("Discover is a standalone directory linked from the planner", () => {
   assert.match(plannerHtml, /id="openCommunityRotationsBtn"[^>]+href="community\/"/);
-  assert.doesNotMatch(plannerHtml, /id="communityModal"/);
-  assert.match(communityHtml, /<body>/);
+  assert.match(plannerHtml, /sidebar-command-label">Discover</);
+  assert.doesNotMatch(plannerHtml, /onclick="saveRotationInCommunity\(\)"/);
+  assert.match(communityHtml, /<h1 id="pageTitle">Rotations &amp; Simulations<\/h1>/);
   assert.match(communityHtml, /id="rotationGrid"/);
-  assert.doesNotMatch(communityHtml, /settings-modal|communityModal/);
+  assert.match(communityHtml, /style\.css\?v=3/);
+  assert.match(communityHtml, /community-page\.js\?v=4/);
 });
 
-test("community page keeps planner loading and legacy links available", () => {
-  assert.match(communityScript, /#setup=\$\{encodeURIComponent\(row\.share_code\)\}/);
-  assert.match(communityScript, /increment_community_rotation_like/);
-  assert.match(communityScript, /increment_community_rotation_view/);
-  assert.match(communityScript, /Community rotation link copied/);
-  assert.match(communityHtml, /id="pageToast"/);
-  assert.match(communityScript, /filter\(row => row\.is_visible !== false\)/);
-  assert.match(plannerCommunityScript, /COMMUNITY_PAGE_PATH = "community\/"/);
-  assert.match(plannerCommunityScript, /window\.location\.replace\(getCommunityPageUrl/);
+test("Discover separates rotation and simulation shares", () => {
+  assert.match(communityHtml, /id="rotationTab"[\s\S]*data-share-type="rotation"/);
+  assert.match(communityHtml, /id="simulationTab"[\s\S]*data-share-type="simulation"/);
+  assert.match(communityScript, /share\.share_type === discoverState\.type/);
+  assert.match(communityScript, /#share=\$\{encodeURIComponent\(share\.short_code\)\}/);
+  assert.match(communityScript, /mode-chip mode-\$\{share\.share_type\}/);
 });
 
-test("planner allows anonymous community submissions", () => {
-  assert.match(plannerCommunityScript, /!isCommunityAccountSignedIn\(\)\) return "Anonymous"/);
-  assert.doesNotMatch(plannerCommunityScript, /Sign in before submitting a rotation/);
-  assert.match(plannerCommunityScript, /submitted_by: getCommunityAccountUserId\(\) \|\| null/);
+test("Discover reads public short shares through a restricted RPC", () => {
+  assert.match(shortShareMigration, /create or replace function public\.list_public_rotation_shares/);
+  assert.match(shortShareMigration, /where share\.is_public/);
+  assert.match(shortShareMigration, /share\.expires_at is null or share\.expires_at > now\(\)/);
+  assert.match(shortShareMigration, /'rotation_count'/);
+  assert.match(shortShareMigration, /'simulation_count'/);
+  assert.match(shortShareMigration, /grant execute on function public\.list_public_rotation_shares\(integer\) to anon, authenticated/);
+  assert.match(shortShareMigration, /legacy-community:/);
+  assert.match(communityScript, /rpc\("list_public_rotation_shares", \{ p_limit: 500 \}\)/);
+  assert.doesNotMatch(communityScript, /from\("community_rotations"\)/);
 });
 
-test("community skill icons use element colors and ultimate fill modes", () => {
-  assert.match(communityScript, /short_type,element_type,icon_path/);
-  assert.match(communityScript, /ef-fill-\$\{fillMode\}/);
-  assert.match(communityScript, /=== "ultimate" \? "full" : "half"/);
-  assert.match(communityScript, /elementType: row\.element_type/);
-  assert.match(communityHtml, /style\.css\?v=2/);
-  assert.match(communityHtml, /community-page\.js\?v=3/);
+test("Discover exposes useful team and metadata filters", () => {
+  assert.match(communityHtml, /id="searchInput"/);
+  assert.match(communityHtml, /id="operatorFilter"/);
+  assert.match(communityHtml, /id="elementFilter"/);
+  assert.match(communityHtml, /id="classFilter"/);
+  assert.match(communityScript, /share\.author_name/);
+  assert.match(communityScript, /share\.description/);
+  assert.match(communityScript, /share\.short_code/);
+  assert.match(communityScript, /list\(share\.operator_ids\)/);
 });

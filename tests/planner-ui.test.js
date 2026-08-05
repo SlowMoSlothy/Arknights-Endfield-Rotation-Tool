@@ -10,6 +10,10 @@ const weaponAtkChartScript = fs.readFileSync("endfield/js/ui/weaponAtkChart.js",
 const uiSettingsScript = fs.readFileSync("endfield/js/logic/uiSettings.js", "utf8");
 const shortShareMigration = fs.readFileSync("supabase/rotation_share_codes.sql", "utf8");
 
+function countOccurrences(source, value) {
+  return source.split(value).length - 1;
+}
+
 test("planner exposes a visible timeline mode switch in the rotation toolbar", () => {
   assert.match(plannerHtml, /class="rotation-actions"[^>]*aria-label="Rotation actions"/);
   assert.match(plannerHtml, /class="rotation-mode-switch"[^>]*aria-label="Rotation mode"/);
@@ -19,6 +23,13 @@ test("planner exposes a visible timeline mode switch in the rotation toolbar", (
   assert.doesNotMatch(plannerHtml, /class="settings-option-btn settings-mode-btn"[^>]*data-setting="timelineMode"/);
 });
 
+test("planner loads each combat registry only once", () => {
+  assert.equal(countOccurrences(plannerHtml, 'js/data/debuffRegistry.js'), 1);
+  assert.equal(countOccurrences(plannerHtml, 'js/data/buffRegistry.js'), 1);
+  assert.equal(countOccurrences(plannerHtml, 'js/data/effectGroups.js'), 1);
+  assert.equal(countOccurrences(plannerHtml, 'js/data/reactionRules.js'), 1);
+});
+
 test("short share codes are unique, mode-aware and accessible only through validated RPCs", () => {
   assert.match(shortShareMigration, /create table if not exists public\.rotation_share_codes/);
   assert.match(shortShareMigration, /short_code varchar\(6\) not null unique/);
@@ -26,14 +37,26 @@ test("short share codes are unique, mode-aware and accessible only through valid
   assert.match(shortShareMigration, /alter table public\.rotation_share_codes enable row level security/);
   assert.match(shortShareMigration, /revoke all on table public\.rotation_share_codes from anon, authenticated/);
   assert.match(shortShareMigration, /operator_ids integer\[\]/);
+  assert.match(shortShareMigration, /title text not null default 'Shared Build'/);
+  assert.match(shortShareMigration, /description text not null default ''/);
+  assert.match(shortShareMigration, /author_name text not null default 'Anonymous'/);
+  assert.match(shortShareMigration, /p_title text/);
+  assert.match(shortShareMigration, /p_description text/);
+  assert.match(shortShareMigration, /auth\.uid\(\)/);
   assert.match(shortShareMigration, /create function public\.create_rotation_share/);
   assert.match(shortShareMigration, /create or replace function public\.resolve_rotation_share/);
   assert.match(shortShareMigration, /create or replace function public\.get_operator_share_summary/);
   assert.match(shortShareMigration, /create or replace function public\.list_operator_shares/);
+  assert.match(shortShareMigration, /create or replace function public\.list_public_rotation_shares/);
   assert.match(shortShareMigration, /using gin \(operator_ids\)/);
   assert.match(shortShareMigration, /share\.operator_ids @> array\[p_operator_id\]/);
   assert.match(shortShareMigration, /grant execute on function public\.get_operator_share_summary/);
-  assert.match(plannerHtml, /shareCode\.js\?v=9/);
+  assert.match(shortShareMigration, /grant execute on function public\.list_public_rotation_shares/);
+  assert.match(plannerHtml, /id="shareMetadataModal"/);
+  assert.match(plannerHtml, /id="shareMetadataTitleInput"[^>]*required/);
+  assert.match(plannerHtml, /id="shareMetadataDescriptionInput"/);
+  assert.match(plannerHtml, /id="shareMetadataCardAuthor"/);
+  assert.match(plannerHtml, /shareCode\.js\?v=10/);
 });
 
 test("timeline mode switch has active styling and accessible pressed state", () => {
