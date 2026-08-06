@@ -578,6 +578,11 @@ function renderSkills() {
             return;
         }
 
+        const operatorElement = typeof normalizeSkillElementType === "function"
+            ? normalizeSkillElementType(op.elementType)
+            : String(op.elementType || "neutral").trim().toLowerCase();
+        operatorWrapper.classList.add(`operator-element-${operatorElement || "neutral"}`);
+
         const card = document.createElement("div");
         card.className = "operator-skill-card";
         const bgPath = op.background || op.icon;
@@ -603,7 +608,17 @@ function renderSkills() {
             card.appendChild(leaderBadge);
         }
         const skillRow = document.createElement("div");
-        skillRow.className = "skill-row";
+        skillRow.className = "skill-row operator-owned-skill-row";
+        skillRow.setAttribute("aria-label", `${op.name} skills`);
+        const skillOwner = document.createElement("div");
+        skillOwner.className = "operator-skill-owner";
+        const skillOwnerDot = document.createElement("span");
+        skillOwnerDot.className = "operator-skill-owner-dot";
+        skillOwnerDot.setAttribute("aria-hidden", "true");
+        const skillOwnerName = document.createElement("span");
+        skillOwnerName.textContent = `${op.name} skills`;
+        skillOwner.append(skillOwnerDot, skillOwnerName);
+        skillRow.appendChild(skillOwner);
         getDisplaySkillsForOperator(op).forEach(({ skill, switchGroup }) => {
             if (uiSettings?.timelineMode === "simulation" && isFinalStrikeSkillForPanel(skill)) return;
             const div = document.createElement("div");

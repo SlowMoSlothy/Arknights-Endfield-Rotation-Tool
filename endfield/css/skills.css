@@ -704,7 +704,7 @@
 
 .skill-row {
     width: 100%;
-    height: 38px;
+    height: 34px;
     box-sizing: border-box;
 
     display: flex;
@@ -712,7 +712,7 @@
     align-items: center;
     gap: 3px;
 
-    padding: 4px 8px;
+    padding: 3px 7px;
 
     border-radius: 12px;
 
@@ -732,6 +732,54 @@
     transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
 }
 
+.operator-owned-skill-row {
+    position: relative;
+    margin-top: 3px;
+    border-color: color-mix(in srgb, var(--element-color, #777) 52%, rgba(160,170,169,0.18));
+    background:
+        linear-gradient(90deg, color-mix(in srgb, var(--element-color, #777) 10%, transparent), transparent 55%),
+        rgba(0, 0, 0, 0.62);
+    box-shadow:
+        0 -6px 0 -5px var(--element-color, #777),
+        0 3px 9px rgba(0, 0, 0, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.055);
+}
+
+.operator-skill-owner {
+    position: absolute;
+    left: 50%;
+    top: -10px;
+    z-index: 8;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    max-width: calc(100% - 14px);
+    padding: 1px 7px;
+    border: 1px solid color-mix(in srgb, var(--element-color, #777) 58%, #222);
+    border-radius: 999px;
+    background: rgba(9, 11, 12, 0.96);
+    color: rgba(244, 245, 242, 0.84);
+    font-size: 8px;
+    font-weight: 900;
+    line-height: 1.35;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.operator-skill-owner-dot {
+    flex: 0 0 auto;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--element-color, #777);
+    box-shadow: 0 0 7px var(--element-color, #777);
+}
+
 .operator-skill-wrapper:has(.skill-small.selected) .skill-row {
     border-color: rgba(248,245,70,0.34);
     background:
@@ -744,10 +792,10 @@
 }
 
 .skill-small {
-    width: 30px;
-    height: 30px;
-    min-width: 30px;
-    min-height: 30px;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
     border-radius: 50%;
     overflow: hidden;
     display: flex;
@@ -812,9 +860,9 @@
 .skill-small .ef-skill-icon {
     position: relative;
     z-index: 1;
-    --ef-size: 30px;
-    width: 30px;
-    height: 30px;
+    --ef-size: 24px;
+    width: 24px;
+    height: 24px;
 }
 
 .skill-small .ef-skill-ring {
@@ -827,9 +875,9 @@
 }
 
 .skill-small.selected .ef-skill-icon {
-    --ef-size: 29px;
-    width: 29px;
-    height: 29px;
+    --ef-size: 23px;
+    width: 23px;
+    height: 23px;
 }
 
 .skill-small.qingbo-switch {

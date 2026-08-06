@@ -286,17 +286,17 @@
 
     .skill-row {
         width: 148px;
-        height: 38px;
-        gap: 4px;
-        padding: 4px 8px;
+        height: 34px;
+        gap: 3px;
+        padding: 3px 7px;
         border-radius: 12px;
     }
 
     .skill-small {
-        width: 32px;
-        height: 32px;
-        min-width: 32px;
-        min-height: 32px;
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+        min-height: 24px;
         padding: 2px;
     }
 
