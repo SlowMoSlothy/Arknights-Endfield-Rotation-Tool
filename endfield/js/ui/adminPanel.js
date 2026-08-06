@@ -30,6 +30,14 @@ const ADMIN_REVIEW_TABS = [
         loadingMessage: "Fetching public visibility settings from Supabase.",
         emptyTitle: "No operators found",
         emptyMessage: "No Endfield operators are available in Supabase."
+    },
+    {
+        id: "batk",
+        label: "BATK Editor",
+        loadingTitle: "Loading BATK profiles",
+        loadingMessage: "Fetching operators and Basic Attack sequences from Supabase.",
+        emptyTitle: "No BATK data found",
+        emptyMessage: "Choose an operator and create the first Basic Attack profile."
     }
 ];
 
@@ -39,6 +47,9 @@ const adminPanelState = {
     username: "",
     rotations: [],
     operators: [],
+    batkRows: [],
+    batkEditor: null,
+    batkSaving: false,
     activeTab: "pending",
     loaded: false,
     loading: false,
@@ -627,11 +638,454 @@ function createAdminOperatorVisibilityCard(operator) {
     return card;
 }
 
+function getAdminBatkProfiles(operatorId) {
+    const id = Number(operatorId);
+    const profiles = new Map();
+    adminPanelState.batkRows
+        .filter(row => Number(row.operator_id) === id)
+        .sort((left, right) => Number(left.sequence_index) - Number(right.sequence_index))
+        .forEach(row => {
+            const formKey = String(row.form_key || "base");
+            if (!profiles.has(formKey)) profiles.set(formKey, []);
+            profiles.get(formKey).push(row);
+        });
+    return profiles;
+}
+
+function createEmptyAdminBatkEditor(operator, formKey = "base") {
+    return {
+        operatorId: Number(operator?.id) || 0,
+        formKey,
+        attackName: `${operator?.name || "Operator"} Basic Attack`,
+        timingMode: "absolute",
+        verified: false,
+        description: "",
+        iconPath: "",
+        sourceUrl: "",
+        sourceNote: "",
+        sequences: [{
+            label: "FS",
+            kind: "final_strike",
+            duration: "1",
+            hitTimings: "0.5",
+            hitMultipliers: "",
+            atkMultiplierTotal: "1",
+            staggerMultiplier: "0",
+            eventHitIndex: "1",
+            emits: "final_strike",
+            endsCycle: true
+        }]
+    };
+}
+
+function loadAdminBatkEditor(operatorId, requestedFormKey = "") {
+    const operator = adminPanelState.operators.find(item => Number(item.id) === Number(operatorId));
+    if (!operator) {
+        adminPanelState.batkEditor = null;
+        return;
+    }
+
+    const profiles = getAdminBatkProfiles(operator.id);
+    const formKey = requestedFormKey && profiles.has(requestedFormKey)
+        ? requestedFormKey
+        : (profiles.keys().next().value || "base");
+    const rows = profiles.get(formKey) || [];
+
+    if (!rows.length) {
+        adminPanelState.batkEditor = createEmptyAdminBatkEditor(operator, formKey);
+        return;
+    }
+
+    const first = rows[0];
+    adminPanelState.batkEditor = {
+        operatorId: Number(operator.id),
+        formKey,
+        attackName: first.attack_name || `${operator.name} Basic Attack`,
+        timingMode: first.hit_timing_mode || "absolute",
+        verified: rows.every(row => row.verified === true),
+        description: first.description || "",
+        iconPath: first.icon_path || "",
+        sourceUrl: first.source_url || "",
+        sourceNote: first.source_note || "",
+        sequences: rows.map(row => ({
+            label: row.label || "",
+            kind: row.kind || "normal",
+            duration: String(Number(row.duration_seconds) || ""),
+            hitTimings: normalizeAdminList(row.hit_timings).join(", "),
+            hitMultipliers: normalizeAdminList(row.hit_multipliers).join(", "),
+            atkMultiplierTotal: String(Number(row.atk_multiplier_total) || 0),
+            staggerMultiplier: String(Number(row.stagger_multiplier) || 0),
+            eventHitIndex: row.event_hit_index === null || row.event_hit_index === undefined ? "" : String(row.event_hit_index),
+            emits: normalizeAdminList(row.emits).join(", "),
+            endsCycle: row.ends_cycle === true
+        }))
+    };
+}
+
+function parseAdminBatkNumberList(value) {
+    const text = String(value || "").trim();
+    if (!text) return [];
+    return text.split(/[;,\s]+/).filter(Boolean).map(Number);
+}
+
+function validateAdminBatkEditor(editor) {
+    if (!editor?.operatorId) throw new Error("Choose an operator first.");
+    if (!/^[a-z0-9][a-z0-9_]{0,63}$/.test(String(editor.formKey || ""))) {
+        throw new Error("Form key may only contain lowercase letters, numbers, and underscores.");
+    }
+    if (!String(editor.attackName || "").trim()) throw new Error("Enter an attack name.");
+    if (!editor.sequences.length) throw new Error("Add at least one sequence.");
+    if (editor.sequences.filter(sequence => sequence.endsCycle).length !== 1) {
+        throw new Error("Exactly one sequence must end the BATK cycle.");
+    }
+
+    const sequences = editor.sequences.map((sequence, index) => {
+        const duration = Number(sequence.duration);
+        const hitTimings = parseAdminBatkNumberList(sequence.hitTimings);
+        const hitMultipliers = parseAdminBatkNumberList(sequence.hitMultipliers);
+        const atkMultiplierTotal = Number(sequence.atkMultiplierTotal);
+        const staggerMultiplier = Number(sequence.staggerMultiplier);
+        const eventHitIndex = String(sequence.eventHitIndex || "").trim() === "" ? null : Number(sequence.eventHitIndex);
+        const emits = String(sequence.emits || "").split(/[;,]+/).map(value => value.trim()).filter(Boolean);
+
+        if (!Number.isFinite(duration) || duration <= 0) throw new Error(`SEQ ${index + 1}: duration must be positive.`);
+        if (!hitTimings.length || hitTimings.some(value => !Number.isFinite(value) || value < 0)) {
+            throw new Error(`SEQ ${index + 1}: enter at least one non-negative hit timing.`);
+        }
+        const lastHit = editor.timingMode === "intervals"
+            ? hitTimings.reduce((sum, value) => sum + value, 0)
+            : Math.max(...hitTimings);
+        if (lastHit > duration + 0.000001) throw new Error(`SEQ ${index + 1}: hits exceed the sequence duration.`);
+        if (hitMultipliers.length && hitMultipliers.length !== hitTimings.length) {
+            throw new Error(`SEQ ${index + 1}: hit multipliers must match the number of hits.`);
+        }
+        if (![atkMultiplierTotal, staggerMultiplier].every(value => Number.isFinite(value) && value >= 0)) {
+            throw new Error(`SEQ ${index + 1}: multipliers cannot be negative.`);
+        }
+        if (hitMultipliers.some(value => !Number.isFinite(value) || value < 0)) {
+            throw new Error(`SEQ ${index + 1}: per-hit multipliers cannot be negative.`);
+        }
+        if (eventHitIndex !== null && (!Number.isInteger(eventHitIndex) || eventHitIndex < 1 || eventHitIndex > hitTimings.length)) {
+            throw new Error(`SEQ ${index + 1}: event hit must reference an existing hit.`);
+        }
+
+        return {
+            label: String(sequence.label || "").trim() || (sequence.endsCycle ? "FS" : `SEQ ${index + 1}`),
+            kind: sequence.kind === "final_strike" ? "final_strike" : "normal",
+            duration,
+            hitTimings,
+            hitMultipliers,
+            atkMultiplierTotal,
+            staggerMultiplier,
+            eventHitIndex,
+            emits,
+            endsCycle: sequence.endsCycle === true
+        };
+    });
+
+    return {
+        attackName: String(editor.attackName).trim(),
+        timingMode: editor.timingMode === "intervals" ? "intervals" : "absolute",
+        verified: editor.verified === true,
+        description: String(editor.description || "").trim(),
+        iconPath: String(editor.iconPath || "").trim(),
+        sourceUrl: String(editor.sourceUrl || "").trim(),
+        sourceNote: String(editor.sourceNote || "").trim(),
+        sequences
+    };
+}
+
+function createAdminBatkInput(label, value, options = {}) {
+    const field = document.createElement("label");
+    field.className = `admin-field admin-batk-field${options.wide ? " is-wide" : ""}`;
+    field.appendChild(createAdminTextElement("span", "", label));
+
+    const input = options.select ? document.createElement("select") : document.createElement(options.multiline ? "textarea" : "input");
+    input.className = "admin-batk-input";
+    if (options.type) input.type = options.type;
+    if (options.step) input.step = options.step;
+    if (options.min !== undefined) input.min = options.min;
+    if (options.placeholder) input.placeholder = options.placeholder;
+
+    if (options.select) {
+        options.select.forEach(option => {
+            const item = document.createElement("option");
+            item.value = option.value;
+            item.textContent = option.label;
+            item.selected = option.value === value;
+            input.appendChild(item);
+        });
+    } else if (options.type === "checkbox") {
+        input.checked = value === true;
+        field.classList.add("is-checkbox");
+    } else {
+        input.value = value ?? "";
+    }
+
+    if (typeof options.onInput === "function") {
+        input.addEventListener(options.select || options.type === "checkbox" ? "change" : "input", event => {
+            options.onInput(options.type === "checkbox" ? event.target.checked : event.target.value);
+        });
+    }
+    field.appendChild(input);
+    return field;
+}
+
+function renderAdminBatkPreview() {
+    const preview = document.getElementById("adminBatkPreview");
+    const editor = adminPanelState.batkEditor;
+    if (!preview || !editor) return;
+    preview.replaceChildren();
+
+    const totalDuration = editor.sequences.reduce((sum, sequence) => sum + Math.max(Number(sequence.duration) || 0, 0), 0) || 1;
+    editor.sequences.forEach((sequence, index) => {
+        const duration = Math.max(Number(sequence.duration) || 0, 0.001);
+        const segment = document.createElement("div");
+        segment.className = `admin-batk-preview-segment${sequence.endsCycle ? " is-final" : ""}`;
+        segment.style.flexGrow = String(duration / totalDuration);
+        segment.style.flexBasis = `${Math.max((duration / totalDuration) * 100, 12)}%`;
+
+        const timingValues = parseAdminBatkNumberList(sequence.hitTimings);
+        let cumulative = 0;
+        const hitTimes = timingValues.map(value => {
+            cumulative = editor.timingMode === "intervals" ? cumulative + value : value;
+            return cumulative;
+        });
+        const track = document.createElement("div");
+        track.className = "admin-batk-preview-track";
+        hitTimes.forEach((timing, hitIndex) => {
+            const hit = createAdminTextElement("span", "admin-batk-preview-hit", String(hitIndex + 1));
+            hit.style.left = `${Math.max(3, Math.min(97, (timing / duration) * 100))}%`;
+            hit.title = `${Number(timing.toFixed(3))}s`;
+            track.appendChild(hit);
+        });
+
+        segment.append(
+            createAdminTextElement("strong", "", sequence.label || (sequence.endsCycle ? "FS" : `SEQ ${index + 1}`)),
+            createAdminTextElement("span", "", `${Number(duration.toFixed(3))}s · ${Number(sequence.atkMultiplierTotal) || 0}x ATK`),
+            track
+        );
+        preview.appendChild(segment);
+    });
+}
+
+function createAdminBatkSequenceCard(sequence, index) {
+    const card = document.createElement("article");
+    card.className = `admin-batk-sequence${sequence.endsCycle ? " is-final" : ""}`;
+    const heading = document.createElement("div");
+    heading.className = "admin-batk-sequence-heading";
+    heading.appendChild(createAdminTextElement("strong", "", `Sequence ${index + 1}`));
+
+    const remove = createAdminActionButton("Remove", () => {
+        const editor = adminPanelState.batkEditor;
+        if (!editor || editor.sequences.length === 1) return;
+        const removed = editor.sequences.splice(index, 1)[0];
+        if (removed.endsCycle && editor.sequences.length) {
+            const last = editor.sequences.at(-1);
+            last.endsCycle = true;
+            last.kind = "final_strike";
+            if (!last.label || /^SEQ\s/i.test(last.label)) last.label = "FS";
+        }
+        renderAdminReviewList();
+    }, { danger: true, disabled: adminPanelState.batkSaving || adminPanelState.batkEditor.sequences.length === 1 });
+    heading.appendChild(remove);
+
+    const fields = document.createElement("div");
+    fields.className = "admin-batk-sequence-fields";
+    const update = (key, value) => {
+        sequence[key] = value;
+        renderAdminBatkPreview();
+    };
+    fields.append(
+        createAdminBatkInput("Label", sequence.label, { onInput: value => update("label", value) }),
+        createAdminBatkInput("Kind", sequence.kind, {
+            select: [{ value: "normal", label: "Normal" }, { value: "final_strike", label: "Final Strike" }],
+            onInput: value => update("kind", value)
+        }),
+        createAdminBatkInput("Duration (s)", sequence.duration, { type: "number", min: "0.001", step: "0.001", onInput: value => update("duration", value) }),
+        createAdminBatkInput("Total ATK ×", sequence.atkMultiplierTotal, { type: "number", min: "0", step: "0.001", onInput: value => update("atkMultiplierTotal", value) }),
+        createAdminBatkInput("Hit timings", sequence.hitTimings, { wide: true, placeholder: "0.267, 0.583", onInput: value => update("hitTimings", value) }),
+        createAdminBatkInput("Per-hit multipliers", sequence.hitMultipliers, { wide: true, placeholder: "Optional: 0.25, 0.51", onInput: value => update("hitMultipliers", value) }),
+        createAdminBatkInput("Stagger ×", sequence.staggerMultiplier, { type: "number", min: "0", step: "0.001", onInput: value => update("staggerMultiplier", value) }),
+        createAdminBatkInput("Event hit #", sequence.eventHitIndex, { type: "number", min: "1", step: "1", onInput: value => update("eventHitIndex", value) }),
+        createAdminBatkInput("Emits", sequence.emits, { wide: true, placeholder: "final_strike", onInput: value => update("emits", value) }),
+        createAdminBatkInput("Ends cycle", sequence.endsCycle, {
+            type: "checkbox",
+            onInput: value => {
+                adminPanelState.batkEditor.sequences.forEach((item, itemIndex) => {
+                    item.endsCycle = itemIndex === index ? value : false;
+                    if (value && itemIndex === index) {
+                        item.kind = "final_strike";
+                        if (!item.label || /^SEQ\s/i.test(item.label)) item.label = "FS";
+                        if (!String(item.emits || "").split(/[;,]+/).map(entry => entry.trim()).includes("final_strike")) {
+                            item.emits = [item.emits, "final_strike"].filter(Boolean).join(", ");
+                        }
+                    } else if (value && itemIndex !== index && item.kind === "final_strike") {
+                        item.kind = "normal";
+                        if (!item.label || item.label === "FS") item.label = `SEQ ${itemIndex + 1}`;
+                    }
+                });
+                renderAdminReviewList();
+            }
+        })
+    );
+    card.append(heading, fields);
+    return card;
+}
+
+function renderAdminBatkEditor(list) {
+    list.classList.add("is-batk");
+    if (!adminPanelState.operators.length) {
+        setAdminListState(list, {
+            type: "empty",
+            title: "No operators found",
+            message: "The BATK editor needs the Endfield operator catalog from Supabase."
+        });
+        return;
+    }
+
+    if (!adminPanelState.batkEditor) loadAdminBatkEditor(adminPanelState.operators[0].id);
+    const editor = adminPanelState.batkEditor;
+    const profiles = getAdminBatkProfiles(editor.operatorId);
+    const shell = document.createElement("section");
+    shell.className = "admin-batk-editor";
+
+    const toolbar = document.createElement("div");
+    toolbar.className = "admin-batk-toolbar";
+    const operatorField = createAdminBatkInput("Operator", String(editor.operatorId), {
+        select: adminPanelState.operators.map(operator => ({ value: String(operator.id), label: operator.name })),
+        onInput: value => {
+            loadAdminBatkEditor(Number(value));
+            setAdminReviewStatus("");
+            renderAdminReviewList();
+        }
+    });
+    const formOptions = [...profiles.keys()].map(formKey => ({ value: formKey, label: formatAdminLabel(formKey) }));
+    formOptions.push({ value: "__new__", label: "+ New profile" });
+    const activeFormValue = profiles.has(editor.formKey) ? editor.formKey : "__new__";
+    const formField = createAdminBatkInput("Profile", activeFormValue, {
+        select: formOptions,
+        onInput: value => {
+            if (value === "__new__") {
+                const operator = adminPanelState.operators.find(item => Number(item.id) === editor.operatorId);
+                adminPanelState.batkEditor = createEmptyAdminBatkEditor(operator, "new_form");
+            } else {
+                loadAdminBatkEditor(editor.operatorId, value);
+            }
+            setAdminReviewStatus("");
+            renderAdminReviewList();
+        }
+    });
+    toolbar.append(operatorField, formField);
+
+    const profileFields = document.createElement("div");
+    profileFields.className = "admin-batk-profile-fields";
+    const updateProfile = (key, value) => {
+        editor[key] = value;
+        renderAdminBatkPreview();
+    };
+    profileFields.append(
+        createAdminBatkInput("Form key", editor.formKey, { onInput: value => updateProfile("formKey", value.toLowerCase().replace(/[^a-z0-9_]/g, "_")) }),
+        createAdminBatkInput("Attack name", editor.attackName, { wide: true, onInput: value => updateProfile("attackName", value) }),
+        createAdminBatkInput("Timing mode", editor.timingMode, {
+            select: [{ value: "absolute", label: "Absolute from sequence start" }, { value: "intervals", label: "Intervals between hits" }],
+            onInput: value => updateProfile("timingMode", value)
+        }),
+        createAdminBatkInput("In-game verified", editor.verified, { type: "checkbox", onInput: value => updateProfile("verified", value) }),
+        createAdminBatkInput("Description", editor.description, { wide: true, multiline: true, onInput: value => updateProfile("description", value) }),
+        createAdminBatkInput("Source URL", editor.sourceUrl, { wide: true, type: "url", onInput: value => updateProfile("sourceUrl", value) }),
+        createAdminBatkInput("Icon path", editor.iconPath, { wide: true, onInput: value => updateProfile("iconPath", value) }),
+        createAdminBatkInput("Source note", editor.sourceNote, { wide: true, onInput: value => updateProfile("sourceNote", value) })
+    );
+
+    const previewHeader = document.createElement("div");
+    previewHeader.className = "admin-batk-section-heading";
+    previewHeader.append(
+        createAdminTextElement("strong", "", "Live preview"),
+        createAdminTextElement("span", "", "Hit markers use the selected timing mode")
+    );
+    const preview = document.createElement("div");
+    preview.id = "adminBatkPreview";
+    preview.className = "admin-batk-preview";
+
+    const sequencesHeader = document.createElement("div");
+    sequencesHeader.className = "admin-batk-section-heading";
+    sequencesHeader.appendChild(createAdminTextElement("strong", "", `${editor.sequences.length} sequence${editor.sequences.length === 1 ? "" : "s"}`));
+    const addSequence = createAdminActionButton("+ Add sequence", () => {
+        editor.sequences.push({
+            label: `SEQ ${editor.sequences.length + 1}`,
+            kind: "normal",
+            duration: "1",
+            hitTimings: "0.5",
+            hitMultipliers: "",
+            atkMultiplierTotal: "1",
+            staggerMultiplier: "0",
+            eventHitIndex: "",
+            emits: "",
+            endsCycle: false
+        });
+        renderAdminReviewList();
+    }, { disabled: adminPanelState.batkSaving || editor.sequences.length >= 20 });
+    sequencesHeader.appendChild(addSequence);
+
+    const sequenceGrid = document.createElement("div");
+    sequenceGrid.className = "admin-batk-sequence-grid";
+    editor.sequences.forEach((sequence, index) => sequenceGrid.appendChild(createAdminBatkSequenceCard(sequence, index)));
+
+    const actions = document.createElement("div");
+    actions.className = "admin-batk-actions";
+    actions.append(
+        createAdminTextElement("span", "admin-batk-save-note", "Saving replaces this complete operator/form profile in Supabase."),
+        createAdminActionButton(adminPanelState.batkSaving ? "Saving..." : "Save BATK profile", saveAdminBatkProfile, {
+            primary: true,
+            disabled: adminPanelState.batkSaving
+        })
+    );
+
+    shell.append(toolbar, profileFields, previewHeader, preview, sequencesHeader, sequenceGrid, actions);
+    list.appendChild(shell);
+    renderAdminBatkPreview();
+}
+
+async function saveAdminBatkProfile() {
+    const client = getAdminSupabaseClient();
+    const editor = adminPanelState.batkEditor;
+    if (!client || !editor || adminPanelState.batkSaving) return;
+
+    try {
+        const payload = validateAdminBatkEditor(editor);
+        adminPanelState.batkSaving = true;
+        setAdminReviewStatus("Saving BATK profile to Supabase...");
+        renderAdminReviewList();
+
+        const { data, error } = await client.rpc("replace_operator_basic_attack_profile", {
+            target_operator_id: editor.operatorId,
+            target_form_key: editor.formKey,
+            profile_data: payload
+        });
+        if (error) throw error;
+        if (!Array.isArray(data) || !data.length) throw new Error("Supabase returned no BATK sequences.");
+
+        adminPanelState.batkRows = adminPanelState.batkRows
+            .filter(row => !(Number(row.operator_id) === editor.operatorId && String(row.form_key) === editor.formKey))
+            .concat(data);
+        loadAdminBatkEditor(editor.operatorId, editor.formKey);
+        setAdminReviewStatus("BATK profile saved. Planner data is live after reload; static operator pages update with the next GitHub build.", "is-success");
+    } catch (error) {
+        console.error("BATK profile save failed:", error);
+        setAdminReviewStatus(error?.message || "BATK profile could not be saved. Run supabase/basic_attack_admin_editor.sql first.", "is-error");
+    } finally {
+        adminPanelState.batkSaving = false;
+        renderAdminReviewList();
+    }
+}
+
 function renderAdminReviewList() {
     const list = document.getElementById("adminReviewList");
     if (!list) return;
 
     list.classList.toggle("is-operators", adminPanelState.activeTab === "operators");
+    list.classList.toggle("is-batk", adminPanelState.activeTab === "batk");
     list.innerHTML = "";
 
     if (adminPanelState.loading) {
@@ -647,9 +1101,10 @@ function renderAdminReviewList() {
 
     if (adminPanelState.reviewError) {
         const isOperatorTab = adminPanelState.activeTab === "operators";
+        const isBatkTab = adminPanelState.activeTab === "batk";
         setAdminListState(list, {
             type: "error",
-            title: isOperatorTab ? "Operator settings unavailable" : "Review queue unavailable",
+            title: isBatkTab ? "BATK editor unavailable" : (isOperatorTab ? "Operator settings unavailable" : "Review queue unavailable"),
             message: adminPanelState.reviewError,
             actionLabel: "Try again",
             action: fetchAdminActiveContent
@@ -659,12 +1114,20 @@ function renderAdminReviewList() {
 
     if (!adminPanelState.loaded) {
         const isOperatorTab = adminPanelState.activeTab === "operators";
+        const isBatkTab = adminPanelState.activeTab === "batk";
         setAdminListState(list, {
-            title: isOperatorTab ? "Ready to manage operators" : "Ready for review",
-            message: isOperatorTab
+            title: isBatkTab ? "Ready to edit BATK profiles" : (isOperatorTab ? "Ready to manage operators" : "Ready for review"),
+            message: isBatkTab
+                ? "Operator Basic Attack profiles will appear here after the first refresh."
+                : isOperatorTab
                 ? "Operator visibility settings will appear here after the first refresh."
                 : "Pending rotations will appear here after the first refresh."
         });
+        return;
+    }
+
+    if (adminPanelState.activeTab === "batk") {
+        renderAdminBatkEditor(list);
         return;
     }
 
@@ -747,6 +1210,8 @@ async function refreshAdminSession({ loadPending = true } = {}) {
         adminPanelState.username = getAdminFallbackUsername(adminPanelState.session);
         adminPanelState.rotations = [];
         adminPanelState.operators = [];
+        adminPanelState.batkRows = [];
+        adminPanelState.batkEditor = null;
         adminPanelState.actionIds.clear();
         adminPanelState.operatorActionIds.clear();
         adminPanelState.reviewError = "";
@@ -886,10 +1351,65 @@ async function fetchAdminOperators() {
     }
 }
 
+async function fetchAdminBatkData() {
+    const client = getAdminSupabaseClient();
+    if (!client || !adminPanelState.isAdmin) return;
+
+    adminPanelState.loading = true;
+    adminPanelState.loaded = false;
+    adminPanelState.reviewError = "";
+    setAdminReviewStatus("");
+    renderAdminReviewList();
+
+    try {
+        const [operatorResult, batkResult] = await Promise.all([
+            client
+                .from("operators")
+                .select("id,name,slug,icon_path,sort_order")
+                .eq("game", "arknights_endfield")
+                .order("sort_order", { ascending: true })
+                .order("name", { ascending: true }),
+            client
+                .from("operator_basic_attack_sequences")
+                .select("*")
+                .eq("game", "arknights_endfield")
+                .order("operator_id", { ascending: true })
+                .order("form_key", { ascending: true })
+                .order("sequence_index", { ascending: true })
+        ]);
+
+        if (operatorResult.error) throw operatorResult.error;
+        if (batkResult.error) throw batkResult.error;
+
+        adminPanelState.operators = Array.isArray(operatorResult.data) ? operatorResult.data : [];
+        adminPanelState.batkRows = Array.isArray(batkResult.data) ? batkResult.data : [];
+        adminPanelState.loaded = true;
+
+        const currentOperatorStillExists = adminPanelState.operators.some(operator => (
+            Number(operator.id) === Number(adminPanelState.batkEditor?.operatorId)
+        ));
+        if (!currentOperatorStillExists) {
+            adminPanelState.batkEditor = null;
+        } else {
+            loadAdminBatkEditor(adminPanelState.batkEditor.operatorId, adminPanelState.batkEditor.formKey);
+        }
+    } catch (error) {
+        console.error("Admin BATK profiles could not be loaded:", error);
+        adminPanelState.loaded = true;
+        adminPanelState.operators = [];
+        adminPanelState.batkRows = [];
+        adminPanelState.batkEditor = null;
+        adminPanelState.reviewError = "BATK profiles could not be loaded. Check Supabase access and the Basic Attack table.";
+    } finally {
+        adminPanelState.loading = false;
+        renderAdminReviewList();
+    }
+}
+
 async function fetchAdminActiveContent() {
-    return adminPanelState.activeTab === "operators"
-        ? fetchAdminOperators()
-        : fetchAdminReviewRotations();
+    if (adminPanelState.activeTab === "operators") return fetchAdminOperators();
+    if (adminPanelState.activeTab === "batk") return fetchAdminBatkData();
+    return fetchAdminReviewRotations();
 }
 
 async function fetchAdminPendingRotations() {
@@ -903,6 +1423,8 @@ function setAdminReviewTab(tabId) {
     adminPanelState.detailRotationId = "";
     adminPanelState.rotations = [];
     adminPanelState.operators = [];
+    adminPanelState.batkRows = [];
+    adminPanelState.batkEditor = null;
     adminPanelState.actionIds.clear();
     adminPanelState.operatorActionIds.clear();
     adminPanelState.loaded = false;
@@ -1009,6 +1531,8 @@ async function signOutAdmin() {
     adminPanelState.username = "";
     adminPanelState.rotations = [];
     adminPanelState.operators = [];
+    adminPanelState.batkRows = [];
+    adminPanelState.batkEditor = null;
     adminPanelState.loaded = false;
     adminPanelState.reviewError = "";
     adminPanelState.detailRotationId = "";
@@ -1206,6 +1730,8 @@ function initAdminPanel() {
             adminPanelState.username = getAdminFallbackUsername(session);
             adminPanelState.rotations = [];
             adminPanelState.operators = [];
+            adminPanelState.batkRows = [];
+            adminPanelState.batkEditor = null;
             adminPanelState.actionIds.clear();
             adminPanelState.operatorActionIds.clear();
             adminPanelState.loaded = false;
