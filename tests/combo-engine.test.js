@@ -13,6 +13,11 @@ function createComboEngineContext() {
     operators: [],
     resolveArtsReactions: (effectMap) => effectMap
   };
+  context.getSkillById = (skillId) => context.operators
+    .flatMap(operator => operator.skills)
+    .find(skill => skill.id === skillId);
+  context.getOperatorBySkillId = (skillId) => context.operators
+    .find(operator => operator.skills.some(skill => skill.id === skillId));
 
   vm.createContext(context);
   vm.runInContext(fs.readFileSync("endfield/js/logic/comboEngine.js", "utf8"), context);
@@ -209,6 +214,44 @@ test("Rossi Battle Skill converts the first Lift to Vulnerable and can self-trig
   assert.deepEqual(Array.from(stackedLift.consumeDebuffs), []);
 });
 
+test("Rossi perfect Combo raises Vulnerable from one to three and triggers Mi Fu Combo", () => {
+  const context = createComboEngineContext();
+  const rossiCs = {
+    id: 503,
+    operatorId: 5,
+    type: "Combo Skill",
+    debuffs: [{
+      appliesEffect: "vulnerable",
+      persistsForCombo: true,
+      stackable: true,
+      stacksApplied: 2,
+      maxStacks: 4
+    }]
+  };
+  const miFuCs = {
+    id: 2703,
+    operatorId: 27,
+    type: "Combo Skill",
+    comboTriggerMode: "all",
+    comboTriggers: [{ effect: "vulnerable", minStacks: 3 }]
+  };
+
+  context.selectedTeam = [5, 27];
+  context.operators = [
+    { id: 5, skills: [rossiCs] },
+    { id: 27, skills: [miFuCs] }
+  ];
+
+  const effectMap = { vulnerable: 1 };
+  context.applySkillEffectsToComboMap(rossiCs, effectMap, true, false, effectMap);
+
+  assert.equal(effectMap.vulnerable, 3);
+  assert.deepEqual(
+    Array.from(context.getComboSkillsFromEffects(effectMap, 5).map(skill => skill.id)),
+    [2703]
+  );
+});
+
 test("Batch 08C keeps Rossi's Lift conversion and self-trigger in Supabase", () => {
   const migration = fs.readFileSync(
     "supabase/operator_mechanics_audit_batch_08c_rossi_camille_combo.sql",
@@ -220,6 +263,35 @@ test("Batch 08C keeps Rossi's Lift conversion and self-trigger in Supabase", () 
   assert.match(migration, /"statusEffect": "lift"/);
   assert.match(migration, /operator_id = 5[\s\S]*id = 503/);
   assert.match(migration, /"allowSelfTrigger": true/);
+});
+
+test("Batch 08D stores Rossi's Slot Mode perfect timing exclusively in Supabase", () => {
+  const migration = fs.readFileSync(
+    "supabase/operator_mechanics_audit_batch_08d_rossi_mifu_combo.sql",
+    "utf8"
+  );
+
+  assert.match(migration, /skill\.operator_id = 5[\s\S]*skill\.id = 503/);
+  assert.match(migration, /effect->>'appliesEffect' = 'vulnerable'/);
+  assert.match(migration, /jsonb_set\(effect, '\{stacksApplied\}', '2'::jsonb/);
+  assert.match(migration, /'slotModePerfectTiming', true/);
+  assert.doesNotMatch(fs.readFileSync("endfield/js/logic/comboEngine.js", "utf8"), /slotModePerfectTiming/);
+});
+
+test("Batch 08E restores Rossi's missing Battle Skill prerequisite in Supabase", () => {
+  const migration = fs.readFileSync(
+    "supabase/operator_mechanics_audit_batch_08e_rossi_combo_prerequisite.sql",
+    "utf8"
+  );
+
+  assert.match(migration, /skill\.operator_id = 5[\s\S]*skill\.id = 502/);
+  assert.match(migration, /'\{physicalStatusResolution\}'/);
+  assert.match(migration, /"vulnerabilityMode": "stack"/);
+  assert.match(migration, /"vulnerableEffect": "vulnerable"/);
+  assert.match(migration, /"statusEffect": "lift"/);
+  assert.match(migration, /"stacksApplied": 1/);
+  assert.match(migration, /skill\.operator_id = 5[\s\S]*skill\.id = 503/);
+  assert.match(migration, /'\{allowSelfTrigger\}'/);
 });
 
 test("Mi Fu batch 07C keeps Level-12 values and Qingbo conditions in Supabase", () => {
@@ -425,6 +497,47 @@ test("Supabase Finisher action rule consumes Stagger and emits a transient Finis
   assert.equal(resolved.emittedEffects.finisher, 1);
   assert.equal(resolved.effectMap.stagger, undefined);
   assert.equal(resolved.effectMap.electric_infliction, 2);
+});
+
+test("auto-inserted Combo chains follow the selected team from left to right", () => {
+  const context = createComboEngineContext();
+  const firstSlotCombo = {
+    id: 103,
+    type: "Combo Skill",
+    comboTriggers: [{ effect: "second_wave", minStacks: 1 }]
+  };
+  const secondSlotCombo = {
+    id: 203,
+    type: "Combo Skill",
+    comboTriggers: [{ effect: "second_wave", minStacks: 1 }]
+  };
+  const startSkill = {
+    id: 302,
+    type: "Battle Skill",
+    debuffs: [{ appliesEffect: "first_wave", persistsForCombo: true }]
+  };
+  const lastSlotCombo = {
+    id: 303,
+    type: "Combo Skill",
+    allowSelfTrigger: true,
+    comboTriggers: [{ effect: "first_wave", minStacks: 1 }],
+    debuffs: [{ appliesEffect: "second_wave", persistsForCombo: true }]
+  };
+
+  context.selectedTeam = [1, 2, 3];
+  context.operators = [
+    { id: 1, skills: [firstSlotCombo] },
+    { id: 2, skills: [secondSlotCombo] },
+    { id: 3, skills: [startSkill, lastSlotCombo] }
+  ];
+  context.rotation = [{ uid: "manual", id: startSkill.id }];
+
+  context.insertComboChain(startSkill.id, 0);
+
+  assert.deepEqual(
+    Array.from(context.rotation, entry => entry.id),
+    [302, 103, 203, 303]
+  );
 });
 
 test("batch 04 stores action conditions and Zhuang's Finisher trigger in Supabase", () => {

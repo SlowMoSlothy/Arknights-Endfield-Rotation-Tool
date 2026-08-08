@@ -637,9 +637,17 @@ function isComboSkillOnCooldown(comboSkill, comboIndex, cooldownState) {
     return (comboIndex - lastTriggeredAt) < cooldown;
 }
 
+function getComboSkillTeamSlot(skill) {
+    const operator = getOperatorBySkillId(skill?.id);
+    const slotIndex = selectedTeam.indexOf(operator?.id);
+
+    return slotIndex >= 0 ? slotIndex : selectedTeam.length;
+}
+
 function insertComboChain(startSkillId, startIndex) {
-    const queue = [{ skillId: startSkillId, insertAfterIndex: startIndex }];
+    const queue = [startSkillId];
     const alreadyInsertedIds = new Set([startSkillId]);
+    const pendingComboSkills = [];
 
     const MAX_CHAIN_LENGTH = 20;
     let chainCount = 0;
@@ -654,9 +662,9 @@ function insertComboChain(startSkillId, startIndex) {
             break;
         }
 
-        const current = queue.shift();
-        const currentSkillData = getSkillById(current.skillId);
-        const sourceOperator = getOperatorBySkillId(current.skillId);
+        const currentSkillId = queue.shift();
+        const currentSkillData = getSkillById(currentSkillId);
+        const sourceOperator = getOperatorBySkillId(currentSkillId);
 
         if (!currentSkillData || !sourceOperator) continue;
 
@@ -697,30 +705,29 @@ Object.entries(chainEffectMap).forEach(([effectName, amount]) => {
 
         const comboSkills = getComboSkillsFromEffects(resolvedEffectMap, sourceOperator.id);
 
-        let insertOffset = 1;
-
         comboSkills.forEach(comboSkill => {
             if (alreadyInsertedIds.has(comboSkill.id)) return;
 
-            const comboIndex = current.insertAfterIndex + insertOffset;
+            const comboIndex = startIndex + pendingComboSkills.length + 1;
             if (isComboSkillOnCooldown(comboSkill, comboIndex, comboCooldownState)) return;
-
-            rotation.splice(comboIndex, 0, {
-                uid: crypto.randomUUID(),
-                id: comboSkill.id,
-                autoInserted: true
-            });
 
             alreadyInsertedIds.add(comboSkill.id);
             comboCooldownState[comboSkill.id] = comboIndex;
 
-            queue.push({
-                skillId: comboSkill.id,
-                insertAfterIndex: comboIndex
-            });
+            pendingComboSkills.push(comboSkill);
+            queue.push(comboSkill.id);
 
-            insertOffset++;
             chainCount++;
         });
     }
+
+    pendingComboSkills
+        .sort((left, right) => getComboSkillTeamSlot(left) - getComboSkillTeamSlot(right))
+        .forEach((comboSkill, offset) => {
+            rotation.splice(startIndex + offset + 1, 0, {
+                uid: crypto.randomUUID(),
+                id: comboSkill.id,
+                autoInserted: true
+            });
+        });
 }
