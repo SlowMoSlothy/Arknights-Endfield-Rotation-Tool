@@ -329,11 +329,39 @@ function applyMatchingInflictionToRotationState(skillData, stackState, metaState
 }
 
 function consumeAllDebuffStacks(effectName, stackState, metaState) {
+    const resolvedEffectName = typeof getConsumedDebuffEffectName === "function"
+        ? getConsumedDebuffEffectName(effectName)
+        : (typeof effectName === "string"
+            ? effectName
+            : effectName?.effect || effectName?.id || effectName?.appliesEffect || effectName?.name);
     const key = normalizeDebuffKey({
-        id: effectName
+        id: resolvedEffectName
     });
+    if (!key) return;
     delete stackState[key];
     delete metaState[key];
+}
+
+function resolveSlotModeSkillData(skillData, debuffStackState) {
+    let resolvedSkillData = skillData;
+    if (typeof resolveSimulationAttributeVariant === "function") {
+        resolvedSkillData = resolveSimulationAttributeVariant(resolvedSkillData, resolvedSkillData?.operatorId);
+    }
+    if (typeof resolveSimulationPhysicalStatusSkill === "function") {
+        resolvedSkillData = resolveSimulationPhysicalStatusSkill(resolvedSkillData, debuffStackState);
+    }
+    return resolvedSkillData;
+}
+
+function consumeSlotModeSkillDebuffs(skillData, stackState, metaState) {
+    (Array.isArray(skillData?.consumeDebuffs) ? skillData.consumeDebuffs : [])
+        .forEach(effect => {
+            if (
+                typeof shouldConsumeDebuffFromEffectMap === "function" &&
+                !shouldConsumeDebuffFromEffectMap(skillData, effect, stackState)
+            ) return;
+            consumeAllDebuffStacks(effect, stackState, metaState);
+        });
 }
 
 const ROTATION_ELEMENTAL_INFLICTION_EFFECTS = [
@@ -6678,8 +6706,9 @@ function renderRotation() {
             showBasicAttack: false
         });
         if (entry) {
-            const skillData = typeof getRotationActionData === "function" ? getRotationActionData(entry) : getSkillById(entry.id);
+            let skillData = typeof getRotationActionData === "function" ? getRotationActionData(entry) : getSkillById(entry.id);
             if (skillData && !skillData.isBasicAttack) {
+                skillData = resolveSlotModeSkillData(skillData, rotationDebuffStackState);
                 const skillDiv = document.createElement("div");
                 skillDiv.className = "skill rotation-skill";
                 if (skillData.elementType) skillDiv.classList.add(`ef-element-${skillData.elementType}`);
@@ -6692,6 +6721,7 @@ function renderRotation() {
                 const activeBuffStacksBeforeSkill = {
                     ...rotationBuffStackState
                 };
+                consumeSlotModeSkillDebuffs(skillData, rotationDebuffStackState, rotationDebuffMetaState);
                 applySkillBuffsAndGetActiveState(skillData, rotationBuffStackState, rotationBuffMetaState, activeBuffsBeforeSkill, activeBuffStacksBeforeSkill);
                 const inner = document.createElement("div");
                 inner.className = "rotation-skill-composite";

@@ -12,6 +12,92 @@
     --rotation-debuff-offset: -30px;
 }
 
+/* Slot mode favors a dense, at-a-glance layout. Simulation keeps its roomier controls. */
+:root:not(.rotation-mode-simulation) #rotationBuilderPanel {
+    padding: 12px;
+}
+
+:root:not(.rotation-mode-simulation) #rotationBuilderPanel .rotation-actions {
+    margin-bottom: 5px;
+}
+
+:root:not(.rotation-mode-simulation) #rotationBuilderPanel .rotation-skills-dock {
+    margin-bottom: 5px;
+}
+
+:root:not(.rotation-mode-simulation) #rotationBuilderPanel .rotation-skills-dock h3,
+:root:not(.rotation-mode-simulation) #rotationBuilderPanel .rotation-panel-title {
+    margin-bottom: 6px;
+    font-size: 18px;
+}
+
+:root:not(.rotation-mode-simulation) #rotationBuilderPanel .rotation-skills-dock .skills-panel {
+    padding: 8px;
+    border-radius: 14px;
+}
+
+:root:not(.rotation-mode-simulation) #rotationBuilderPanel .operators-skills-grid {
+    gap: 8px;
+}
+
+:root:not(.rotation-mode-simulation) #rotationBuilderPanel .operator-skill-wrapper {
+    gap: 4px;
+}
+
+:root:not(.rotation-mode-simulation) #rotationBuilderPanel .operator-skill-card,
+:root:not(.rotation-mode-simulation) #rotationBuilderPanel .operator-skill-add-card {
+    min-height: 78px;
+}
+
+:root:not(.rotation-mode-simulation) #rotationBuilderPanel .operator-skill-card::before {
+    top: 24px;
+    height: 58px;
+}
+
+:root:not(.rotation-mode-simulation) #rotationBuilderPanel .leader-badge {
+    width: 15px;
+    height: 78px;
+    font-size: 11px;
+}
+
+:root:not(.rotation-mode-simulation) #rotationBuilderPanel .operator-skill-name {
+    height: 24px;
+    font-size: 12px;
+}
+
+:root:not(.rotation-mode-simulation) #rotationBuilderPanel .skill-row {
+    height: 30px;
+    margin-top: 2px;
+    padding: 2px 6px;
+}
+
+:root:not(.rotation-mode-simulation) #rotationBuilderPanel .operator-skill-owner {
+    top: -8px;
+    font-size: 7px;
+}
+
+:root:not(.rotation-mode-simulation) #rotationBuilderPanel .skill-small {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    min-height: 22px;
+}
+
+:root:not(.rotation-mode-simulation) #rotationBuilderPanel .skill-small .ef-skill-icon {
+    --ef-size: 22px;
+    width: 22px;
+    height: 22px;
+}
+
+:root:not(.rotation-mode-simulation) #rotationBuilderPanel .rotation-panel {
+    padding: 12px 12px 20px;
+}
+
+:root:not(.rotation-mode-simulation) #rotationBuilderPanel #rotationDropZone {
+    padding-top: 15px;
+    padding-bottom: 24px;
+}
+
 .rotation-panel {
     border: 1px solid rgba(248,245,70,0.18);
     border-radius: 18px;

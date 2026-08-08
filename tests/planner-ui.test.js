@@ -65,6 +65,13 @@ test("timeline mode switch has active styling and accessible pressed state", () 
   assert.match(uiSettingsScript, /btn\.setAttribute\("aria-pressed", String\(isActive\)\)/);
 });
 
+test("slot mode uses a compact layout without shrinking simulation mode", () => {
+  assert.match(rotationCss, /:root:not\(\.rotation-mode-simulation\) #rotationBuilderPanel\s*\{[\s\S]*padding:\s*12px/);
+  assert.match(rotationCss, /:root:not\(\.rotation-mode-simulation\) #rotationBuilderPanel \.operator-skill-card,[\s\S]*min-height:\s*78px/);
+  assert.match(rotationCss, /:root:not\(\.rotation-mode-simulation\) #rotationBuilderPanel \.skill-small\s*\{[\s\S]*width:\s*22px/);
+  assert.match(rotationCss, /:root:not\(\.rotation-mode-simulation\) #rotationBuilderPanel \.rotation-panel\s*\{[\s\S]*padding:\s*12px 12px 20px/);
+});
+
 test("sticky header stays above planner toolbar controls while scrolling", () => {
   assert.match(layoutCss, /\.top\s*\{[\s\S]*z-index:\s*120/);
   assert.match(rotationCss, /\.rotation-actions\s*\{[\s\S]*z-index:\s*40/);
@@ -123,6 +130,13 @@ test("simulation lets a newly applied stack satisfy a total-stack Combo trigger"
   assert.match(rotationGridScript, /removeConsumedDebuffsFromEffectMap\(chainComboSkill, chainEffectMap\)/);
   assert.match(rotationGridScript, /currentTriggerMap\[effectName\][\s\S]*Math\.max\(1, resolvedAmount\)/);
   assert.match(rotationGridScript, /sourceOperatorId: resolvedComboOperatorId/);
+});
+
+test("slot mode resolves and displays physical-status Vulnerable stacks", () => {
+  assert.match(rotationGridScript, /function resolveSlotModeSkillData\(skillData, debuffStackState\)/);
+  assert.match(rotationGridScript, /resolveSimulationPhysicalStatusSkill\(resolvedSkillData, debuffStackState\)/);
+  assert.match(rotationGridScript, /skillData = resolveSlotModeSkillData\(skillData, rotationDebuffStackState\)/);
+  assert.match(rotationGridScript, /consumeSlotModeSkillDebuffs\(skillData, rotationDebuffStackState, rotationDebuffMetaState\)/);
 });
 
 test("simulation resolves consumed-effect scaling from Supabase skill data", () => {
