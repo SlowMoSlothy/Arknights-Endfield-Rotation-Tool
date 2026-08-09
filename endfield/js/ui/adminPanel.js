@@ -41,6 +41,36 @@ const ADMIN_REVIEW_TABS = [
     }
 ];
 
+const ADMIN_OPERATOR_STAR_OPTIONS = [4, 5, 6].map(value => ({
+    value: String(value),
+    label: `${value} stars`
+}));
+
+const ADMIN_OPERATOR_CLASS_OPTIONS = [
+    "Caster",
+    "Defender",
+    "Guard",
+    "Striker",
+    "Supporter",
+    "Vanguard"
+].map(value => ({ value, label: value }));
+
+const ADMIN_OPERATOR_ELEMENT_OPTIONS = [
+    { value: "physical", label: "Physical" },
+    { value: "heat", label: "Heat" },
+    { value: "electric", label: "Electric" },
+    { value: "cryo", label: "Cryo" },
+    { value: "nature", label: "Nature" }
+];
+
+const ADMIN_OPERATOR_WEAPON_OPTIONS = [
+    { value: "arts_unit", label: "Arts Unit" },
+    { value: "great_sword", label: "Great Sword" },
+    { value: "handcannon", label: "Handcannon" },
+    { value: "polearm", label: "Polearm" },
+    { value: "sword", label: "Sword" }
+];
+
 const adminPanelState = {
     session: null,
     isAdmin: false,
@@ -654,7 +684,11 @@ function loadAdminOperatorEditor(operatorId) {
         star: String(operator.star || 1),
         operatorClass: String(operator.operator_class || ""),
         elementType: String(operator.element_type || ""),
-        weaponType: String(operator.weapon_type || ""),
+        weaponType: String(operator.weapon_type || "")
+            .trim()
+            .toLowerCase()
+            .replace(/[\s-]+/g, "_")
+            .replace(/^greatsword$/, "great_sword"),
         iconPath: String(operator.icon_path || ""),
         sortOrder: String(Number(operator.sort_order) || 0),
         canEnterUltimateState: operator.can_enter_ultimate_state === true,
@@ -673,11 +707,13 @@ function validateAdminOperatorEditor(editor) {
     if (!/^[a-z0-9][a-z0-9_]{0,63}$/.test(slug)) {
         throw new Error("Slug may only contain lowercase letters, numbers, and underscores.");
     }
-    if (!Number.isInteger(star) || star < 1 || star > 6) throw new Error("Stars must be between 1 and 6.");
-    if (!Number.isInteger(sortOrder)) throw new Error("Sort order must be a whole number.");
-    if (![editor.operatorClass, editor.elementType, editor.weaponType].every(value => String(value || "").trim())) {
-        throw new Error("Class, element, and weapon type are required.");
+    if (!ADMIN_OPERATOR_STAR_OPTIONS.some(option => Number(option.value) === star)) {
+        throw new Error("Stars must be 4, 5, or 6.");
     }
+    if (!Number.isInteger(sortOrder)) throw new Error("Sort order must be a whole number.");
+    if (!ADMIN_OPERATOR_CLASS_OPTIONS.some(option => option.value === editor.operatorClass)) throw new Error("Choose a valid class.");
+    if (!ADMIN_OPERATOR_ELEMENT_OPTIONS.some(option => option.value === editor.elementType)) throw new Error("Choose a valid element.");
+    if (!ADMIN_OPERATOR_WEAPON_OPTIONS.some(option => option.value === editor.weaponType)) throw new Error("Choose a valid weapon type.");
 
     return {
         name,
@@ -731,13 +767,22 @@ function renderAdminOperatorEditor(list) {
         createAdminBatkInput("Name", editor.name, { onInput: value => update("name", value) }),
         createAdminBatkInput("Slug", editor.slug, { onInput: value => update("slug", value) }),
         createAdminBatkInput("Stars", editor.star, {
-            select: [1, 2, 3, 4, 5, 6].map(value => ({ value: String(value), label: `${value} star${value === 1 ? "" : "s"}` })),
+            select: ADMIN_OPERATOR_STAR_OPTIONS,
             onInput: value => update("star", value)
         }),
         createAdminBatkInput("Sort order", editor.sortOrder, { type: "number", step: "1", onInput: value => update("sortOrder", value) }),
-        createAdminBatkInput("Class", editor.operatorClass, { onInput: value => update("operatorClass", value) }),
-        createAdminBatkInput("Element", editor.elementType, { onInput: value => update("elementType", value) }),
-        createAdminBatkInput("Weapon type", editor.weaponType, { onInput: value => update("weaponType", value) }),
+        createAdminBatkInput("Class", editor.operatorClass, {
+            select: ADMIN_OPERATOR_CLASS_OPTIONS,
+            onInput: value => update("operatorClass", value)
+        }),
+        createAdminBatkInput("Element", editor.elementType, {
+            select: ADMIN_OPERATOR_ELEMENT_OPTIONS,
+            onInput: value => update("elementType", value)
+        }),
+        createAdminBatkInput("Weapon type", editor.weaponType, {
+            select: ADMIN_OPERATOR_WEAPON_OPTIONS,
+            onInput: value => update("weaponType", value)
+        }),
         createAdminBatkInput("Icon path", editor.iconPath, { wide: true, onInput: value => update("iconPath", value) }),
         createAdminBatkInput("Ultimate state", editor.canEnterUltimateState, { type: "checkbox", onInput: value => update("canEnterUltimateState", value) }),
         createAdminBatkInput("Visible", editor.isVisible, { type: "checkbox", onInput: value => update("isVisible", value) })

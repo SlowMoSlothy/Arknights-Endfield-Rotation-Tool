@@ -16,8 +16,10 @@ test("operator editor writes catalog fields through an admin-only RPC", () => {
 
 test("operator editor validates core catalog data in the database", () => {
   assert.match(migration, /normalized_slug !~ '\^\[a-z0-9\]/i);
-  assert.match(migration, /normalized_star not between 1 and 6/i);
-  assert.match(migration, /Class, element, and weapon type are required/i);
+  assert.match(migration, /normalized_star not in \(4, 5, 6\)/i);
+  assert.match(migration, /normalized_class not in \('Caster', 'Defender', 'Guard', 'Striker', 'Supporter', 'Vanguard'\)/i);
+  assert.match(migration, /normalized_element not in \('physical', 'heat', 'electric', 'cryo', 'nature'\)/i);
+  assert.match(migration, /normalized_weapon not in \('arts_unit', 'great_sword', 'handcannon', 'polearm', 'sword'\)/i);
   assert.match(migration, /existing\.game = 'arknights_endfield'/i);
 });
 
@@ -27,6 +29,16 @@ test("admin panel exposes editable operator fields and saves the profile", () =>
   assert.match(adminScript, /client\.rpc\("update_operator_profile"/);
   assert.match(adminScript, /createAdminBatkInput\("Weapon type"/);
   assert.match(adminScript, /createAdminBatkInput\("Visible"/);
+});
+
+test("operator stars, classes, elements, and weapons use fixed dropdown options", () => {
+  assert.match(adminScript, /ADMIN_OPERATOR_STAR_OPTIONS/);
+  assert.match(adminScript, /ADMIN_OPERATOR_CLASS_OPTIONS/);
+  assert.match(adminScript, /ADMIN_OPERATOR_ELEMENT_OPTIONS/);
+  assert.match(adminScript, /ADMIN_OPERATOR_WEAPON_OPTIONS/);
+  assert.match(adminScript, /createAdminBatkInput\("Class"[\s\S]*select: ADMIN_OPERATOR_CLASS_OPTIONS/);
+  assert.match(adminScript, /createAdminBatkInput\("Element"[\s\S]*select: ADMIN_OPERATOR_ELEMENT_OPTIONS/);
+  assert.match(adminScript, /createAdminBatkInput\("Weapon type"[\s\S]*select: ADMIN_OPERATOR_WEAPON_OPTIONS/);
 });
 
 test("operator editor is responsive and retains compact visibility toggles", () => {

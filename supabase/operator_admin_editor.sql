@@ -49,8 +49,14 @@ begin
     if normalized_slug !~ '^[a-z0-9][a-z0-9_]{0,63}$' then
         raise exception 'Operator slug may only contain lowercase letters, numbers, and underscores' using errcode = '22023';
     end if;
-    if normalized_class = '' or normalized_element = '' or normalized_weapon = '' then
-        raise exception 'Class, element, and weapon type are required' using errcode = '22023';
+    if normalized_class not in ('Caster', 'Defender', 'Guard', 'Striker', 'Supporter', 'Vanguard') then
+        raise exception 'Unsupported operator class: %', normalized_class using errcode = '22023';
+    end if;
+    if normalized_element not in ('physical', 'heat', 'electric', 'cryo', 'nature') then
+        raise exception 'Unsupported operator element: %', normalized_element using errcode = '22023';
+    end if;
+    if normalized_weapon not in ('arts_unit', 'great_sword', 'handcannon', 'polearm', 'sword') then
+        raise exception 'Unsupported operator weapon type: %', normalized_weapon using errcode = '22023';
     end if;
 
     begin
@@ -59,8 +65,8 @@ begin
     exception when invalid_text_representation then
         raise exception 'Stars and sort order must be whole numbers' using errcode = '22023';
     end;
-    if normalized_star not between 1 and 6 then
-        raise exception 'Stars must be between 1 and 6' using errcode = '22023';
+    if normalized_star not in (4, 5, 6) then
+        raise exception 'Stars must be 4, 5, or 6' using errcode = '22023';
     end if;
     if normalized_sort_order is null then
         raise exception 'Sort order must be a whole number' using errcode = '22023';
