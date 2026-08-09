@@ -5,6 +5,7 @@ import test from "node:test";
 const migration = fs.readFileSync("supabase/operator_admin_editor.sql", "utf8");
 const adminScript = fs.readFileSync("endfield/js/ui/adminPanel.js", "utf8");
 const adminStyles = fs.readFileSync("endfield/css/admin.css", "utf8");
+const plannerHtml = fs.readFileSync("endfield/index.html", "utf8");
 
 test("operator editor writes catalog fields through an admin-only RPC", () => {
   assert.match(migration, /update_operator_profile\(integer, jsonb\)/i);
@@ -32,4 +33,11 @@ test("operator editor is responsive and retains compact visibility toggles", () 
   assert.match(adminStyles, /\.admin-operator-fields\s*\{[^}]*repeat\(4, minmax\(0, 1fr\)\)/s);
   assert.match(adminStyles, /\.admin-operator-visibility-grid\s*\{[^}]*repeat\(auto-fill, 100px\)/s);
   assert.match(adminStyles, /@media \(max-width: 520px\)[\s\S]*\.admin-operator-fields\s*\{[^}]*grid-template-columns: 1fr/s);
+});
+
+test("admin control renders as an in-page workspace instead of a modal", () => {
+  assert.match(plannerHtml, /id="adminPanelView" class="admin-page"/);
+  assert.doesNotMatch(plannerHtml, /id="adminModal"/);
+  assert.match(adminScript, /document\.body\.classList\.add\("admin-page-open"\)/);
+  assert.match(adminStyles, /body\.admin-page-open #builderScreen/);
 });

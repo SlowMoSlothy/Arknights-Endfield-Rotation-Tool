@@ -41,7 +41,7 @@
       "isAccessibleForFree": true
     }
   </script>
-  <link rel="stylesheet" href="css/style.css?v=66">
+  <link rel="stylesheet" href="css/style.css?v=67">
   <link rel="stylesheet" href="css/mobile.css?v=17">
     <link rel="stylesheet" href="atk-chart.css?v=16">
 </head>
@@ -724,11 +724,14 @@
     </div>
   </div>
 
-  <div id="adminModal" class="settings-modal admin-modal">
-    <div class="settings-dialog admin-dialog">
-      <div class="settings-header">
-        <h2 class="settings-title">Admin Control</h2>
-        <button id="closeAdminPanelBtn" class="settings-close" type="button" aria-label="Close admin control">&times;</button>
+  <section id="adminPanelView" class="admin-page" aria-labelledby="adminPanelTitle" hidden>
+    <div class="admin-page-shell">
+      <div class="admin-page-header">
+        <div>
+          <span class="admin-page-kicker">RotationForge administration</span>
+          <h2 id="adminPanelTitle" class="settings-title">Admin Control</h2>
+        </div>
+        <button id="closeAdminPanelBtn" class="admin-secondary-btn admin-back-btn" type="button" aria-label="Back to Rotation Builder">Back to Builder</button>
       </div>
 
       <section id="adminLoginPanel" class="admin-login-panel">
@@ -768,7 +771,7 @@
         <div id="adminReviewList" class="admin-review-list"></div>
       </section>
     </div>
-  </div>
+  </section>
 
   <div id="enemyModal" class="settings-modal">
     <div class="settings-dialog">
@@ -886,7 +889,7 @@
   <script src="js/ui/communityRotations.js"></script>
   <script src="js/ui/operatorGallery.js?v=2"></script>
   <script src="js/ui/myRotations.js"></script>
-  <script src="js/ui/adminPanel.js?v=7"></script>
+  <script src="js/ui/adminPanel.js?v=8"></script>
   <script src="js/main.js?v=6"></script>
 </body>
 

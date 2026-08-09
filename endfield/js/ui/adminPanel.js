@@ -1339,12 +1339,12 @@ function renderAdminPanel() {
 
 function updateAdminEntryVisibility() {
     const openButton = document.getElementById("openAdminPanelBtn");
-    const modal = document.getElementById("adminModal");
+    const panel = document.getElementById("adminPanelView");
     const canShowAdmin = Boolean(adminPanelState.session && adminPanelState.isAdmin);
 
     if (openButton) openButton.hidden = !canShowAdmin;
-    if (!canShowAdmin && modal?.classList.contains("open")) {
-        modal.classList.remove("open");
+    if (!canShowAdmin && panel && !panel.hidden) {
+        closeAdminPanel();
     }
 }
 
@@ -1848,18 +1848,22 @@ async function reviewAdminRotation(rotationId, approve) {
 }
 
 function openAdminPanel() {
-    const modal = document.getElementById("adminModal");
-    if (!modal) return;
+    const panel = document.getElementById("adminPanelView");
+    if (!panel) return;
 
-    modal.classList.add("open");
+    panel.hidden = false;
+    document.body.classList.add("admin-page-open");
+    window.scrollTo({ top: 0, behavior: "smooth" });
     refreshAdminSession();
 }
 
 function closeAdminPanel() {
-    const modal = document.getElementById("adminModal");
-    if (!modal) return;
+    const panel = document.getElementById("adminPanelView");
+    if (!panel) return;
 
-    modal.classList.remove("open");
+    panel.hidden = true;
+    document.body.classList.remove("admin-page-open");
+    window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function initAdminPanel() {
@@ -1872,7 +1876,6 @@ function initAdminPanel() {
     const signOutButton = document.getElementById("adminSignOutBtn");
     const loginSignOutButton = document.getElementById("adminLoginSignOutBtn");
     const refreshButton = document.getElementById("adminRefreshBtn");
-    const modal = document.getElementById("adminModal");
 
     if (openButton) openButton.addEventListener("click", openAdminPanel);
     if (closeButton) closeButton.addEventListener("click", closeAdminPanel);
@@ -1881,15 +1884,9 @@ function initAdminPanel() {
     if (loginSignOutButton) loginSignOutButton.addEventListener("click", signOutAdmin);
     if (refreshButton) refreshButton.addEventListener("click", fetchAdminPendingRotations);
 
-    if (modal) {
-        modal.addEventListener("click", event => {
-            if (event.target === modal) closeAdminPanel();
-        });
-    }
-
     document.addEventListener("keydown", event => {
-        const modalElement = document.getElementById("adminModal");
-        if (event.key === "Escape" && modalElement?.classList.contains("open")) {
+        const panel = document.getElementById("adminPanelView");
+        if (event.key === "Escape" && panel && !panel.hidden) {
             closeAdminPanel();
         }
     });

@@ -1,16 +1,64 @@
-.settings-dialog.admin-dialog {
-    width: min(980px, calc(100vw - 32px));
-    max-height: min(760px, calc(100vh - 32px));
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+.admin-page {
+    box-sizing: border-box;
+    width: min(1500px, calc(100% - 32px));
+    min-height: calc(100vh - 120px);
+    margin: 24px auto 48px;
+}
+
+.admin-page[hidden] {
+    display: none;
+}
+
+.admin-page-shell {
+    min-height: inherit;
+    padding: 24px;
+    box-sizing: border-box;
     background:
         linear-gradient(180deg, rgba(49,55,57,0.92), rgba(18,20,22,0.98)),
         radial-gradient(circle at 18% 10%, rgba(248,245,70,0.08), transparent 34%);
+    border: 1px solid rgba(160,170,169,0.28);
+    border-radius: 18px;
     border-color: rgba(160,170,169,0.28);
     box-shadow:
-        0 22px 54px rgba(0,0,0,0.58),
+        0 18px 44px rgba(0,0,0,0.38),
         inset 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+.admin-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin: -24px -24px 22px;
+    padding: 22px 24px 18px;
+    border-bottom: 1px solid rgba(248,245,70,0.12);
+    background: linear-gradient(180deg, rgba(28,33,34,0.92), rgba(28,33,34,0.56));
+    border-radius: 18px 18px 0 0;
+}
+
+.admin-page-header .settings-title {
+    margin: 3px 0 0;
+}
+
+.admin-page-kicker {
+    color: #A0AAA9;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.admin-back-btn {
+    flex: 0 0 auto;
+}
+
+body.admin-page-open {
+    overflow-y: auto;
+}
+
+body.admin-page-open #builderScreen,
+body.admin-page-open #selectionScreen {
+    display: none !important;
 }
 
 .admin-login-panel,
@@ -965,9 +1013,25 @@ textarea.admin-batk-input {
 }
 
 @media (max-width: 900px) {
-    .settings-dialog.admin-dialog {
-        width: calc(100vw - 20px);
-        max-height: calc(100vh - 20px);
+    .admin-page {
+        width: calc(100% - 20px);
+        min-height: calc(100vh - 90px);
+        margin: 10px auto 24px;
+    }
+
+    .admin-page-shell {
+        padding: 16px;
+    }
+
+    .admin-page-header {
+        align-items: stretch;
+        flex-direction: column;
+        margin: -16px -16px 18px;
+        padding: 18px 16px 16px;
+    }
+
+    .admin-back-btn {
+        width: 100%;
     }
 
     .admin-session-bar,
