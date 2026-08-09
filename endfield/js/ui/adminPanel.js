@@ -47,6 +47,8 @@ const adminPanelState = {
     username: "",
     rotations: [],
     operators: [],
+    operatorEditor: null,
+    operatorSaving: false,
     batkRows: [],
     batkEditor: null,
     batkSaving: false,
@@ -638,6 +640,165 @@ function createAdminOperatorVisibilityCard(operator) {
     return card;
 }
 
+function loadAdminOperatorEditor(operatorId) {
+    const operator = adminPanelState.operators.find(item => Number(item.id) === Number(operatorId));
+    if (!operator) {
+        adminPanelState.operatorEditor = null;
+        return;
+    }
+
+    adminPanelState.operatorEditor = {
+        id: Number(operator.id),
+        name: String(operator.name || ""),
+        slug: String(operator.slug || ""),
+        star: String(operator.star || 1),
+        operatorClass: String(operator.operator_class || ""),
+        elementType: String(operator.element_type || ""),
+        weaponType: String(operator.weapon_type || ""),
+        iconPath: String(operator.icon_path || ""),
+        sortOrder: String(Number(operator.sort_order) || 0),
+        canEnterUltimateState: operator.can_enter_ultimate_state === true,
+        isVisible: operator.is_visible !== false
+    };
+}
+
+function validateAdminOperatorEditor(editor) {
+    const name = String(editor?.name || "").trim();
+    const slug = String(editor?.slug || "").trim().toLowerCase();
+    const star = Number(editor?.star);
+    const sortOrder = Number(editor?.sortOrder);
+
+    if (!editor?.id) throw new Error("Choose an operator first.");
+    if (!name) throw new Error("Enter an operator name.");
+    if (!/^[a-z0-9][a-z0-9_]{0,63}$/.test(slug)) {
+        throw new Error("Slug may only contain lowercase letters, numbers, and underscores.");
+    }
+    if (!Number.isInteger(star) || star < 1 || star > 6) throw new Error("Stars must be between 1 and 6.");
+    if (!Number.isInteger(sortOrder)) throw new Error("Sort order must be a whole number.");
+    if (![editor.operatorClass, editor.elementType, editor.weaponType].every(value => String(value || "").trim())) {
+        throw new Error("Class, element, and weapon type are required.");
+    }
+
+    return {
+        name,
+        slug,
+        star,
+        operatorClass: String(editor.operatorClass).trim(),
+        elementType: String(editor.elementType).trim().toLowerCase(),
+        weaponType: String(editor.weaponType).trim().toLowerCase(),
+        iconPath: String(editor.iconPath || "").trim(),
+        sortOrder,
+        canEnterUltimateState: editor.canEnterUltimateState === true,
+        isVisible: editor.isVisible === true
+    };
+}
+
+function renderAdminOperatorEditor(list) {
+    if (!adminPanelState.operators.length) {
+        setAdminListState(list, {
+            type: "empty",
+            title: "No operators found",
+            message: "No Endfield operators are available in Supabase.",
+            actionLabel: "Refresh",
+            action: fetchAdminActiveContent
+        });
+        return;
+    }
+    if (!adminPanelState.operatorEditor && adminPanelState.operators.length) {
+        loadAdminOperatorEditor(adminPanelState.operators[0].id);
+    }
+    const editor = adminPanelState.operatorEditor;
+    if (!editor) return;
+
+    const shell = document.createElement("section");
+    shell.className = "admin-operator-editor";
+    const toolbar = document.createElement("div");
+    toolbar.className = "admin-operator-toolbar";
+    toolbar.appendChild(createAdminBatkInput("Operator", String(editor.id), {
+        select: adminPanelState.operators.map(operator => ({ value: String(operator.id), label: operator.name })),
+        onInput: value => {
+            loadAdminOperatorEditor(Number(value));
+            setAdminReviewStatus("");
+            renderAdminReviewList();
+        }
+    }));
+    toolbar.appendChild(createAdminTextElement("span", "admin-operator-editor-hint", `Database ID ${editor.id}`));
+
+    const fields = document.createElement("div");
+    fields.className = "admin-operator-fields";
+    const update = (key, value) => { editor[key] = value; };
+    fields.append(
+        createAdminBatkInput("Name", editor.name, { onInput: value => update("name", value) }),
+        createAdminBatkInput("Slug", editor.slug, { onInput: value => update("slug", value) }),
+        createAdminBatkInput("Stars", editor.star, {
+            select: [1, 2, 3, 4, 5, 6].map(value => ({ value: String(value), label: `${value} star${value === 1 ? "" : "s"}` })),
+            onInput: value => update("star", value)
+        }),
+        createAdminBatkInput("Sort order", editor.sortOrder, { type: "number", step: "1", onInput: value => update("sortOrder", value) }),
+        createAdminBatkInput("Class", editor.operatorClass, { onInput: value => update("operatorClass", value) }),
+        createAdminBatkInput("Element", editor.elementType, { onInput: value => update("elementType", value) }),
+        createAdminBatkInput("Weapon type", editor.weaponType, { onInput: value => update("weaponType", value) }),
+        createAdminBatkInput("Icon path", editor.iconPath, { wide: true, onInput: value => update("iconPath", value) }),
+        createAdminBatkInput("Ultimate state", editor.canEnterUltimateState, { type: "checkbox", onInput: value => update("canEnterUltimateState", value) }),
+        createAdminBatkInput("Visible", editor.isVisible, { type: "checkbox", onInput: value => update("isVisible", value) })
+    );
+
+    const actions = document.createElement("div");
+    actions.className = "admin-operator-actions";
+    actions.append(
+        createAdminTextElement("span", "admin-operator-editor-hint", "Changes become active in the planner after reload."),
+        createAdminActionButton(adminPanelState.operatorSaving ? "Saving..." : "Save operator", saveAdminOperatorProfile, {
+            primary: true,
+            disabled: adminPanelState.operatorSaving
+        })
+    );
+
+    const visibilityHeading = document.createElement("div");
+    visibilityHeading.className = "admin-batk-section-heading";
+    visibilityHeading.append(
+        createAdminTextElement("strong", "", "Visibility quick toggles"),
+        createAdminTextElement("span", "", "Click a card to show or hide an operator")
+    );
+    const visibilityGrid = document.createElement("div");
+    visibilityGrid.className = "admin-operator-visibility-grid";
+    adminPanelState.operators.forEach(operator => visibilityGrid.appendChild(createAdminOperatorVisibilityCard(operator)));
+
+    shell.append(toolbar, fields, actions, visibilityHeading, visibilityGrid);
+    list.appendChild(shell);
+}
+
+async function saveAdminOperatorProfile() {
+    const client = getAdminSupabaseClient();
+    const editor = adminPanelState.operatorEditor;
+    if (!client || !editor || adminPanelState.operatorSaving) return;
+
+    try {
+        const profile = validateAdminOperatorEditor(editor);
+        adminPanelState.operatorSaving = true;
+        setAdminReviewStatus(`Saving ${profile.name}...`);
+        renderAdminReviewList();
+        const { data, error } = await client.rpc("update_operator_profile", {
+            target_operator_id: editor.id,
+            profile_data: profile
+        });
+        if (error) throw error;
+        if (!Array.isArray(data) || !data.length) throw new Error("Supabase returned no updated operator.");
+
+        const saved = data[0];
+        adminPanelState.operators = adminPanelState.operators
+            .map(operator => Number(operator.id) === Number(saved.id) ? { ...operator, ...saved } : operator)
+            .sort((left, right) => Number(left.sort_order) - Number(right.sort_order) || String(left.name).localeCompare(String(right.name)));
+        loadAdminOperatorEditor(saved.id);
+        setAdminReviewStatus(`${saved.name} saved. Reload the planner to use the updated data.`, "is-success");
+    } catch (error) {
+        console.error("Operator profile save failed:", error);
+        setAdminReviewStatus(error?.message || "Operator could not be saved. Run supabase/operator_admin_editor.sql first.", "is-error");
+    } finally {
+        adminPanelState.operatorSaving = false;
+        renderAdminReviewList();
+    }
+}
+
 function getAdminBatkProfiles(operatorId) {
     const id = Number(operatorId);
     const profiles = new Map();
@@ -1131,8 +1292,12 @@ function renderAdminReviewList() {
         return;
     }
 
-    const isOperatorTab = adminPanelState.activeTab === "operators";
-    const entries = isOperatorTab ? adminPanelState.operators : adminPanelState.rotations;
+    if (adminPanelState.activeTab === "operators") {
+        renderAdminOperatorEditor(list);
+        return;
+    }
+
+    const entries = adminPanelState.rotations;
 
     if (!entries.length) {
         const activeTab = getActiveAdminTab();
@@ -1146,11 +1311,7 @@ function renderAdminReviewList() {
         return;
     }
 
-    entries.forEach(row => {
-        list.appendChild(isOperatorTab
-            ? createAdminOperatorVisibilityCard(row)
-            : createAdminReviewCard(row));
-    });
+    entries.forEach(row => list.appendChild(createAdminReviewCard(row)));
 }
 
 function renderAdminPanel() {
@@ -1210,6 +1371,7 @@ async function refreshAdminSession({ loadPending = true } = {}) {
         adminPanelState.username = getAdminFallbackUsername(adminPanelState.session);
         adminPanelState.rotations = [];
         adminPanelState.operators = [];
+        adminPanelState.operatorEditor = null;
         adminPanelState.batkRows = [];
         adminPanelState.batkEditor = null;
         adminPanelState.actionIds.clear();
@@ -1339,12 +1501,18 @@ async function fetchAdminOperators() {
         if (error) throw error;
 
         adminPanelState.operators = Array.isArray(data) ? data : [];
+        const selectedId = adminPanelState.operatorEditor?.id;
+        loadAdminOperatorEditor(
+            adminPanelState.operators.some(operator => Number(operator.id) === Number(selectedId))
+                ? selectedId
+                : adminPanelState.operators[0]?.id
+        );
         adminPanelState.loaded = true;
     } catch (error) {
         console.error("Admin operator visibility could not be loaded:", error);
         adminPanelState.loaded = true;
         adminPanelState.operators = [];
-        adminPanelState.reviewError = "Operator visibility could not be loaded. Run supabase/operator_visibility_admin.sql and refresh.";
+        adminPanelState.reviewError = "Operator data could not be loaded. Run the latest operator admin migrations and refresh.";
     } finally {
         adminPanelState.loading = false;
         renderAdminReviewList();
@@ -1423,6 +1591,7 @@ function setAdminReviewTab(tabId) {
     adminPanelState.detailRotationId = "";
     adminPanelState.rotations = [];
     adminPanelState.operators = [];
+    adminPanelState.operatorEditor = null;
     adminPanelState.batkRows = [];
     adminPanelState.batkEditor = null;
     adminPanelState.actionIds.clear();
@@ -1460,6 +1629,9 @@ async function setAdminOperatorVisibility(operatorId, shouldBeVisible) {
                 ? { ...item, is_visible: shouldBeVisible === true, updated_at: data[0]?.updated_at || item.updated_at }
                 : item
         ));
+        if (Number(adminPanelState.operatorEditor?.id) === Number(operatorId)) {
+            adminPanelState.operatorEditor.isVisible = shouldBeVisible === true;
+        }
         setAdminReviewStatus(
             `${operator?.name || "Operator"}: ${shouldBeVisible ? "shown" : "hidden"}. Planner: reload; operator pages: next build.`,
             "is-success"

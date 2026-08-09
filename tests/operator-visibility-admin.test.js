@@ -38,8 +38,8 @@ test("operator visibility cards reuse the compact selectable operator-card grid"
   assert.match(adminScript, /classList\.toggle\("is-operators"/);
   assert.match(adminScript, /operator-card operator-element-/);
   assert.match(adminScript, /setAttribute\("role", "switch"\)/);
-  assert.match(adminStyles, /\.admin-review-list\.is-operators\s*\{[^}]*repeat\(auto-fill, 100px\)/s);
-  assert.match(adminStyles, /@media \(max-width: 520px\)[\s\S]*repeat\(auto-fill, 86px\)/);
+  assert.match(adminStyles, /\.admin-operator-visibility-grid\s*\{[^}]*repeat\(auto-fill, 100px\)/s);
+  assert.match(adminStyles, /@media \(max-width: 520px\)[\s\S]*\.admin-operator-visibility-grid\s*\{[^}]*repeat\(auto-fill, 86px\)/s);
 });
 
 test("planner excludes hidden operators while treating legacy rows as visible", () => {

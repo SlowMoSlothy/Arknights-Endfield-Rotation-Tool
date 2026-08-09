@@ -248,6 +248,46 @@
 }
 
 .admin-review-list.is-operators {
+    display: block;
+    padding: 0;
+}
+
+.admin-operator-editor {
+    display: grid;
+    gap: 12px;
+    padding: 12px;
+}
+
+.admin-operator-toolbar,
+.admin-operator-actions {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.admin-operator-toolbar .admin-field {
+    width: min(360px, 100%);
+}
+
+.admin-operator-fields {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 9px;
+    padding: 11px;
+    border: 1px solid rgba(160,170,169,0.16);
+    border-radius: 12px;
+    background: rgba(7,9,10,0.28);
+}
+
+.admin-operator-editor-hint {
+    color: rgba(242,242,242,0.55);
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.admin-operator-visibility-grid {
+    display: grid;
     grid-template-columns: repeat(auto-fill, 100px);
     justify-content: center;
     align-content: start;
@@ -950,9 +990,13 @@ textarea.admin-batk-input {
         min-height: 240px;
     }
 
-    .admin-review-list.is-operators {
+    .admin-operator-visibility-grid {
         grid-template-columns: repeat(auto-fill, 92px);
         gap: 9px;
+    }
+
+    .admin-operator-fields {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .admin-visibility-card.operator-card {
@@ -993,6 +1037,16 @@ textarea.admin-batk-input {
 }
 
 @media (max-width: 520px) {
+    .admin-operator-toolbar,
+    .admin-operator-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-operator-fields {
+        grid-template-columns: 1fr;
+    }
+
     .admin-batk-toolbar,
     .admin-batk-profile-fields,
     .admin-batk-sequence-fields {
@@ -1008,7 +1062,7 @@ textarea.admin-batk-input {
         flex-direction: column;
     }
 
-    .admin-review-list.is-operators {
+    .admin-operator-visibility-grid {
         grid-template-columns: repeat(auto-fill, 86px);
         gap: 8px;
     }

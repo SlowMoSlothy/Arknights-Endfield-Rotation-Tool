@@ -115,6 +115,9 @@ supabase/
   community_rotations_review.sql
   user_rotations.sql
   admin_panel.sql
+  operator_visibility_admin.sql
+  operator_admin_editor.sql
+  basic_attack_admin_editor.sql
   seed_operators_basic.sql
 ```
 
@@ -185,6 +188,9 @@ The in-app Admin panel uses Supabase Auth. To enable it, run:
 
 ```text
 supabase/admin_panel.sql
+supabase/operator_visibility_admin.sql
+supabase/operator_admin_editor.sql
+supabase/basic_attack_admin_editor.sql
 ```
 
 Then create your admin user in Supabase Authentication and add that user's id:
@@ -195,7 +201,7 @@ values ('YOUR_AUTH_USER_ID')
 on conflict (user_id) do nothing;
 ```
 
-After that, open the Admin panel in the app and sign in with that Supabase Auth account. The panel includes `Pending`, `Approved`, and `Rejected` tabs, a detail view, preview loading, restore actions, and optional internal reject notes. The frontend still uses only the publishable/anon key.
+After that, open the Admin panel in the app and sign in with that Supabase Auth account. The panel includes `Pending`, `Approved`, and `Rejected` tabs, an operator catalog editor with visibility controls, the BATK editor, a detail view, preview loading, restore actions, and optional internal reject notes. The frontend still uses only the publishable/anon key.
 
 ## Project Structure
 
