@@ -41,7 +41,7 @@
       "isAccessibleForFree": true
     }
   </script>
-  <link rel="stylesheet" href="css/style.css?v=68">
+  <link rel="stylesheet" href="css/style.css?v=69">
   <link rel="stylesheet" href="css/mobile.css?v=17">
     <link rel="stylesheet" href="atk-chart.css?v=16">
 </head>
@@ -660,8 +660,8 @@
       </div>
 
       <p class="my-rotations-intro">Send an anonymous report directly to RotationForge. No account or email address is required.</p>
-      <form id="reportIssueForm" class="rotation-quick-save-form">
-        <label class="my-rotations-field">
+      <form id="reportIssueForm" class="rotation-quick-save-form report-issue-form">
+        <label class="my-rotations-field report-issue-type">
           <span>Report type</span>
           <select id="reportIssueTypeInput" required>
             <option value="missing_data">Missing data</option>
@@ -670,17 +670,17 @@
             <option value="other">Other</option>
           </select>
         </label>
-        <div class="share-metadata-author-preview">
+        <div class="share-metadata-author-preview report-issue-context">
           <span>Included context</span>
           <strong id="reportIssueContextPreview">Current page</strong>
           <small>The current page and selected operators are included automatically.</small>
         </div>
-        <label class="my-rotations-field">
+        <label class="my-rotations-field report-issue-description">
           <span>What is missing or incorrect?</span>
           <textarea id="reportIssueDescriptionInput" minlength="20" maxlength="2000" rows="5" required
             placeholder="Please describe the problem and name the affected item or operator."></textarea>
         </label>
-        <label class="my-rotations-field">
+        <label class="my-rotations-field report-issue-additional">
           <span>Additional information <em>Optional</em></span>
           <textarea id="reportIssueAdditionalInput" maxlength="1500" rows="3"
             placeholder="Sources, reproduction steps, or other useful details"></textarea>

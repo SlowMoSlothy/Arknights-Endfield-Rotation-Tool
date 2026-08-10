@@ -24,19 +24,31 @@
 }
 
 .settings-dialog.report-issue-dialog {
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    width: min(860px, calc(100vw - 32px));
+    overflow: hidden;
 }
 
+.report-issue-dialog .report-issue-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 12px;
+    margin-top: 8px;
+    padding: 12px;
+}
+
+.report-issue-dialog .report-issue-description textarea,
+.report-issue-dialog .report-issue-additional textarea {
+    height: 120px;
+    min-height: 120px;
+    resize: none;
+}
+
+.report-issue-dialog .my-rotations-status,
 .report-issue-dialog .my-rotations-actions {
-    position: sticky;
-    bottom: -14px;
-    z-index: 2;
-    margin: 0 -14px -14px;
-    padding: 12px 14px 14px;
-    border-top: 1px solid rgba(160,170,169,0.18);
-    background: rgba(18,20,22,0.96);
-    box-shadow: 0 -10px 20px rgba(18,20,22,0.9);
+    grid-column: 1 / -1;
+}
+
+.report-issue-dialog .my-rotations-status:empty {
+    display: none;
 }
 
 .share-metadata-author-preview {
@@ -827,5 +839,35 @@
 
     .my-detail-team {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    .settings-dialog.report-issue-dialog {
+        width: calc(100vw - 20px);
+    }
+
+    .report-issue-dialog .settings-header {
+        margin-bottom: 12px;
+    }
+
+    .report-issue-dialog .my-rotations-intro {
+        font-size: 12px;
+    }
+
+    .report-issue-dialog .report-issue-form {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .report-issue-dialog .report-issue-description textarea {
+        height: 86px;
+        min-height: 86px;
+    }
+
+    .report-issue-dialog .report-issue-additional textarea {
+        height: 64px;
+        min-height: 64px;
     }
 }

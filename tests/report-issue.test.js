@@ -38,11 +38,14 @@ test("Rotation Builder exposes an account-free report form with sidebar command 
   assert.doesNotMatch(plannerHtml, /Arknights-Endfield-Rotation-Tool\/issues\/new/);
 });
 
-test("report form keeps its actions reachable in short desktop and mobile viewports", () => {
+test("report form fits its actions without a nested scroll area", () => {
   assert.match(plannerHtml, /class="settings-dialog rotation-quick-save-dialog report-issue-dialog"/);
-  assert.match(plannerHtml, /css\/style\.css\?v=68/);
-  assert.match(reportIssueStyles, /\.settings-dialog\.report-issue-dialog\s*{[^}]*overflow-y:\s*auto/s);
-  assert.match(reportIssueStyles, /\.report-issue-dialog \.my-rotations-actions\s*{[^}]*position:\s*sticky[^}]*bottom:\s*-14px/s);
+  assert.match(plannerHtml, /class="rotation-quick-save-form report-issue-form"/);
+  assert.match(plannerHtml, /css\/style\.css\?v=69/);
+  assert.match(reportIssueStyles, /\.settings-dialog\.report-issue-dialog\s*{[^}]*width:\s*min\(860px[^}]*overflow:\s*hidden/s);
+  assert.match(reportIssueStyles, /\.report-issue-dialog \.report-issue-form\s*{[^}]*grid-template-columns:\s*repeat\(2/s);
+  assert.match(reportIssueStyles, /@media \(max-width: 700px\)[\s\S]*\.report-issue-dialog \.report-issue-form\s*{[^}]*grid-template-columns:\s*1fr/s);
+  assert.doesNotMatch(reportIssueStyles, /\.report-issue-dialog \.my-rotations-actions\s*{[^}]*position:\s*sticky/s);
 });
 
 test("anonymous report payload includes page and selected operator context", () => {
