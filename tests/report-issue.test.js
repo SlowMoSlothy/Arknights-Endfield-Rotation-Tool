@@ -7,6 +7,7 @@ const plannerHtml = fs.readFileSync("endfield/index.html", "utf8");
 const reportIssueScript = fs.readFileSync("endfield/js/ui/reportIssue.js", "utf8");
 const reportIssueSql = fs.readFileSync("supabase/issue_reports.sql", "utf8");
 const adminScript = fs.readFileSync("endfield/js/ui/adminPanel.js", "utf8");
+const reportIssueStyles = fs.readFileSync("endfield/css/my-rotations.css", "utf8");
 
 function loadReportIssueHelper() {
   const context = {
@@ -35,6 +36,13 @@ test("Rotation Builder exposes an account-free report form with sidebar command 
   assert.match(plannerHtml, /id="reportIssueDescriptionInput"[^>]*minlength="20"[^>]*maxlength="2000"/);
   assert.match(plannerHtml, /js\/ui\/reportIssue\.js\?v=2/);
   assert.doesNotMatch(plannerHtml, /Arknights-Endfield-Rotation-Tool\/issues\/new/);
+});
+
+test("report form keeps its actions reachable in short desktop and mobile viewports", () => {
+  assert.match(plannerHtml, /class="settings-dialog rotation-quick-save-dialog report-issue-dialog"/);
+  assert.match(plannerHtml, /css\/style\.css\?v=68/);
+  assert.match(reportIssueStyles, /\.settings-dialog\.report-issue-dialog\s*{[^}]*overflow-y:\s*auto/s);
+  assert.match(reportIssueStyles, /\.report-issue-dialog \.my-rotations-actions\s*{[^}]*position:\s*sticky[^}]*bottom:\s*-14px/s);
 });
 
 test("anonymous report payload includes page and selected operator context", () => {

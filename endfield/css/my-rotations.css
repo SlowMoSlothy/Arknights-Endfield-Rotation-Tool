@@ -23,6 +23,22 @@
     width: min(620px, calc(100vw - 32px));
 }
 
+.settings-dialog.report-issue-dialog {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.report-issue-dialog .my-rotations-actions {
+    position: sticky;
+    bottom: -14px;
+    z-index: 2;
+    margin: 0 -14px -14px;
+    padding: 12px 14px 14px;
+    border-top: 1px solid rgba(160,170,169,0.18);
+    background: rgba(18,20,22,0.96);
+    box-shadow: 0 -10px 20px rgba(18,20,22,0.9);
+}
+
 .share-metadata-author-preview {
     display: grid;
     grid-template-columns: max-content minmax(0, 1fr);
