@@ -34,18 +34,30 @@ test("Rotation Builder exposes an account-free report form with sidebar command 
   assert.match(plannerHtml, /id="reportIssueModal" class="settings-modal my-rotations-modal"/);
   assert.match(plannerHtml, /No account or email address is required/);
   assert.match(plannerHtml, /id="reportIssueDescriptionInput"[^>]*minlength="20"[^>]*maxlength="2000"/);
-  assert.match(plannerHtml, /js\/ui\/reportIssue\.js\?v=2/);
+  assert.match(plannerHtml, /js\/ui\/reportIssue\.js\?v=3/);
   assert.doesNotMatch(plannerHtml, /Arknights-Endfield-Rotation-Tool\/issues\/new/);
 });
 
 test("report form fits its actions without a nested scroll area", () => {
   assert.match(plannerHtml, /class="settings-dialog rotation-quick-save-dialog report-issue-dialog"/);
   assert.match(plannerHtml, /class="rotation-quick-save-form report-issue-form"/);
-  assert.match(plannerHtml, /css\/style\.css\?v=69/);
+  assert.match(plannerHtml, /css\/style\.css\?v=70/);
   assert.match(reportIssueStyles, /\.settings-dialog\.report-issue-dialog\s*{[^}]*width:\s*min\(860px[^}]*overflow:\s*hidden/s);
   assert.match(reportIssueStyles, /\.report-issue-dialog \.report-issue-form\s*{[^}]*grid-template-columns:\s*repeat\(2/s);
   assert.match(reportIssueStyles, /@media \(max-width: 700px\)[\s\S]*\.report-issue-dialog \.report-issue-form\s*{[^}]*grid-template-columns:\s*1fr/s);
   assert.doesNotMatch(reportIssueStyles, /\.report-issue-dialog \.my-rotations-actions\s*{[^}]*position:\s*sticky/s);
+});
+
+test("report modal prevents background scroll and avoids expensive backdrop blur", () => {
+  assert.match(reportIssueScript, /document\.documentElement\?\.classList\.add\("report-issue-modal-open"\)/);
+  assert.match(reportIssueScript, /document\.documentElement\?\.classList\.remove\("report-issue-modal-open"\)/);
+  assert.match(reportIssueScript, /document\.body\?\.classList\.add\("report-issue-modal-open"\)/);
+  assert.match(reportIssueScript, /document\.body\?\.classList\.remove\("report-issue-modal-open"\)/);
+  assert.match(reportIssueScript, /document\.body\.style\.top = `-\$\{reportIssueState\.scrollY\}px`/);
+  assert.match(reportIssueScript, /window\.scrollTo\(\{ top: reportIssueState\.scrollY, left: 0, behavior: "instant" \}\)/);
+  assert.match(reportIssueStyles, /html\.report-issue-modal-open,\s*body\.report-issue-modal-open\s*{[^}]*overflow:\s*hidden/s);
+  assert.match(reportIssueStyles, /body\.report-issue-modal-open\s*{[^}]*position:\s*fixed/s);
+  assert.match(reportIssueStyles, /#reportIssueModal\s*{[^}]*overflow:\s*hidden[^}]*backdrop-filter:\s*none/s);
 });
 
 test("anonymous report payload includes page and selected operator context", () => {

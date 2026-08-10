@@ -26,6 +26,27 @@
 .settings-dialog.report-issue-dialog {
     width: min(860px, calc(100vw - 32px));
     overflow: hidden;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+html.report-issue-modal-open,
+body.report-issue-modal-open {
+    overflow: hidden;
+}
+
+body.report-issue-modal-open {
+    position: fixed;
+    right: 0;
+    left: 0;
+    width: 100%;
+}
+
+#reportIssueModal {
+    overflow: hidden;
+    overscroll-behavior: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 }
 
 .report-issue-dialog .report-issue-form {

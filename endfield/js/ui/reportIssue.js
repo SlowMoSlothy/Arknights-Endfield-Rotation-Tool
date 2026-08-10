@@ -3,7 +3,8 @@ const REPORT_DESCRIPTION_MAX_LENGTH = 2000;
 const REPORT_ADDITIONAL_MAX_LENGTH = 1500;
 
 const reportIssueState = {
-    submitting: false
+    submitting: false,
+    scrollY: 0
 };
 
 function getReportOperatorContext(team = selectedTeam, operatorList = operators) {
@@ -69,6 +70,10 @@ function openReportIssueModal() {
     form.reset();
     setReportIssueStatus("");
     updateReportIssueContextPreview();
+    reportIssueState.scrollY = Math.max(0, Number(window.scrollY) || 0);
+    document.body.style.top = `-${reportIssueState.scrollY}px`;
+    document.documentElement?.classList.add("report-issue-modal-open");
+    document.body?.classList.add("report-issue-modal-open");
     modal.classList.add("open");
     modal.setAttribute("aria-hidden", "false");
     window.setTimeout(() => document.getElementById("reportIssueDescriptionInput")?.focus(), 0);
@@ -82,6 +87,10 @@ function closeReportIssueModal() {
 
     modal.classList.remove("open");
     modal.setAttribute("aria-hidden", "true");
+    document.documentElement?.classList.remove("report-issue-modal-open");
+    document.body?.classList.remove("report-issue-modal-open");
+    document.body.style.top = "";
+    window.scrollTo({ top: reportIssueState.scrollY, left: 0, behavior: "instant" });
 }
 
 async function submitReportIssue(event) {
