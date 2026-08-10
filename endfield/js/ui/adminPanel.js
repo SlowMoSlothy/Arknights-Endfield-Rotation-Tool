@@ -24,6 +24,14 @@ const ADMIN_REVIEW_TABS = [
         emptyMessage: "Rejected submissions and hidden rotations will appear here."
     },
     {
+        id: "reports",
+        label: "Reports",
+        loadingTitle: "Loading issue reports",
+        loadingMessage: "Fetching anonymous reports from RotationForge.",
+        emptyTitle: "No issue reports",
+        emptyMessage: "Anonymous reports submitted from the Rotation Builder will appear here."
+    },
+    {
         id: "operators",
         label: "Operators",
         loadingTitle: "Loading operators",
@@ -76,6 +84,7 @@ const adminPanelState = {
     isAdmin: false,
     username: "",
     rotations: [],
+    reports: [],
     operators: [],
     operatorEditor: null,
     operatorSaving: false,
@@ -89,6 +98,7 @@ const adminPanelState = {
     reviewError: "",
     detailRotationId: "",
     actionIds: new Set(),
+    reportActionIds: new Set(),
     operatorActionIds: new Set(),
     authStatus: "",
     authStatusClass: "",
@@ -417,7 +427,7 @@ function renderAdminDetailPanel() {
     const panel = document.getElementById("adminDetailPanel");
     if (!panel) return;
 
-    if (adminPanelState.activeTab === "operators") {
+    if (adminPanelState.activeTab === "operators" || adminPanelState.activeTab === "reports") {
         adminPanelState.detailRotationId = "";
         panel.replaceChildren();
         panel.hidden = true;
@@ -579,6 +589,88 @@ function createAdminReviewCard(row) {
     return card;
 }
 
+function formatAdminReportType(value) {
+    const labels = {
+        missing_data: "Missing data",
+        incorrect_data: "Incorrect data",
+        bug: "Not working",
+        other: "Other"
+    };
+    return labels[value] || formatAdminLabel(value) || "Report";
+}
+
+function formatAdminReportStatus(value) {
+    const status = String(value || "pending").toLowerCase();
+    if (status === "resolved") return "Resolved";
+    if (status === "dismissed") return "Dismissed";
+    return "Pending";
+}
+
+function getSafeAdminReportPageUrl(value) {
+    try {
+        const url = new URL(String(value || ""), window.location.origin);
+        return url.protocol === "https:" || url.protocol === "http:" ? url.href : "";
+    } catch {
+        return "";
+    }
+}
+
+function createAdminIssueReportCard(row) {
+    const reportId = String(row?.id || "");
+    const isBusy = adminPanelState.reportActionIds.has(reportId);
+    const card = document.createElement("article");
+    card.className = `admin-review-card${isBusy ? " is-busy" : ""}`;
+
+    const header = document.createElement("div");
+    header.className = "admin-review-card-header";
+    const titleWrap = document.createElement("div");
+    titleWrap.append(
+        createAdminTextElement("h3", "admin-review-title", formatAdminReportType(row.report_type)),
+        createAdminTextElement("div", "admin-review-meta", ["Anonymous", formatAdminDate(row.created_at)].filter(Boolean).join(" - "))
+    );
+    header.append(
+        titleWrap,
+        createAdminTextElement("span", "admin-review-stat", formatAdminReportStatus(row.status))
+    );
+
+    const context = normalizeAdminList(row.team_operator_names).length
+        ? normalizeAdminList(row.team_operator_names).join(", ")
+        : "No team selected";
+    const meta = createAdminTextElement("div", "admin-review-meta", `Team: ${context}`);
+    const description = createAdminTextElement("p", "admin-review-description", row.description || "No description provided.");
+    const additional = row.additional_information
+        ? createAdminTextElement("p", "admin-detail-note", row.additional_information)
+        : null;
+
+    const pageLink = document.createElement("a");
+    const safePageUrl = getSafeAdminReportPageUrl(row.page_url);
+    pageLink.className = "admin-action-btn";
+    pageLink.href = safePageUrl || "#";
+    pageLink.target = "_blank";
+    pageLink.rel = "noopener noreferrer";
+    pageLink.textContent = "Open reported page";
+    if (!safePageUrl) pageLink.hidden = true;
+
+    const actions = document.createElement("div");
+    actions.className = "admin-review-actions";
+    actions.appendChild(pageLink);
+    if (row.status !== "pending") {
+        actions.appendChild(createAdminActionButton("Restore", () => setAdminIssueReportStatus(row.id, "pending"), { disabled: isBusy }));
+    }
+    if (row.status !== "dismissed") {
+        actions.appendChild(createAdminActionButton("Dismiss", () => setAdminIssueReportStatus(row.id, "dismissed"), { danger: true, disabled: isBusy }));
+    }
+    if (row.status !== "resolved") {
+        actions.appendChild(createAdminActionButton(isBusy ? "Saving..." : "Resolve", () => setAdminIssueReportStatus(row.id, "resolved"), { primary: true, disabled: isBusy }));
+    }
+
+    card.append(header, meta, description);
+    if (additional) card.appendChild(additional);
+    if (row.review_note) card.appendChild(createAdminTextElement("p", "admin-detail-note", `Admin note: ${row.review_note}`));
+    card.appendChild(actions);
+    return card;
+}
+
 function getAdminRowActions(row, isBusy, isActive = false) {
     const state = getAdminReviewState(row);
     const actions = [
@@ -714,7 +806,6 @@ function validateAdminOperatorEditor(editor) {
     if (!ADMIN_OPERATOR_CLASS_OPTIONS.some(option => option.value === editor.operatorClass)) throw new Error("Choose a valid class.");
     if (!ADMIN_OPERATOR_ELEMENT_OPTIONS.some(option => option.value === editor.elementType)) throw new Error("Choose a valid element.");
     if (!ADMIN_OPERATOR_WEAPON_OPTIONS.some(option => option.value === editor.weaponType)) throw new Error("Choose a valid weapon type.");
-
     return {
         name,
         slug,
@@ -1342,6 +1433,22 @@ function renderAdminReviewList() {
         return;
     }
 
+    if (adminPanelState.activeTab === "reports") {
+        if (!adminPanelState.reports.length) {
+            const activeTab = getActiveAdminTab();
+            setAdminListState(list, {
+                type: "empty",
+                title: activeTab.emptyTitle,
+                message: activeTab.emptyMessage,
+                actionLabel: "Refresh",
+                action: fetchAdminActiveContent
+            });
+            return;
+        }
+        adminPanelState.reports.forEach(row => list.appendChild(createAdminIssueReportCard(row)));
+        return;
+    }
+
     const entries = adminPanelState.rotations;
 
     if (!entries.length) {
@@ -1619,7 +1726,75 @@ async function fetchAdminBatkData() {
     }
 }
 
+async function fetchAdminIssueReports() {
+    const client = getAdminSupabaseClient();
+    if (!client || !adminPanelState.isAdmin) return;
+
+    adminPanelState.loading = true;
+    adminPanelState.loaded = false;
+    adminPanelState.reviewError = "";
+    setAdminReviewStatus("");
+    renderAdminReviewList();
+
+    try {
+        const { data, error } = await client
+            .from("issue_reports")
+            .select("id,report_type,description,additional_information,page_url,team_operator_ids,team_operator_names,status,review_note,reviewed_at,created_at,updated_at")
+            .eq("game", "arknights_endfield")
+            .order("created_at", { ascending: false });
+        if (error) throw error;
+        adminPanelState.reports = Array.isArray(data) ? data : [];
+        adminPanelState.loaded = true;
+    } catch (error) {
+        console.error("Admin issue reports could not be loaded:", error);
+        adminPanelState.reports = [];
+        adminPanelState.loaded = true;
+        adminPanelState.reviewError = "Issue reports could not be loaded. Run the latest supabase/issue_reports.sql and refresh.";
+    } finally {
+        adminPanelState.loading = false;
+        renderAdminReviewList();
+    }
+}
+
+async function setAdminIssueReportStatus(reportId, status) {
+    const client = getAdminSupabaseClient();
+    if (!client || !reportId) return;
+
+    let reviewNote = "";
+    if (status === "dismissed") {
+        const note = prompt("Optional internal note. Leave empty if no note is needed:");
+        if (note === null) return;
+        reviewNote = note.trim();
+    }
+
+    const id = String(reportId);
+    adminPanelState.reportActionIds.add(id);
+    setAdminReviewStatus(`Setting report to ${formatAdminReportStatus(status).toLowerCase()}...`);
+    renderAdminReviewList();
+
+    try {
+        const { data, error } = await client.rpc("set_issue_report_status", {
+            target_report_id: reportId,
+            report_status: status,
+            admin_review_note: reviewNote
+        });
+        if (error) throw error;
+        const updated = Array.isArray(data) ? data[0] : data;
+        adminPanelState.reports = adminPanelState.reports.map(row => (
+            String(row.id) === id ? { ...row, ...updated, status, review_note: reviewNote } : row
+        ));
+        setAdminReviewStatus(`Report marked as ${formatAdminReportStatus(status).toLowerCase()}.`, "is-success");
+    } catch (error) {
+        console.error("Issue report status update failed:", error);
+        setAdminReviewStatus(error?.message || "Report status could not be updated.", "is-error");
+    } finally {
+        adminPanelState.reportActionIds.delete(id);
+        renderAdminReviewList();
+    }
+}
+
 async function fetchAdminActiveContent() {
+    if (adminPanelState.activeTab === "reports") return fetchAdminIssueReports();
     if (adminPanelState.activeTab === "operators") return fetchAdminOperators();
     if (adminPanelState.activeTab === "batk") return fetchAdminBatkData();
     return fetchAdminReviewRotations();
@@ -1635,11 +1810,13 @@ function setAdminReviewTab(tabId) {
     adminPanelState.activeTab = tabId;
     adminPanelState.detailRotationId = "";
     adminPanelState.rotations = [];
+    adminPanelState.reports = [];
     adminPanelState.operators = [];
     adminPanelState.operatorEditor = null;
     adminPanelState.batkRows = [];
     adminPanelState.batkEditor = null;
     adminPanelState.actionIds.clear();
+    adminPanelState.reportActionIds.clear();
     adminPanelState.operatorActionIds.clear();
     adminPanelState.loaded = false;
     adminPanelState.reviewError = "";

@@ -6,6 +6,7 @@ import vm from "node:vm";
 const plannerHtml = fs.readFileSync("endfield/index.html", "utf8");
 const reportIssueScript = fs.readFileSync("endfield/js/ui/reportIssue.js", "utf8");
 const reportIssueSql = fs.readFileSync("supabase/issue_reports.sql", "utf8");
+const adminScript = fs.readFileSync("endfield/js/ui/adminPanel.js", "utf8");
 
 function loadReportIssueHelper() {
   const context = {
@@ -71,4 +72,19 @@ test("issue report migration permits anonymous inserts but keeps reports private
   assert.match(reportIssueSql, /Admins can read issue reports/);
   assert.match(reportIssueSql, /using \(public\.is_app_admin\(\)\)/);
   assert.doesNotMatch(reportIssueSql, /grant select on public\.issue_reports to anon/);
+});
+
+test("admin panel lists reports and updates their review status through an admin RPC", () => {
+  assert.match(adminScript, /id: "reports"[\s\S]*label: "Reports"/);
+  assert.match(adminScript, /function createAdminIssueReportCard/);
+  assert.match(adminScript, /function getSafeAdminReportPageUrl/);
+  assert.match(adminScript, /url\.protocol === "https:" \|\| url\.protocol === "http:"/);
+  assert.match(adminScript, /\.from\("issue_reports"\)/);
+  assert.match(adminScript, /client\.rpc\("set_issue_report_status"/);
+  assert.match(adminScript, /"pending"/);
+  assert.match(adminScript, /"resolved"/);
+  assert.match(adminScript, /"dismissed"/);
+  assert.match(reportIssueSql, /create or replace function public\.set_issue_report_status/);
+  assert.match(reportIssueSql, /if not public\.is_app_admin\(\)/);
+  assert.match(reportIssueSql, /grant execute on function public\.set_issue_report_status\(uuid, text, text\) to authenticated/);
 });

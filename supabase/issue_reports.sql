@@ -61,3 +61,47 @@ create policy "Admins can read issue reports"
     using (public.is_app_admin());
 
 revoke update, delete on public.issue_reports from anon, authenticated;
+
+create or replace function public.set_issue_report_status(
+    target_report_id uuid,
+    report_status text,
+    admin_review_note text default ''
+)
+returns table (
+    id uuid,
+    status text,
+    review_note text,
+    reviewed_at timestamptz,
+    updated_at timestamptz
+)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+    normalized_status text := lower(trim(coalesce(report_status, '')));
+begin
+    if not public.is_app_admin() then
+        raise exception 'Admin access required' using errcode = '42501';
+    end if;
+
+    if normalized_status not in ('pending', 'resolved', 'dismissed') then
+        raise exception 'Unsupported report status: %', report_status using errcode = '22023';
+    end if;
+
+    return query
+    update public.issue_reports as report
+    set
+        status = normalized_status,
+        review_note = left(coalesce(admin_review_note, ''), 400),
+        reviewed_by = case when normalized_status = 'pending' then null else auth.uid() end,
+        reviewed_at = case when normalized_status = 'pending' then null else now() end,
+        updated_at = now()
+    where report.id = target_report_id
+        and report.game = 'arknights_endfield'
+    returning report.id, report.status, report.review_note, report.reviewed_at, report.updated_at;
+end;
+$$;
+
+revoke all on function public.set_issue_report_status(uuid, text, text) from public;
+grant execute on function public.set_issue_report_status(uuid, text, text) to authenticated;
