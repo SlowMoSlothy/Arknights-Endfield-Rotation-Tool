@@ -15,6 +15,7 @@ const myRotationsState = {
     authStatusClass: "",
     listStatus: "",
     listStatusClass: "",
+    modalScrollY: 0,
     detailRotationId: "",
     detailEditing: false
 };
@@ -1538,6 +1539,10 @@ function openMyRotationsModal(options = {}) {
 
     setMyAuthMode(options.mode || "signIn");
     if (myRotationsState.session) renderMyAuthPanel();
+    myRotationsState.modalScrollY = Math.max(0, Number(window.scrollY) || 0);
+    document.body.style.top = `-${myRotationsState.modalScrollY}px`;
+    document.documentElement?.classList.add("my-rotations-modal-open");
+    document.body?.classList.add("my-rotations-modal-open");
     modal.classList.add("open");
     refreshMySession(true);
 
@@ -1557,6 +1562,10 @@ function closeMyRotationsModal() {
     if (!modal) return;
 
     modal.classList.remove("open");
+    document.documentElement?.classList.remove("my-rotations-modal-open");
+    document.body?.classList.remove("my-rotations-modal-open");
+    document.body.style.top = "";
+    window.scrollTo({ top: myRotationsState.modalScrollY, left: 0, behavior: "instant" });
 }
 
 function setMyPasswordResetStatus(text, className = "") {
