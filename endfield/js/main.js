@@ -455,6 +455,7 @@ async function initApp() {
         if (typeof initOperatorGallery === "function") initOperatorGallery();
         if (typeof initMyRotations === "function") initMyRotations();
         if (typeof initAdminPanel === "function") initAdminPanel();
+        if (typeof initReportIssue === "function") initReportIssue();
 
         // Direkt den Rotation Builder anzeigen
         showBuilderScreen();

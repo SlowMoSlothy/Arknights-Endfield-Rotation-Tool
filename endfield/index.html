@@ -208,6 +208,17 @@
             <span class="sidebar-command-label">Admin</span>
             <span class="sidebar-command-signal"></span>
           </button>
+          <button id="reportIssueBtn" class="sidebar-command" type="button">
+            <span class="sidebar-command-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M12 3l9 16H3z"></path>
+                <path d="M12 9v4"></path>
+                <path d="M12 17h.01"></path>
+              </svg>
+            </span>
+            <span class="sidebar-command-label">Report issue</span>
+            <span class="sidebar-command-signal"></span>
+          </button>
           <button id="openSettingsBtn" class="sidebar-command" type="button">
             <span class="sidebar-command-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false">
@@ -639,6 +650,50 @@
     </div>
   </div>
 
+  <div id="reportIssueModal" class="settings-modal my-rotations-modal" aria-hidden="true">
+    <div class="settings-dialog rotation-quick-save-dialog" role="dialog" aria-modal="true"
+      aria-labelledby="reportIssueModalTitle">
+      <div class="settings-header">
+        <h2 id="reportIssueModalTitle" class="settings-title">Report missing or incorrect data</h2>
+        <button id="closeReportIssueModalBtn" class="settings-close" type="button"
+          aria-label="Close report form">&times;</button>
+      </div>
+
+      <p class="my-rotations-intro">Send an anonymous report directly to RotationForge. No account or email address is required.</p>
+      <form id="reportIssueForm" class="rotation-quick-save-form">
+        <label class="my-rotations-field">
+          <span>Report type</span>
+          <select id="reportIssueTypeInput" required>
+            <option value="missing_data">Missing data</option>
+            <option value="incorrect_data">Incorrect data</option>
+            <option value="bug">Something is not working</option>
+            <option value="other">Other</option>
+          </select>
+        </label>
+        <div class="share-metadata-author-preview">
+          <span>Included context</span>
+          <strong id="reportIssueContextPreview">Current page</strong>
+          <small>The current page and selected operators are included automatically.</small>
+        </div>
+        <label class="my-rotations-field">
+          <span>What is missing or incorrect?</span>
+          <textarea id="reportIssueDescriptionInput" minlength="20" maxlength="2000" rows="5" required
+            placeholder="Please describe the problem and name the affected item or operator."></textarea>
+        </label>
+        <label class="my-rotations-field">
+          <span>Additional information <em>Optional</em></span>
+          <textarea id="reportIssueAdditionalInput" maxlength="1500" rows="3"
+            placeholder="Sources, reproduction steps, or other useful details"></textarea>
+        </label>
+        <div id="reportIssueStatus" class="my-rotations-status" role="status" aria-live="polite"></div>
+        <div class="my-rotations-actions">
+          <button id="cancelReportIssueBtn" class="my-secondary-btn" type="button">Cancel</button>
+          <button id="submitReportIssueBtn" class="my-primary-btn" type="submit">Send report</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div id="shareMetadataModal" class="settings-modal my-rotations-modal" aria-hidden="true">
     <div class="settings-dialog rotation-quick-save-dialog share-metadata-dialog" role="dialog" aria-modal="true"
       aria-labelledby="shareMetadataModalTitle">
@@ -890,6 +945,7 @@
   <script src="js/ui/operatorGallery.js?v=2"></script>
   <script src="js/ui/myRotations.js"></script>
   <script src="js/ui/adminPanel.js?v=9"></script>
+  <script src="js/ui/reportIssue.js?v=2"></script>
   <script src="js/main.js?v=6"></script>
 </body>
 

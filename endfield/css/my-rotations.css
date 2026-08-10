@@ -255,6 +255,7 @@
 }
 
 .my-rotations-field input,
+.my-rotations-field select,
 .my-rotations-field textarea {
     width: 100%;
     border-radius: 8px;
@@ -277,6 +278,7 @@
 }
 
 .my-rotations-field input:focus,
+.my-rotations-field select:focus,
 .my-rotations-field textarea:focus {
     border-color: rgba(248,245,70,0.68);
     box-shadow:
