@@ -20,6 +20,7 @@ returns table (
     can_enter_ultimate_state boolean,
     is_visible boolean,
     sort_order integer,
+    raw_data jsonb,
     updated_at timestamptz
 )
 language plpgsql
@@ -32,6 +33,8 @@ declare
     normalized_class text := trim(coalesce(profile_data ->> 'operatorClass', ''));
     normalized_element text := lower(trim(coalesce(profile_data ->> 'elementType', '')));
     normalized_weapon text := lower(trim(coalesce(profile_data ->> 'weaponType', '')));
+    normalized_main_attribute text := trim(coalesce(profile_data ->> 'mainAttribute', ''));
+    normalized_secondary_attribute text := trim(coalesce(profile_data ->> 'secondaryAttribute', ''));
     normalized_star integer;
     normalized_sort_order integer;
 begin
@@ -57,6 +60,15 @@ begin
     end if;
     if normalized_weapon not in ('arts_unit', 'great_sword', 'handcannon', 'polearm', 'sword') then
         raise exception 'Unsupported operator weapon type: %', normalized_weapon using errcode = '22023';
+    end if;
+    if normalized_main_attribute not in ('Strength', 'Agility', 'Intellect', 'Will') then
+        raise exception 'Unsupported main attribute: %', normalized_main_attribute using errcode = '22023';
+    end if;
+    if normalized_secondary_attribute not in ('Strength', 'Agility', 'Intellect', 'Will') then
+        raise exception 'Unsupported secondary attribute: %', normalized_secondary_attribute using errcode = '22023';
+    end if;
+    if normalized_main_attribute = normalized_secondary_attribute then
+        raise exception 'Main and secondary attribute must be different' using errcode = '22023';
     end if;
 
     begin
@@ -92,12 +104,16 @@ begin
         can_enter_ultimate_state = coalesce((profile_data ->> 'canEnterUltimateState')::boolean, false),
         is_visible = coalesce((profile_data ->> 'isVisible')::boolean, true),
         sort_order = normalized_sort_order,
+        raw_data = coalesce(op.raw_data, '{}'::jsonb) || jsonb_build_object(
+            'mainAttribute', normalized_main_attribute,
+            'secondaryAttribute', normalized_secondary_attribute
+        ),
         updated_at = now()
     where op.id = target_operator_id and op.game = 'arknights_endfield'
     returning
         op.id, op.game, op.slug, op.name, op.star, op.operator_class,
         op.element_type, op.weapon_type, op.icon_path, op.can_enter_ultimate_state,
-        op.is_visible, op.sort_order, op.updated_at;
+        op.is_visible, op.sort_order, op.raw_data, op.updated_at;
 end;
 $$;
 

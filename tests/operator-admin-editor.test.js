@@ -20,6 +20,10 @@ test("operator editor validates core catalog data in the database", () => {
   assert.match(migration, /normalized_class not in \('Caster', 'Defender', 'Guard', 'Striker', 'Supporter', 'Vanguard'\)/i);
   assert.match(migration, /normalized_element not in \('physical', 'heat', 'electric', 'cryo', 'nature'\)/i);
   assert.match(migration, /normalized_weapon not in \('arts_unit', 'great_sword', 'handcannon', 'polearm', 'sword'\)/i);
+  assert.match(migration, /normalized_main_attribute not in \('Strength', 'Agility', 'Intellect', 'Will'\)/i);
+  assert.match(migration, /normalized_secondary_attribute not in \('Strength', 'Agility', 'Intellect', 'Will'\)/i);
+  assert.match(migration, /Main and secondary attribute must be different/i);
+  assert.match(migration, /raw_data = coalesce\(op\.raw_data, '\{\}'::jsonb\) \|\| jsonb_build_object/i);
   assert.match(migration, /existing\.game = 'arknights_endfield'/i);
 });
 
@@ -39,6 +43,14 @@ test("operator stars, classes, elements, and weapons use fixed dropdown options"
   assert.match(adminScript, /createAdminBatkInput\("Class"[\s\S]*select: ADMIN_OPERATOR_CLASS_OPTIONS/);
   assert.match(adminScript, /createAdminBatkInput\("Element"[\s\S]*select: ADMIN_OPERATOR_ELEMENT_OPTIONS/);
   assert.match(adminScript, /createAdminBatkInput\("Weapon type"[\s\S]*select: ADMIN_OPERATOR_WEAPON_OPTIONS/);
+});
+
+test("operator main and secondary attributes use fixed distinct dropdown values", () => {
+  assert.match(adminScript, /ADMIN_OPERATOR_ATTRIBUTE_OPTIONS/);
+  assert.match(adminScript, /createAdminBatkInput\("Main attribute"[\s\S]*select: ADMIN_OPERATOR_ATTRIBUTE_OPTIONS/);
+  assert.match(adminScript, /createAdminBatkInput\("Secondary attribute"[\s\S]*select: ADMIN_OPERATOR_ATTRIBUTE_OPTIONS/);
+  assert.match(adminScript, /Main and secondary attribute must be different/);
+  assert.match(adminScript, /mainAttribute: String\(rawData\.mainAttribute/);
 });
 
 test("operator editor is responsive and retains compact visibility toggles", () => {

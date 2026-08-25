@@ -79,6 +79,14 @@ const ADMIN_OPERATOR_WEAPON_OPTIONS = [
     { value: "sword", label: "Sword" }
 ];
 
+const ADMIN_OPERATOR_ATTRIBUTE_OPTIONS = [
+    { value: "", label: "Select attribute" },
+    { value: "Strength", label: "Strength" },
+    { value: "Agility", label: "Agility" },
+    { value: "Intellect", label: "Intellect" },
+    { value: "Will", label: "Will" }
+];
+
 const adminPanelState = {
     session: null,
     isAdmin: false,
@@ -769,6 +777,7 @@ function loadAdminOperatorEditor(operatorId) {
         return;
     }
 
+    const rawData = operator.raw_data && typeof operator.raw_data === "object" ? operator.raw_data : {};
     adminPanelState.operatorEditor = {
         id: Number(operator.id),
         name: String(operator.name || ""),
@@ -781,6 +790,8 @@ function loadAdminOperatorEditor(operatorId) {
             .toLowerCase()
             .replace(/[\s-]+/g, "_")
             .replace(/^greatsword$/, "great_sword"),
+        mainAttribute: String(rawData.mainAttribute || ""),
+        secondaryAttribute: String(rawData.secondaryAttribute || ""),
         iconPath: String(operator.icon_path || ""),
         sortOrder: String(Number(operator.sort_order) || 0),
         canEnterUltimateState: operator.can_enter_ultimate_state === true,
@@ -806,6 +817,15 @@ function validateAdminOperatorEditor(editor) {
     if (!ADMIN_OPERATOR_CLASS_OPTIONS.some(option => option.value === editor.operatorClass)) throw new Error("Choose a valid class.");
     if (!ADMIN_OPERATOR_ELEMENT_OPTIONS.some(option => option.value === editor.elementType)) throw new Error("Choose a valid element.");
     if (!ADMIN_OPERATOR_WEAPON_OPTIONS.some(option => option.value === editor.weaponType)) throw new Error("Choose a valid weapon type.");
+    if (!ADMIN_OPERATOR_ATTRIBUTE_OPTIONS.some(option => option.value && option.value === editor.mainAttribute)) {
+        throw new Error("Choose a valid main attribute.");
+    }
+    if (!ADMIN_OPERATOR_ATTRIBUTE_OPTIONS.some(option => option.value && option.value === editor.secondaryAttribute)) {
+        throw new Error("Choose a valid secondary attribute.");
+    }
+    if (editor.mainAttribute === editor.secondaryAttribute) {
+        throw new Error("Main and secondary attribute must be different.");
+    }
     return {
         name,
         slug,
@@ -813,6 +833,8 @@ function validateAdminOperatorEditor(editor) {
         operatorClass: String(editor.operatorClass).trim(),
         elementType: String(editor.elementType).trim().toLowerCase(),
         weaponType: String(editor.weaponType).trim().toLowerCase(),
+        mainAttribute: editor.mainAttribute,
+        secondaryAttribute: editor.secondaryAttribute,
         iconPath: String(editor.iconPath || "").trim(),
         sortOrder,
         canEnterUltimateState: editor.canEnterUltimateState === true,
@@ -873,6 +895,14 @@ function renderAdminOperatorEditor(list) {
         createAdminBatkInput("Weapon type", editor.weaponType, {
             select: ADMIN_OPERATOR_WEAPON_OPTIONS,
             onInput: value => update("weaponType", value)
+        }),
+        createAdminBatkInput("Main attribute", editor.mainAttribute, {
+            select: ADMIN_OPERATOR_ATTRIBUTE_OPTIONS,
+            onInput: value => update("mainAttribute", value)
+        }),
+        createAdminBatkInput("Secondary attribute", editor.secondaryAttribute, {
+            select: ADMIN_OPERATOR_ATTRIBUTE_OPTIONS,
+            onInput: value => update("secondaryAttribute", value)
         }),
         createAdminBatkInput("Icon path", editor.iconPath, { wide: true, onInput: value => update("iconPath", value) }),
         createAdminBatkInput("Ultimate state", editor.canEnterUltimateState, { type: "checkbox", onInput: value => update("canEnterUltimateState", value) }),
