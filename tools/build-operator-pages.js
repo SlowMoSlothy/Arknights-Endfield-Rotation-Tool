@@ -465,10 +465,10 @@ function formatUpdatedDate(value) {
 export function getBasicAttackTimeline(operator) {
   const rawData = isPlainObject(operator?.raw_data) ? operator.raw_data : {};
   const basicAttack = [
-    operator?.basicAttack,
-    operator?.basic_attack,
     rawData.basicAttack,
-    rawData.basic_attack
+    rawData.basic_attack,
+    operator?.basicAttack,
+    operator?.basic_attack
   ].find(isPlainObject);
 
   if (!basicAttack) return null;
@@ -547,7 +547,7 @@ export function getBasicAttackTimeline(operator) {
     name: formatValue(basicAttack.name, "Basic Attack"),
     sequences,
     totalDuration,
-    updatedAt: basicAttack.updatedAt || "",
+    updatedAt: basicAttack.updatedAt || operator?.updated_at || "",
     verified: detailsComplete && timingVerification === true
   };
 }
@@ -1580,7 +1580,9 @@ export async function build({ supabase = createSupabaseClient() } = {}) {
     groupBasicAttackSequences(basicAttackSequences);
   for (const operator of operators) {
     const basicAttack = baseByOperator.get(Number(operator.id));
-    if (basicAttack) operator.basicAttack = basicAttack;
+    const rawData = isPlainObject(operator.raw_data) ? operator.raw_data : {};
+    const hasCanonicalBasicAttack = isPlainObject(rawData.basicAttack) || isPlainObject(rawData.basic_attack);
+    if (!hasCanonicalBasicAttack && basicAttack) operator.basicAttack = basicAttack;
   }
 
   writeGeneratedOutput({ operators, skillsByOperator, basicAttackFormsByOperator });

@@ -297,22 +297,22 @@ test("normalized BATK rows create separate base and form configurations", () => 
   );
 });
 
-test("normalized BATK config takes precedence over legacy operator raw_data", () => {
+test("canonical operator raw_data BATK takes precedence over normalized fallback rows", () => {
   const timeline = getBasicAttackTimeline(operator({
     basicAttack: {
-      name: "Normalized BATK",
+      name: "Normalized fallback BATK",
       sequences: [{ duration: 0.5, hitCount: 1, hitTimings: [0.25] }]
     },
     raw_data: {
       basicAttack: {
-        name: "Legacy BATK",
+        name: "Canonical BATK",
         sequences: [{ duration: 2, hitCount: 1, hitTimings: [1] }]
       }
     }
   }));
 
-  assert.equal(timeline.name, "Normalized BATK");
-  assert.equal(timeline.totalDuration, 0.5);
+  assert.equal(timeline.name, "Canonical BATK");
+  assert.equal(timeline.totalDuration, 2);
 });
 
 test("BATK timeline displays its latest Supabase update date", () => {
@@ -328,6 +328,21 @@ test("BATK timeline displays its latest Supabase update date", () => {
 
   assert.match(page, /<span>Last updated<\/span><strong>26 Jul 2026, 12:00 UTC<\/strong>/);
   assert.match(page, /class="batk-updated"/);
+});
+
+test("BATK timeline falls back to the operator update date for raw_data profiles", () => {
+  const timeline = getBasicAttackTimeline(operator({
+    updated_at: "2026-08-25T08:21:54.000Z",
+    raw_data: {
+      basicAttack: {
+        name: "Current BATK",
+        timingVerified: true,
+        sequences: [{ duration: 0.5, hitCount: 1, hitTimings: [0.25] }]
+      }
+    }
+  }));
+
+  assert.equal(timeline.updatedAt, "2026-08-25T08:21:54.000Z");
 });
 
 test("generated pages use placeholders when an operator image is missing", () => {

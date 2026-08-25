@@ -262,7 +262,9 @@ function mapDatabaseOperator(row, skillRows, basicAttackConfig = null) {
         baseStatsLevel: row.base_stats_level ?? raw.baseStatsLevel,
         mainAttribute: row.main_attribute || raw.mainAttribute,
         secondaryAttribute: row.secondary_attribute || raw.secondaryAttribute,
-        basicAttack: basicAttackConfig || raw.basicAttack || raw.basic_attack,
+        // The BATK Analyzer writes the canonical base profile to operators.raw_data.basicAttack.
+        // Normalized sequence rows remain a legacy fallback and are still used for form variants.
+        basicAttack: raw.basicAttack || raw.basic_attack || basicAttackConfig,
         skills: skillRows.map(mapDatabaseSkill)
     };
 }
