@@ -14,6 +14,11 @@ function countOccurrences(source, value) {
   return source.split(value).length - 1;
 }
 
+test("planner remains visible when initialization falls back", () => {
+  assert.match(plannerHtml, /<div id="builderScreen">/);
+  assert.doesNotMatch(plannerHtml, /id="builderScreen"[^>]*display\s*:\s*none/);
+});
+
 test("planner exposes a visible timeline mode switch in the rotation toolbar", () => {
   assert.match(plannerHtml, /class="rotation-actions"[^>]*aria-label="Rotation actions"/);
   assert.match(plannerHtml, /class="rotation-mode-switch"[^>]*aria-label="Rotation mode"/);
