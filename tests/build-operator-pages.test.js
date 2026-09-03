@@ -345,6 +345,23 @@ test("BATK timeline falls back to the operator update date for raw_data profiles
   assert.equal(timeline.updatedAt, "2026-08-25T08:21:54.000Z");
 });
 
+test("operator pages read attributes stored by the admin editor in raw_data", () => {
+  const entry = operator({
+    main_attribute: undefined,
+    secondary_attribute: undefined,
+    raw_data: {
+      mainAttribute: "Agility",
+      secondaryAttribute: "Will"
+    }
+  });
+
+  const page = createOperatorPage(entry, [entry], new Map());
+
+  assert.match(page, /<span class="info-label">Main Attribute<\/span><strong>Agility<\/strong>/);
+  assert.match(page, /<span class="info-label">Secondary Attribute<\/span><strong>Will<\/strong>/);
+  assert.match(page, /lists Agility as the main attribute and Will as the secondary attribute/);
+});
+
 test("generated pages use placeholders when an operator image is missing", () => {
   const entry = operator({ icon_path: "" });
   const page = createOperatorPage(entry, [entry], new Map());

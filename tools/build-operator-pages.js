@@ -190,6 +190,7 @@ function localPageUrlFor(operator) {
 }
 
 function getRelatedOperators(current, allOperators) {
+  const currentMainAttribute = operatorAttribute(current, "mainAttribute");
   return allOperators
     .filter((operator) => operator.id !== current.id)
     .map((operator) => {
@@ -197,7 +198,10 @@ function getRelatedOperators(current, allOperators) {
       if (operator.operator_class === current.operator_class) score += 3;
       if (operator.element_type === current.element_type) score += 2;
       if (operator.weapon_type === current.weapon_type) score += 1;
-      if (operator.main_attribute === current.main_attribute) score += 1;
+      if (
+        currentMainAttribute
+        && operatorAttribute(operator, "mainAttribute") === currentMainAttribute
+      ) score += 1;
       return { operator, score };
     })
     .filter((entry) => entry.score > 0)
@@ -208,6 +212,12 @@ function getRelatedOperators(current, allOperators) {
 
 function isPlainObject(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function operatorAttribute(operator, field) {
+  const rawData = isPlainObject(operator.raw_data) ? operator.raw_data : {};
+  const databaseField = field === "mainAttribute" ? "main_attribute" : "secondary_attribute";
+  return operator[databaseField] || rawData[field] || "";
 }
 
 function asArray(value) {
@@ -410,15 +420,17 @@ function buildRotationProfile(operator, skills) {
     : `No structured Combo Skill trigger or visible persistent effect is stored for ${name} yet.`;
 
   const signatureSkills = featuredSkillNames(skills);
+  const mainAttribute = operatorAttribute(operator, "mainAttribute");
+  const secondaryAttribute = operatorAttribute(operator, "secondaryAttribute");
   const aboutParts = [
     `${name} is a ${operator.star}-star ${formatLabel(operator.element_type)} ${formatLabel(operator.operator_class)} operator using ${formatLabel(operator.weapon_type)}.`
   ];
-  if (operator.main_attribute && operator.secondary_attribute) {
+  if (mainAttribute && secondaryAttribute) {
     aboutParts.push(
-      `The database lists ${formatLabel(operator.main_attribute)} as the main attribute and ${formatLabel(operator.secondary_attribute)} as the secondary attribute.`
+      `The database lists ${formatLabel(mainAttribute)} as the main attribute and ${formatLabel(secondaryAttribute)} as the secondary attribute.`
     );
-  } else if (operator.main_attribute) {
-    aboutParts.push(`The database lists ${formatLabel(operator.main_attribute)} as the main attribute.`);
+  } else if (mainAttribute) {
+    aboutParts.push(`The database lists ${formatLabel(mainAttribute)} as the main attribute.`);
   }
   if (signatureSkills.length > 0) {
     aboutParts.push(`Key listed skills include ${englishList(signatureSkills)}.`);
@@ -914,8 +926,8 @@ export function createOperatorPage(
   const operatorClass = formatLabel(operator.operator_class);
   const elementType = formatLabel(operator.element_type);
   const weaponType = formatLabel(operator.weapon_type);
-  const mainAttribute = formatLabel(operator.main_attribute);
-  const secondaryAttribute = formatLabel(operator.secondary_attribute);
+  const mainAttribute = formatLabel(operatorAttribute(operator, "mainAttribute"));
+  const secondaryAttribute = formatLabel(operatorAttribute(operator, "secondaryAttribute"));
   const databaseId = `OPERATOR_${String(operator.slug || "unknown").toUpperCase().replaceAll("-", "_")}`;
 
   const classIcon = classIconPath(operator.operator_class);
