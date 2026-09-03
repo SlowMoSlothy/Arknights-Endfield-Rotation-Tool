@@ -997,19 +997,21 @@
 
 @media (min-width: 1100px) {
     .operators-skills-grid {
-        width: max-content;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(148px, 260px));
+        justify-content: space-between;
+        width: 100%;
     }
 
     .operator-skill-wrapper {
-        flex: 0 0 148px;
-        width: 148px;
-        min-width: 148px;
+        width: 100%;
+        min-width: 0;
     }
 
     .operator-skill-card,
     .operator-skill-add-card {
-        width: 148px;
-        min-width: 148px;
+        width: 100%;
+        min-width: 0;
         box-sizing: border-box;
     }
 

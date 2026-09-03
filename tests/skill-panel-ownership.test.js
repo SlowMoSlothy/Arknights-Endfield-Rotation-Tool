@@ -18,3 +18,8 @@ test("planner skill icons use the compact size on desktop and mobile", () => {
   assert.match(skillsStyles, /\.skill-small\s*\{[^}]*width:\s*24px;[^}]*height:\s*24px;/s);
   assert.match(mobileStyles, /\.skill-small\s*\{[^}]*width:\s*24px;[^}]*height:\s*24px;/s);
 });
+
+test("desktop operator cards use the available skills panel width", () => {
+  assert.match(skillsStyles, /@media \(min-width: 1100px\)[\s\S]*\.operators-skills-grid\s*\{[^}]*grid-template-columns:\s*repeat\(4, minmax\(148px, 260px\)\)[^}]*justify-content:\s*space-between[^}]*width:\s*100%/s);
+  assert.match(skillsStyles, /@media \(min-width: 1100px\)[\s\S]*\.operator-skill-wrapper\s*\{[^}]*width:\s*100%[^}]*min-width:\s*0/s);
+});

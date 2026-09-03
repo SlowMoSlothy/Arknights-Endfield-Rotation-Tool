@@ -134,6 +134,9 @@ function setTimelineMode(mode) {
 
     uiSettings.timelineMode = mode;
     saveUiSettings();
+    if (mode === TIMELINE_MODE_OPTIONS.simulation && typeof normalizeSimulationBattleSkillSpTimes === "function") {
+        normalizeSimulationBattleSkillSpTimes();
+    }
     applyUiSettings();
 
     if (typeof renderRotation === "function") {
@@ -155,6 +158,9 @@ function setSimulationSpPerSecond(value) {
 
     uiSettings.simulationSpPerSecond = Math.round(spPerSecond * 10) / 10;
     saveUiSettings();
+    if (typeof normalizeSimulationBattleSkillSpTimes === "function") {
+        normalizeSimulationBattleSkillSpTimes();
+    }
     applyUiSettings();
 
     if (typeof renderRotation === "function") {
@@ -235,6 +241,12 @@ function updateSettingsUi() {
 function initUiSettings() {
     loadUiSettings();
     applyUiSettings();
+    if (
+        uiSettings.timelineMode === TIMELINE_MODE_OPTIONS.simulation
+        && typeof normalizeSimulationBattleSkillSpTimes === "function"
+    ) {
+        normalizeSimulationBattleSkillSpTimes();
+    }
 
     const openBtn = document.getElementById("openSettingsBtn");
     if (openBtn) {

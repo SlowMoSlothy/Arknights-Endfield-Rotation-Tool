@@ -1454,6 +1454,19 @@ function formatSimulationSpValue(value) {
     return String(Math.round(number * 10) / 10);
 }
 
+function getSimulationSpTransaction(before, cost) {
+    const available = Math.max(0, Number(before) || 0);
+    const required = Math.max(0, Number(cost) || 0);
+    const affordable = available + 0.001 >= required;
+    return {
+        before: available,
+        cost: required,
+        after: affordable ? available - required : available,
+        affordable,
+        missing: affordable ? 0 : required - available
+    };
+}
+
 function normalizeSimulationEffectKey(value) {
     return String(value || "").trim().toLowerCase().replace(/\s+/g, "_");
 }
@@ -1957,10 +1970,13 @@ function getSimulationSpAtTime(events, time, threshold = 100) {
         lastTime = eventTime;
 
         const cost = getSimulationBattleSkillSpCost(event.skillData);
-        if (cost !== null && cost > 0) currentSp -= cost;
+        const transaction = cost !== null && cost > 0
+            ? getSimulationSpTransaction(currentSp, cost)
+            : null;
+        if (transaction) currentSp = transaction.after;
 
         const recovery = getSimulationSkillSpRecovery(event.skillData, event);
-        if (recovery > 0) {
+        if (recovery > 0 && transaction?.affordable !== false) {
             const beforeRecovery = currentSp;
             currentSp = Math.min(SIMULATION_MAX_SP, currentSp + recovery);
             if (beforeRecovery < threshold && currentSp >= threshold) latestCrossing = eventTime;
@@ -2001,10 +2017,15 @@ function findSimulationNextSpThresholdTime(events, fromTime, threshold = 100) {
         lastTime = eventTime;
 
         const cost = getSimulationBattleSkillSpCost(event.skillData);
-        if (cost !== null && cost > 0) currentSp -= cost;
+        const transaction = cost !== null && cost > 0
+            ? getSimulationSpTransaction(currentSp, cost)
+            : null;
+        if (transaction) currentSp = transaction.after;
 
         const recovery = getSimulationSkillSpRecovery(event.skillData, event);
-        if (recovery > 0) currentSp = Math.min(SIMULATION_MAX_SP, currentSp + recovery);
+        if (recovery > 0 && transaction?.affordable !== false) {
+            currentSp = Math.min(SIMULATION_MAX_SP, currentSp + recovery);
+        }
         if (currentSp >= threshold) return eventTime;
     }
 
@@ -2050,6 +2071,29 @@ function getSnappedSimulationEntryTime(index, value, secondsPerSlot = getTimelin
     }
 
     return roundSimulationTime(findSimulationNextSpThresholdTime(snapEvents, candidateTime, cost));
+}
+
+function normalizeSimulationBattleSkillSpTimes() {
+    if (!Array.isArray(rotation) || rotation.length === 0) return false;
+    const secondsPerSlot = getTimelineSecondsPerSlot(getTimelineBasicAttackData());
+    let changed = false;
+
+    rotation.forEach((entry, index) => {
+        if (!entry) return;
+        const skillData = getSimulationSkillData(entry);
+        if (!isBattleSkillData(skillData)) return;
+
+        const currentTime = getRotationEntryTime(entry, index, secondsPerSlot);
+        const snappedTime = getSnappedSimulationEntryTime(index, currentTime, secondsPerSlot);
+        if (snappedTime <= currentTime + 0.001) return;
+        entry.time = snappedTime;
+        changed = true;
+    });
+
+    if (changed) {
+        localStorage.setItem("rotation", JSON.stringify(rotation));
+    }
+    return changed;
 }
 
 function setRotationEntryTime(index, value, options = {}) {
@@ -2243,7 +2287,8 @@ function createSimulationCursorIcon(name) {
         pause: ["M8 5h4v14H8z", "M14 5h4v14h-4z"],
         stepForward: ["M9 7l7 5-7 5V7z"],
         next: ["M13 6l7 6-7 6V6z", "M4 6l7 6-7 6V6z"],
-        end: ["M18 5v14", "M6 6l8 6-8 6V6z"]
+        end: ["M18 5v14", "M6 6l8 6-8 6V6z"],
+        keyboard: ["M4 7h16v10H4V7z", "M7 10h1", "M11 10h1", "M15 10h1", "M7 13h1", "M11 13h6"]
     };
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("viewBox", "0 0 24 24");
@@ -2568,6 +2613,60 @@ function createSimulationCursorController(body, events, durationSeconds, pixelsP
     durationControls.append(durationLabel, durationSelect);
     controls.appendChild(durationControls);
 
+    const shortcutHelp = document.createElement("div");
+    shortcutHelp.className = "rotation-sim-shortcuts";
+    const shortcutButton = createSimulationCursorButton("Shortcuts", "rotation-sim-shortcuts-button", {
+        icon: "keyboard",
+        ariaLabel: "Show timeline shortcuts",
+        shortcut: "?",
+        keyShortcuts: "?"
+    });
+    shortcutButton.setAttribute("aria-expanded", "false");
+    shortcutButton.setAttribute("aria-controls", "rotationTimelineShortcuts");
+
+    const shortcutPanel = document.createElement("div");
+    shortcutPanel.id = "rotationTimelineShortcuts";
+    shortcutPanel.className = "rotation-sim-shortcuts-panel";
+    shortcutPanel.hidden = true;
+    shortcutPanel.setAttribute("role", "dialog");
+    shortcutPanel.setAttribute("aria-label", "Timeline shortcuts");
+
+    const shortcutHeader = document.createElement("div");
+    shortcutHeader.className = "rotation-sim-shortcuts-header";
+    const shortcutHeading = document.createElement("strong");
+    shortcutHeading.textContent = "Timeline shortcuts";
+    const shortcutCloseButton = createSimulationCursorButton("Close", "rotation-sim-shortcuts-close", {
+        ariaLabel: "Close timeline shortcuts"
+    });
+    shortcutCloseButton.textContent = "×";
+    shortcutHeader.append(shortcutHeading, shortcutCloseButton);
+
+    const shortcutList = document.createElement("div");
+    shortcutList.className = "rotation-sim-shortcuts-list";
+    [
+        ["← / →", "Move time by 0.1s"],
+        ["Shift + ← / →", "Previous / next skill"],
+        ["Home / End", "Timeline start / end"],
+        ["Space / K", "Play / pause"],
+        ["Ctrl + wheel", "Zoom timeline"],
+        ["Shift + wheel", "Scroll horizontally"],
+        ["Drag empty area", "Move timeline"],
+        ["Drag blue marker", "Move time cursor"],
+        ["? / Esc", "Open / close this help"]
+    ].forEach(([keys, description]) => {
+        const row = document.createElement("div");
+        row.className = "rotation-sim-shortcuts-row";
+        const key = document.createElement("kbd");
+        key.textContent = keys;
+        const copy = document.createElement("span");
+        copy.textContent = description;
+        row.append(key, copy);
+        shortcutList.appendChild(row);
+    });
+    shortcutPanel.append(shortcutHeader, shortcutList);
+    shortcutHelp.append(shortcutButton, shortcutPanel);
+    controls.appendChild(shortcutHelp);
+
     const focusModeActive = document.documentElement.classList.contains("simulation-timeline-focus");
     const focusBar = document.createElement("div");
     focusBar.className = "rotation-sim-focus-bar";
@@ -2659,14 +2758,20 @@ function createSimulationCursorController(body, events, durationSeconds, pixelsP
 
     const cursor = document.createElement("div");
     cursor.className = "rotation-sim-cursor";
-    cursor.setAttribute("aria-hidden", "true");
 
     const line = document.createElement("div");
     line.className = "rotation-sim-cursor-line";
+    line.setAttribute("aria-hidden", "true");
     const handle = document.createElement("div");
     handle.className = "rotation-sim-cursor-handle";
+    handle.tabIndex = 0;
+    handle.setAttribute("role", "slider");
+    handle.setAttribute("aria-label", "Timeline time");
+    handle.setAttribute("aria-valuemin", "0");
+    handle.setAttribute("aria-valuemax", String(durationSeconds));
     const timeBadge = document.createElement("div");
     timeBadge.className = "rotation-sim-cursor-time";
+    timeBadge.setAttribute("aria-hidden", "true");
     cursor.append(line, handle, timeBadge);
     body.appendChild(cursor);
 
@@ -2687,6 +2792,8 @@ function createSimulationCursorController(body, events, durationSeconds, pixelsP
         const state = getSimulationCursorState(events, simulationCursorTime);
         const formattedTime = formatSimulationInspectorSeconds(simulationCursorTime);
         timeBadge.textContent = formattedTime;
+        handle.setAttribute("aria-valuenow", String(simulationCursorTime));
+        handle.setAttribute("aria-valuetext", formattedTime);
         timeStat.valueElement.textContent = formattedTime;
         spStat.valueElement.textContent = `${formatSimulationSpValue(state.sp)} / ${SIMULATION_MAX_SP}`;
         spStat.item.classList.toggle("is-warning", state.sp < 100);
@@ -2781,6 +2888,13 @@ function createSimulationCursorController(body, events, durationSeconds, pixelsP
         jumpToClosestEvent(1);
     };
 
+    const setShortcutHelpOpen = isOpen => {
+        const nextOpen = Boolean(isOpen);
+        shortcutPanel.hidden = !nextOpen;
+        shortcutButton.setAttribute("aria-expanded", String(nextOpen));
+        shortcutButton.classList.toggle("is-active", nextOpen);
+    };
+
     startButton.addEventListener("click", jumpToStart);
     previousEventButton.addEventListener("click", jumpToPreviousEvent);
     playButton.addEventListener("click", startPlayback);
@@ -2788,6 +2902,11 @@ function createSimulationCursorController(body, events, durationSeconds, pixelsP
     forwardButton.addEventListener("click", () => stepCursor(1));
     nextEventButton.addEventListener("click", jumpToNextEvent);
     endButton.addEventListener("click", jumpToEnd);
+    shortcutButton.addEventListener("click", () => setShortcutHelpOpen(shortcutPanel.hidden));
+    shortcutCloseButton.addEventListener("click", () => {
+        setShortcutHelpOpen(false);
+        shortcutButton.focus();
+    });
     zoomOutButton.addEventListener("click", () => {
         setSimulationTimelineZoom(simulationTimelineZoom - SIMULATION_TIMELINE_ZOOM_STEP);
     });
@@ -2842,8 +2961,15 @@ function createSimulationCursorController(body, events, durationSeconds, pixelsP
         const lowerKey = String(key || "").toLowerCase();
         let handled = true;
 
-        if (key === "Escape" && document.documentElement.classList.contains("simulation-timeline-focus")) {
+        if (key === "Escape" && !shortcutPanel.hidden) {
+            setShortcutHelpOpen(false);
+            shortcutButton.focus();
+        } else if (key === "Escape" && document.documentElement.classList.contains("simulation-timeline-focus")) {
             setSimulationTimelineFocusMode(false);
+        } else if (key === "?") {
+            const willOpen = shortcutPanel.hidden;
+            setShortcutHelpOpen(willOpen);
+            (willOpen ? shortcutCloseButton : shortcutButton).focus();
         } else if (key === "Home" && !event.shiftKey) {
             jumpToStart();
         } else if (key === "End" && !event.shiftKey) {
@@ -2875,21 +3001,73 @@ function createSimulationCursorController(body, events, durationSeconds, pixelsP
         return clampSimulationCursorTime((event.clientX - rect.left) / pixelsPerSecond, durationSeconds);
     };
 
+    const beginCursorDrag = (event, preserveGrabOffset = false) => {
+        if (event.button !== 0) return;
+        event.preventDefault();
+        event.stopPropagation();
+        stopSimulationCursorPlayback();
+
+        const startClientX = event.clientX;
+        const startTime = simulationCursorTime;
+        cursor.classList.add("is-dragging");
+        if (!preserveGrabOffset) setCursorTime(getTimeFromPointer(event));
+
+        const move = moveEvent => {
+            const nextTime = preserveGrabOffset
+                ? startTime + ((moveEvent.clientX - startClientX) / pixelsPerSecond)
+                : getTimeFromPointer(moveEvent);
+            setCursorTime(nextTime);
+        };
+        const up = () => {
+            cursor.classList.remove("is-dragging");
+            document.removeEventListener("pointermove", move);
+            document.removeEventListener("pointerup", up);
+            document.removeEventListener("pointercancel", up);
+        };
+
+        document.addEventListener("pointermove", move);
+        document.addEventListener("pointerup", up);
+        document.addEventListener("pointercancel", up);
+    };
+
+    handle.addEventListener("pointerdown", event => beginCursorDrag(event, true));
+    timeBadge.addEventListener("pointerdown", event => beginCursorDrag(event, true));
+
     body.addEventListener("pointerdown", event => {
         if (event.button !== 0) return;
         if (event.target.closest(".rotation-sim-skill, .rotation-sim-sp-marker, .rotation-batk-hit-marker, button, .rotation-sim-inspector")) return;
         event.preventDefault();
         stopSimulationCursorPlayback();
-        setCursorTime(getTimeFromPointer(event));
 
-        const move = moveEvent => setCursorTime(getTimeFromPointer(moveEvent));
-        const up = () => {
+        const scrollArea = body.closest(".rotation-sim-track-scroll");
+        const startX = event.clientX;
+        const startScrollLeft = scrollArea?.scrollLeft || 0;
+        let isPanning = false;
+        let wasCancelled = false;
+
+        const move = moveEvent => {
+            const deltaX = moveEvent.clientX - startX;
+            if (!isPanning && scrollArea && Math.abs(deltaX) >= 5) {
+                isPanning = true;
+                scrollArea.classList.add("is-panning");
+            }
+            if (isPanning) scrollArea.scrollLeft = startScrollLeft - deltaX;
+        };
+        const cleanup = upEvent => {
+            scrollArea?.classList.remove("is-panning");
             document.removeEventListener("pointermove", move);
-            document.removeEventListener("pointerup", up);
+            document.removeEventListener("pointerup", cleanup);
+            document.removeEventListener("pointercancel", cancel);
+            if (!isPanning && !wasCancelled) setCursorTime(getTimeFromPointer(upEvent));
+        };
+        const cancel = cancelEvent => {
+            wasCancelled = true;
+            cleanup(cancelEvent);
         };
 
         document.addEventListener("pointermove", move);
-        document.addEventListener("pointerup", up);
+        document.addEventListener("pointerup", cleanup);
+        document.addEventListener("pointercancel", cancel);
     });
 
     setCursorTime(simulationCursorTime);
@@ -3301,14 +3479,21 @@ function createSimulationSpMarkerInspector(marker) {
     const title = marker.type === "recovery" ? "SP recovery" : "SP cost";
     panel.appendChild(createSimulationInspectorHeader(title, formatSimulationInspectorSeconds(marker.time)));
 
-    appendSimulationInspectorSection(panel, "SP", [
-        ["Skill", marker.name || "Skill"],
-        [
+    const spLines = [["Skill", marker.name || "Skill"]];
+    if (marker.type === "cost" && marker.affordable === false) {
+        spLines.push(
+            ["Available", `${formatSimulationSpValue(marker.before)} SP`],
+            ["Cost", `${formatSimulationSpValue(marker.amount)} SP`],
+            ["Missing", `${formatSimulationSpValue(marker.missing)} SP`, "is-warning"]
+        );
+    } else {
+        spLines.push([
             marker.type === "recovery" ? "Recovery" : "Cost",
             `${formatSimulationSpValue(marker.before)} -> ${formatSimulationSpValue(marker.after)} (${getSimulationSpMarkerText(marker)})`,
-            marker.type === "recovery" ? "is-positive" : (marker.affordable ? "" : "is-warning")
-        ]
-    ]);
+            marker.type === "recovery" ? "is-positive" : ""
+        ]);
+    }
+    appendSimulationInspectorSection(panel, "SP", spLines);
 
     const event = marker.event;
     if (event?.kind === "auto") {
@@ -3918,7 +4103,9 @@ function createSimulationSkillElement(entry, index, skillData, secondsPerSlot, p
 
         const spBadge = document.createElement("div");
         spBadge.className = "rotation-sim-sp-badge";
-        spBadge.textContent = `${formatSimulationSpValue(spState.cost)} SP`;
+        spBadge.textContent = spState.affordable
+            ? `${formatSimulationSpValue(spState.cost)} SP`
+            : `${formatSimulationSpValue(spState.missing)} SP short`;
         spBadge.title = spState.affordable
             ? `SP ${formatSimulationSpValue(spState.before)} -> ${formatSimulationSpValue(spState.after)}`
             : `Not enough SP: ${formatSimulationSpValue(spState.before)} / ${formatSimulationSpValue(spState.cost)}`;
@@ -3970,7 +4157,10 @@ function createSimulationSkillElement(entry, index, skillData, secondsPerSlot, p
             event.preventDefault();
             event.stopPropagation();
             const direction = directionIndex === 0 ? -SIMULATION_TIME_STEP : SIMULATION_TIME_STEP;
-            setRotationEntryTime(index, getRotationEntryTime(rotation[index], index, secondsPerSlot) + direction);
+            setRotationEntryTime(index, getRotationEntryTime(rotation[index], index, secondsPerSlot) + direction, {
+                snapBattleSkill: item.dataset.skillLane === "battle",
+                secondsPerSlot
+            });
             renderRotation();
         });
     });
@@ -4498,24 +4688,21 @@ function enrichSimulationSkillEventsWithSp(events) {
             lastTime = eventTime;
 
             const cost = getSimulationBattleSkillSpCost(event.skillData);
+            let costTransaction = null;
             if (cost !== null && cost > 0) {
-                const before = currentSp;
-                const after = before - cost;
+                costTransaction = getSimulationSpTransaction(currentSp, cost);
                 event.spState = {
                     start: SIMULATION_START_SP,
                     max: SIMULATION_MAX_SP,
                     spPerSecond,
-                    cost,
-                    before,
-                    after,
-                    generated: generatedSp,
-                    affordable: before + 0.001 >= cost
+                    ...costTransaction,
+                    generated: generatedSp
                 };
-                currentSp = after;
+                currentSp = costTransaction.after;
             }
 
             const recovery = getSimulationSkillSpRecovery(event.skillData, event);
-            if (recovery > 0) {
+            if (recovery > 0 && costTransaction?.affordable !== false) {
                 const before = currentSp;
                 const after = Math.min(SIMULATION_MAX_SP, before + recovery);
                 event.spRecoveryState = {
@@ -5376,6 +5563,7 @@ function getSimulationSpTimeline(events, durationSeconds) {
                 after: spState.after,
                 amount: spState.cost,
                 affordable: spState.affordable,
+                missing: spState.missing,
                 name: event.skillData?.name || "Battle Skill",
                 event
             });
@@ -5496,6 +5684,10 @@ function appendSimulationSpReference(svg, track, value, className, width, domain
 }
 
 function getSimulationSpMarkerText(marker) {
+    if (marker.type === "cost" && marker.affordable === false) {
+        const missing = Math.max(0, Number(marker.missing) || Number(marker.amount) - Number(marker.before));
+        return `${formatSimulationSpValue(missing)} short`;
+    }
     return marker.type === "recovery"
         ? `+${formatSimulationSpValue(marker.amount)}`
         : `-${formatSimulationSpValue(marker.amount)}`;
@@ -5579,9 +5771,6 @@ function renderSimulationSpTrack(track, events, durationSeconds, pixelsPerSecond
         markerElement.style.left = `${markerLayouts[index].x}px`;
         markerElement.style.top = `${markerLayouts[index].y}px`;
         markerElement.textContent = getSimulationSpMarkerText(marker);
-        markerElement.title = marker.type === "recovery"
-            ? `${marker.name}: ${formatSimulationSpValue(marker.before)} SP + ${formatSimulationSpValue(marker.amount)} SP = ${formatSimulationSpValue(marker.after)} SP`
-            : `${marker.name}: ${formatSimulationSpValue(marker.before)} SP - ${formatSimulationSpValue(marker.amount)} SP = ${formatSimulationSpValue(marker.after)} SP`;
         attachSimulationInspector(
             markerElement,
             createSimulationSpMarkerInspector(marker),
@@ -6080,56 +6269,116 @@ function formatSimulationEffectTimelineRange(interval) {
     return interval.openEnded ? `${durationText}, until timeline end` : durationText;
 }
 
-function getSimulationEffectInspectorValue(effect) {
-    const valuePercent = Number(
-        effect?.valuePercent
-        ?? effect?.susceptibilityPercent
-        ?? effect?.damageTakenPercent
-        ?? effect?.damageBonusPercent
-    );
-    if (!Number.isFinite(valuePercent)) return "";
-    return `${valuePercent >= 0 ? "+" : ""}${valuePercent}%`;
+function getSimulationEffectInspectorData(effect, type) {
+    const registryEntry = getSimulationEffectTimelineRegistryEntry(effect, type) || {};
+    return {
+        ...registryEntry,
+        ...(effect || {})
+    };
+}
+
+function getSimulationEffectInspectorSummary(effect, type) {
+    const data = getSimulationEffectInspectorData(effect, type);
+    const summary = String(
+        data.effectSummary
+        || data.summary
+        || data.effectDescription
+        || data.description
+        || ""
+    ).trim();
+    const values = [];
+    const usedKeys = new Set();
+    const readPercent = (label, keys, options = {}) => {
+        const key = keys.find(candidate => Number.isFinite(Number(data[candidate])));
+        if (!key || usedKeys.has(key)) return;
+        usedKeys.add(key);
+        const value = Number(data[key]);
+        const sign = options.unsigned ? "" : (value >= 0 ? "+" : "");
+        values.push(`${sign}${value}% ${label}`);
+    };
+
+    readPercent("Crit Rate", ["critRatePercent", "criticalRatePercent", "critRateBonusPercent", "criticalRateBonusPercent"]);
+    readPercent("Crit DMG", ["critDamagePercent", "criticalDamagePercent", "critDamageBonusPercent", "criticalDamageBonusPercent"]);
+    readPercent("ATK", ["atkPercent", "attackBonusPercent", "activeBuffAtkPercent"]);
+    readPercent("All DMG", ["allDamageBonusPercent", "allDamageDealtPercent", "damageBonusPercent"]);
+    readPercent("Physical DMG", ["physicalDamageBonusPercent", "physicalDamageDealtPercent"]);
+    readPercent("Heat DMG", ["heatDamageBonusPercent", "heatDamageDealtPercent"]);
+    readPercent("Cryo DMG", ["cryoDamageBonusPercent", "cryoDamageDealtPercent"]);
+    readPercent("Electric DMG", ["electricDamageBonusPercent", "electricDamageDealtPercent"]);
+    readPercent("Nature DMG", ["natureDamageBonusPercent", "natureDamageDealtPercent"]);
+    readPercent("Arts DMG", ["artsDamageBonusPercent", "artsDamageDealtPercent", "artsDamagePercent"]);
+    readPercent("damage taken", ["susceptibilityPercent", "damageTakenPercent", "increasedDamageTakenPercent"]);
+    readPercent("DEF reduction", ["defenseReductionPercent"], { unsigned: true });
+    readPercent("RES reduction", ["resistanceReductionPercent"], { unsigned: true });
+    readPercent("damage reduction", ["protectionPercent"], { unsigned: true });
+    readPercent("Max HP as Shield", ["shieldMaxHpPercent"], { unsigned: true });
+    readPercent("Treatment Effect", ["treatmentEffectPercent"]);
+
+    if (Number.isFinite(Number(data.valuePercent)) && !usedKeys.has("valuePercent")) {
+        const effectKey = normalizeSimulationEffectKey(data.appliesEffect || data.id || data.name);
+        if (effectKey.includes("susceptibility")) {
+            readPercent("damage taken", ["valuePercent"]);
+        } else if (effectKey.includes("protection")) {
+            readPercent("damage reduction", ["valuePercent"], { unsigned: true });
+        } else if (effectKey.includes("slow")) {
+            readPercent("movement speed reduction", ["valuePercent"], { unsigned: true });
+        } else {
+            readPercent("effect value", ["valuePercent"]);
+        }
+    }
+
+    if (values.length > 0) return values.join(" · ");
+    if (summary) return summary;
+    if (data.battlefieldResource) {
+        const maxStacks = Number(data.maxStacks);
+        return Number.isFinite(maxStacks) && maxStacks > 0
+            ? `Stored battlefield resource · up to ${maxStacks} stacks`
+            : "Stored battlefield resource";
+    }
+    if (data.stackable === true || Number(data.maxStacks) > 1) {
+        const maxStacks = Number(data.maxStacks);
+        return Number.isFinite(maxStacks) && maxStacks > 1
+            ? `Stackable effect · up to ${maxStacks} stacks`
+            : "Stackable effect";
+    }
+    return "No detailed effect value is stored yet.";
 }
 
 function createSimulationEffectInspector(interval, type) {
     const sourceEvent = interval?.sourceEvent;
-    const panel = sourceEvent?.skillData
-        ? createSimulationSkillInspector(sourceEvent)
-        : document.createElement("div");
-    if (!panel) return null;
-
+    const panel = document.createElement("div");
     panel.classList.add("rotation-sim-inspector", "is-effect-inspector");
     panel.addEventListener("click", event => event.stopPropagation());
     const name = getSimulationEffectTimelineName(interval.effect, type);
     const target = getSimulationEffectTimelineTarget(interval.effect, type);
-    const existingHeader = panel.querySelector(".rotation-sim-inspector-header");
     const header = createSimulationInspectorHeader(
         name,
         `${interval.effect?.battlefieldResource ? "RESOURCE" : (type === "buff" ? "BUFF" : "DEBUFF")} - ${formatSimulationInspectorSeconds(interval.start)}`
     );
-    if (existingHeader) existingHeader.replaceWith(header);
-    else panel.prepend(header);
+    panel.appendChild(header);
 
-    const effectSectionHost = document.createElement("div");
-    appendSimulationInspectorSection(effectSectionHost, "Effect", [
+    const summary = document.createElement("p");
+    summary.className = "rotation-sim-effect-summary";
+    summary.textContent = getSimulationEffectInspectorSummary(interval.effect, type);
+    panel.appendChild(summary);
+
+    const stackCount = Math.max(1, Number(interval.stackCount) || 1);
+    const effectData = getSimulationEffectInspectorData(interval.effect, type);
+    const maxStacks = Math.max(0, Number(effectData.maxStacks) || 0);
+    appendSimulationInspectorSection(panel, "Details", [
         ["Target", target],
-        ["Stacks", String(interval.stackCount || 1)],
-        ["Active", `${formatSimulationInspectorSeconds(interval.start)} - ${formatSimulationInspectorSeconds(interval.end)}`],
         ["Duration", formatSimulationEffectTimelineRange(interval)],
-        ["Value", getSimulationEffectInspectorValue(interval.effect)]
+        ["Stacks", effectData.stackable === true || stackCount > 1
+            ? `${stackCount}${maxStacks > 1 ? ` / ${maxStacks}` : ""}`
+            : ""]
     ]);
-    const effectSection = effectSectionHost.firstElementChild;
-    if (effectSection) header.insertAdjacentElement("afterend", effectSection);
 
     if (sourceEvent?.skillData) {
-        const sourceSectionHost = document.createElement("div");
-        appendSimulationInspectorSection(sourceSectionHost, "Source", [
+        appendSimulationInspectorSection(panel, "Source", [
             ["Skill", sourceEvent.skillData.name || "Timeline event"],
             ["Operator", getSimulationOperatorName(getSimulationSourceOperatorId(sourceEvent.skillData))],
             ["Applied", formatSimulationInspectorSeconds(sourceEvent.time)]
         ]);
-        const sourceSection = sourceSectionHost.firstElementChild;
-        if (sourceSection) effectSection?.insertAdjacentElement("afterend", sourceSection);
     }
 
     return panel;

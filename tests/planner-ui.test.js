@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
+import vm from "node:vm";
 
 const plannerHtml = fs.readFileSync("endfield/index.html", "utf8");
 const layoutCss = fs.readFileSync("endfield/css/layout.css", "utf8");
@@ -111,6 +112,95 @@ test("simulation renders duration-aware buff and debuff tracks", () => {
   assert.doesNotMatch(rotationGridScript, /bar\.title\s*=/);
   assert.match(rotationCss, /\.rotation-sim-effect-track\.is-buff/);
   assert.match(rotationCss, /\.rotation-sim-effect-track\.is-debuff/);
+});
+
+test("simulation cursor can be dragged directly with mouse or touch", () => {
+  assert.match(rotationGridScript, /handle\.setAttribute\("role", "slider"\)/);
+  assert.match(rotationGridScript, /handle\.setAttribute\("aria-valuenow", String\(simulationCursorTime\)\)/);
+  assert.match(rotationGridScript, /const beginCursorDrag = \(event, preserveGrabOffset = false\) =>/);
+  assert.match(rotationGridScript, /handle\.addEventListener\("pointerdown", event => beginCursorDrag\(event, true\)\)/);
+  assert.match(rotationGridScript, /timeBadge\.addEventListener\("pointerdown", event => beginCursorDrag\(event, true\)\)/);
+  assert.match(rotationGridScript, /document\.addEventListener\("pointercancel", up\)/);
+  assert.match(rotationCss, /\.rotation-sim-cursor-handle\s*\{[\s\S]*pointer-events:\s*auto;[\s\S]*cursor:\s*grab;[\s\S]*touch-action:\s*none;/);
+  assert.match(rotationCss, /\.rotation-sim-cursor\.is-dragging \.rotation-sim-cursor-handle\s*\{[\s\S]*cursor:\s*grabbing;/);
+});
+
+test("simulation timeline pans horizontally by dragging an empty track area", () => {
+  assert.match(rotationGridScript, /const scrollArea = body\.closest\("\.rotation-sim-track-scroll"\)/);
+  assert.match(rotationGridScript, /if \(!isPanning && scrollArea && Math\.abs\(deltaX\) >= 5\)/);
+  assert.match(rotationGridScript, /scrollArea\.scrollLeft = startScrollLeft - deltaX/);
+  assert.match(rotationGridScript, /if \(!isPanning && !wasCancelled\) setCursorTime\(getTimeFromPointer\(upEvent\)\)/);
+  assert.match(rotationCss, /\.rotation-sim-track-scroll\s*\{[\s\S]*touch-action:\s*pan-y;/);
+  assert.match(rotationCss, /\.rotation-sim-body\s*\{[\s\S]*cursor:\s*grab;/);
+});
+
+test("simulation timeline exposes an accessible shortcut reference", () => {
+  assert.match(rotationGridScript, /icon: "keyboard"/);
+  assert.match(rotationGridScript, /shortcutPanel\.setAttribute\("role", "dialog"\)/);
+  assert.match(rotationGridScript, /\["Drag empty area", "Move timeline"\]/);
+  assert.match(rotationGridScript, /const setShortcutHelpOpen = isOpen =>/);
+  assert.match(rotationGridScript, /else if \(key === "\?"\)/);
+  assert.match(rotationGridScript, /if \(key === "Escape" && !shortcutPanel\.hidden\)/);
+  assert.match(rotationCss, /\.rotation-sim-shortcuts-panel\s*\{/);
+  assert.match(rotationCss, /\.rotation-sim-shortcuts-row kbd\s*\{/);
+});
+
+test("effect inspectors stay compact and lead with the actual effect", () => {
+  assert.match(rotationGridScript, /function getSimulationEffectInspectorSummary\(effect, type\)/);
+  assert.match(rotationGridScript, /readPercent\("Crit Rate", \["critRatePercent"/);
+  assert.match(rotationGridScript, /readPercent\("Crit DMG", \["critDamagePercent"/);
+  assert.match(rotationGridScript, /summary\.className = "rotation-sim-effect-summary"/);
+  assert.match(rotationGridScript, /appendSimulationInspectorSection\(panel, "Details"/);
+  assert.doesNotMatch(rotationGridScript, /function createSimulationEffectInspector\(interval, type\) \{[\s\S]*?createSimulationSkillInspector\(sourceEvent\)/);
+  assert.match(rotationCss, /\.rotation-sim-inspector\.is-effect-inspector\s*\{[\s\S]*width:\s*300px/);
+  assert.match(rotationCss, /\.rotation-sim-effect-summary\s*\{/);
+});
+
+test("unaffordable SP costs show the shortfall without creating negative SP", () => {
+  const start = rotationGridScript.indexOf("function getSimulationSpTransaction");
+  const end = rotationGridScript.indexOf("\nfunction normalizeSimulationEffectKey", start);
+  const context = { result: null };
+  vm.runInNewContext(
+    `${rotationGridScript.slice(start, end)}; result = getSimulationSpTransaction(80, 100);`,
+    context
+  );
+
+  assert.deepEqual(
+    { ...context.result },
+    { before: 80, cost: 100, after: 80, affordable: false, missing: 20 }
+  );
+  assert.match(rotationGridScript, /costTransaction\?\.affordable !== false/);
+  assert.match(rotationGridScript, /return `\$\{formatSimulationSpValue\(missing\)\} short`/);
+  assert.doesNotMatch(rotationGridScript, /markerElement\.title\s*=/);
+});
+
+test("Battle Skills automatically move to the next affordable SP position", () => {
+  const start = rotationGridScript.indexOf("function normalizeSimulationBattleSkillSpTimes");
+  const end = rotationGridScript.indexOf("\nfunction setRotationEntryTime", start);
+  const saved = [];
+  const context = {
+    rotation: [{ id: 1, time: 5 }, { id: 2, time: 6 }],
+    getTimelineSecondsPerSlot: () => 1,
+    getTimelineBasicAttackData: () => null,
+    getSimulationSkillData: () => ({ type: "Battle Skill" }),
+    isBattleSkillData: () => true,
+    getRotationEntryTime: entry => entry.time,
+    getSnappedSimulationEntryTime: (index, time) => time + index + 2,
+    localStorage: { setItem: (key, value) => saved.push([key, value]) }
+  };
+  vm.createContext(context);
+  vm.runInContext(rotationGridScript.slice(start, end), context);
+
+  assert.equal(context.normalizeSimulationBattleSkillSpTimes(), true);
+  assert.deepEqual(context.rotation.map(entry => entry.time), [7, 9]);
+  assert.equal(saved.length, 1);
+  assert.match(rotationGridScript, /function normalizeSimulationBattleSkillSpTimes\(\)/);
+  assert.match(rotationGridScript, /const snappedTime = getSnappedSimulationEntryTime\(index, currentTime, secondsPerSlot\)/);
+  assert.match(rotationGridScript, /if \(snappedTime <= currentTime \+ 0\.001\) return/);
+  assert.match(uiSettingsScript, /mode === TIMELINE_MODE_OPTIONS\.simulation[\s\S]*normalizeSimulationBattleSkillSpTimes\(\)/);
+  assert.match(uiSettingsScript, /function setSimulationSpPerSecond[\s\S]*normalizeSimulationBattleSkillSpTimes\(\)/);
+  assert.match(uiSettingsScript, /function initUiSettings\(\)[\s\S]*uiSettings\.timelineMode === TIMELINE_MODE_OPTIONS\.simulation[\s\S]*normalizeSimulationBattleSkillSpTimes\(\)/);
+  assert.match(rotationGridScript, /setRotationEntryTime\(index,[\s\S]*snapBattleSkill: item\.dataset\.skillLane === "battle"/);
 });
 
 test("simulation loads generic battlefield resources and exposes them in the inspector", () => {
