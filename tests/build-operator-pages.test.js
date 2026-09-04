@@ -23,6 +23,7 @@ import {
 const checkedInOperatorIndex = fs.readFileSync("endfield/operators/index.html", "utf8");
 const actionTimingMigration = fs.readFileSync("supabase/operator_action_timings.sql", "utf8");
 const operatorSharesScript = fs.readFileSync("endfield/js/ui/operatorShares.js", "utf8");
+const operatorBatkExportScript = fs.readFileSync("endfield/js/ui/operatorBatkExport.js", "utf8");
 
 test("checked-in operator index contains no unresolved merge conflicts", () => {
   assert.doesNotMatch(checkedInOperatorIndex, /^(?:<<<<<<<|=======|>>>>>>>)/m);
@@ -551,6 +552,12 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /class="batk-status is-verified"/);
   assert.match(page, /class="batk-title-row"/);
   assert.match(page, /data-label="Verified"/);
+  assert.match(page, /class="batk-export-button"/);
+  assert.match(page, /data-batk-export/);
+  assert.match(page, /class="batk-export-data"/);
+  assert.match(page, /"operator":\{"name":"Mi Fu","avatar":"\/endfield\/assets\/operators\/mi_fu\.webp","rarity":5/);
+  assert.match(page, /"timeline":\{"name":"Measured Combo","kicker":"BATK timeline","totalDuration":2\.5/);
+  assert.match(page, /js\/ui\/operatorBatkExport\.js\?v=3/);
   assert.ok(page.indexOf('id="stats"') < page.indexOf('id="batk"'));
   assert.match(page, /href="#related">Related/);
   assert.match(page, /id="related"/);
@@ -570,6 +577,19 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.doesNotMatch(page, /<section class="meta-strip">/);
   assert.doesNotMatch(page, /<span class="stat-label">Ultimate<\/span>/);
   assert.doesNotMatch(page, /-webkit-line-clamp/);
+});
+
+test("BATK PNG export renders a complete standalone canvas and downloads it", () => {
+  assert.match(operatorBatkExportScript, /createBatkCanvas/);
+  assert.match(operatorBatkExportScript, /drawTimeline/);
+  assert.match(operatorBatkExportScript, /drawSequenceDetails/);
+  assert.match(operatorBatkExportScript, /loadImage\(operator\.avatar\)/);
+  assert.match(operatorBatkExportScript, /function drawAvatar/);
+  assert.match(operatorBatkExportScript, /ctx\.clip\(\)/);
+  assert.match(operatorBatkExportScript, /const operatorChipY = 288/);
+  assert.match(operatorBatkExportScript, /canvas\.toBlob/);
+  assert.match(operatorBatkExportScript, /data-batk-export/);
+  assert.match(operatorBatkExportScript, /BATK timing reference/);
 });
 
 test("operator share browser loads live counts and safe public share cards", () => {
