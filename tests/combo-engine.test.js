@@ -551,3 +551,23 @@ test("batch 04 stores action conditions and Zhuang's Finisher trigger in Supabas
   assert.match(migration, /"effect":"finisher"/);
   assert.match(migration, /where operator_id = 9 and id = 903/);
 });
+
+test("Typhoeus migration stores every skill, the max-Signs trigger, and original icons", () => {
+  const migration = fs.readFileSync("supabase/typhoeus_skill_update.sql", "utf8");
+
+  for (const skill of [
+    "Wildlands Huntress",
+    "Piercing Arrows of the Woods",
+    "Rampant Thorns",
+    "Call of Ice Mountain"
+  ]) {
+    assert.match(migration, new RegExp(skill));
+  }
+
+  assert.match(migration, /"effect":"typhoeus_sign","minStacks":8/);
+  assert.match(migration, /'8 Signs', 'all'/);
+  assert.match(migration, /skills\/typhoeus\/fs_small\.png/);
+  assert.match(migration, /skills\/typhoeus\/bs_small\.png/);
+  assert.match(migration, /skills\/typhoeus\/cs_small\.png/);
+  assert.match(migration, /skills\/typhoeus\/ult_small\.png/);
+});
