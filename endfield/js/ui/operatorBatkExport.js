@@ -104,6 +104,22 @@
     ctx.fillText(value || "Unknown", x + 16, y + 50);
   }
 
+  function layoutHitMarkers(hitTimings, duration, lineStart, lineWidth) {
+    const levelLastX = [-Infinity, -Infinity, -Infinity];
+    const minimumSpacing = 50;
+
+    return hitTimings.map(hitTime => {
+      const position = duration > 0 ? Math.max(0, Math.min(1, Number(hitTime) / duration)) : 0;
+      const x = lineStart + lineWidth * position;
+      let level = levelLastX.findIndex(lastX => x - lastX >= minimumSpacing);
+      if (level < 0) {
+        level = levelLastX.indexOf(Math.min(...levelLastX));
+      }
+      levelLastX[level] = x;
+      return { x, level };
+    });
+  }
+
   function drawBackground(ctx, width, height) {
     const gradient = ctx.createLinearGradient(0, 0, width, height);
     gradient.addColorStop(0, "#20292a");
@@ -144,7 +160,6 @@
     const contentX = x + 10;
     const contentWidth = width - 20 - gap * Math.max(0, sequences.length - 1);
     let cursorX = contentX;
-    let elapsed = 0;
 
     sequences.forEach((sequence, index) => {
       const duration = Math.max(0, Number(sequence.duration) || 0);
@@ -168,16 +183,25 @@
       ctx.strokeStyle = "rgba(244,246,239,0.58)";
       ctx.lineWidth = 3;
       ctx.beginPath();
-      ctx.moveTo(lineStart, trackY + 120);
-      ctx.lineTo(lineStart + lineWidth, trackY + 120);
+      ctx.moveTo(lineStart, trackY + 132);
+      ctx.lineTo(lineStart + lineWidth, trackY + 132);
       ctx.stroke();
 
       const hits = Array.isArray(sequence.hitTimings) ? sequence.hitTimings : [];
+      const hitLayouts = layoutHitMarkers(hits, duration, lineStart, lineWidth);
       hits.forEach((hitTime, hitIndex) => {
-        const position = duration > 0 ? Math.max(0, Math.min(1, Number(hitTime) / duration)) : 0;
-        const hitX = lineStart + lineWidth * position;
+        const { x: hitX, level } = hitLayouts[hitIndex];
+        const hitY = trackY + [132, 116, 148][level];
+        if (level !== 0) {
+          ctx.strokeStyle = "rgba(248,245,70,0.38)";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(hitX, trackY + 132);
+          ctx.lineTo(hitX, hitY);
+          ctx.stroke();
+        }
         ctx.beginPath();
-        ctx.arc(hitX, trackY + 120, 12, 0, Math.PI * 2);
+        ctx.arc(hitX, hitY, 11, 0, Math.PI * 2);
         ctx.fillStyle = "#202627";
         ctx.fill();
         ctx.strokeStyle = COLORS.yellow;
@@ -186,14 +210,10 @@
         ctx.fillStyle = COLORS.text;
         ctx.font = "900 11px Arial, sans-serif";
         const hitLabel = sequence.label === "FS" && hits.length === 1 ? "FS" : String(hitIndex + 1);
-        ctx.fillText(hitLabel, hitX, trackY + 124);
-        ctx.fillStyle = COLORS.muted;
-        ctx.font = "700 12px Arial, sans-serif";
-        ctx.fillText(formatSeconds(elapsed + Number(hitTime || 0)), hitX, trackY + 151);
+        ctx.fillText(hitLabel, hitX, hitY + 4);
       });
 
       cursorX += segmentWidth + gap;
-      elapsed += duration;
     });
     ctx.textAlign = "left";
   }

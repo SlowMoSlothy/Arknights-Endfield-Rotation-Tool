@@ -557,7 +557,7 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /class="batk-export-data"/);
   assert.match(page, /"operator":\{"name":"Mi Fu","avatar":"\/endfield\/assets\/operators\/mi_fu\.webp","rarity":5/);
   assert.match(page, /"timeline":\{"name":"Measured Combo","kicker":"BATK timeline","totalDuration":2\.5/);
-  assert.match(page, /js\/ui\/operatorBatkExport\.js\?v=3/);
+  assert.match(page, /js\/ui\/operatorBatkExport\.js\?v=5/);
   assert.ok(page.indexOf('id="stats"') < page.indexOf('id="batk"'));
   assert.match(page, /href="#related">Related/);
   assert.match(page, /id="related"/);
@@ -587,6 +587,10 @@ test("BATK PNG export renders a complete standalone canvas and downloads it", ()
   assert.match(operatorBatkExportScript, /function drawAvatar/);
   assert.match(operatorBatkExportScript, /ctx\.clip\(\)/);
   assert.match(operatorBatkExportScript, /const operatorChipY = 288/);
+  assert.match(operatorBatkExportScript, /function layoutHitMarkers/);
+  assert.match(operatorBatkExportScript, /const minimumSpacing = 50/);
+  assert.match(operatorBatkExportScript, /\[132, 116, 148\]\[level\]/);
+  assert.doesNotMatch(operatorBatkExportScript, /const timeY =/);
   assert.match(operatorBatkExportScript, /canvas\.toBlob/);
   assert.match(operatorBatkExportScript, /data-batk-export/);
   assert.match(operatorBatkExportScript, /BATK timing reference/);
