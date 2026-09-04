@@ -576,6 +576,7 @@ function basicAttackVerificationMarkup(verified) {
 function basicAttackTimelineSectionMarkup(timeline, {
   operatorName,
   exportProfile,
+  exportSkill,
   id = "",
   kicker = "BATK timeline",
   extraClass = ""
@@ -624,6 +625,7 @@ function basicAttackTimelineSectionMarkup(timeline, {
       totalDuration: timeline.totalDuration,
       updatedAt: timeline.updatedAt || "",
       verified: timeline.verified,
+      skill: exportSkill,
       sequences: timeline.sequences.map((sequence) => ({
         label: sequence.label,
         duration: sequence.duration,
@@ -657,9 +659,19 @@ function basicAttackTimelineSectionMarkup(timeline, {
   </section>`;
 }
 
-function basicAttackTimelineMarkup(operator, formVariants = []) {
+function basicAttackTimelineMarkup(operator, formVariants = [], skills = []) {
   const timeline = getBasicAttackTimeline(operator);
   const operatorName = formatValue(operator.name);
+  const timelineNameKey = normalizeKey(timeline?.name);
+  const basicAttackSkill = skills.find(skill => normalizeKey(skill?.name) === timelineNameKey)
+    || skills.find(skill => normalizeKey(skill?.skill_type) === "final_strike" || normalizeKey(skill?.short_type) === "fs")
+    || null;
+  const exportSkill = basicAttackSkill
+    ? {
+        icon: normalizeAssetPath(basicAttackSkill.icon_small_path || basicAttackSkill.icon_path),
+        element: skillElementKey(basicAttackSkill.element_type)
+      }
+    : { icon: "", element: "neutral" };
   const exportProfile = {
     name: operatorName,
     avatar: normalizeAssetPath(operator.icon_path),
@@ -671,7 +683,7 @@ function basicAttackTimelineMarkup(operator, formVariants = []) {
   const hasTiming = timeline && timeline.totalDuration > 0 && timeline.sequences.length > 0;
 
   const baseMarkup = hasTiming
-    ? basicAttackTimelineSectionMarkup(timeline, { operatorName, exportProfile, id: "batk" })
+    ? basicAttackTimelineSectionMarkup(timeline, { operatorName, exportProfile, exportSkill, id: "batk" })
     : `<section class="panel batk-section" id="batk">
       <div class="profile-heading">
         <div>
@@ -700,6 +712,7 @@ function basicAttackTimelineMarkup(operator, formVariants = []) {
     }, {
       operatorName,
       exportProfile,
+      exportSkill,
       kicker: "Ultimate form BATK",
       extraClass: "batk-form-section"
     });
@@ -1147,7 +1160,7 @@ export function createOperatorPage(
       </article>
     </section>
 
-    ${basicAttackTimelineMarkup(operator, basicAttackForms)}
+    ${basicAttackTimelineMarkup(operator, basicAttackForms, skills)}
 
     <section class="panel skills-section" id="skills">
       <h2>${escapeHtml(name)} Skills</h2>
@@ -1164,7 +1177,7 @@ export function createOperatorPage(
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/endfield/supabaseClient.js?v=14"></script>
   <script src="/endfield/js/ui/operatorShares.js?v=2"></script>
-  <script src="/endfield/js/ui/operatorBatkExport.js?v=5"></script>
+  <script src="/endfield/js/ui/operatorBatkExport.js?v=8"></script>
   ${operatorHeadingScript()}
 </body>
 </html>`;

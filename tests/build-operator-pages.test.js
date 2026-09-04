@@ -433,6 +433,7 @@ test("operator pages render the compact rotation overview without redundant fiel
           name: "Opening Strike",
           skill_type: "final_strike",
           short_type: "fs",
+          icon_small_path: "assets/operators/skills/mi_fu/fs.png",
           cooldown: 8,
           energy: null,
           element_type: "nature",
@@ -557,7 +558,8 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /class="batk-export-data"/);
   assert.match(page, /"operator":\{"name":"Mi Fu","avatar":"\/endfield\/assets\/operators\/mi_fu\.webp","rarity":5/);
   assert.match(page, /"timeline":\{"name":"Measured Combo","kicker":"BATK timeline","totalDuration":2\.5/);
-  assert.match(page, /js\/ui\/operatorBatkExport\.js\?v=5/);
+  assert.match(page, /"skill":\{"icon":"\/endfield\/assets\/operators\/skills\/mi_fu\/fs\.png","element":"nature"\}/);
+  assert.match(page, /js\/ui\/operatorBatkExport\.js\?v=8/);
   assert.ok(page.indexOf('id="stats"') < page.indexOf('id="batk"'));
   assert.match(page, /href="#related">Related/);
   assert.match(page, /id="related"/);
@@ -585,6 +587,10 @@ test("BATK PNG export renders a complete standalone canvas and downloads it", ()
   assert.match(operatorBatkExportScript, /drawSequenceDetails/);
   assert.match(operatorBatkExportScript, /loadImage\(operator\.avatar\)/);
   assert.match(operatorBatkExportScript, /function drawAvatar/);
+  assert.match(operatorBatkExportScript, /function drawSkillIcon/);
+  assert.match(operatorBatkExportScript, /getSkillElementColor/);
+  assert.match(operatorBatkExportScript, /const elementFillRadius = size \* 0\.61/);
+  assert.match(operatorBatkExportScript, /loadImage\(timeline\.skill\?\.icon\)/);
   assert.match(operatorBatkExportScript, /ctx\.clip\(\)/);
   assert.match(operatorBatkExportScript, /const operatorChipY = 288/);
   assert.match(operatorBatkExportScript, /function layoutHitMarkers/);

@@ -96,6 +96,58 @@
     ctx.stroke();
   }
 
+  function getSkillElementColor(element) {
+    const colors = {
+      heat: "#ef4b43",
+      cryo: "#5ab8ff",
+      electric: "#f0d34a",
+      nature: "#58d17a",
+      physical: "#b9b9b9",
+      neutral: "#8c8c8c"
+    };
+    return colors[String(element || "neutral").toLowerCase()] || colors.neutral;
+  }
+
+  function drawSkillIcon(ctx, image, element, x, y, size = 72) {
+    if (!image) return;
+    const color = getSkillElementColor(element);
+    const centerX = x + size / 2;
+    const centerY = y + size / 2;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, size / 2, 0, Math.PI * 2);
+    ctx.clip();
+    ctx.fillStyle = "#202728";
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, size / 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    const elementFillRadius = size * 0.61;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(centerX, y + size * 1.13, elementFillRadius, 0, Math.PI * 2);
+    ctx.fill();
+    const glow = ctx.createRadialGradient(centerX, centerY, 4, centerX, centerY, size / 2);
+    glow.addColorStop(0, "rgba(255,255,255,0.16)");
+    glow.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = glow;
+    ctx.fillRect(x, y, size, size);
+    drawImageContained(ctx, image, x + size * 0.14, y + size * 0.14, size * 0.72, size * 0.72);
+    ctx.restore();
+
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, size / 2 - 1.5, 0, Math.PI * 2);
+    ctx.strokeStyle = "rgba(255,255,255,0.92)";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, size / 2 + 5, 0, Math.PI * 2);
+    ctx.strokeStyle = `${color}66`;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
   function drawChip(ctx, label, value, x, y, width) {
     fillRoundedRect(ctx, x, y, width, 64, 12, "#242b2c", COLORS.border);
     drawLabel(ctx, label, x + 16, y + 23);
@@ -144,11 +196,13 @@
     }
   }
 
-  function drawTimeline(ctx, timeline, x, y, width) {
-    drawLabel(ctx, timeline.kicker || "BATK timeline", x, y, COLORS.yellow);
+  function drawTimeline(ctx, timeline, x, y, width, skillImage) {
+    const headingX = skillImage ? x + 96 : x;
+    drawSkillIcon(ctx, skillImage, timeline.skill?.element, x, y - 12);
+    drawLabel(ctx, timeline.kicker || "BATK timeline", headingX, y, COLORS.yellow);
     ctx.fillStyle = COLORS.text;
     ctx.font = "900 34px Arial, sans-serif";
-    ctx.fillText(timeline.name || "Basic Attack", x, y + 48);
+    ctx.fillText(timeline.name || "Basic Attack", headingX, y + 48, skillImage ? width - 96 : width);
 
     const trackY = y + 78;
     const trackHeight = 174;
@@ -262,7 +316,10 @@
     ctx.scale(scale, scale);
     drawBackground(ctx, width, height);
 
-    const avatar = await loadImage(operator.avatar);
+    const [avatar, skillIcon] = await Promise.all([
+      loadImage(operator.avatar),
+      loadImage(timeline.skill?.icon)
+    ]);
     drawAvatar(ctx, avatar, operator.name);
 
     drawLabel(ctx, "Arknights: Endfield operator", 390, 107, COLORS.yellow);
@@ -292,7 +349,7 @@
       ctx.fillText(`Updated ${dateText}`, 1220, 268, 270);
     }
 
-    drawTimeline(ctx, timeline, 80, 410, 1440);
+    drawTimeline(ctx, timeline, 80, 410, 1440, skillIcon);
     drawSequenceDetails(ctx, sequences, 700);
 
     const footerY = height - 46;
