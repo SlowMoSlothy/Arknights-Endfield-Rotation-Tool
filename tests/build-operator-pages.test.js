@@ -581,6 +581,16 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.doesNotMatch(page, /-webkit-line-clamp/);
 });
 
+test("half-filled skill icons use the complete lower semicircle", () => {
+  const css = fs.readFileSync("endfield/css/skill-elements.css", "utf8");
+  const generator = fs.readFileSync("tools/build-operator-pages.js", "utf8");
+
+  assert.match(css, /\.ef-fill-half \.ef-skill-fill\s*\{[\s\S]*?inset:\s*50% 0 0;/);
+  assert.doesNotMatch(css, /\.ef-fill-half \.ef-skill-fill\s*\{[\s\S]*?width:\s*122%/);
+  assert.match(generator, /\.ef-fill-half \.ef-skill-fill\{inset:50% 0 0;/);
+  assert.doesNotMatch(generator, /\.ef-fill-half \.ef-skill-fill\{left:50%;top:52%;width:122%/);
+});
+
 test("BATK PNG export renders a complete standalone canvas and downloads it", () => {
   assert.match(operatorBatkExportScript, /createBatkCanvas/);
   assert.match(operatorBatkExportScript, /drawTimeline/);

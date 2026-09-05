@@ -62,17 +62,8 @@
 
 /* Normale Skills: Farbe unten, oben offen */
 .ef-fill-half .ef-skill-fill {
-    position: absolute;
-    left: 50%;
-    top: 52%;
-    transform: translateX(-50%);
-
-    width: 122%;
-    height: 122%;
-
-    border-radius: 50%;
+    inset: 50% 0 0;
     background: var(--ef-bg-color);
-
     z-index: 1;
 }
 
