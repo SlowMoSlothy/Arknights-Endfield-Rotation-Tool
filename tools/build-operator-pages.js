@@ -11,6 +11,9 @@ const SITEMAP_PATH = path.join(process.cwd(), "sitemap.xml");
 const SKILL_PAGE_SIZE = 1000;
 const OPERATOR_ID_CHUNK_SIZE = 100;
 const OPERATOR_SLUG_PATTERN = /^[a-z0-9]+(?:[_-][a-z0-9]+)*$/;
+const OPERATOR_AVATAR_OVERRIDES = new Map([
+  ["liino", "assets/operators/avatars/Liino.png"]
+]);
 
 export function createSupabaseClient(env = process.env) {
   const url = String(env.SUPABASE_URL || "").trim();
@@ -69,6 +72,13 @@ export function normalizeAssetPath(assetPath) {
 
   const cleaned = value.replace(/^\/+/, "");
   return cleaned ? `${BASE_PATH}/${cleaned}` : "";
+}
+
+function operatorAvatarPath(operator) {
+  return normalizeAssetPath(
+    OPERATOR_AVATAR_OVERRIDES.get(String(operator?.slug || "").toLowerCase())
+      || operator?.icon_path
+  );
 }
 
 export function validateOperators(operators) {
@@ -674,7 +684,7 @@ function basicAttackTimelineMarkup(operator, formVariants = [], skills = []) {
     : { icon: "", element: "neutral" };
   const exportProfile = {
     name: operatorName,
-    avatar: normalizeAssetPath(operator.icon_path),
+    avatar: operatorAvatarPath(operator),
     rarity: Number(operator.star) || 0,
     className: formatLabel(operator.operator_class),
     element: formatLabel(operator.element_type),
@@ -770,7 +780,7 @@ function skillCard(skill) {
 }
 
 function relatedCard(operator) {
-  const avatar = normalizeAssetPath(operator.icon_path);
+  const avatar = operatorAvatarPath(operator);
   const classIcon = classIconPath(operator.operator_class);
   const elementIcon = elementIconPath(operator.element_type);
   const avatarMarkup = avatar
@@ -788,7 +798,7 @@ function relatedCard(operator) {
 }
 
 function indexCard(operator) {
-  const avatar = normalizeAssetPath(operator.icon_path);
+  const avatar = operatorAvatarPath(operator);
   const classIcon = classIconPath(operator.operator_class);
   const elementIcon = elementIconPath(operator.element_type);
   const operatorClass = normalizeKey(operator.operator_class);
@@ -974,7 +984,7 @@ export function createOperatorPage(
 ) {
   const pageUrl = pageUrlFor(operator);
   const toolUrl = `${SITE_URL}${BASE_PATH}/?leader=${encodeURIComponent(operator.slug)}`;
-  const avatarPath = normalizeAssetPath(operator.icon_path);
+  const avatarPath = operatorAvatarPath(operator);
   const avatarUrl = avatarPath ? `${SITE_URL}${avatarPath}` : "";
 
   const name = formatValue(operator.name);
@@ -1285,8 +1295,9 @@ export function createSitemap(operators) {
   const operatorEntries = operators
     .map((operator) => {
       const pageUrl = pageUrlFor(operator);
-      const imageEntry = operator.icon_path
-        ? `\n    <image:image><image:loc>${escapeXml(`${SITE_URL}${normalizeAssetPath(operator.icon_path)}`)}</image:loc></image:image>`
+      const avatarPath = operatorAvatarPath(operator);
+      const imageEntry = avatarPath
+        ? `\n    <image:image><image:loc>${escapeXml(`${SITE_URL}${avatarPath}`)}</image:loc></image:image>`
         : "";
       return `  <url>
     <loc>${escapeXml(pageUrl)}</loc>${imageEntry}

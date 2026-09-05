@@ -591,6 +591,22 @@ test("half-filled skill icons use the complete lower semicircle", () => {
   assert.doesNotMatch(generator, /\.ef-fill-half \.ef-skill-fill\{left:50%;top:52%;width:122%/);
 });
 
+test("Liino pages use the current PNG avatar despite a stale SVG database path", () => {
+  const liino = operator({
+    id: 30,
+    slug: "liino",
+    name: "Liino",
+    icon_path: "assets/operators/avatars/Liino.svg"
+  });
+  const page = createOperatorPage(liino, [liino], new Map());
+  const index = createIndexPage([liino]);
+
+  assert.match(page, /avatars\/Liino\.png/);
+  assert.doesNotMatch(page, /avatars\/Liino\.svg/);
+  assert.match(index, /avatars\/Liino\.png/);
+  assert.doesNotMatch(index, /avatars\/Liino\.svg/);
+});
+
 test("BATK PNG export renders a complete standalone canvas and downloads it", () => {
   assert.match(operatorBatkExportScript, /createBatkCanvas/);
   assert.match(operatorBatkExportScript, /drawTimeline/);
