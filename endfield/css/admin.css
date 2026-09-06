@@ -234,7 +234,11 @@ body.admin-page-open #selectionScreen {
 
 .admin-review-tab {
     position: relative;
-    overflow: visible;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     min-height: 27px;
     flex: 1 1 120px;
     border: 1px solid rgba(160,170,169,0.28);
@@ -250,10 +254,9 @@ body.admin-page-open #selectionScreen {
 }
 
 .admin-review-tab-badge {
-    position: absolute;
-    top: -9px;
-    right: 10px;
-    z-index: 5;
+    position: static;
+    order: -1;
+    flex: 0 0 auto;
     min-width: 22px;
     height: 22px;
     padding: 0 4px;
@@ -267,7 +270,7 @@ body.admin-page-open #selectionScreen {
     font-size: 10px;
     font-weight: 900;
     line-height: 1;
-    box-shadow: 0 0 10px rgba(248,245,70,0.48), 0 2px 5px rgba(0,0,0,0.45);
+    box-shadow: 0 0 8px rgba(248,245,70,0.36), 0 2px 4px rgba(0,0,0,0.35);
     pointer-events: none;
 }
 
