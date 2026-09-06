@@ -93,6 +93,7 @@ const adminPanelState = {
     username: "",
     rotations: [],
     reports: [],
+    notificationCount: 0,
     showClosedReports: false,
     operators: [],
     operatorEditor: null,
@@ -1563,9 +1564,55 @@ function updateAdminEntryVisibility() {
     const canShowAdmin = Boolean(adminPanelState.session && adminPanelState.isAdmin);
 
     if (openButton) openButton.hidden = !canShowAdmin;
+    renderAdminNotificationBadge();
     if (!canShowAdmin && panel && !panel.hidden) {
         closeAdminPanel();
     }
+}
+
+function renderAdminNotificationBadge() {
+    const badge = document.getElementById("adminNotificationBadge");
+    if (!badge) return;
+
+    const count = Math.max(0, Number(adminPanelState.notificationCount) || 0);
+    badge.hidden = !adminPanelState.isAdmin || count === 0;
+    badge.textContent = count > 99 ? "99+" : String(count);
+    badge.setAttribute("aria-label", `${count} new admin notification${count === 1 ? "" : "s"}`);
+}
+
+async function refreshAdminNotificationCount() {
+    const client = getAdminSupabaseClient();
+    if (!client || !adminPanelState.isAdmin) {
+        adminPanelState.notificationCount = 0;
+        renderAdminNotificationBadge();
+        return;
+    }
+
+    try {
+        const [rotationResult, reportResult] = await Promise.all([
+            client
+                .from("community_rotations")
+                .select("id", { count: "exact", head: true })
+                .eq("game", "arknights_endfield")
+                .eq("is_public", true)
+                .eq("is_approved", false)
+                .eq("is_hidden", false),
+            client
+                .from("issue_reports")
+                .select("id", { count: "exact", head: true })
+                .eq("game", "arknights_endfield")
+                .eq("status", "pending")
+        ]);
+
+        if (rotationResult.error) throw rotationResult.error;
+        if (reportResult.error) throw reportResult.error;
+        adminPanelState.notificationCount = (rotationResult.count || 0) + (reportResult.count || 0);
+    } catch (error) {
+        console.error("Admin notification count could not be loaded:", error);
+        adminPanelState.notificationCount = 0;
+    }
+
+    renderAdminNotificationBadge();
 }
 
 async function refreshAdminSession({ loadPending = true } = {}) {
@@ -1616,12 +1663,14 @@ async function refreshAdminSession({ loadPending = true } = {}) {
 
         await loadAdminUsername(client);
         setAdminAuthStatus("");
+        await refreshAdminNotificationCount();
         if (loadPending) {
             await fetchAdminActiveContent();
         }
     } catch (error) {
         console.error("Admin session check failed:", error);
         adminPanelState.isAdmin = false;
+        adminPanelState.notificationCount = 0;
         setAdminAuthStatus(error.message || "Admin login could not be checked.", "is-error");
     } finally {
         adminPanelState.checkingAuth = false;
@@ -1857,6 +1906,7 @@ async function setAdminIssueReportStatus(reportId, status) {
         setAdminReviewStatus(error?.message || "Report status could not be updated.", "is-error");
     } finally {
         adminPanelState.reportActionIds.delete(id);
+        refreshAdminNotificationCount();
         renderAdminReviewList();
     }
 }
@@ -2128,6 +2178,7 @@ async function reviewAdminRotationState(rotationId, targetState) {
         setAdminReviewStatus(error.message || "Review action failed. Check admin access and Supabase setup.", "is-error");
     } finally {
         adminPanelState.actionIds.delete(id);
+        refreshAdminNotificationCount();
         renderAdminDetailPanel();
         renderAdminReviewList();
     }
