@@ -93,6 +93,7 @@ const adminPanelState = {
     username: "",
     rotations: [],
     reports: [],
+    showClosedReports: false,
     operators: [],
     operatorEditor: null,
     operatorSaving: false,
@@ -621,6 +622,33 @@ function getSafeAdminReportPageUrl(value) {
     } catch {
         return "";
     }
+}
+
+function createAdminIssueReportsToolbar(closedCount) {
+    const toolbar = document.createElement("div");
+    toolbar.className = "admin-reports-toolbar";
+
+    const summary = createAdminTextElement(
+        "span",
+        "admin-reports-summary",
+        adminPanelState.showClosedReports
+            ? "Showing open and archived reports"
+            : "Showing open reports"
+    );
+
+    const toggle = createAdminActionButton(
+        adminPanelState.showClosedReports
+            ? "Hide resolved/dismissed"
+            : `Show resolved/dismissed (${closedCount})`,
+        () => {
+            adminPanelState.showClosedReports = !adminPanelState.showClosedReports;
+            renderAdminReviewList();
+        },
+        { disabled: closedCount === 0 }
+    );
+
+    toolbar.append(summary, toggle);
+    return toolbar;
 }
 
 function createAdminIssueReportCard(row) {
@@ -1464,18 +1492,28 @@ function renderAdminReviewList() {
     }
 
     if (adminPanelState.activeTab === "reports") {
-        if (!adminPanelState.reports.length) {
+        const closedReports = adminPanelState.reports.filter(row => row.status === "resolved" || row.status === "dismissed");
+        const visibleReports = adminPanelState.showClosedReports
+            ? adminPanelState.reports
+            : adminPanelState.reports.filter(row => row.status === "pending");
+
+        list.appendChild(createAdminIssueReportsToolbar(closedReports.length));
+
+        if (!visibleReports.length) {
             const activeTab = getActiveAdminTab();
-            setAdminListState(list, {
+            list.appendChild(createAdminStateCard({
                 type: "empty",
-                title: activeTab.emptyTitle,
-                message: activeTab.emptyMessage,
-                actionLabel: "Refresh",
-                action: fetchAdminActiveContent
-            });
+                title: adminPanelState.reports.length ? "No open reports" : activeTab.emptyTitle,
+                message: adminPanelState.reports.length
+                    ? "Resolved and dismissed reports are hidden. Use the archive button above to view them."
+                    : activeTab.emptyMessage,
+                actionLabel: adminPanelState.reports.length ? "" : "Refresh",
+                action: adminPanelState.reports.length ? null : fetchAdminActiveContent
+            }));
             return;
         }
-        adminPanelState.reports.forEach(row => list.appendChild(createAdminIssueReportCard(row)));
+
+        visibleReports.forEach(row => list.appendChild(createAdminIssueReportCard(row)));
         return;
     }
 
