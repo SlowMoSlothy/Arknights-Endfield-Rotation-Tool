@@ -345,6 +345,10 @@
     canvas.height = height * scale;
     const ctx = canvas.getContext("2d");
     ctx.scale(scale, scale);
+    const canvasCornerRadius = 28;
+    ctx.save();
+    roundedRect(ctx, 0, 0, width, height, canvasCornerRadius);
+    ctx.clip();
     drawBackground(ctx, width, height);
 
     const [avatar, skillIcon] = await Promise.all([
@@ -398,6 +402,12 @@
     ctx.font = "700 16px Arial, sans-serif";
     ctx.fillText("BATK timing reference", 1520, footerY);
     ctx.textAlign = "left";
+
+    ctx.strokeStyle = "rgba(160,170,169,0.32)";
+    ctx.lineWidth = 2;
+    roundedRect(ctx, 1, 1, width - 2, height - 2, canvasCornerRadius - 1);
+    ctx.stroke();
+    ctx.restore();
     return canvas;
   }
 
