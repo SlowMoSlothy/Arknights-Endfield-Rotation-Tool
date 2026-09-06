@@ -429,6 +429,12 @@
 
 #openAdminPanelBtn {
     order: -1;
+    overflow: visible;
+    z-index: 4;
+}
+
+#openAdminPanelBtn .admin-notification-badge {
+    z-index: 10;
 }
 
 .sidebar-command-signal {
