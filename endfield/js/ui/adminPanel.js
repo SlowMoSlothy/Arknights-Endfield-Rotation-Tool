@@ -94,6 +94,8 @@ const adminPanelState = {
     rotations: [],
     reports: [],
     notificationCount: 0,
+    pendingRotationCount: 0,
+    pendingReportCount: 0,
     showClosedReports: false,
     operators: [],
     operatorEditor: null,
@@ -214,7 +216,22 @@ function renderAdminReviewTabs() {
         button.type = "button";
         button.setAttribute("role", "tab");
         button.setAttribute("aria-selected", isActive ? "true" : "false");
-        button.textContent = tab.label;
+        button.appendChild(createAdminTextElement("span", "admin-review-tab-label", tab.label));
+
+        const notificationCount = tab.id === "pending"
+            ? adminPanelState.pendingRotationCount
+            : tab.id === "reports"
+                ? adminPanelState.pendingReportCount
+                : 0;
+        if (notificationCount > 0) {
+            const badge = createAdminTextElement(
+                "span",
+                "admin-review-tab-badge",
+                notificationCount > 99 ? "99+" : String(notificationCount)
+            );
+            badge.setAttribute("aria-label", `${notificationCount} new ${tab.id === "reports" ? "reports" : "rotations"}`);
+            button.appendChild(badge);
+        }
         button.addEventListener("click", () => setAdminReviewTab(tab.id));
         tabs.appendChild(button);
     });
@@ -1584,7 +1601,10 @@ async function refreshAdminNotificationCount() {
     const client = getAdminSupabaseClient();
     if (!client || !adminPanelState.isAdmin) {
         adminPanelState.notificationCount = 0;
+        adminPanelState.pendingRotationCount = 0;
+        adminPanelState.pendingReportCount = 0;
         renderAdminNotificationBadge();
+        renderAdminReviewTabs();
         return;
     }
 
@@ -1606,13 +1626,18 @@ async function refreshAdminNotificationCount() {
 
         if (rotationResult.error) throw rotationResult.error;
         if (reportResult.error) throw reportResult.error;
-        adminPanelState.notificationCount = (rotationResult.count || 0) + (reportResult.count || 0);
+        adminPanelState.pendingRotationCount = rotationResult.count || 0;
+        adminPanelState.pendingReportCount = reportResult.count || 0;
+        adminPanelState.notificationCount = adminPanelState.pendingRotationCount + adminPanelState.pendingReportCount;
     } catch (error) {
         console.error("Admin notification count could not be loaded:", error);
         adminPanelState.notificationCount = 0;
+        adminPanelState.pendingRotationCount = 0;
+        adminPanelState.pendingReportCount = 0;
     }
 
     renderAdminNotificationBadge();
+    renderAdminReviewTabs();
 }
 
 async function refreshAdminSession({ loadPending = true } = {}) {
@@ -1671,6 +1696,8 @@ async function refreshAdminSession({ loadPending = true } = {}) {
         console.error("Admin session check failed:", error);
         adminPanelState.isAdmin = false;
         adminPanelState.notificationCount = 0;
+        adminPanelState.pendingRotationCount = 0;
+        adminPanelState.pendingReportCount = 0;
         setAdminAuthStatus(error.message || "Admin login could not be checked.", "is-error");
     } finally {
         adminPanelState.checkingAuth = false;
