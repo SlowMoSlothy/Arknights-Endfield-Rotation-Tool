@@ -119,4 +119,5 @@ test("admin command shows the number of pending review notifications", () => {
   assert.match(adminScript, /\.select\("id", \{ count: "exact", head: true \}\)/);
   assert.match(adminScript, /notificationCount = \(rotationResult\.count \|\| 0\) \+ \(reportResult\.count \|\| 0\)/);
   assert.match(layoutStyles, /#openAdminPanelBtn\s*\{[^}]*order:\s*-1/s);
+  assert.match(layoutStyles, /#openAdminPanelBtn\s*\{[^}]*overflow:\s*visible[^}]*z-index:\s*4/s);
 });
