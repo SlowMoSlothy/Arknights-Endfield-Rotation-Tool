@@ -539,6 +539,12 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /SEQ 1 hit 1: 0\.25s[^\"]+, 20% ATK/);
   assert.match(page, /SEQ 1 hit 2: 0\.5s/);
   assert.match(page, /class="batk-segment-multiplier">60% ATK<\/span>/);
+  assert.match(page, /class="batk-detail-grid"/);
+  assert.match(page, /<strong>Sequence: 1<\/strong><i aria-hidden="true">•<\/i>/);
+  assert.match(page, /ATK Multiplier: <b>60%<\/b>/);
+  assert.match(page, /Hits: <b>2<\/b>/);
+  assert.match(page, /<dt>Sequence duration<\/dt><dd>0\.75s<\/dd>/);
+  assert.match(page, /<dt>Hit timings<\/dt><dd class="batk-detail-timings"><span>0\.25s<\/span><i aria-hidden="true">·<\/i><span>0\.5s<\/span>/);
   assert.match(page, /class="batk-hit-tooltip-multiplier"><small>ATK MULTIPLIER<\/small><strong>20% ATK<\/strong>/);
   assert.match(page, /class="batk-hit is-left-edge" style="left:33\.333%"/);
   assert.match(page, /class="batk-hit-tooltip"/);
@@ -549,7 +555,9 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /\.operator-page \.batk-track\{min-width:560px;height:108px\}/);
   assert.match(page, /\.batk-track\{height:124px\}/);
   assert.match(page, /\.batk-segment-multiplier\+\.batk-hit-track\{margin-top:8px\}/);
-  assert.match(page, /@media\(max-width:520px\)\{\.operator-page \.batk-track\{height:128px\}\}/);
+  assert.match(page, /\.batk-detail-grid\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+  assert.match(page, /@media\(max-width:760px\)\{\.operator-page \.batk-detail-grid\{grid-template-columns:1fr\}\}/);
+  assert.match(page, /@media\(max-width:520px\)\{\.operator-page \.batk-track\{height:128px\}\.operator-page \.batk-details/);
   assert.match(page, /<small>BATK TIME<\/small><strong>0\.25s<\/strong>/);
   assert.match(page, /tabindex="0" aria-label="SEQ 2 hit 1: 0\.75s from sequence start, 1\.5s from BATK start, 80% ATK"/);
   assert.doesNotMatch(page, /class="batk-segment"[^>]* title=/);
