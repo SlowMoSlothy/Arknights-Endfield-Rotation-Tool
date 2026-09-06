@@ -734,6 +734,8 @@
 
 .operator-owned-skill-row {
     position: relative;
+    width: calc(100% - 8px);
+    align-self: center;
     margin-top: 3px;
     border-color: color-mix(in srgb, var(--element-color, #777) 52%, rgba(160,170,169,0.18));
     background:
@@ -743,6 +745,10 @@
         0 -6px 0 -5px var(--element-color, #777),
         0 3px 9px rgba(0, 0, 0, 0.22),
         inset 0 1px 0 rgba(255, 255, 255, 0.055);
+}
+
+.operator-skill-wrapper.leader .operator-owned-skill-row {
+    transform: translateX(8px);
 }
 
 .operator-skill-owner {
@@ -1085,7 +1091,7 @@
     }
 
     .operator-skill-card.leader .skill-row {
-        left: 21px;
+        left: auto;
     }
 
     .skill-row {
