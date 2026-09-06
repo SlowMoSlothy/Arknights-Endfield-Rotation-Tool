@@ -415,9 +415,9 @@ test("operator pages render the compact rotation overview without redundant fiel
         cycleDuration: 2.5,
         timingVerified: true,
         sequences: [
-          { sequenceIndex: 1, duration: 0.75, hitCount: 2, hitTimings: [0.25, 0.5] },
-          { sequenceIndex: 2, duration: 1.25, hitCount: 1, hitTimings: [0.75] },
-          { sequenceIndex: 3, kind: "final_strike", duration: 0.5, hitCount: 1, hitTimings: [0.25] }
+          { sequenceIndex: 1, duration: 0.75, hitCount: 2, hitTimings: [0.25, 0.5], hitMultipliers: [0.2, 0.4], atkMultiplierTotal: 0.6 },
+          { sequenceIndex: 2, duration: 1.25, hitCount: 1, hitTimings: [0.75], hitMultipliers: [0.8], atkMultiplierTotal: 0.8 },
+          { sequenceIndex: 3, kind: "final_strike", duration: 0.5, hitCount: 1, hitTimings: [0.25], hitMultipliers: [1.2], atkMultiplierTotal: 1.2 }
         ]
       }
     }
@@ -536,7 +536,10 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /class="batk-segment-body"/);
   assert.match(page, /class="batk-hit-track"/);
   assert.match(page, /SEQ 1 hit 1: 0\.25s/);
+  assert.match(page, /SEQ 1 hit 1: 0\.25s[^\"]+, 20% ATK/);
   assert.match(page, /SEQ 1 hit 2: 0\.5s/);
+  assert.match(page, /class="batk-segment-multiplier">60% ATK<\/span>/);
+  assert.match(page, /class="batk-hit-tooltip-multiplier"><small>ATK MULTIPLIER<\/small><strong>20% ATK<\/strong>/);
   assert.match(page, /class="batk-hit is-left-edge" style="left:33\.333%"/);
   assert.match(page, /class="batk-hit-tooltip"/);
   assert.match(page, /\.batk-track-scroll\{padding-top:64px;margin-top:-64px\}/);
@@ -544,8 +547,11 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /\.operator-page \.batk-track-scroll\{scroll-snap-type:x proximity/);
   assert.match(page, /\.operator-page \.batk-track-scroll::-webkit-scrollbar\{height:6px\}/);
   assert.match(page, /\.operator-page \.batk-track\{min-width:560px;height:108px\}/);
+  assert.match(page, /\.batk-track\{height:124px\}/);
+  assert.match(page, /\.batk-segment-multiplier\+\.batk-hit-track\{margin-top:8px\}/);
+  assert.match(page, /@media\(max-width:520px\)\{\.operator-page \.batk-track\{height:128px\}\}/);
   assert.match(page, /<small>BATK TIME<\/small><strong>0\.25s<\/strong>/);
-  assert.match(page, /tabindex="0" aria-label="SEQ 2 hit 1: 0\.75s from sequence start, 1\.5s from BATK start"/);
+  assert.match(page, /tabindex="0" aria-label="SEQ 2 hit 1: 0\.75s from sequence start, 1\.5s from BATK start, 80% ATK"/);
   assert.doesNotMatch(page, /class="batk-segment"[^>]* title=/);
   assert.match(page, /class="batk-segment"[^>]* aria-label="SEQ 1: 0\.75s"/);
   assert.match(page, /style="left:33\.333%"/);
@@ -556,10 +562,12 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /class="batk-export-button"/);
   assert.match(page, /data-batk-export/);
   assert.match(page, /class="batk-export-data"/);
-  assert.match(page, /"operator":\{"name":"Mi Fu","avatar":"\/endfield\/assets\/operators\/mi_fu\.webp","rarity":5/);
+  assert.match(page, /"operator":\{"name":"Mi Fu","avatar":"\/endfield\/assets\/operators\/mi_fu\.webp"/);
+  assert.match(page, /"pageUrl":"https:\/\/rotationforge\.gg\/endfield\/operators\/mi_fu\/"/);
   assert.match(page, /"timeline":\{"name":"Measured Combo","kicker":"BATK timeline","totalDuration":2\.5/);
+  assert.match(page, /"hitMultipliers":\[0\.2,0\.4\],"atkMultiplierTotal":0\.6/);
   assert.match(page, /"skill":\{"icon":"\/endfield\/assets\/operators\/skills\/mi_fu\/fs\.png","element":"nature"\}/);
-  assert.match(page, /js\/ui\/operatorBatkExport\.js\?v=8/);
+  assert.match(page, /js\/ui\/operatorBatkExport\.js\?v=11/);
   assert.ok(page.indexOf('id="stats"') < page.indexOf('id="batk"'));
   assert.match(page, /href="#related">Related/);
   assert.match(page, /id="related"/);
@@ -611,6 +619,8 @@ test("BATK PNG export renders a complete standalone canvas and downloads it", ()
   assert.match(operatorBatkExportScript, /createBatkCanvas/);
   assert.match(operatorBatkExportScript, /drawTimeline/);
   assert.match(operatorBatkExportScript, /drawSequenceDetails/);
+  assert.match(operatorBatkExportScript, /function formatAttackMultiplier/);
+  assert.match(operatorBatkExportScript, /operator\.pageUrl/);
   assert.match(operatorBatkExportScript, /loadImage\(operator\.avatar\)/);
   assert.match(operatorBatkExportScript, /function drawAvatar/);
   assert.match(operatorBatkExportScript, /function drawSkillIcon/);
@@ -621,7 +631,13 @@ test("BATK PNG export renders a complete standalone canvas and downloads it", ()
   assert.match(operatorBatkExportScript, /const operatorChipY = 288/);
   assert.match(operatorBatkExportScript, /function layoutHitMarkers/);
   assert.match(operatorBatkExportScript, /const minimumSpacing = 50/);
-  assert.match(operatorBatkExportScript, /\[132, 116, 148\]\[level\]/);
+  assert.match(operatorBatkExportScript, /\[152, 136, 168\]\[level\]/);
+  assert.match(operatorBatkExportScript, /const trackHeight = 194/);
+  assert.match(operatorBatkExportScript, /drawSequenceDetails\(ctx, sequences, 730\)/);
+  assert.match(operatorBatkExportScript, /ATK MULTIPLIER:/);
+  assert.match(operatorBatkExportScript, /SEQUENCE DURATION:/);
+  assert.match(operatorBatkExportScript, /HIT TIMINGS:/);
+  assert.match(operatorBatkExportScript, /join\("  ·  "\)/);
   assert.doesNotMatch(operatorBatkExportScript, /const timeY =/);
   assert.match(operatorBatkExportScript, /canvas\.toBlob/);
   assert.match(operatorBatkExportScript, /data-batk-export/);
@@ -651,8 +667,8 @@ test("BATK timing falls back to summed sequence durations and supports missing d
 
   assert.equal(timeline.totalDuration, 1);
   assert.deepEqual(timeline.sequences, [
-    { label: "A1", duration: 0.4, hitCount: 0, hitTimings: [], timingComplete: false },
-    { label: "A2", duration: 0.6, hitCount: 0, hitTimings: [], timingComplete: false }
+    { label: "A1", duration: 0.4, hitCount: 0, hitTimings: [], hitMultipliers: [], atkMultiplierTotal: 0, timingComplete: false },
+    { label: "A2", duration: 0.6, hitCount: 0, hitTimings: [], hitMultipliers: [], atkMultiplierTotal: 0, timingComplete: false }
   ]);
   assert.equal(timeline.verified, false);
 

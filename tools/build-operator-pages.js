@@ -473,6 +473,13 @@ function formatDurationSeconds(value) {
   return `${rounded.toFixed(3).replace(/\.?0+$/, "")}s`;
 }
 
+function formatAttackMultiplier(value, suffix = "% ATK") {
+  const number = Number(value);
+  if (!Number.isFinite(number) || number <= 0) return "";
+  const percent = Math.round(number * 100000) / 1000;
+  return `${percent.toFixed(3).replace(/\.?0+$/, "")}${suffix}`;
+}
+
 function formatUpdatedDate(value) {
   if (!value) return "";
   const date = new Date(value);
@@ -540,6 +547,20 @@ export function getBasicAttackTimeline(operator) {
         ? Math.min(duration, Math.max(0, suppliedTime))
         : duration * (hitIndex + 1) / (hitCount + 1);
     });
+    const rawHitMultipliers = Array.isArray(sequence?.hitMultipliers)
+      ? sequence.hitMultipliers
+      : (Array.isArray(sequence?.hit_multipliers) ? sequence.hit_multipliers : []);
+    const hitMultipliers = rawHitMultipliers
+      .slice(0, hitCount || rawHitMultipliers.length)
+      .map(Number)
+      .filter((multiplier) => Number.isFinite(multiplier) && multiplier >= 0);
+    const configuredMultiplierTotal = Number(
+      sequence?.atkMultiplierTotal
+      ?? sequence?.atk_multiplier_total
+    );
+    const atkMultiplierTotal = Number.isFinite(configuredMultiplierTotal) && configuredMultiplierTotal > 0
+      ? configuredMultiplierTotal
+      : hitMultipliers.reduce((total, multiplier) => total + multiplier, 0);
 
     return {
       label: formatValue(
@@ -549,6 +570,8 @@ export function getBasicAttackTimeline(operator) {
       duration,
       hitCount,
       hitTimings,
+      hitMultipliers,
+      atkMultiplierTotal,
       timingComplete: hitCount > 0 && rawHitTimings.length >= hitCount
     };
   }).filter(Boolean);
@@ -603,23 +626,31 @@ function basicAttackTimelineSectionMarkup(timeline, {
         : String(hitIndex + 1);
       const sequenceTimeLabel = formatDurationSeconds(hitTime);
       const totalTimeLabel = formatDurationSeconds(sequenceStartTime + hitTime);
+      const hitMultiplierLabel = formatAttackMultiplier(sequence.hitMultipliers[hitIndex]);
+      const hitMultiplierMarkup = hitMultiplierLabel
+        ? `\n          <span class="batk-hit-tooltip-multiplier"><small>ATK MULTIPLIER</small><strong>${escapeHtml(hitMultiplierLabel)}</strong></span>`
+        : "";
       const edgeClass = (sequenceIndex === 0 && hitIndex === 0) || position < 28
         ? " is-left-edge"
         : (position > 72 ? " is-right-edge" : "");
-      const accessibleLabel = `${sequence.label} hit ${hitIndex + 1}: ${sequenceTimeLabel} from sequence start, ${totalTimeLabel} from BATK start`;
+      const accessibleLabel = `${sequence.label} hit ${hitIndex + 1}: ${sequenceTimeLabel} from sequence start, ${totalTimeLabel} from BATK start${hitMultiplierLabel ? `, ${hitMultiplierLabel}` : ""}`;
       return `<span class="batk-hit${edgeClass}" style="left:${Math.round(position * 1000) / 1000}%" tabindex="0" aria-label="${escapeHtml(accessibleLabel)}">
         <span class="batk-hit-label">${escapeHtml(hitLabel)}</span>
         <span class="batk-hit-tooltip" role="tooltip" aria-hidden="true">
           <span class="batk-hit-tooltip-head">${escapeHtml(sequence.label)} <i></i> HIT ${hitIndex + 1}</span>
           <span class="batk-hit-tooltip-time"><strong>${escapeHtml(sequenceTimeLabel)}</strong><small>SEQUENCE</small></span>
-          <span class="batk-hit-tooltip-total"><small>BATK TIME</small><strong>${escapeHtml(totalTimeLabel)}</strong></span>
+          <span class="batk-hit-tooltip-total"><small>BATK TIME</small><strong>${escapeHtml(totalTimeLabel)}</strong></span>${hitMultiplierMarkup}
         </span>
       </span>`;
     }).join("");
+    const sequenceMultiplierLabel = formatAttackMultiplier(sequence.atkMultiplierTotal);
+    const sequenceMultiplierMarkup = sequenceMultiplierLabel
+      ? `\n        <span class="batk-segment-multiplier">${escapeHtml(sequenceMultiplierLabel)}</span>`
+      : "";
     const markup = `<div class="batk-segment" style="--segment-duration:${width}" aria-label="${escapeHtml(`${sequence.label}: ${durationLabel}`)}">
       <strong class="batk-segment-duration">${escapeHtml(durationLabel)}</strong>
       <div class="batk-segment-body">
-        <span class="batk-segment-index">${escapeHtml(sequence.label)}</span>
+        <span class="batk-segment-index">${escapeHtml(sequence.label)}</span>${sequenceMultiplierMarkup}
         ${sequence.hitCount > 0 ? `<div class="batk-hit-track" aria-label="${escapeHtml(`${sequence.hitCount} ${sequence.hitCount === 1 ? "hit" : "hits"}`)}">${hitMarkup}</div>` : ""}
       </div>
     </div>`;
@@ -639,10 +670,35 @@ function basicAttackTimelineSectionMarkup(timeline, {
       sequences: timeline.sequences.map((sequence) => ({
         label: sequence.label,
         duration: sequence.duration,
-        hitTimings: sequence.hitTimings
+        hitTimings: sequence.hitTimings,
+        hitMultipliers: sequence.hitMultipliers,
+        atkMultiplierTotal: sequence.atkMultiplierTotal
       }))
     }
   };
+
+  const sequenceDetailMarkup = timeline.sequences.map((sequence, sequenceIndex) => {
+    const hits = Array.isArray(sequence.hitTimings) ? sequence.hitTimings : [];
+    const sequenceNumber = String(sequence.label || "").match(/\d+/)?.[0];
+    const sequenceName = sequence.label === "FS"
+      ? "Final Strike"
+      : (sequenceNumber ? `Sequence: ${sequenceNumber}` : `Sequence: ${sequence.label || sequenceIndex + 1}`);
+    const multiplierLabel = formatAttackMultiplier(sequence.atkMultiplierTotal, "%") || "—";
+    const timingMarkup = hits.length
+      ? hits.map((hitTime) => `<span>${escapeHtml(formatDurationSeconds(hitTime))}</span>`).join('<i aria-hidden="true">·</i>')
+      : "<span>No hit timings</span>";
+    return `<article class="batk-detail-card">
+        <div class="batk-detail-head">
+          <strong>${escapeHtml(sequenceName)}</strong><i aria-hidden="true">•</i>
+          <span>ATK Multiplier: <b>${escapeHtml(multiplierLabel)}</b></span><i aria-hidden="true">•</i>
+          <span>Hits: <b>${hits.length}</b></span>
+        </div>
+        <dl class="batk-detail-data">
+          <div><dt>Sequence duration</dt><dd>${escapeHtml(formatDurationSeconds(sequence.duration))}</dd></div>
+          <div><dt>Hit timings</dt><dd class="batk-detail-timings">${timingMarkup}</dd></div>
+        </dl>
+      </article>`;
+  }).join("\n");
 
   return `<section class="panel batk-section ${extraClass}"${id ? ` id="${escapeHtml(id)}"` : ""}>
     <div class="profile-heading batk-heading">
@@ -665,6 +721,12 @@ function basicAttackTimelineSectionMarkup(timeline, {
         ${segmentMarkup}
       </div>
     </div>
+    <div class="batk-details">
+      <h3>Sequence details</h3>
+      <div class="batk-detail-grid">
+        ${sequenceDetailMarkup}
+      </div>
+    </div>
     <script type="application/json" class="batk-export-data">${jsonForHtml(exportData)}</script>
   </section>`;
 }
@@ -685,6 +747,7 @@ function basicAttackTimelineMarkup(operator, formVariants = [], skills = []) {
   const exportProfile = {
     name: operatorName,
     avatar: operatorAvatarPath(operator),
+    pageUrl: pageUrlFor(operator),
     rarity: Number(operator.star) || 0,
     className: formatLabel(operator.operator_class),
     element: formatLabel(operator.element_type),
@@ -842,6 +905,7 @@ function baseStyles() {
     .batk-track{height:104px;gap:4px;padding:5px}.batk-segment,.batk-segment:nth-child(even){justify-content:flex-start;overflow:hidden;padding:2px;gap:2px;border-color:rgba(160,170,169,.36);background:rgba(15,20,21,.68);box-shadow:none}.batk-segment:last-child{border-color:rgba(248,245,70,.56);box-shadow:none}.batk-segment:before{display:none}.batk-segment-duration{position:static;display:grid;min-height:24px;place-items:center;border:1px solid rgba(248,245,70,.34);border-radius:4px;color:var(--yellow);background:linear-gradient(135deg,rgba(248,245,70,.26),rgba(101,113,54,.68));font-size:.72rem;line-height:1;text-align:center}.batk-segment:nth-child(even) .batk-segment-duration{border-color:rgba(160,170,169,.38);color:#e6e9e4;background:linear-gradient(135deg,rgba(160,170,169,.24),rgba(49,55,57,.96))}.batk-segment-body{position:relative;flex:1;padding-top:5px;overflow:hidden;border:1px solid rgba(248,245,70,.28);border-radius:4px;background:linear-gradient(135deg,rgba(248,245,70,.26),rgba(101,113,54,.68))}.batk-segment:nth-child(even) .batk-segment-body{background:linear-gradient(135deg,rgba(160,170,169,.24),rgba(49,55,57,.96))}.batk-segment:last-child .batk-segment-body{border-color:rgba(248,245,70,.62);box-shadow:inset 0 -3px 0 var(--yellow)}.batk-segment-index{position:relative;display:inline-flex;min-height:20px;align-items:center;align-self:center;justify-content:center;padding:2px 9px;border:1px solid rgba(248,245,70,.34);border-radius:4px;color:#f4f5ed;background:rgba(248,245,70,.06);box-shadow:none}.batk-segment:nth-child(even) .batk-segment-index{border-color:rgba(160,170,169,.36);background:rgba(160,170,169,.08)}.batk-hit-track{height:24px;margin:8px 5px 0}
     .batk-segment:has(.batk-hit:hover),.batk-segment:has(.batk-hit:focus-visible),.batk-segment-body:has(.batk-hit:hover),.batk-segment-body:has(.batk-hit:focus-visible){overflow:visible;z-index:20}.batk-hit{cursor:help;outline:none;transition:border-color .14s ease,background .14s ease,box-shadow .14s ease,transform .14s ease}.batk-hit:hover,.batk-hit:focus-visible{z-index:30;border-color:#fff;background:var(--yellow);box-shadow:0 0 0 3px rgba(248,245,70,.18),0 0 18px rgba(248,245,70,.72);transform:translateX(-50%) scale(1.12)}.batk-hit>.batk-hit-label{display:grid;width:100%;height:100%;place-items:center;color:#fff;font-size:.48rem;font-weight:950;line-height:1}.batk-hit:hover>.batk-hit-label,.batk-hit:focus-visible>.batk-hit-label{color:#242b2c}.batk-hit>.batk-hit-tooltip{position:absolute;left:50%;bottom:calc(100% + 13px);z-index:40;display:grid;width:154px;height:auto;place-items:normal;grid-template-columns:1fr auto;gap:5px 10px;padding:8px 10px;border:1px solid rgba(248,245,70,.5);border-radius:7px;color:#f6f7f0;background:linear-gradient(145deg,rgba(30,36,37,.98),rgba(15,19,20,.98));box-shadow:0 12px 30px rgba(0,0,0,.55),0 0 20px rgba(248,245,70,.1);font-size:inherit;font-weight:inherit;line-height:normal;text-align:left;opacity:0;pointer-events:none;transform:translate(-50%,5px) scale(.96);transform-origin:50% 100%;transition:opacity .14s ease,transform .14s ease;backdrop-filter:blur(10px)}.batk-hit-tooltip:after{content:"";position:absolute;left:50%;bottom:-5px;width:8px;height:8px;border-right:1px solid rgba(248,245,70,.5);border-bottom:1px solid rgba(248,245,70,.5);background:#111617;transform:translateX(-50%) rotate(45deg)}.batk-hit:hover>.batk-hit-tooltip,.batk-hit:focus-visible>.batk-hit-tooltip{opacity:1;transform:translate(-50%,0) scale(1)}.batk-hit-tooltip>.batk-hit-tooltip-head{grid-column:1/-1;display:flex;width:auto;height:auto;place-items:normal;align-items:center;gap:6px;color:var(--yellow);font-size:.58rem;font-weight:950;letter-spacing:.09em;line-height:1;text-transform:uppercase}.batk-hit-tooltip-head i{width:3px;height:3px;border-radius:50%;background:var(--silver)}.batk-hit-tooltip>.batk-hit-tooltip-time{display:flex;width:auto;height:auto;place-items:normal;align-items:baseline;gap:5px}.batk-hit-tooltip-time strong{color:#fff;font-size:.9rem;line-height:1}.batk-hit-tooltip small{display:inline;width:auto;height:auto;place-items:normal;color:#9ba5a2;font-size:.48rem;font-style:normal;font-weight:900;letter-spacing:.08em}.batk-hit-tooltip>.batk-hit-tooltip-total{display:flex;width:auto;height:auto;place-items:normal;align-items:baseline;justify-content:flex-end;gap:5px;padding-left:9px;border-left:1px solid rgba(160,170,169,.2)}.batk-hit-tooltip-total strong{color:var(--yellow);font-size:.68rem}.batk-hit.is-left-edge>.batk-hit-tooltip{left:-8px;transform:translateY(5px) scale(.96);transform-origin:16px 100%}.batk-hit.is-left-edge:hover>.batk-hit-tooltip,.batk-hit.is-left-edge:focus-visible>.batk-hit-tooltip{transform:translateY(0) scale(1)}.batk-hit.is-left-edge>.batk-hit-tooltip:after{left:16px}.batk-hit.is-right-edge>.batk-hit-tooltip{right:-8px;left:auto;transform:translateY(5px) scale(.96);transform-origin:calc(100% - 16px) 100%}.batk-hit.is-right-edge:hover>.batk-hit-tooltip,.batk-hit.is-right-edge:focus-visible>.batk-hit-tooltip{transform:translateY(0) scale(1)}.batk-hit.is-right-edge>.batk-hit-tooltip:after{right:12px;left:auto}
     .batk-track-scroll{padding-top:64px;margin-top:-64px}.batk-hit>.batk-hit-tooltip{width:210px;grid-template-columns:minmax(0,1fr) minmax(0,1fr);padding-right:12px;padding-left:12px}.batk-hit-tooltip>.batk-hit-tooltip-time,.batk-hit-tooltip>.batk-hit-tooltip-total{display:grid;min-width:0;grid-template-rows:auto auto;gap:3px}.batk-hit-tooltip>.batk-hit-tooltip-time{grid-template-areas:"label" "value"}.batk-hit-tooltip-time small{grid-area:label}.batk-hit-tooltip-time strong{grid-area:value}.batk-hit-tooltip>.batk-hit-tooltip-total{grid-template-areas:"label" "value";justify-items:end;padding-right:2px}.batk-hit-tooltip-total small{grid-area:label}.batk-hit-tooltip-total strong{grid-area:value;font-size:.82rem}.batk-hit-tooltip small,.batk-hit-tooltip strong{white-space:nowrap}
+    .batk-track{height:124px}.batk-segment-multiplier{display:block;min-height:12px;margin-top:1px;color:var(--yellow);font-size:.52rem;font-weight:900;line-height:12px;white-space:nowrap}.batk-segment:nth-child(even) .batk-segment-multiplier{color:#e6e9e4}.batk-segment-multiplier+.batk-hit-track{margin-top:8px}.batk-hit-tooltip>.batk-hit-tooltip-multiplier{grid-column:1/-1;display:flex;width:auto;height:auto;align-items:baseline;justify-content:space-between;gap:8px;padding-top:5px;border-top:1px solid rgba(160,170,169,.2)}.batk-hit-tooltip-multiplier strong{color:var(--yellow);font-size:.78rem}
     .batk-title-row{display:flex;align-items:center;gap:8px}.batk-title-row .batk-status{width:24px;height:24px;font-size:.72rem}.batk-title-row .batk-status:after{bottom:calc(100% + 6px)}
     .operator-page .batk-form-section{margin-top:10px;background:linear-gradient(135deg,rgba(49,55,57,.9),rgba(37,44,46,.9))}
     .operator-page .actions .primary{order:-1}
@@ -875,6 +939,7 @@ function baseStyles() {
     .operator-page .batk-export-button{display:inline-flex;min-height:38px;align-items:center;justify-content:center;gap:7px;padding:0 12px;border:1px solid rgba(248,245,70,.38);border-radius:8px;color:var(--yellow);background:rgba(248,245,70,.07);font:inherit;font-size:.68rem;font-weight:900;letter-spacing:.04em;white-space:nowrap;cursor:pointer;transition:border-color .16s ease,background .16s ease,transform .16s ease}.operator-page .batk-export-button span{font-size:1rem;line-height:1}.operator-page .batk-export-button:hover{border-color:rgba(248,245,70,.76);background:rgba(248,245,70,.14);transform:translateY(-1px)}.operator-page .batk-export-button:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}.operator-page .batk-export-button:disabled{cursor:wait;opacity:.62;transform:none}.operator-page .batk-export-data{display:none}
     .batk-mobile-hint{display:none}
     @media(max-width:520px){.operator-page .batk-section{padding:14px 12px}.operator-page .batk-heading{display:grid;grid-template-columns:minmax(0,1fr);gap:9px;margin-bottom:0}.operator-page .batk-heading h2{margin:5px 0 0;font-size:1rem;line-height:1.2}.operator-page .batk-heading-meta{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:stretch}.operator-page .batk-export-button{grid-column:1/-1;min-height:36px}.operator-page .batk-updated{display:flex;min-width:0;flex-direction:column;justify-content:center;text-align:left}.operator-page .batk-updated strong{font-size:.68rem;line-height:1.25}.operator-page .batk-total{min-width:108px;padding:8px 10px}.operator-page .batk-total span{font-size:.56rem}.operator-page .batk-total strong{font-size:1.08rem}.operator-page .batk-mobile-hint{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin:7px 3px 0;color:#aeb7b3;font-size:.58rem;font-weight:850;letter-spacing:.08em;text-transform:uppercase}.operator-page .batk-mobile-hint b{color:var(--yellow);font-size:.8rem}.operator-page .batk-track-scroll{scroll-snap-type:x proximity;scroll-padding-inline:4px;overscroll-behavior-inline:contain;-webkit-overflow-scrolling:touch;touch-action:pan-x;padding-right:3px;padding-left:3px}.operator-page .batk-track-scroll::-webkit-scrollbar{height:6px}.operator-page .batk-track-scroll::-webkit-scrollbar-track{border-radius:999px;background:rgba(0,0,0,.24)}.operator-page .batk-track-scroll::-webkit-scrollbar-thumb{border-radius:999px;background:rgba(248,245,70,.56)}.operator-page .batk-track-scroll::-webkit-scrollbar-button{display:none}.operator-page .batk-track{min-width:560px;height:108px}.operator-page .batk-segment{min-width:92px;scroll-snap-align:start}.operator-page .batk-hit{width:18px;height:18px;top:-9px}.operator-page .batk-hit:after{top:17px}.operator-page .batk-hit>.batk-hit-tooltip{width:190px}.operator-index .operator-toolbar{grid-template-columns:1fr}.operator-index .operator-summary,.operator-index .search-control{grid-column:auto}.operator-index .index-hero{padding:16px}.operator-index .operator-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.operator-index .operator-tile{padding:8px}.operator-index .nav-cta{width:auto;margin-left:auto;padding:9px 11px}.operator-index .nav-links{width:auto;margin-left:auto}}
+    @media(max-width:520px){.operator-page .batk-track{height:128px}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.related-card,.operator-tile{transition:none}}
   </style>`;
 }
@@ -1187,7 +1252,7 @@ export function createOperatorPage(
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/endfield/supabaseClient.js?v=14"></script>
   <script src="/endfield/js/ui/operatorShares.js?v=2"></script>
-  <script src="/endfield/js/ui/operatorBatkExport.js?v=8"></script>
+  <script src="/endfield/js/ui/operatorBatkExport.js?v=11"></script>
   ${operatorHeadingScript()}
 </body>
 </html>`;

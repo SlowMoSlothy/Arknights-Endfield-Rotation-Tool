@@ -17,6 +17,13 @@
     return `${numeric.toFixed(3).replace(/0+$/, "").replace(/\.$/, "")}s`;
   }
 
+  function formatAttackMultiplier(value, suffix = "% ATK") {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric) || numeric <= 0) return "";
+    const percent = Math.round(numeric * 100000) / 1000;
+    return `${percent.toFixed(3).replace(/\.?0+$/, "")}${suffix}`;
+  }
+
   function roundedRect(ctx, x, y, width, height, radius) {
     const r = Math.min(radius, width / 2, height / 2);
     ctx.beginPath();
@@ -205,7 +212,7 @@
     ctx.fillText(timeline.name || "Basic Attack", headingX, y + 48, skillImage ? width - 96 : width);
 
     const trackY = y + 78;
-    const trackHeight = 174;
+    const trackHeight = 194;
     fillRoundedRect(ctx, x, trackY, width, trackHeight, 16, "#151a1b", COLORS.border);
 
     const sequences = Array.isArray(timeline.sequences) ? timeline.sequences : [];
@@ -232,25 +239,32 @@
       ctx.font = "900 18px Arial, sans-serif";
       ctx.fillText(sequence.label || `SEQ ${index + 1}`, cursorX + segmentWidth / 2, trackY + 82, Math.max(18, segmentWidth - 16));
 
+      const sequenceMultiplierLabel = formatAttackMultiplier(sequence.atkMultiplierTotal);
+      if (sequenceMultiplierLabel) {
+        ctx.fillStyle = index % 2 === 0 ? COLORS.yellow : COLORS.text;
+        ctx.font = "800 13px Arial, sans-serif";
+        ctx.fillText(sequenceMultiplierLabel, cursorX + segmentWidth / 2, trackY + 110, Math.max(18, segmentWidth - 16));
+      }
+
       const lineStart = cursorX + 18;
       const lineWidth = Math.max(0, segmentWidth - 36);
       ctx.strokeStyle = "rgba(244,246,239,0.58)";
       ctx.lineWidth = 3;
       ctx.beginPath();
-      ctx.moveTo(lineStart, trackY + 132);
-      ctx.lineTo(lineStart + lineWidth, trackY + 132);
+      ctx.moveTo(lineStart, trackY + 152);
+      ctx.lineTo(lineStart + lineWidth, trackY + 152);
       ctx.stroke();
 
       const hits = Array.isArray(sequence.hitTimings) ? sequence.hitTimings : [];
       const hitLayouts = layoutHitMarkers(hits, duration, lineStart, lineWidth);
       hits.forEach((hitTime, hitIndex) => {
         const { x: hitX, level } = hitLayouts[hitIndex];
-        const hitY = trackY + [132, 116, 148][level];
+        const hitY = trackY + [152, 136, 168][level];
         if (level !== 0) {
           ctx.strokeStyle = "rgba(248,245,70,0.38)";
           ctx.lineWidth = 1.5;
           ctx.beginPath();
-          ctx.moveTo(hitX, trackY + 132);
+          ctx.moveTo(hitX, trackY + 152);
           ctx.lineTo(hitX, hitY);
           ctx.stroke();
         }
@@ -276,28 +290,39 @@
     drawLabel(ctx, "Sequence details", 80, y, COLORS.yellow);
     const columns = 2;
     const columnWidth = 712;
-    const rowHeight = 90;
+    const rowHeight = 116;
     sequences.forEach((sequence, index) => {
       const column = index % columns;
       const row = Math.floor(index / columns);
       const x = 80 + column * 736;
       const cardY = y + 20 + row * rowHeight;
-      fillRoundedRect(ctx, x, cardY, columnWidth, 74, 12, "rgba(35,43,44,0.94)", COLORS.border);
-      ctx.fillStyle = COLORS.text;
-      ctx.font = "900 21px Arial, sans-serif";
-      ctx.fillText(sequence.label || `SEQ ${index + 1}`, x + 18, cardY + 30);
-      ctx.fillStyle = COLORS.yellow;
-      ctx.font = "900 20px Arial, sans-serif";
-      ctx.fillText(formatSeconds(sequence.duration), x + 18, cardY + 58);
+      fillRoundedRect(ctx, x, cardY, columnWidth, 100, 12, "rgba(35,43,44,0.94)", COLORS.border);
 
       const hits = Array.isArray(sequence.hitTimings) ? sequence.hitTimings : [];
-      ctx.textAlign = "right";
-      drawLabel(ctx, `${hits.length} ${hits.length === 1 ? "hit" : "hits"}`, x + columnWidth - 18, cardY + 27);
+      const sequenceNumber = String(sequence.label || "").match(/\d+/)?.[0];
+      const sequenceName = sequence.label === "FS"
+        ? "FINAL STRIKE"
+        : (sequenceNumber ? `SEQUENCE: ${sequenceNumber}` : `SEQUENCE: ${sequence.label || index + 1}`);
+      const sequenceMultiplierLabel = formatAttackMultiplier(sequence.atkMultiplierTotal, "%") || "—";
+      const headingText = `${sequenceName}  •  ATK MULTIPLIER: ${sequenceMultiplierLabel}  •  HITS: ${hits.length}`;
       ctx.fillStyle = COLORS.text;
-      ctx.font = "700 17px Arial, sans-serif";
+      ctx.font = "900 16px Arial, sans-serif";
+      ctx.fillText(headingText, x + 18, cardY + 28, columnWidth - 36);
+
+      ctx.fillStyle = COLORS.muted;
+      ctx.font = "800 13px Arial, sans-serif";
+      ctx.fillText("SEQUENCE DURATION:", x + 18, cardY + 58);
+      ctx.fillStyle = COLORS.yellow;
+      ctx.font = "900 16px Arial, sans-serif";
+      ctx.fillText(formatSeconds(sequence.duration), x + 181, cardY + 58);
+
+      ctx.fillStyle = COLORS.muted;
+      ctx.font = "800 13px Arial, sans-serif";
+      ctx.fillText("HIT TIMINGS:", x + 18, cardY + 84);
+      ctx.fillStyle = COLORS.text;
+      ctx.font = "800 15px Arial, sans-serif";
       const timingText = hits.length ? hits.map(formatSeconds).join("  ·  ") : "No hit timings";
-      ctx.fillText(timingText, x + columnWidth - 18, cardY + 56, columnWidth - 180);
-      ctx.textAlign = "left";
+      ctx.fillText(timingText, x + 121, cardY + 84, columnWidth - 145);
     });
   }
 
@@ -307,7 +332,7 @@
     const sequences = Array.isArray(timeline.sequences) ? timeline.sequences : [];
     const detailRows = Math.max(1, Math.ceil(sequences.length / 2));
     const width = 1600;
-    const height = 790 + detailRows * 90;
+    const height = 820 + detailRows * 116;
     const scale = 2;
     const canvas = document.createElement("canvas");
     canvas.width = width * scale;
@@ -350,7 +375,7 @@
     }
 
     drawTimeline(ctx, timeline, 80, 410, 1440, skillIcon);
-    drawSequenceDetails(ctx, sequences, 700);
+    drawSequenceDetails(ctx, sequences, 730);
 
     const footerY = height - 46;
     ctx.strokeStyle = "rgba(160,170,169,0.25)";
@@ -360,7 +385,8 @@
     ctx.stroke();
     ctx.fillStyle = COLORS.yellow;
     ctx.font = "900 18px Arial, sans-serif";
-    ctx.fillText("ROTATIONFORGE.GG", 80, footerY);
+    ctx.font = "800 15px Arial, sans-serif";
+    ctx.fillText(operator.pageUrl || "https://rotationforge.gg/", 80, footerY, 1100);
     ctx.textAlign = "right";
     ctx.fillStyle = COLORS.muted;
     ctx.font = "700 16px Arial, sans-serif";
