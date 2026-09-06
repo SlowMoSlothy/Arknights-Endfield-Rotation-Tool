@@ -309,20 +309,26 @@
       ctx.font = "900 16px Arial, sans-serif";
       ctx.fillText(headingText, x + 18, cardY + 28, columnWidth - 36);
 
+      const detailLeft = x + 18;
+      const detailGap = 12;
+      const durationLabel = "SEQUENCE DURATION:";
       ctx.fillStyle = COLORS.muted;
       ctx.font = "800 13px Arial, sans-serif";
-      ctx.fillText("SEQUENCE DURATION:", x + 18, cardY + 58);
+      ctx.fillText(durationLabel, detailLeft, cardY + 58);
+      const durationValueX = detailLeft + ctx.measureText(durationLabel).width + detailGap;
       ctx.fillStyle = COLORS.yellow;
       ctx.font = "900 16px Arial, sans-serif";
-      ctx.fillText(formatSeconds(sequence.duration), x + 181, cardY + 58);
+      ctx.fillText(formatSeconds(sequence.duration), durationValueX, cardY + 58, x + columnWidth - 18 - durationValueX);
 
+      const hitTimingsLabel = "HIT TIMINGS:";
       ctx.fillStyle = COLORS.muted;
       ctx.font = "800 13px Arial, sans-serif";
-      ctx.fillText("HIT TIMINGS:", x + 18, cardY + 84);
+      ctx.fillText(hitTimingsLabel, detailLeft, cardY + 84);
+      const hitTimingsValueX = detailLeft + ctx.measureText(hitTimingsLabel).width + detailGap;
       ctx.fillStyle = COLORS.text;
       ctx.font = "800 15px Arial, sans-serif";
       const timingText = hits.length ? hits.map(formatSeconds).join("  ·  ") : "No hit timings";
-      ctx.fillText(timingText, x + 121, cardY + 84, columnWidth - 145);
+      ctx.fillText(timingText, hitTimingsValueX, cardY + 84, x + columnWidth - 18 - hitTimingsValueX);
     });
   }
 

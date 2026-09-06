@@ -575,7 +575,7 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /"timeline":\{"name":"Measured Combo","kicker":"BATK timeline","totalDuration":2\.5/);
   assert.match(page, /"hitMultipliers":\[0\.2,0\.4\],"atkMultiplierTotal":0\.6/);
   assert.match(page, /"skill":\{"icon":"\/endfield\/assets\/operators\/skills\/mi_fu\/fs\.png","element":"nature"\}/);
-  assert.match(page, /js\/ui\/operatorBatkExport\.js\?v=11/);
+  assert.match(page, /js\/ui\/operatorBatkExport\.js\?v=12/);
   assert.ok(page.indexOf('id="stats"') < page.indexOf('id="batk"'));
   assert.match(page, /href="#related">Related/);
   assert.match(page, /id="related"/);
@@ -645,6 +645,8 @@ test("BATK PNG export renders a complete standalone canvas and downloads it", ()
   assert.match(operatorBatkExportScript, /ATK MULTIPLIER:/);
   assert.match(operatorBatkExportScript, /SEQUENCE DURATION:/);
   assert.match(operatorBatkExportScript, /HIT TIMINGS:/);
+  assert.match(operatorBatkExportScript, /measureText\(durationLabel\)\.width \+ detailGap/);
+  assert.match(operatorBatkExportScript, /measureText\(hitTimingsLabel\)\.width \+ detailGap/);
   assert.match(operatorBatkExportScript, /join\("  ·  "\)/);
   assert.doesNotMatch(operatorBatkExportScript, /const timeY =/);
   assert.match(operatorBatkExportScript, /canvas\.toBlob/);
