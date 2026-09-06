@@ -221,10 +221,10 @@ body.admin-page-open #selectionScreen {
     display: flex;
     flex-wrap: wrap;
     gap: 5px;
-    padding: 3px;
-    border: 1px solid rgba(160,170,169,0.16);
-    border-radius: 999px;
-    background: linear-gradient(180deg, rgba(160,170,169,0.08), rgba(7,9,10,0.36));
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
 }
 
 .admin-review-tab {
