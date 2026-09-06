@@ -281,19 +281,28 @@
     }
 
     .skill-row {
-        width: 148px;
-        height: 34px;
+        width: calc(100% - 10px);
+        height: 38px;
         gap: 3px;
-        padding: 3px 7px;
+        padding: 3px 5px;
         border-radius: 12px;
     }
 
     .skill-small {
-        width: 24px;
-        height: 24px;
-        min-width: 24px;
-        min-height: 24px;
+        width: 26px;
+        height: 26px;
+        min-width: 26px;
+        min-height: 26px;
         padding: 2px;
+    }
+
+    :root:not(.rotation-mode-simulation) #rotationBuilderPanel .skill-small,
+    :root:not(.rotation-mode-simulation) #rotationBuilderPanel .skill-small .ef-skill-icon {
+        --ef-size: 26px;
+        width: 26px;
+        height: 26px;
+        min-width: 26px;
+        min-height: 26px;
     }
 
     .skill-small.selected {
