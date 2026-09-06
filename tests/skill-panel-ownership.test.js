@@ -14,9 +14,20 @@ test("operator skill rows expose a visible owner label and element accent", () =
   assert.match(skillsStyles, /var\(--element-color/);
 });
 
-test("planner skill icons use the compact size on desktop and mobile", () => {
+test("operator skill rows are centered below the visible avatar area", () => {
+  assert.match(skillsStyles, /\.operator-owned-skill-row\s*\{[^}]*width:\s*calc\(100% - 8px\)[^}]*align-self:\s*center/s);
+  assert.match(skillsStyles, /\.operator-skill-wrapper\.leader \.operator-owned-skill-row\s*\{[^}]*translateX\(8px\)/s);
+  assert.match(skillsStyles, /\.operator-skill-card\.leader \.skill-row\s*\{[^}]*left:\s*auto/s);
+});
+
+test("mobile skill icons use a larger tap-friendly size", () => {
+  assert.match(mobileStyles, /#rotationBuilderPanel \.skill-small,[\s\S]*--ef-size:\s*26px/);
+  assert.match(mobileStyles, /\.skill-row\s*\{[^}]*width:\s*calc\(100% - 10px\)[^}]*height:\s*38px/s);
+});
+
+test("planner skill icons stay compact on desktop and become tap-friendly on mobile", () => {
   assert.match(skillsStyles, /\.skill-small\s*\{[^}]*width:\s*24px;[^}]*height:\s*24px;/s);
-  assert.match(mobileStyles, /\.skill-small\s*\{[^}]*width:\s*24px;[^}]*height:\s*24px;/s);
+  assert.match(mobileStyles, /\.skill-small\s*\{[^}]*width:\s*26px;[^}]*height:\s*26px;/s);
 });
 
 test("desktop operator cards use the available skills panel width", () => {
