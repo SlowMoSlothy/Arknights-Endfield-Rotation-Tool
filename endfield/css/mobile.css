@@ -112,7 +112,7 @@
         align-items: stretch;
         flex-wrap: nowrap;
         gap: 5px;
-        padding: 7px;
+        padding: 14px 7px 7px;
         width: 100%;
         min-width: 0;
         box-sizing: border-box;
