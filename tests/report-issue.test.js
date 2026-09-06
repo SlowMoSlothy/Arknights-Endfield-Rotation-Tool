@@ -9,6 +9,7 @@ const reportIssueSql = fs.readFileSync("supabase/issue_reports.sql", "utf8");
 const adminScript = fs.readFileSync("endfield/js/ui/adminPanel.js", "utf8");
 const reportIssueStyles = fs.readFileSync("endfield/css/my-rotations.css", "utf8");
 const layoutStyles = fs.readFileSync("endfield/css/layout.css", "utf8");
+const adminStyles = fs.readFileSync("endfield/css/admin.css", "utf8");
 
 function loadReportIssueHelper() {
   const context = {
@@ -117,7 +118,10 @@ test("admin command shows the number of pending review notifications", () => {
   assert.match(plannerHtml, /id="adminNotificationBadge" class="admin-notification-badge"/);
   assert.match(adminScript, /function refreshAdminNotificationCount\(\)/);
   assert.match(adminScript, /\.select\("id", \{ count: "exact", head: true \}\)/);
-  assert.match(adminScript, /notificationCount = \(rotationResult\.count \|\| 0\) \+ \(reportResult\.count \|\| 0\)/);
+  assert.match(adminScript, /pendingRotationCount = rotationResult\.count \|\| 0/);
+  assert.match(adminScript, /pendingReportCount = reportResult\.count \|\| 0/);
+  assert.match(adminScript, /"admin-review-tab-badge"/);
+  assert.match(adminStyles, /\.admin-review-tab-badge\s*\{[^}]*background:\s*#F8F546/s);
   assert.match(layoutStyles, /#openAdminPanelBtn\s*\{[^}]*order:\s*-1/s);
   assert.match(layoutStyles, /#openAdminPanelBtn\s*\{[^}]*overflow:\s*visible[^}]*z-index:\s*4/s);
 });
