@@ -202,16 +202,37 @@ body.report-issue-modal-open {
 }
 
 .share-metadata-card-close {
+    position: relative;
     width: 28px;
     height: 28px;
     flex: 0 0 auto;
     border: 1px solid rgba(160,170,169,0.25);
     border-radius: 50%;
+    appearance: none;
+    -webkit-appearance: none;
     background: rgba(7,9,10,0.46);
     color: rgba(242,242,242,0.76);
-    font-size: 20px;
-    line-height: 1;
+    padding: 0;
+    font-size: 0;
+    line-height: 0;
     cursor: pointer;
+}
+
+.share-metadata-card-close::before,
+.share-metadata-card-close::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 12px;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.share-metadata-card-close::after {
+    transform: translate(-50%, -50%) rotate(-45deg);
 }
 
 .share-metadata-card-close:hover {
