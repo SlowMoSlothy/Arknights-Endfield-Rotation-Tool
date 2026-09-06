@@ -184,15 +184,7 @@
     }
 
     .skills-panel::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        width: 30px;
-        background: linear-gradient(90deg, transparent, rgba(16, 18, 20, 0.92));
-        pointer-events: none;
-        z-index: 3;
+        display: none;
     }
 
     .operators-skills-grid {
