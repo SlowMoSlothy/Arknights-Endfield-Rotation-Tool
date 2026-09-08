@@ -446,7 +446,7 @@ function createSkillOperatorDetailButton(op) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "operator-skill-detail-btn";
-    button.dataset.buttonTooltip = "Open in Operator Database";
+    button.dataset.buttonTooltip = "Operator Database";
     button.setAttribute("aria-label", `${op.name} in der Operator-Datenbank anzeigen (neuer Tab)`);
 
     button.addEventListener("click", (e) => {

@@ -636,6 +636,14 @@
     white-space: normal;
 }
 
+.operator-skill-detail-btn[data-button-tooltip]::after {
+    top: calc(100% + 5px);
+    box-sizing: border-box;
+    max-width: 120px;
+    padding: 5px 8px;
+    text-align: left;
+}
+
 .swap-operator-btn[data-button-tooltip]:hover::before,
 .swap-operator-btn[data-button-tooltip]:hover::after,
 .swap-operator-btn[data-button-tooltip]:focus-visible::before,
