@@ -446,16 +446,14 @@ function createSkillOperatorDetailButton(op) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "operator-skill-detail-btn";
-    button.dataset.buttonTooltip = "Operator details";
-    button.setAttribute("aria-label", `${op.name} details anzeigen`);
+    button.dataset.buttonTooltip = "Open in Operator Database";
+    button.setAttribute("aria-label", `${op.name} in der Operator-Datenbank anzeigen (neuer Tab)`);
 
     button.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
 
-        if (typeof openOperatorGalleryDetail === "function") {
-            openOperatorGalleryDetail(op.id);
-        }
+        window.open(createOperatorLandingPageUrl(op), "_blank", "noopener");
     });
 
     return button;
