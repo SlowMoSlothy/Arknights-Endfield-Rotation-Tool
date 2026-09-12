@@ -60,9 +60,10 @@
     opacity: 0.92;
 }
 
-/* Normale Skills: Farbe unten, oben offen */
+/* Alle Skill-Hintergründe bleiben kreisförmig. */
 .ef-fill-half .ef-skill-fill {
-    inset: 50% 0 0;
+    inset: 0;
+    border-radius: 50%;
     background: var(--ef-bg-color);
     z-index: 1;
 }
