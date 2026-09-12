@@ -373,17 +373,55 @@
       border-color: var(--accent);
     }
 
-    .game-status {
-      display: inline-flex;
+    .game-identity {
+      display: inline-grid;
+      grid-template-columns: 42px minmax(0, auto);
+      align-items: center;
+      gap: 10px;
       width: fit-content;
-      padding: 6px 9px;
+      padding: 6px 12px 6px 6px;
       border: 1px solid rgba(252, 111, 2, 0.38);
-      border-radius: 999px;
-      color: var(--accent);
+      border-radius: 13px;
       background: rgba(24, 29, 31, 0.7);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.025);
+    }
+
+    .game-icon {
+      width: 42px;
+      height: 42px;
+      overflow: hidden;
+      border: 1px solid rgba(160, 170, 169, 0.24);
+      border-radius: 10px;
+      background-color: #080a0b;
+      background-image: url("/endfield/assets/header.png");
+      background-repeat: no-repeat;
+      background-position: left -5px;
+      background-size: 120px auto;
+      box-shadow: 0 5px 14px rgba(0,0,0,0.34);
+    }
+
+    .game-identity-copy {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .game-name {
+      color: #d8ddda;
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 0.055em;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .game-tool-name {
+      color: var(--accent);
       font-size: 0.62rem;
-      font-weight: 900;
+      font-weight: 950;
       letter-spacing: 0.1em;
+      line-height: 1.05;
       text-transform: uppercase;
     }
 
@@ -397,12 +435,21 @@
       font-size: 1.55rem;
     }
 
+    .game-identity h3 {
+      margin: 0;
+      font-size: 0.72rem;
+    }
+
     .game-card p {
       max-width: 600px;
       margin: 0;
       color: #c9d1cf;
       font-size: 0.78rem;
       line-height: 1.5;
+    }
+
+    .game-identity + p {
+      margin-top: 13px;
     }
 
     .game-action {
@@ -585,8 +632,13 @@
       <div class="game-grid">
         <a class="game-card featured planner-card" href="endfield/">
           <div class="game-card-content">
-            <span class="game-status">Rotation Planner</span>
-            <h3>Arknights: Endfield</h3>
+            <div class="game-identity">
+              <span class="game-icon" aria-hidden="true"></span>
+              <span class="game-identity-copy">
+                <span class="game-name">Arknights: Endfield</span>
+                <h3 class="game-tool-name">Rotation Planner</h3>
+              </span>
+            </div>
             <p>
               Plan operator skill order, combo triggers, SP flow, cooldown windows,
               buffs, debuffs, and reaction timing.
@@ -604,8 +656,13 @@
             <img src="endfield/assets/operators/avatars/Catcher.png" alt="">
           </div>
           <div class="game-card-content">
-            <span class="game-status">Operator Database</span>
-            <h3>Endfield Operator Database</h3>
+            <div class="game-identity">
+              <span class="game-icon" aria-hidden="true"></span>
+              <span class="game-identity-copy">
+                <span class="game-name">Arknights: Endfield</span>
+                <h3 class="game-tool-name">Operator Database</h3>
+              </span>
+            </div>
             <p>
               Browse operator profiles with stats, classes, elements, skills,
               related operators, and direct links into the rotation planner.
