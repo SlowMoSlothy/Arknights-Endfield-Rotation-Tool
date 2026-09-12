@@ -60,10 +60,15 @@
     opacity: 0.92;
 }
 
-/* Alle Skill-Hintergründe bleiben kreisförmig. */
+/* Normale Skills: ein größerer Kreis ragt von unten bis etwa zur Hälfte hinein. */
 .ef-fill-half .ef-skill-fill {
-    inset: 0;
+    inset: auto;
+    left: 50%;
+    top: 43%;
+    width: 116%;
+    height: 116%;
     border-radius: 50%;
+    transform: translateX(-50%);
     background: var(--ef-bg-color);
     z-index: 1;
 }
