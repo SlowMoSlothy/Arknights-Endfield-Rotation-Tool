@@ -33,6 +33,7 @@ test("tool cards use a shared text-only Endfield game identity", () => {
   assert.equal((landingHtml.match(/class="game-name">Arknights: Endfield/g) || []).length, 2);
   assert.match(landingHtml, /class="game-tool-name">Rotation Planner/);
   assert.match(landingHtml, /class="game-tool-name">Operator Database/);
+  assert.match(landingHtml, /\.game-card\.featured \.game-identity h3\s*\{[^}]*margin:\s*0/s);
   assert.doesNotMatch(landingHtml, /class="game-icon"/);
   assert.doesNotMatch(landingHtml, /background-image:\s*url\("\/endfield\/assets\/header\.png"\)/);
   assert.doesNotMatch(landingHtml, /<h3>Endfield Operator Database<\/h3>/);
