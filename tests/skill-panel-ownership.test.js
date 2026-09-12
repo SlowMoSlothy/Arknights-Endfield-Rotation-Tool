@@ -19,6 +19,9 @@ test("attribute-dependent operators expose a persisted INT/WILL skill switch", (
   assert.match(skillsPanelScript, /getOperatorAttributeVariantSelection/);
   assert.match(skillsPanelScript, /setOperatorAttributeVariantSelection/);
   assert.match(skillsStyles, /\.operator-attribute-variant-btn\.active/);
+  assert.match(skillsStyles, /\.operator-skill-owner:has\(\.operator-attribute-variant\)[^}]*top:\s*-15px[^}]*pointer-events:\s*none/s);
+  assert.match(skillsStyles, /\.operator-attribute-variant\s*\{[^}]*pointer-events:\s*auto/s);
+  assert.match(mobileStyles, /\.operator-skill-owner:has\(\.operator-attribute-variant\)[^}]*top:\s*-17px/s);
 });
 
 test("operator skill rows are centered below the visible avatar area", () => {

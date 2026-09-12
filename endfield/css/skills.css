@@ -787,28 +787,33 @@
 
 .operator-skill-owner:has(.operator-attribute-variant) {
     max-width: calc(100% - 8px);
+    top: -15px;
+    padding: 1px 6px;
     overflow: visible;
-    pointer-events: auto;
+    pointer-events: none;
 }
 
 .operator-attribute-variant {
     display: inline-flex;
+    align-items: center;
     gap: 1px;
     margin-left: 3px;
     padding-left: 4px;
     border-left: 1px solid rgba(255,255,255,0.18);
+    pointer-events: auto;
 }
 
 .operator-attribute-variant-btn {
-    min-width: 25px;
-    min-height: 18px;
-    padding: 1px 4px;
+    min-width: 23px;
+    min-height: 14px;
+    padding: 0 3px;
     border: 1px solid rgba(160,170,169,0.32);
     border-radius: 999px;
     background: rgba(49,55,57,0.88);
     color: rgba(244,245,242,0.72);
     font: inherit;
     font-size: 7px;
+    line-height: 12px;
     cursor: pointer;
 }
 

@@ -288,6 +288,15 @@
         border-radius: 12px;
     }
 
+    .operator-skill-owner:has(.operator-attribute-variant) {
+        top: -17px;
+    }
+
+    .operator-attribute-variant-btn {
+        min-width: 22px;
+        min-height: 14px;
+    }
+
     .skill-small {
         width: 26px;
         height: 26px;
