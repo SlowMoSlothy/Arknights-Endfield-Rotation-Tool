@@ -10,13 +10,40 @@
     place-items: center;
     padding: 24px;
     box-sizing: border-box;
+    overflow: hidden;
     background:
-        radial-gradient(circle at 50% 18%, rgba(248,245,70,0.10), transparent 34%),
-        radial-gradient(circle at 50% 82%, rgba(160,170,169,0.07), transparent 40%),
-        linear-gradient(180deg, rgba(49,55,57,0.98), rgba(18,20,22,0.99));
+        radial-gradient(circle at 50% 38%, rgba(255,104,0,0.15), transparent 32%),
+        radial-gradient(circle at 50% 78%, rgba(248,245,70,0.05), transparent 38%),
+        linear-gradient(155deg, #252c2e 0%, #111517 58%, #080a0b 100%);
     opacity: 1;
     visibility: visible;
     transition: opacity 0.24s ease, visibility 0.24s ease;
+}
+
+.app-loading-screen::before {
+    content: "";
+    position: absolute;
+    inset: -40%;
+    pointer-events: none;
+    opacity: 0.26;
+    background:
+        repeating-linear-gradient(90deg, transparent 0 63px, rgba(160,170,169,0.08) 64px 65px),
+        repeating-linear-gradient(0deg, transparent 0 63px, rgba(160,170,169,0.06) 64px 65px);
+    transform: perspective(520px) rotateX(58deg) translateY(18%);
+    transform-origin: center;
+}
+
+.app-loading-screen::after {
+    content: "";
+    position: absolute;
+    left: 10%;
+    right: 10%;
+    top: -20%;
+    height: 1px;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(255,104,0,0.58), transparent);
+    box-shadow: 0 0 18px rgba(255,104,0,0.24);
+    animation: appLoadingScan 3.2s ease-in-out infinite;
 }
 
 .app-loading-screen.is-hidden {
@@ -27,35 +54,32 @@
 
 .app-loading-card {
     position: relative;
-    width: min(420px, calc(100vw - 36px));
-    min-height: 300px;
-    padding: 34px 28px 30px;
+    width: min(370px, calc(100vw - 36px));
+    padding: 42px 34px 34px;
     box-sizing: border-box;
-    border: 1px solid rgba(160,170,169,0.24);
-    border-radius: 18px;
-    background:
-        radial-gradient(circle at 50% 0%, rgba(248,245,70,0.12), transparent 56%),
-        linear-gradient(180deg, rgba(49,55,57,0.70), rgba(10,12,14,0.96));
-    box-shadow:
-        inset 0 0 0 1px rgba(255,255,255,0.045),
-        inset 0 1px 0 rgba(255,255,255,0.08),
-        0 24px 70px rgba(0,0,0,0.42);
-    backdrop-filter: blur(16px) saturate(1.12);
-    -webkit-backdrop-filter: blur(16px) saturate(1.12);
     overflow: hidden;
+    border: 1px solid rgba(255,117,24,0.30);
+    border-radius: 24px;
+    background:
+        radial-gradient(circle at 50% 16%, rgba(255,104,0,0.11), transparent 44%),
+        linear-gradient(180deg, rgba(38,44,46,0.94), rgba(9,11,12,0.98));
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.035),
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        0 30px 80px rgba(0,0,0,0.52),
+        0 0 50px rgba(255,104,0,0.06);
 }
 
 .app-loading-card::before {
     content: "";
     position: absolute;
-    inset: 10px;
+    inset: 11px;
     pointer-events: none;
     background:
-        linear-gradient(#f8f546, #f8f546) left top / 32px 1px no-repeat,
-        linear-gradient(#f8f546, #f8f546) left top / 1px 18px no-repeat,
-        linear-gradient(rgba(160,170,169,0.58), rgba(160,170,169,0.58)) right bottom / 32px 1px no-repeat,
-        linear-gradient(rgba(160,170,169,0.58), rgba(160,170,169,0.58)) right bottom / 1px 18px no-repeat;
-    opacity: 0.9;
+        linear-gradient(#ff6800, #ff6800) left top / 38px 2px no-repeat,
+        linear-gradient(#ff6800, #ff6800) left top / 2px 24px no-repeat,
+        linear-gradient(rgba(160,170,169,0.58), rgba(160,170,169,0.58)) right bottom / 38px 1px no-repeat,
+        linear-gradient(rgba(160,170,169,0.58), rgba(160,170,169,0.58)) right bottom / 1px 24px no-repeat;
 }
 
 .app-loading-card::after {
@@ -63,91 +87,200 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background:
-        linear-gradient(135deg, rgba(255,255,255,0.14), transparent 30%),
-        repeating-linear-gradient(-45deg, rgba(255,255,255,0.012) 0 2px, transparent 2px 8px);
-    opacity: 0.7;
+    opacity: 0.5;
+    background: repeating-linear-gradient(-45deg, rgba(255,255,255,0.012) 0 2px, transparent 2px 9px);
 }
 
-.app-loading-logo,
-.app-loading-orbit,
-.app-loading-copy {
+.app-loading-emblem,
+.app-loading-copy,
+.app-loading-progress,
+.app-loading-detail {
     position: relative;
     z-index: 1;
 }
 
-.app-loading-logo {
-    display: block;
-    width: min(270px, 76vw);
-    height: auto;
-    margin: 0 auto 24px;
-    filter:
-        drop-shadow(0 0 16px rgba(248,245,70,0.12))
-        drop-shadow(0 12px 20px rgba(0,0,0,0.34));
-}
-
-.app-loading-orbit {
-    width: 74px;
-    height: 74px;
+.app-loading-emblem {
+    width: 166px;
+    height: 166px;
     margin: 0 auto 22px;
-    border-radius: 50%;
-    border: 1px solid rgba(160,170,169,0.20);
-    background:
-        radial-gradient(circle at 50% 50%, rgba(248,245,70,0.10), transparent 48%),
-        rgba(8,10,12,0.42);
-    box-shadow:
-        inset 0 0 0 1px rgba(255,255,255,0.035),
-        0 0 26px rgba(248,245,70,0.12);
+    display: grid;
+    place-items: center;
 }
 
-.app-loading-orbit::before {
+.app-loading-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(
+        from 12deg,
+        transparent 0 10%,
+        rgba(255,104,0,0.30) 10% 21%,
+        #ff6800 21% 27%,
+        transparent 27% 54%,
+        rgba(248,245,70,0.72) 54% 61%,
+        transparent 61% 86%,
+        rgba(255,104,0,0.48) 86% 94%,
+        transparent 94%
+    );
+    filter: drop-shadow(0 0 9px rgba(255,104,0,0.36));
+    animation: appLoadingForgeSpin 2.1s linear infinite;
+}
+
+.app-loading-ring::before {
     content: "";
     position: absolute;
     inset: 7px;
     border-radius: 50%;
-    border: 3px solid rgba(160,170,169,0.18);
-    border-top-color: #f8f546;
-    border-right-color: rgba(248,245,70,0.72);
-    animation: appLoadingSpin 0.9s linear infinite;
+    background: #171b1d;
+    box-shadow: inset 0 0 0 1px rgba(160,170,169,0.24);
 }
 
-.app-loading-orbit span {
+.app-loading-ring::after {
+    content: "";
     position: absolute;
-    inset: 28px;
+    inset: 17px;
+    border: 1px dashed rgba(255,255,255,0.18);
     border-radius: 50%;
-    background: #f8f546;
+}
+
+.app-loading-logo-frame {
+    position: relative;
+    z-index: 2;
+    width: 116px;
+    height: 116px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid rgba(255,104,0,0.36);
+    border-radius: 30px;
+    background: #07090a;
     box-shadow:
-        0 0 14px rgba(248,245,70,0.55),
-        0 0 28px rgba(248,245,70,0.22);
+        inset 0 0 20px rgba(255,104,0,0.10),
+        0 0 24px rgba(255,104,0,0.18),
+        0 14px 28px rgba(0,0,0,0.48);
+}
+
+.app-loading-logo {
+    display: block;
+    width: 104px;
+    height: 104px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 8px rgba(255,104,0,0.28));
+    animation: appLoadingLogoPulse 1.6s ease-in-out infinite;
+}
+
+.app-loading-spark {
+    position: absolute;
+    z-index: 3;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #F8F546;
+    box-shadow: 0 0 8px #ff6800, 0 0 14px rgba(255,104,0,0.6);
+    opacity: 0;
+    animation: appLoadingSpark 1.8s ease-out infinite;
+}
+
+.spark-one {
+    left: 20px;
+    bottom: 28px;
+}
+
+.spark-two {
+    right: 19px;
+    top: 34px;
+    animation-delay: 0.55s;
+}
+
+.spark-three {
+    right: 34px;
+    bottom: 18px;
+    animation-delay: 1.08s;
 }
 
 .app-loading-copy {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     text-align: center;
 }
 
 .app-loading-copy strong {
-    color: #f8f546;
-    font-size: 20px;
+    color: #f4f5f2;
+    font-size: 29px;
+    font-weight: 950;
+    letter-spacing: 0.015em;
+    line-height: 1;
+}
+
+.app-loading-copy strong span {
+    color: #ff6800;
+}
+
+.app-loading-copy > span {
+    color: rgba(248,245,70,0.90);
+    font-size: 11px;
     font-weight: 900;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
 }
 
-.app-loading-copy span {
-    color: rgba(244,245,242,0.74);
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.02em;
+.app-loading-progress {
+    width: min(232px, 78%);
+    height: 4px;
+    margin: 24px auto 11px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(160,170,169,0.16);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.48);
 }
 
-@keyframes appLoadingSpin {
-    to {
-        transform: rotate(360deg);
-    }
+.app-loading-progress span {
+    display: block;
+    width: 42%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, transparent, #ff6800 42%, #F8F546 78%, transparent);
+    box-shadow: 0 0 12px rgba(255,104,0,0.55);
+    animation: appLoadingProgress 1.25s ease-in-out infinite;
+}
+
+.app-loading-detail {
+    display: block;
+    color: rgba(244,245,242,0.58);
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 700;
+    letter-spacing: 0.025em;
+    text-align: center;
+}
+
+@keyframes appLoadingForgeSpin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes appLoadingLogoPulse {
+    0%, 100% { transform: scale(0.97); filter: drop-shadow(0 0 6px rgba(255,104,0,0.22)); }
+    50% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(255,104,0,0.42)); }
+}
+
+@keyframes appLoadingProgress {
+    from { transform: translateX(-125%); }
+    to { transform: translateX(340%); }
+}
+
+@keyframes appLoadingSpark {
+    0% { transform: translate(0, 0) scale(0.4); opacity: 0; }
+    18% { opacity: 1; }
+    100% { transform: translate(15px, -28px) scale(0); opacity: 0; }
+}
+
+@keyframes appLoadingScan {
+    0%, 12% { top: -10%; opacity: 0; }
+    32% { opacity: 0.7; }
+    72% { opacity: 0.28; }
+    88%, 100% { top: 110%; opacity: 0; }
 }
 
 @media (max-width: 900px) {
@@ -156,28 +289,38 @@
     }
 
     .app-loading-card {
-        min-height: 270px;
-        padding: 30px 22px 26px;
-        backdrop-filter: blur(10px) saturate(1.06);
-        -webkit-backdrop-filter: blur(10px) saturate(1.06);
+        padding: 36px 24px 30px;
+        border-radius: 20px;
     }
 
-    .app-loading-logo {
-        width: min(280px, 82vw);
+    .app-loading-emblem {
+        width: 150px;
+        height: 150px;
         margin-bottom: 20px;
     }
 
-    .app-loading-orbit {
-        width: 66px;
-        height: 66px;
-        margin-bottom: 18px;
+    .app-loading-logo-frame {
+        width: 104px;
+        height: 104px;
+        border-radius: 27px;
     }
 
-    .app-loading-orbit span {
-        inset: 25px;
+    .app-loading-logo {
+        width: 94px;
+        height: 94px;
     }
 
     .app-loading-copy strong {
-        font-size: 18px;
+        font-size: 26px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app-loading-ring,
+    .app-loading-logo,
+    .app-loading-progress span,
+    .app-loading-spark,
+    .app-loading-screen::after {
+        animation-duration: 5s;
     }
 }

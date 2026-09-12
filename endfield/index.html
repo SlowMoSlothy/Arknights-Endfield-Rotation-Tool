@@ -41,7 +41,7 @@
       "isAccessibleForFree": true
     }
   </script>
-  <link rel="stylesheet" href="css/style.css?v=96">
+  <link rel="stylesheet" href="css/style.css?v=97">
   <link rel="stylesheet" href="css/mobile.css?v=24">
     <link rel="stylesheet" href="atk-chart.css?v=16">
 </head>
@@ -79,14 +79,21 @@
 
   <div id="appLoadingScreen" class="app-loading-screen" role="status" aria-live="polite" aria-busy="true">
     <div class="app-loading-card">
-      <img class="app-loading-logo" src="assets/header.png" alt="Arknights Endfield Rotation Builder">
-      <div class="app-loading-orbit" aria-hidden="true">
-        <span></span>
+      <div class="app-loading-emblem">
+        <span class="app-loading-ring" aria-hidden="true"></span>
+        <span class="app-loading-logo-frame">
+          <img class="app-loading-logo" src="/favicon-flat.png" alt="RotationForge">
+        </span>
+        <i class="app-loading-spark spark-one" aria-hidden="true"></i>
+        <i class="app-loading-spark spark-two" aria-hidden="true"></i>
+        <i class="app-loading-spark spark-three" aria-hidden="true"></i>
       </div>
       <div class="app-loading-copy">
-        <strong>Loading database</strong>
-        <span>Preparing operators and rotation data</span>
+        <strong>Rotation<span>Forge</span></strong>
+        <span>Forging your rotation data</span>
       </div>
+      <div class="app-loading-progress" aria-hidden="true"><span></span></div>
+      <small class="app-loading-detail">Loading operators &amp; combat data</small>
     </div>
   </div>
 
