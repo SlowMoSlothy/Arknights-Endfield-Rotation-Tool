@@ -75,6 +75,7 @@
     .attribute-variant-switch{display:inline-flex;padding:3px;border:1px solid rgba(160,170,169,.28);border-radius:999px;background:rgba(12,15,16,.72)}
     .attribute-variant-switch button{min-width:58px;padding:7px 12px;border:0;border-radius:999px;background:transparent;color:#b9c1bd;font:inherit;font-size:.76rem;font-weight:900;cursor:pointer}
     .attribute-variant-switch button.active{background:linear-gradient(135deg,rgba(101,113,54,.8),rgba(248,245,70,.18));color:var(--yellow);box-shadow:inset 0 0 0 1px rgba(248,245,70,.45)}
+    [data-attribute-variant-panel][hidden]{display:none}
     @media(max-width:640px){.attribute-variant-heading{align-items:flex-start;flex-direction:column}.attribute-variant-switch{width:100%}.attribute-variant-switch button{flex:1}}
   </style>
 </head>
@@ -380,12 +381,9 @@
     <section class="panel skills-section" id="skills">
       <div class="attribute-variant-heading">
         <h2>Arcane Skills</h2>
-        <div class="attribute-variant-switch" role="group" aria-label="Arcane attribute stance">
-          <button type="button" data-attribute-variant="intellect" aria-pressed="false">INT</button>
-          <button type="button" data-attribute-variant="will" aria-pressed="false">WILL</button>
-        </div>
+        <div class="attribute-variant-switch" role="group" aria-label="Arcane attribute stance"><button type="button" data-attribute-variant="intellect" aria-pressed="false">INT</button><button type="button" data-attribute-variant="will" aria-pressed="false">WILL</button></div>
       </div>
-      <div class="skills-grid"><article class="skill-card skill-element-nature">
+      <div class="skills-grid" data-attribute-variant-panel="intellect" hidden><article class="skill-card skill-element-nature">
     <div class="skill-head">
       <div class="skill-icon-wrap">
         <div class="ef-skill-icon ef-element-nature ef-fill-half">
@@ -414,7 +412,7 @@
         </div>
       </div>
       <div>
-        <span class="skill-type">Battle Skill</span>
+        <span class="skill-type">Battle Skill · Intellect Stance</span>
         <h3>Jadecrushing Grid</h3>
       </div>
     </div>
@@ -434,7 +432,7 @@
         </div>
       </div>
       <div>
-        <span class="skill-type">Combo Skill</span>
+        <span class="skill-type">Combo Skill · INTELLECT</span>
         <h3>Yinglung Stance IV</h3>
       </div>
     </div>
@@ -455,7 +453,107 @@
         </div>
       </div>
       <div>
-        <span class="skill-type">Ultimate</span>
+        <span class="skill-type">Ultimate · INTELLECT</span>
+        <h3>Gloompurge</h3>
+      </div>
+    </div>
+    <div class="skill-meta">
+      <span>Cooldown: <strong>20s</strong></span>
+      <span>Energy: <strong>100</strong></span>
+      <span><img src="/endfield/assets/ui/elements/nature.webp" alt="" loading="lazy">Nature</span>
+    </div>
+    <p>Creates Gloompurger Array for 20 seconds. Controlled Final Strikes or Finishers can trigger up to two Cluster Strikes; the second cast becomes Gloompurge Arcana.</p>
+  </article>
+<article class="skill-card skill-element-nature">
+    <div class="skill-head">
+      <div class="skill-icon-wrap">
+        <div class="ef-skill-icon ef-element-nature ef-fill-half">
+          <span class="ef-skill-fill"></span>
+          <span class="ef-skill-ring"></span>
+          <span class="ef-skill-glyph-wrap"><img class="ef-skill-glyph" src="/endfield/assets/operators/skills/shared/dive_attack.png" alt="Dive Attack icon" loading="lazy"></span>
+        </div>
+      </div>
+      <div>
+        <span class="skill-type">Dive Attack</span>
+        <h3>Dive Attack</h3>
+      </div>
+    </div>
+    <div class="skill-meta">
+      <span><img src="/endfield/assets/ui/elements/nature.webp" alt="" loading="lazy">Nature</span>
+    </div>
+    <p>Universal Level-12 Dive Attack.</p>
+  </article></div>
+<div class="skills-grid" data-attribute-variant-panel="will" hidden><article class="skill-card skill-element-nature">
+    <div class="skill-head">
+      <div class="skill-icon-wrap">
+        <div class="ef-skill-icon ef-element-nature ef-fill-half">
+          <span class="ef-skill-fill"></span>
+          <span class="ef-skill-ring"></span>
+          <span class="ef-skill-glyph-wrap"><img class="ef-skill-glyph" src="/endfield/assets/operators/skills/arcane/artillery-interdiction.png" alt="Artillery Interdiction icon" loading="lazy"></span>
+        </div>
+      </div>
+      <div>
+        <span class="skill-type">Final Strike</span>
+        <h3>Artillery Interdiction</h3>
+      </div>
+    </div>
+    <div class="skill-meta">
+      <span><img src="/endfield/assets/ui/elements/nature.webp" alt="" loading="lazy">Nature</span>
+    </div>
+    <p>Performs Nature basic attacks. The finisher deals 900% ATK and the controlled Final Strike deals 17 Stagger.</p>
+  </article>
+<article class="skill-card skill-element-nature">
+    <div class="skill-head">
+      <div class="skill-icon-wrap">
+        <div class="ef-skill-icon ef-element-nature ef-fill-half">
+          <span class="ef-skill-fill"></span>
+          <span class="ef-skill-ring"></span>
+          <span class="ef-skill-glyph-wrap"><img class="ef-skill-glyph" src="/endfield/assets/operators/skills/arcane/jadecrushing-grid.png" alt="Jadecrushing Grid icon" loading="lazy"></span>
+        </div>
+      </div>
+      <div>
+        <span class="skill-type">Battle Skill · Will Stance</span>
+        <h3>Jadecrushing Grid</h3>
+      </div>
+    </div>
+    <div class="skill-meta">
+      <span>Energy: <strong>100</strong></span>
+      <span><img src="/endfield/assets/ui/elements/nature.webp" alt="" loading="lazy">Nature</span>
+    </div>
+    <p>Deals Nature DMG and applies Nature Infliction. Its damage and Pull behavior depend on whether Intellect or Will is higher.</p>
+  </article>
+<article class="skill-card skill-element-nature">
+    <div class="skill-head">
+      <div class="skill-icon-wrap">
+        <div class="ef-skill-icon ef-element-nature ef-fill-half">
+          <span class="ef-skill-fill"></span>
+          <span class="ef-skill-ring"></span>
+          <span class="ef-skill-glyph-wrap"><img class="ef-skill-glyph" src="/endfield/assets/operators/skills/arcane/yinglung-stance-iv.png" alt="Yinglung Stance IV icon" loading="lazy"></span>
+        </div>
+      </div>
+      <div>
+        <span class="skill-type">Combo Skill · WILL</span>
+        <h3>Yinglung Stance IV</h3>
+      </div>
+    </div>
+    <div class="skill-meta">
+      <span>Cooldown: <strong>19s</strong></span>
+      <span>Energy: <strong>0</strong></span>
+      <span><img src="/endfield/assets/ui/elements/nature.webp" alt="" loading="lazy">Nature</span>
+    </div>
+    <p>Attribute-dependent Combo Skill. Intellect and Will variants use different trigger sets and imprisonment durations.</p>
+  </article>
+<article class="skill-card skill-element-nature">
+    <div class="skill-head">
+      <div class="skill-icon-wrap">
+        <div class="ef-skill-icon ef-element-nature ef-fill-full">
+          <span class="ef-skill-fill"></span>
+          <span class="ef-skill-ring"></span>
+          <span class="ef-skill-glyph-wrap"><img class="ef-skill-glyph" src="/endfield/assets/operators/skills/arcane/gloompurge.png" alt="Gloompurge icon" loading="lazy"></span>
+        </div>
+      </div>
+      <div>
+        <span class="skill-type">Ultimate · WILL</span>
         <h3>Gloompurge</h3>
       </div>
     </div>
@@ -533,50 +631,22 @@
     (() => {
       const storageKey = "rotationforge.operatorAttributeVariants.v1";
       const buttons = [...document.querySelectorAll("[data-attribute-variant]")];
-      const cards = [...document.querySelectorAll("#skills .skill-card")];
-      const variants = {
-        intellect: {
-          labels: ["Battle Skill · Array Arcana: INT", "Combo Skill · Array Arcana: INT", "Ultimate · Array Arcana: INT"],
-          descriptions: [
-            "Array Arcana: INT deals 500% ATK as Nature DMG and applies Nature Infliction.",
-            "INT form: 13s cooldown. Requires Nature Infliction or 2 stacks of another Arts Infliction; applies 4s Imprisonment and 4% Arts Susceptibility.",
-            "INT form: the second cast deals 1440% Nature DMG, applies Corrosion for 15s, and grants the team 24% Arts DMG."
-          ],
-          comboCooldown: "13s"
-        },
-        will: {
-          labels: ["Battle Skill · Array Arcana: WILL", "Combo Skill · Array Arcana: WILL", "Ultimate · Array Arcana: WILL"],
-          descriptions: [
-            "Array Arcana: WILL deals 300% ATK as Nature DMG, applies Nature Infliction, and pulls enemies toward the center.",
-            "WILL form: 19s cooldown. Requires 1 stack of any Arts Infliction; applies 6s Imprisonment and 12% Arts Susceptibility.",
-            "WILL form: the second cast deals 360% Nature DMG, duplicates the current Arts Infliction, and applies 12.8% Nature and Cryo Susceptibility for 10s."
-          ],
-          comboCooldown: "19s"
-        }
-      };
+      const panels = [...document.querySelectorAll("[data-attribute-variant-panel]")];
       let saved = {};
       try { saved = JSON.parse(localStorage.getItem(storageKey) || "{}"); } catch (_) {}
       const select = (key) => {
-        const variant = variants[key] || variants.intellect;
         buttons.forEach((button) => {
           const active = button.dataset.attributeVariant === key;
           button.classList.toggle("active", active);
           button.setAttribute("aria-pressed", String(active));
         });
-        [cards[1], cards[2], cards[3]].forEach((card, index) => {
-          if (!card) return;
-          const type = card.querySelector(".skill-type");
-          const description = card.querySelector("p");
-          if (type) type.textContent = variant.labels[index];
-          if (description) description.textContent = variant.descriptions[index];
-        });
-        const comboCooldown = cards[2]?.querySelector(".skill-meta strong");
-        if (comboCooldown) comboCooldown.textContent = variant.comboCooldown;
+        panels.forEach((panel) => { panel.hidden = panel.dataset.attributeVariantPanel !== key; });
         saved["28"] = key;
         try { localStorage.setItem(storageKey, JSON.stringify(saved)); } catch (_) {}
       };
       buttons.forEach((button) => button.addEventListener("click", () => select(button.dataset.attributeVariant)));
-      select(saved["28"] === "will" ? "will" : "intellect");
+      const savedKey = saved["28"];
+      select(buttons.some((button) => button.dataset.attributeVariant === savedKey) ? savedKey : "intellect");
     })();
   </script>
   <script>

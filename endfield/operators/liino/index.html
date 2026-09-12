@@ -70,6 +70,14 @@
     @media(max-width:520px){.operator-page .batk-track{height:128px}.operator-page .batk-details{margin-top:12px}.operator-page .batk-detail-card{padding:10px}.operator-page .batk-detail-data>div{grid-template-columns:116px minmax(0,1fr)}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.related-card,.operator-tile{transition:none}}
   </style>
+  <style>
+    .attribute-variant-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.attribute-variant-heading h2{margin:0}
+    .attribute-variant-switch{display:inline-flex;padding:3px;border:1px solid rgba(160,170,169,.28);border-radius:999px;background:rgba(12,15,16,.72)}
+    .attribute-variant-switch button{min-width:58px;padding:7px 12px;border:0;border-radius:999px;background:transparent;color:#b9c1bd;font:inherit;font-size:.76rem;font-weight:900;cursor:pointer}
+    .attribute-variant-switch button.active{background:linear-gradient(135deg,rgba(101,113,54,.8),rgba(248,245,70,.18));color:var(--yellow);box-shadow:inset 0 0 0 1px rgba(248,245,70,.45)}
+    [data-attribute-variant-panel][hidden]{display:none}
+    @media(max-width:640px){.attribute-variant-heading{align-items:flex-start;flex-direction:column}.attribute-variant-switch{width:100%}.attribute-variant-switch button{flex:1}}
+  </style>
 </head>
 <body class="operator-page">
   <header class="top">
@@ -184,14 +192,17 @@
     </section>
 
     <section class="panel skills-section" id="skills">
-      <h2>Liino Skills</h2>
+      <div class="attribute-variant-heading">
+        <h2>Liino Skills</h2>
+        
+      </div>
       <div class="skills-grid"><article class="skill-card skill-element-electric">
     <div class="skill-head">
       <div class="skill-icon-wrap">
         <div class="ef-skill-icon ef-element-electric ef-fill-half">
           <span class="ef-skill-fill"></span>
           <span class="ef-skill-ring"></span>
-          <span class="ef-skill-glyph-wrap"><img class="ef-skill-glyph" src="/endfield/assets/operators/skills/liino/starry-heart-throb.svg" alt="Starry Heart Throb icon" loading="lazy"></span>
+          <span class="ef-skill-glyph-wrap"><img class="ef-skill-glyph" src="/endfield/assets/operators/skills/liino/starry-heart-throb.png" alt="Starry Heart Throb icon" loading="lazy"></span>
         </div>
       </div>
       <div>
@@ -210,7 +221,7 @@
         <div class="ef-skill-icon ef-element-electric ef-fill-half">
           <span class="ef-skill-fill"></span>
           <span class="ef-skill-ring"></span>
-          <span class="ef-skill-glyph-wrap"><img class="ef-skill-glyph" src="/endfield/assets/operators/skills/liino/dazzling-focus.svg" alt="Dazzling Focus icon" loading="lazy"></span>
+          <span class="ef-skill-glyph-wrap"><img class="ef-skill-glyph" src="/endfield/assets/operators/skills/liino/dazzling-focus.png" alt="Dazzling Focus icon" loading="lazy"></span>
         </div>
       </div>
       <div>
@@ -229,7 +240,7 @@
         <div class="ef-skill-icon ef-element-electric ef-fill-half">
           <span class="ef-skill-fill"></span>
           <span class="ef-skill-ring"></span>
-          <span class="ef-skill-glyph-wrap"><img class="ef-skill-glyph" src="/endfield/assets/operators/skills/liino/delightful-harmonics.svg" alt="Delightful Harmonics icon" loading="lazy"></span>
+          <span class="ef-skill-glyph-wrap"><img class="ef-skill-glyph" src="/endfield/assets/operators/skills/liino/delightful-harmonics.png" alt="Delightful Harmonics icon" loading="lazy"></span>
         </div>
       </div>
       <div>
@@ -249,7 +260,7 @@
         <div class="ef-skill-icon ef-element-electric ef-fill-full">
           <span class="ef-skill-fill"></span>
           <span class="ef-skill-ring"></span>
-          <span class="ef-skill-glyph-wrap"><img class="ef-skill-glyph" src="/endfield/assets/operators/skills/liino/dawnstar-concerto.svg" alt="Dawnstar Concerto icon" loading="lazy"></span>
+          <span class="ef-skill-glyph-wrap"><img class="ef-skill-glyph" src="/endfield/assets/operators/skills/liino/dawnstar-concerto.png" alt="Dawnstar Concerto icon" loading="lazy"></span>
         </div>
       </div>
       <div>
@@ -325,6 +336,7 @@
   <script src="/endfield/supabaseClient.js?v=14"></script>
   <script src="/endfield/js/ui/operatorShares.js?v=2"></script>
   <script src="/endfield/js/ui/operatorBatkExport.js?v=13"></script>
+  
   <script>
     (() => {
       const heading = document.querySelector(".operator-name");
