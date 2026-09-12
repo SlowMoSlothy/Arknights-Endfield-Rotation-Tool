@@ -27,6 +27,12 @@ test("desktop navigation reuses the compact header and off-canvas drawer", () =>
   assert.doesNotMatch(accountScript, /innerWidth\s*>\s*900[\s\S]*closeMobileNav/);
 });
 
+test("desktop drawer controls stay positioned and the backdrop keeps its dark hover state", () => {
+  assert.match(plannerHtml, /id="mobileNavCloseBtn"[\s\S]*<svg[^>]*>[\s\S]*<path/s);
+  assert.match(layoutCss, /\.builder-sidebar > \.mobile-nav-close\s*\{[^}]*position:\s*absolute;[^}]*right:\s*16px;[^}]*top:\s*16px/s);
+  assert.match(layoutCss, /\.mobile-nav-backdrop:hover,[\s\S]*background:\s*rgba\(5,7,8,0\.58\)/s);
+});
+
 test("mobile header exposes profile and admin notifications", () => {
   assert.match(plannerHtml, /id="mobileNotificationBtn"/);
   assert.match(plannerHtml, /id="mobileNotificationBadge"/);

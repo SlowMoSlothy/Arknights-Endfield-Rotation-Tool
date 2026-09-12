@@ -25,6 +25,7 @@
 }
 
 .admin-page-header {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -50,10 +51,41 @@
 
 .admin-back-btn {
     flex: 0 0 auto;
+    margin-right: 52px;
 }
 
 .admin-mobile-close {
-    display: none;
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    padding: 0;
+    border: 1px solid rgba(160,170,169,0.35);
+    border-radius: 50%;
+    background: linear-gradient(180deg, rgba(160,170,169,0.18), rgba(18,20,22,0.96));
+    color: #f2f2f2;
+    cursor: pointer;
+}
+
+.admin-mobile-close:hover,
+.admin-mobile-close:focus-visible {
+    transform: none;
+    border-color: rgba(248,245,70,0.68);
+    background: linear-gradient(180deg, rgba(160,170,169,0.18), rgba(18,20,22,0.96));
+    color: #F8F546;
+    outline: none;
+}
+
+.admin-mobile-close svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
 }
 
 body.admin-page-open {
@@ -1097,26 +1129,13 @@ textarea.admin-batk-input {
     }
 
     .admin-mobile-close {
-        position: absolute;
         top: 12px;
         right: 12px;
-        display: grid;
-        width: 40px;
-        height: 40px;
-        place-items: center;
-        padding: 0 0 3px;
-        border: 1px solid rgba(160,170,169,0.35);
-        border-radius: 50%;
-        background: linear-gradient(180deg, rgba(160,170,169,0.18), rgba(18,20,22,0.96));
-        color: #f2f2f2;
-        font: inherit;
-        font-size: 26px;
-        line-height: 1;
-        cursor: pointer;
     }
 
     .admin-back-btn {
         width: 100%;
+        margin-right: 0;
     }
 
     .admin-session-bar,
