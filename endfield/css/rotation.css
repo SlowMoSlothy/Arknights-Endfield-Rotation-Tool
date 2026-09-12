@@ -72,7 +72,8 @@
 }
 
 :root:not(.rotation-mode-simulation) #rotationBuilderPanel .operator-skill-owner {
-    top: -8px;
+    top: auto;
+    bottom: calc(100% - 1px);
     font-size: 7px;
 }
 

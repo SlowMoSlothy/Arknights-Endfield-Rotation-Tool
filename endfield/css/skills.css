@@ -762,7 +762,8 @@
 .operator-skill-owner {
     position: absolute;
     left: 50%;
-    top: -10px;
+    top: auto;
+    bottom: calc(100% - 1px);
     z-index: 8;
     display: flex;
     align-items: center;
