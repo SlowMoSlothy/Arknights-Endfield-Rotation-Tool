@@ -767,7 +767,9 @@
     display: flex;
     align-items: center;
     gap: 4px;
-    max-width: calc(100% - 14px);
+    width: calc(100% - 16px);
+    max-width: calc(100% - 16px);
+    justify-content: center;
     padding: 1px 7px;
     border: 1px solid color-mix(in srgb, var(--element-color, #777) 58%, #222);
     border-radius: 999px;
@@ -786,6 +788,7 @@
 }
 
 .operator-skill-owner:has(.operator-attribute-variant) {
+    width: auto;
     max-width: calc(100% - 8px);
     top: -15px;
     padding: 1px 6px;

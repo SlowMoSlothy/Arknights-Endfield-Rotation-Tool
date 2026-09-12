@@ -609,8 +609,8 @@ test("operator database renders switchable attribute skill variants", () => {
     description: "Attribute-dependent skill.",
     raw_data: {
       attributeVariants: [
-        { key: "intellect", label: "Array Arcana: INT", actionOverride: { description: "INT damage form." } },
-        { key: "will", label: "Array Arcana: WILL", actionOverride: { description: "WILL pull form." } }
+        { key: "intellect", label: "Array Arcana: INT", actionOverride: { iconSmall: "assets/operators/skills/arcane/jadecrushing-grid-int.png", description: "INT damage form." } },
+        { key: "will", label: "Array Arcana: WILL", actionOverride: { iconSmall: "assets/operators/skills/arcane/jadecrushing-grid-will.png", description: "WILL pull form." } }
       ]
     }
   }]]]);
@@ -621,6 +621,8 @@ test("operator database renders switchable attribute skill variants", () => {
   assert.match(page, /data-attribute-variant-panel="intellect"/);
   assert.match(page, /INT damage form\./);
   assert.match(page, /WILL pull form\./);
+  assert.match(page, /jadecrushing-grid-int\.png/);
+  assert.match(page, /jadecrushing-grid-will\.png/);
 });
 
 test("half-filled skill icons use the complete lower semicircle", () => {

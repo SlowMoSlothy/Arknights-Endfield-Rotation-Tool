@@ -13,6 +13,42 @@ from (
 where skill.id = variants.skill_id
   and skill.operator_id = 28;
 
+-- Keep the original in-game glyphs in sync with the selected Arcane form.
+update public.operator_skills as skill
+set raw_data = jsonb_set(
+      skill.raw_data,
+      '{attributeVariants}',
+      (
+        select jsonb_agg(
+          jsonb_set(
+            jsonb_set(variant, '{actionOverride,icon}', to_jsonb(
+              case variant ->> 'key'
+                when 'will' then icon_paths.will_icon
+                else icon_paths.int_icon
+              end
+            ), true),
+            '{actionOverride,iconSmall}', to_jsonb(
+              case variant ->> 'key'
+                when 'will' then icon_paths.will_icon
+                else icon_paths.int_icon
+              end
+            ), true
+          ) order by ordinal
+        )
+        from jsonb_array_elements(skill.raw_data -> 'attributeVariants') with ordinality as entry(variant, ordinal)
+      ),
+      true
+    ),
+    updated_at = now()
+from (
+  values
+    (2802, 'assets/operators/skills/arcane/jadecrushing-grid-int.png', 'assets/operators/skills/arcane/jadecrushing-grid-will.png'),
+    (2803, 'assets/operators/skills/arcane/yinglung-stance-iv-int.png', 'assets/operators/skills/arcane/yinglung-stance-iv-will.png'),
+    (2804, 'assets/operators/skills/arcane/gloompurge-int.png', 'assets/operators/skills/arcane/gloompurge-will.png')
+) as icon_paths(skill_id, int_icon, will_icon)
+where skill.id = icon_paths.skill_id
+  and skill.operator_id = 28;
+
 commit;
 
 select id, name, raw_data -> 'attributeVariants' as attribute_variants

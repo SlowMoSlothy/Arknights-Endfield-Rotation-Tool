@@ -36,8 +36,8 @@ test("attribute variants select database overrides from current loadout stats", 
     operatorId: 28,
     damageProfile: { atkMultiplier: 5, element: "nature" },
     attributeVariants: [
-      { key: "intellect", condition: { leftStat: "intellect", comparison: "gte", rightStat: "will" }, actionOverride: { damageProfile: { atkMultiplier: 5 } } },
-      { key: "will", condition: { leftStat: "will", comparison: "gt", rightStat: "intellect" }, actionOverride: { damageProfile: { atkMultiplier: 3 }, debuffs: [{ appliesEffect: "pull" }] } }
+      { key: "intellect", condition: { leftStat: "intellect", comparison: "gte", rightStat: "will" }, actionOverride: { iconSmall: "arcane-int.png", damageProfile: { atkMultiplier: 5 } } },
+      { key: "will", condition: { leftStat: "will", comparison: "gt", rightStat: "intellect" }, actionOverride: { iconSmall: "arcane-will.png", damageProfile: { atkMultiplier: 3 }, debuffs: [{ appliesEffect: "pull" }] } }
     ]
   };
 
@@ -46,6 +46,7 @@ test("attribute variants select database overrides from current loadout stats", 
   assert.equal(intellectContext.window.resolveSimulationAttributeVariant(skill, 28).attributeVariantKey, "intellect");
   const resolvedWill = willContext.window.resolveSimulationAttributeVariant(skill, 28);
   assert.equal(resolvedWill.attributeVariantKey, "will");
+  assert.equal(resolvedWill.iconSmall, "arcane-will.png");
   assert.equal(resolvedWill.damageProfile.atkMultiplier, 3);
   assert.equal(resolvedWill.debuffs[0].appliesEffect, "pull");
 });
@@ -222,7 +223,11 @@ test("Batch 08 keeps new operator mechanics and pre-release uncertainty in Supab
   assert.match(migration, /'camille', 'Camille'/);
   assert.match(migration, /'liino', 'Liino'/);
   assert.match(migration, /"attributeVariants"/);
-  assert.match(fs.readFileSync("supabase/arcane_attribute_stance_switch.sql", "utf8"), /Array Arcana: WILL/);
+  const arcaneMigration = fs.readFileSync("supabase/arcane_attribute_stance_switch.sql", "utf8");
+  assert.match(arcaneMigration, /Array Arcana: WILL/);
+  assert.match(arcaneMigration, /jadecrushing-grid-will\.png/);
+  assert.match(arcaneMigration, /yinglung-stance-iv-will\.png/);
+  assert.match(arcaneMigration, /gloompurge-will\.png/);
   assert.match(migration, /camille_hunter_pursuit/);
   assert.match(migration, /"dataStatus":"pre_release"/);
   assert.match(migration, /3003[\s\S]*"comboTriggerMode":"all"/);

@@ -835,7 +835,7 @@ function skillForAttributeVariant(skill, variantKey) {
 }
 
 function skillCard(skill) {
-  const iconPath = skill.icon_small_path || skill.icon_path;
+  const iconPath = skill.iconSmall || skill.icon || skill.icon_small_path || skill.icon_path;
   const icon = iconPath ? normalizeAssetPath(iconPath) : "";
   const elementIcon = elementIconPath(skill.element_type);
   const skillElement = skillElementKey(skill.element_type);

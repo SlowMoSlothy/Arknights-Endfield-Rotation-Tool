@@ -11,6 +11,7 @@ test("operator skill rows expose a visible owner label and element accent", () =
   assert.match(skillsPanelScript, /operator-skill-owner/);
   assert.match(skillsPanelScript, /operator-element-\$\{operatorElement/);
   assert.match(skillsStyles, /\.operator-skill-owner\s*\{/);
+  assert.match(skillsStyles, /\.operator-skill-owner\s*\{[^}]*width:\s*calc\(100% - 16px\)[^}]*justify-content:\s*center/s);
   assert.match(skillsStyles, /var\(--element-color/);
 });
 
