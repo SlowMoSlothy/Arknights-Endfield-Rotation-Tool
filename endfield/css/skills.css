@@ -770,6 +770,8 @@
     gap: 4px;
     width: calc(100% - 16px);
     max-width: calc(100% - 16px);
+    min-height: 18px;
+    box-sizing: border-box;
     justify-content: center;
     padding: 1px 7px;
     border: 1px solid color-mix(in srgb, var(--element-color, #777) 58%, #222);
