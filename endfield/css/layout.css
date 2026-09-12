@@ -145,6 +145,13 @@
         0 0 14px rgba(248,245,70,0.10);
 }
 
+.mobile-top-action,
+.mobile-top-actions,
+.mobile-nav-backdrop,
+.mobile-nav-close {
+    display: none;
+}
+
 .account-bar {
     position: relative;
     display: flex;

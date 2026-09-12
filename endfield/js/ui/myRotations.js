@@ -356,6 +356,8 @@ function updateAccountBar() {
     const signOutButton = document.getElementById("accountSignOutBtn");
     const userLabel = document.getElementById("accountUserLabel");
     const avatar = document.getElementById("accountAvatar");
+    const mobileProfileButton = document.getElementById("mobileProfileButton");
+    const mobileAvatar = document.getElementById("mobileAccountAvatar");
     const openMyRotationsButton = document.getElementById("openMyRotationsBtn");
     const openProfileButton = document.getElementById("openProfileBtn");
     const isSignedIn = Boolean(myRotationsState.session);
@@ -385,6 +387,16 @@ function updateAccountBar() {
         avatar.hidden = !isSignedIn || !avatarUrl;
         avatar.src = avatarUrl || "";
         avatar.alt = avatarUrl ? `${displayName} avatar` : "";
+    }
+    if (mobileProfileButton) {
+        mobileProfileButton.classList.toggle("has-avatar", Boolean(isSignedIn && avatarUrl));
+        mobileProfileButton.setAttribute("aria-label", isSignedIn ? `Open ${displayName} profile` : "Sign in");
+        mobileProfileButton.title = isSignedIn ? displayName : "Sign in";
+    }
+    if (mobileAvatar) {
+        mobileAvatar.hidden = !isSignedIn || !avatarUrl;
+        mobileAvatar.src = avatarUrl || "";
+        mobileAvatar.alt = avatarUrl ? `${displayName} avatar` : "";
     }
 }
 
@@ -1696,6 +1708,11 @@ function initMyRotations() {
     const accountSignOutButton = document.getElementById("accountSignOutBtn");
     const accountMenuToggle = document.getElementById("accountMenuToggle");
     const accountBar = document.querySelector(".account-bar");
+    const mobileNavToggle = document.getElementById("mobileNavToggle");
+    const mobileNavCloseButton = document.getElementById("mobileNavCloseBtn");
+    const mobileNavBackdrop = document.getElementById("mobileNavBackdrop");
+    const mobileProfileButton = document.getElementById("mobileProfileButton");
+    const builderSidebar = document.getElementById("builderSidebar");
     const closeButton = document.getElementById("closeMyRotationsModalBtn");
     const closeProfileButton = document.getElementById("closeProfileModalBtn");
     const closePasswordResetButton = document.getElementById("closePasswordResetModalBtn");
@@ -1713,11 +1730,36 @@ function initMyRotations() {
     const profileModal = document.getElementById("profileModal");
     const passwordResetModal = document.getElementById("passwordResetModal");
 
+    const closeMobileNav = () => {
+        document.body.classList.remove("mobile-nav-open");
+        mobileNavToggle?.setAttribute("aria-expanded", "false");
+        if (mobileNavBackdrop) mobileNavBackdrop.hidden = true;
+    };
+    const openMobileNav = () => {
+        document.body.classList.add("mobile-nav-open");
+        mobileNavToggle?.setAttribute("aria-expanded", "true");
+        if (mobileNavBackdrop) mobileNavBackdrop.hidden = false;
+    };
+
     if (openButton) openButton.addEventListener("click", () => openMyRotationsModal());
     if (openProfileButton) openProfileButton.addEventListener("click", openProfileModal);
     if (accountSignInButton) accountSignInButton.addEventListener("click", () => openMyRotationsModal({ mode: "signIn" }));
     if (accountCreateButton) accountCreateButton.addEventListener("click", () => openMyRotationsModal({ mode: "create" }));
     if (accountSignOutButton) accountSignOutButton.addEventListener("click", signOutMyAccount);
+    if (mobileNavToggle) mobileNavToggle.addEventListener("click", openMobileNav);
+    if (mobileNavCloseButton) mobileNavCloseButton.addEventListener("click", closeMobileNav);
+    if (mobileNavBackdrop) mobileNavBackdrop.addEventListener("click", closeMobileNav);
+    if (builderSidebar) builderSidebar.addEventListener("click", event => {
+        if (event.target.closest(".sidebar-command")) closeMobileNav();
+    });
+    if (mobileProfileButton) mobileProfileButton.addEventListener("click", () => {
+        closeMobileNav();
+        if (myRotationsState.session) openProfileModal();
+        else openMyRotationsModal({ mode: "signIn" });
+    });
+    window.addEventListener("resize", () => {
+        if (window.innerWidth > 900) closeMobileNav();
+    });
     if (accountMenuToggle) accountMenuToggle.addEventListener("click", event => {
         event.stopPropagation();
         const isOpen = accountBar?.classList.toggle("is-menu-open") || false;
@@ -1730,6 +1772,7 @@ function initMyRotations() {
     });
     document.addEventListener("keydown", event => {
         if (event.key !== "Escape") return;
+        closeMobileNav();
         accountBar?.classList.remove("is-menu-open");
         accountMenuToggle?.setAttribute("aria-expanded", "false");
     });

@@ -44,6 +44,119 @@
         overflow-x: hidden;
     }
 
+    body.mobile-nav-open {
+        overflow: hidden;
+    }
+
+    .top .nav {
+        display: grid;
+        grid-template-columns: 42px minmax(0, 1fr) auto;
+        gap: 8px;
+    }
+
+    .top .brand {
+        min-width: 0;
+    }
+
+    .top .brand > span:last-child {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .mobile-top-actions,
+    .mobile-top-action {
+        display: flex;
+    }
+
+    .mobile-top-actions {
+        align-items: center;
+        gap: 5px;
+    }
+
+    .mobile-top-action {
+        position: relative;
+        width: 40px;
+        height: 40px;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border: 1px solid rgba(160,170,169,0.22);
+        border-radius: 50%;
+        background: rgba(20,24,25,0.56);
+        color: #eef1ed;
+    }
+
+    .mobile-top-action[hidden] {
+        display: none;
+    }
+
+    .mobile-top-action svg {
+        width: 22px;
+        height: 22px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .mobile-profile-button,
+    .mobile-profile-button img {
+        overflow: hidden;
+        border-radius: 50%;
+    }
+
+    .mobile-profile-button img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .mobile-profile-button.has-avatar .mobile-profile-fallback {
+        display: none;
+    }
+
+    .mobile-top-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        display: grid;
+        min-width: 19px;
+        height: 19px;
+        place-items: center;
+        padding: 0 4px;
+        border: 2px solid #252c2e;
+        border-radius: 999px;
+        background: #F8F546;
+        color: #111;
+        font-size: 9px;
+        font-weight: 950;
+    }
+
+    .mobile-top-badge[hidden] {
+        display: none;
+    }
+
+    .mobile-nav-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 3990;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        border: 0;
+        background: rgba(5,7,8,0.66);
+    }
+
+    .mobile-nav-backdrop:not([hidden]) {
+        display: block;
+    }
+
+    .app-brand .account-bar {
+        display: none;
+    }
+
     .builder-shell {
         padding: 0;
         box-sizing: border-box;
@@ -107,15 +220,34 @@
     }
 
     .builder-sidebar {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 4000;
+        display: flex;
+        width: min(86vw, 340px);
+        height: 100dvh;
+        flex-direction: column;
         align-items: stretch;
-        gap: 6px;
-        padding: 8px;
-        width: 100%;
-        min-width: 0;
-        box-sizing: border-box;
-        overflow: visible;
+        gap: 5px;
+        padding: 76px 12px 18px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        border: 0;
+        border-right: 1px solid rgba(160,170,169,0.30);
+        border-radius: 0 18px 18px 0;
+        transform: translateX(-105%);
+        transition: transform 0.2s ease;
+        box-shadow: 18px 0 42px rgba(0,0,0,0.42);
+    }
+
+    body.mobile-nav-open .builder-sidebar {
+        transform: translateX(0);
+    }
+
+    .builder-sidebar::before,
+    .builder-sidebar::after {
+        display: none;
     }
 
     .builder-panel {
@@ -126,26 +258,51 @@
     }
 
     .builder-sidebar h3 {
+        position: static;
+        width: auto;
+        height: auto;
+        margin: 0 0 8px;
+        padding: 0 8px 12px;
+        overflow: visible;
+        clip: auto;
+        border-bottom: 1px solid rgba(160,170,169,0.20);
+        color: #F8F546;
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+    }
+
+    .mobile-nav-close {
         position: absolute;
-        width: 1px;
-        height: 1px;
-        margin: -1px;
+        right: 14px;
+        top: 14px;
+        display: grid;
+        width: 42px;
+        height: 42px;
+        place-items: center;
+        padding: 0;
+        border: 1px solid rgba(160,170,169,0.26);
+        border-radius: 50%;
+        background: rgba(18,20,22,0.88);
+        color: #eef1ed;
+        font: inherit;
+        font-size: 25px;
     }
 
     .builder-sidebar .sidebar-command {
         width: 100%;
-        text-align: center;
+        text-align: left;
     }
 
     .sidebar-command {
         min-width: 0;
-        min-height: 58px;
-        grid-template-columns: minmax(0, 1fr);
-        grid-template-rows: 27px minmax(18px, auto);
-        place-items: center;
-        align-content: center;
-        gap: 3px;
-        padding: 5px 3px;
+        min-height: 52px;
+        grid-template-columns: 34px minmax(0, 1fr);
+        grid-template-rows: auto;
+        justify-items: start;
+        align-items: center;
+        gap: 11px;
+        padding: 7px 10px;
     }
 
     .sidebar-command:hover {
@@ -153,8 +310,8 @@
     }
 
     .sidebar-command-icon {
-        width: 27px;
-        height: 27px;
+        width: 34px;
+        height: 34px;
         font-size: 11px;
     }
 
@@ -166,24 +323,21 @@
     .sidebar-command-label {
         width: 100%;
         max-width: 100%;
-        display: -webkit-box;
-        font-size: 8px;
+        display: block;
+        font-size: 12px;
         font-weight: 800;
-        line-height: 1.05;
-        text-align: center;
+        line-height: 1.15;
+        text-align: left;
         white-space: normal;
-        overflow-wrap: anywhere;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
         overflow: hidden;
     }
 
     .sidebar-command-signal {
         display: block;
-        left: 50%;
-        right: auto;
-        width: 14px;
-        transform: translateX(-50%) skewX(-28deg);
+        left: auto;
+        right: 8px;
+        width: 10px;
+        transform: skewX(-28deg);
     }
 
     .builder-main {

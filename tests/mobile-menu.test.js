@@ -3,10 +3,25 @@ import fs from "node:fs";
 import test from "node:test";
 
 const mobileCss = fs.readFileSync("endfield/css/mobile.css", "utf8");
+const plannerHtml = fs.readFileSync("endfield/index.html", "utf8");
+const accountScript = fs.readFileSync("endfield/js/ui/myRotations.js", "utf8");
+const adminScript = fs.readFileSync("endfield/js/ui/adminPanel.js", "utf8");
 
-test("mobile builder menu shows every action in a compact icon grid", () => {
-  assert.match(mobileCss, /\.builder-sidebar\s*\{[^}]*display:\s*grid;[^}]*grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\)[^}]*overflow:\s*visible/s);
-  assert.match(mobileCss, /\.sidebar-command\s*\{[^}]*min-height:\s*58px;[^}]*grid-template-rows:\s*27px minmax\(18px, auto\)[^}]*place-items:\s*center/s);
-  assert.match(mobileCss, /\.sidebar-command-icon\s*\{[^}]*width:\s*27px;[^}]*height:\s*27px/s);
-  assert.match(mobileCss, /\.sidebar-command-label\s*\{[^}]*font-size:\s*8px;[^}]*text-align:\s*center[^}]*-webkit-line-clamp:\s*2/s);
+test("mobile navigation uses a header trigger and off-canvas menu", () => {
+  assert.match(plannerHtml, /id="mobileNavToggle"[^>]*aria-controls="builderSidebar"/s);
+  assert.match(plannerHtml, /id="builderSidebar" class="builder-sidebar"/);
+  assert.match(plannerHtml, /id="mobileNavBackdrop"/);
+  assert.match(mobileCss, /\.builder-sidebar\s*\{[^}]*position:\s*fixed;[^}]*height:\s*100dvh;[^}]*transform:\s*translateX\(-105%\)/s);
+  assert.match(mobileCss, /body\.mobile-nav-open \.builder-sidebar\s*\{[^}]*transform:\s*translateX\(0\)/s);
+  assert.match(accountScript, /document\.body\.classList\.add\("mobile-nav-open"\)/);
+  assert.match(accountScript, /document\.body\.classList\.remove\("mobile-nav-open"\)/);
+});
+
+test("mobile header exposes profile and admin notifications", () => {
+  assert.match(plannerHtml, /id="mobileNotificationBtn"/);
+  assert.match(plannerHtml, /id="mobileNotificationBadge"/);
+  assert.match(plannerHtml, /id="mobileProfileButton"/);
+  assert.match(accountScript, /if \(myRotationsState\.session\) openProfileModal\(\)/);
+  assert.match(adminScript, /document\.getElementById\("mobileNotificationBadge"\)/);
+  assert.match(adminScript, /mobileNotificationButton\.addEventListener\("click", openAdminPanel\)/);
 });

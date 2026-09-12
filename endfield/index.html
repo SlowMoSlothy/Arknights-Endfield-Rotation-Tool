@@ -41,8 +41,8 @@
       "isAccessibleForFree": true
     }
   </script>
-  <link rel="stylesheet" href="css/style.css?v=92">
-  <link rel="stylesheet" href="css/mobile.css?v=22">
+  <link rel="stylesheet" href="css/style.css?v=93">
+  <link rel="stylesheet" href="css/mobile.css?v=23">
     <link rel="stylesheet" href="atk-chart.css?v=16">
 </head>
 
@@ -52,13 +52,30 @@
 
   <header class="top">
     <nav class="nav" aria-label="Primary">
+      <button id="mobileNavToggle" class="mobile-top-action mobile-nav-toggle" type="button"
+        aria-label="Open menu" aria-expanded="false" aria-controls="builderSidebar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+      </button>
       <a class="brand" href="/">
         <span class="mark"><img src="/favicon-flat.png" alt=""></span>
         <span>RotationForge</span>
       </a>
       <span class="tool-name">Combat Rotation Tools</span>
+      <div class="mobile-top-actions">
+        <button id="mobileNotificationBtn" class="mobile-top-action mobile-notification-btn" type="button"
+          aria-label="Notifications" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg>
+          <span id="mobileNotificationBadge" class="mobile-top-badge" hidden>0</span>
+        </button>
+        <button id="mobileProfileButton" class="mobile-top-action mobile-profile-button" type="button"
+          aria-label="Sign in">
+          <img id="mobileAccountAvatar" alt="" hidden>
+          <svg class="mobile-profile-fallback" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M5 21c1-5 3.3-7 7-7s6 2 7 7"></path></svg>
+        </button>
+      </div>
     </nav>
   </header>
+  <button id="mobileNavBackdrop" class="mobile-nav-backdrop" type="button" aria-label="Close menu" hidden></button>
 
   <div id="appLoadingScreen" class="app-loading-screen" role="status" aria-live="polite" aria-busy="true">
     <div class="app-loading-card">
@@ -144,8 +161,9 @@
       <div class="builder-divider"></div>
 
       <div class="builder-content">
-        <nav class="builder-sidebar" aria-label="Builder menu">
+        <nav id="builderSidebar" class="builder-sidebar" aria-label="Builder menu">
           <h3>Menu</h3>
+          <button id="mobileNavCloseBtn" class="mobile-nav-close" type="button" aria-label="Close menu">×</button>
           <button id="openMyRotationsBtn" class="sidebar-command" type="button" hidden>
             <span class="sidebar-command-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false">
@@ -950,8 +968,8 @@
   <script src="js/ui/teamSelection.js"></script>
   <script src="js/ui/communityRotations.js"></script>
   <script src="js/ui/operatorGallery.js?v=2"></script>
-  <script src="js/ui/myRotations.js?v=3"></script>
-  <script src="js/ui/adminPanel.js?v=14"></script>
+  <script src="js/ui/myRotations.js?v=4"></script>
+  <script src="js/ui/adminPanel.js?v=15"></script>
   <script src="js/ui/reportIssue.js?v=3"></script>
   <script src="js/main.js?v=6"></script>
 </body>

@@ -1577,10 +1577,12 @@ function renderAdminPanel() {
 
 function updateAdminEntryVisibility() {
     const openButton = document.getElementById("openAdminPanelBtn");
+    const mobileNotificationButton = document.getElementById("mobileNotificationBtn");
     const panel = document.getElementById("adminPanelView");
     const canShowAdmin = Boolean(adminPanelState.session && adminPanelState.isAdmin);
 
     if (openButton) openButton.hidden = !canShowAdmin;
+    if (mobileNotificationButton) mobileNotificationButton.hidden = !canShowAdmin;
     renderAdminNotificationBadge();
     if (!canShowAdmin && panel && !panel.hidden) {
         closeAdminPanel();
@@ -1588,13 +1590,18 @@ function updateAdminEntryVisibility() {
 }
 
 function renderAdminNotificationBadge() {
-    const badge = document.getElementById("adminNotificationBadge");
-    if (!badge) return;
+    const badges = [
+        document.getElementById("adminNotificationBadge"),
+        document.getElementById("mobileNotificationBadge")
+    ].filter(Boolean);
+    if (badges.length === 0) return;
 
     const count = Math.max(0, Number(adminPanelState.notificationCount) || 0);
-    badge.hidden = !adminPanelState.isAdmin || count === 0;
-    badge.textContent = count > 99 ? "99+" : String(count);
-    badge.setAttribute("aria-label", `${count} new admin notification${count === 1 ? "" : "s"}`);
+    badges.forEach(badge => {
+        badge.hidden = !adminPanelState.isAdmin || count === 0;
+        badge.textContent = count > 99 ? "99+" : String(count);
+        badge.setAttribute("aria-label", `${count} new admin notification${count === 1 ? "" : "s"}`);
+    });
 }
 
 async function refreshAdminNotificationCount() {
@@ -2239,6 +2246,7 @@ function initAdminPanel() {
     adminPanelState.initialized = true;
 
     const openButton = document.getElementById("openAdminPanelBtn");
+    const mobileNotificationButton = document.getElementById("mobileNotificationBtn");
     const closeButton = document.getElementById("closeAdminPanelBtn");
     const loginForm = document.getElementById("adminLoginForm");
     const signOutButton = document.getElementById("adminSignOutBtn");
@@ -2246,6 +2254,7 @@ function initAdminPanel() {
     const refreshButton = document.getElementById("adminRefreshBtn");
 
     if (openButton) openButton.addEventListener("click", openAdminPanel);
+    if (mobileNotificationButton) mobileNotificationButton.addEventListener("click", openAdminPanel);
     if (closeButton) closeButton.addEventListener("click", closeAdminPanel);
     if (loginForm) loginForm.addEventListener("submit", signInAdmin);
     if (signOutButton) signOutButton.addEventListener("click", signOutAdmin);
