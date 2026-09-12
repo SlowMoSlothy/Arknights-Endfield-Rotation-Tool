@@ -29,11 +29,11 @@ test("landing page uses concise non-repetitive header copy", () => {
   assert.doesNotMatch(landingHtml, /Available tools/);
 });
 
-test("tool cards use a shared Endfield game identity", () => {
-  assert.equal((landingHtml.match(/class="game-icon"/g) || []).length, 2);
+test("tool cards use a shared text-only Endfield game identity", () => {
   assert.equal((landingHtml.match(/class="game-name">Arknights: Endfield/g) || []).length, 2);
   assert.match(landingHtml, /class="game-tool-name">Rotation Planner/);
   assert.match(landingHtml, /class="game-tool-name">Operator Database/);
-  assert.match(landingHtml, /\.game-icon\s*\{[^}]*background-image:\s*url\("\/endfield\/assets\/header\.png"\)/s);
+  assert.doesNotMatch(landingHtml, /class="game-icon"/);
+  assert.doesNotMatch(landingHtml, /background-image:\s*url\("\/endfield\/assets\/header\.png"\)/);
   assert.doesNotMatch(landingHtml, /<h3>Endfield Operator Database<\/h3>/);
 });
