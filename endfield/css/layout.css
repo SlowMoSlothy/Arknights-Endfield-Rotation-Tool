@@ -145,10 +145,121 @@
         0 0 14px rgba(248,245,70,0.10);
 }
 
-.mobile-top-action,
 .mobile-top-actions,
-.mobile-nav-backdrop,
-.mobile-nav-close {
+.mobile-top-action {
+    display: flex;
+}
+
+.mobile-top-actions {
+    align-items: center;
+    gap: 7px;
+    margin-left: auto;
+}
+
+.mobile-top-action {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid rgba(160,170,169,0.24);
+    border-radius: 50%;
+    background: rgba(20,24,25,0.58);
+    color: #eef1ed;
+    cursor: pointer;
+    transition: border-color 0.16s ease, background 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.mobile-top-action:hover,
+.mobile-top-action:focus-visible {
+    border-color: rgba(248,245,70,0.68);
+    color: #F8F546;
+    transform: translateY(-1px);
+    outline: none;
+}
+
+.mobile-top-action[hidden] {
+    display: none;
+}
+
+.mobile-top-action svg {
+    width: 21px;
+    height: 21px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.mobile-profile-button,
+.mobile-profile-button img {
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.mobile-profile-button img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.mobile-profile-button.has-avatar .mobile-profile-fallback {
+    display: none;
+}
+
+.mobile-notification-btn.is-active {
+    border-color: rgba(248,245,70,0.88);
+    background: #F8F546;
+    color: #111;
+    box-shadow: 0 0 18px rgba(248,245,70,0.24);
+}
+
+.mobile-top-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    display: grid;
+    min-width: 19px;
+    height: 19px;
+    place-items: center;
+    box-sizing: border-box;
+    padding: 0 4px;
+    border: 2px solid #252c2e;
+    border-radius: 999px;
+    background: #F8F546;
+    color: #111;
+    font-size: 9px;
+    font-weight: 950;
+}
+
+.mobile-top-badge[hidden] {
+    display: none;
+}
+
+.mobile-nav-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 3990;
+    display: none;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: rgba(5,7,8,0.58);
+}
+
+.mobile-nav-backdrop:not([hidden]) {
+    display: block;
+}
+
+body.mobile-nav-open {
+    overflow: hidden;
+}
+
+.app-brand .account-bar {
     display: none;
 }
 
@@ -500,6 +611,109 @@
         left: calc(100% + 18px);
         opacity: 0;
     }
+}
+
+/* Shared navigation drawer: compact header on mobile and desktop. */
+.builder-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 4000;
+    display: flex;
+    width: min(360px, calc(100vw - 44px));
+    height: 100dvh;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 7px;
+    box-sizing: border-box;
+    padding: 82px 16px 22px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border: 0;
+    border-right: 1px solid rgba(160,170,169,0.32);
+    border-radius: 0 20px 20px 0;
+    transform: translateX(-105%);
+    transition: transform 0.2s ease;
+    box-shadow: 20px 0 46px rgba(0,0,0,0.46);
+}
+
+body.mobile-nav-open .builder-sidebar {
+    transform: translateX(0);
+}
+
+.builder-sidebar::before,
+.builder-sidebar::after {
+    display: none;
+}
+
+.builder-sidebar h3 {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0 0 10px;
+    padding: 0 8px 14px;
+    overflow: visible;
+    clip: auto;
+    border-bottom: 1px solid rgba(160,170,169,0.20);
+    color: #F8F546;
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    white-space: normal;
+    text-transform: uppercase;
+}
+
+.mobile-nav-close {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    padding: 0 0 3px;
+    border: 1px solid rgba(160,170,169,0.28);
+    border-radius: 50%;
+    background: rgba(18,20,22,0.88);
+    color: #eef1ed;
+    font: inherit;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+.builder-sidebar .sidebar-command {
+    width: 100%;
+    min-height: 56px;
+    flex: 0 0 auto;
+    grid-template-columns: 38px minmax(0, 1fr);
+    grid-template-rows: auto;
+    justify-items: start;
+    gap: 12px;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+.builder-sidebar .sidebar-command-icon {
+    width: 38px;
+    height: 38px;
+}
+
+.builder-sidebar .sidebar-command-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.builder-sidebar .sidebar-command-label {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+    font-size: 13px;
+    line-height: 1.15;
+    white-space: normal;
+}
+
+.builder-sidebar .sidebar-command-signal {
+    right: 10px;
+    width: 12px;
 }
 
 @media (prefers-reduced-motion: reduce) {

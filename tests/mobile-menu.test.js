@@ -6,6 +6,7 @@ const mobileCss = fs.readFileSync("endfield/css/mobile.css", "utf8");
 const plannerHtml = fs.readFileSync("endfield/index.html", "utf8");
 const accountScript = fs.readFileSync("endfield/js/ui/myRotations.js", "utf8");
 const adminScript = fs.readFileSync("endfield/js/ui/adminPanel.js", "utf8");
+const layoutCss = fs.readFileSync("endfield/css/layout.css", "utf8");
 
 test("mobile navigation uses a header trigger and off-canvas menu", () => {
   assert.match(plannerHtml, /id="mobileNavToggle"[^>]*aria-controls="builderSidebar"/s);
@@ -16,6 +17,14 @@ test("mobile navigation uses a header trigger and off-canvas menu", () => {
   assert.match(accountScript, /document\.body\.classList\.add\("mobile-nav-open"\)/);
   assert.match(accountScript, /document\.body\.classList\.remove\("mobile-nav-open"\)/);
   assert.match(accountScript, /classList\.contains\("admin-page-open"\)[\s\S]*closeAdminPanel\(\)/);
+});
+
+test("desktop navigation reuses the compact header and off-canvas drawer", () => {
+  assert.match(layoutCss, /\.mobile-top-actions,\s*\.mobile-top-action\s*\{\s*display:\s*flex/s);
+  assert.match(layoutCss, /\.builder-sidebar\s*\{[^}]*position:\s*fixed;[^}]*width:\s*min\(360px,[^}]*transform:\s*translateX\(-105%\)/s);
+  assert.match(layoutCss, /body\.mobile-nav-open \.builder-sidebar\s*\{[^}]*transform:\s*translateX\(0\)/s);
+  assert.match(layoutCss, /\.app-brand \.account-bar\s*\{[^}]*display:\s*none/s);
+  assert.doesNotMatch(accountScript, /innerWidth\s*>\s*900[\s\S]*closeMobileNav/);
 });
 
 test("mobile header exposes profile and admin notifications", () => {

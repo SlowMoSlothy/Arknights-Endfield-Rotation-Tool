@@ -1760,9 +1760,6 @@ function initMyRotations() {
         if (myRotationsState.session) openProfileModal();
         else openMyRotationsModal({ mode: "signIn" });
     });
-    window.addEventListener("resize", () => {
-        if (window.innerWidth > 900) closeMobileNav();
-    });
     if (accountMenuToggle) accountMenuToggle.addEventListener("click", event => {
         event.stopPropagation();
         const isOpen = accountBar?.classList.toggle("is-menu-open") || false;

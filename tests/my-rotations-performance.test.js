@@ -21,7 +21,7 @@ test("My Rotations uses one contained scroll area without backdrop blur", () => 
   assert.match(myRotationsStyles, /\.my-rotations-list\s*{[^}]*overflow-y:\s*auto[^}]*overscroll-behavior:\s*contain[^}]*contain:\s*layout paint/s);
   assert.match(myRotationsStyles, /\.my-rotation-card\s*{[^}]*contain:\s*layout paint/s);
   assert.match(plannerHtml, /css\/style\.css\?v=\d+/);
-  assert.match(plannerHtml, /js\/ui\/myRotations\.js\?v=5/);
+  assert.match(plannerHtml, /js\/ui\/myRotations\.js\?v=6/);
 });
 
 test("signed-in mobile account controls collapse into a compact menu", () => {
