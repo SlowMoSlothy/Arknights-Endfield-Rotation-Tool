@@ -15,6 +15,7 @@ test("mobile navigation uses a header trigger and off-canvas menu", () => {
   assert.match(mobileCss, /body\.mobile-nav-open \.builder-sidebar\s*\{[^}]*transform:\s*translateX\(0\)/s);
   assert.match(accountScript, /document\.body\.classList\.add\("mobile-nav-open"\)/);
   assert.match(accountScript, /document\.body\.classList\.remove\("mobile-nav-open"\)/);
+  assert.match(accountScript, /classList\.contains\("admin-page-open"\)[\s\S]*closeAdminPanel\(\)/);
 });
 
 test("mobile header exposes profile and admin notifications", () => {
@@ -23,5 +24,8 @@ test("mobile header exposes profile and admin notifications", () => {
   assert.match(plannerHtml, /id="mobileProfileButton"/);
   assert.match(accountScript, /if \(myRotationsState\.session\) openProfileModal\(\)/);
   assert.match(adminScript, /document\.getElementById\("mobileNotificationBadge"\)/);
-  assert.match(adminScript, /mobileNotificationButton\.addEventListener\("click", openAdminPanel\)/);
+  assert.match(plannerHtml, /id="adminMobileCloseBtn"/);
+  assert.match(adminScript, /mobileNotificationButton\.addEventListener\("click", toggleAdminPanel\)/);
+  assert.match(adminScript, /mobileCloseButton\.addEventListener\("click", closeAdminPanel\)/);
+  assert.match(adminScript, /function toggleAdminPanel\(\)[\s\S]*!panel\.hidden[\s\S]*closeAdminPanel\(\)[\s\S]*openAdminPanel\(\)/);
 });

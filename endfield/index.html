@@ -41,8 +41,8 @@
       "isAccessibleForFree": true
     }
   </script>
-  <link rel="stylesheet" href="css/style.css?v=93">
-  <link rel="stylesheet" href="css/mobile.css?v=23">
+  <link rel="stylesheet" href="css/style.css?v=94">
+  <link rel="stylesheet" href="css/mobile.css?v=24">
     <link rel="stylesheet" href="atk-chart.css?v=16">
 </head>
 
@@ -63,7 +63,7 @@
       <span class="tool-name">Combat Rotation Tools</span>
       <div class="mobile-top-actions">
         <button id="mobileNotificationBtn" class="mobile-top-action mobile-notification-btn" type="button"
-          aria-label="Notifications" hidden>
+          aria-label="Notifications" aria-expanded="false" aria-controls="adminPanelView" hidden>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg>
           <span id="mobileNotificationBadge" class="mobile-top-badge" hidden>0</span>
         </button>
@@ -811,6 +811,8 @@
           <span class="admin-page-kicker">RotationForge administration</span>
           <h2 id="adminPanelTitle" class="settings-title">Admin Control</h2>
         </div>
+        <button id="adminMobileCloseBtn" class="admin-mobile-close" type="button"
+          aria-label="Close Admin Control">&times;</button>
         <button id="closeAdminPanelBtn" class="admin-secondary-btn admin-back-btn" type="button" aria-label="Back to Rotation Builder">Back to Builder</button>
       </div>
 
@@ -968,8 +970,8 @@
   <script src="js/ui/teamSelection.js"></script>
   <script src="js/ui/communityRotations.js"></script>
   <script src="js/ui/operatorGallery.js?v=2"></script>
-  <script src="js/ui/myRotations.js?v=4"></script>
-  <script src="js/ui/adminPanel.js?v=15"></script>
+  <script src="js/ui/myRotations.js?v=5"></script>
+  <script src="js/ui/adminPanel.js?v=16"></script>
   <script src="js/ui/reportIssue.js?v=3"></script>
   <script src="js/main.js?v=6"></script>
 </body>

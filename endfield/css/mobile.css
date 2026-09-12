@@ -101,6 +101,13 @@
         stroke-linejoin: round;
     }
 
+    .mobile-notification-btn.is-active {
+        border-color: rgba(248,245,70,0.88);
+        background: #F8F546;
+        color: #111;
+        box-shadow: 0 0 18px rgba(248,245,70,0.24);
+    }
+
     .mobile-profile-button,
     .mobile-profile-button img {
         overflow: hidden;

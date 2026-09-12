@@ -1736,6 +1736,9 @@ function initMyRotations() {
         if (mobileNavBackdrop) mobileNavBackdrop.hidden = true;
     };
     const openMobileNav = () => {
+        if (document.body.classList.contains("admin-page-open") && typeof closeAdminPanel === "function") {
+            closeAdminPanel();
+        }
         document.body.classList.add("mobile-nav-open");
         mobileNavToggle?.setAttribute("aria-expanded", "true");
         if (mobileNavBackdrop) mobileNavBackdrop.hidden = false;

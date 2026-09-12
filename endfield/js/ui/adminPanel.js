@@ -2224,21 +2224,36 @@ async function reviewAdminRotation(rotationId, approve) {
 
 function openAdminPanel() {
     const panel = document.getElementById("adminPanelView");
+    const mobileNotificationButton = document.getElementById("mobileNotificationBtn");
     if (!panel) return;
 
     panel.hidden = false;
     document.body.classList.add("admin-page-open");
+    mobileNotificationButton?.classList.add("is-active");
+    mobileNotificationButton?.setAttribute("aria-expanded", "true");
     window.scrollTo({ top: 0, behavior: "smooth" });
     refreshAdminSession();
 }
 
 function closeAdminPanel() {
     const panel = document.getElementById("adminPanelView");
+    const mobileNotificationButton = document.getElementById("mobileNotificationBtn");
     if (!panel) return;
 
     panel.hidden = true;
     document.body.classList.remove("admin-page-open");
+    mobileNotificationButton?.classList.remove("is-active");
+    mobileNotificationButton?.setAttribute("aria-expanded", "false");
     window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function toggleAdminPanel() {
+    const panel = document.getElementById("adminPanelView");
+    if (panel && !panel.hidden) {
+        closeAdminPanel();
+        return;
+    }
+    openAdminPanel();
 }
 
 function initAdminPanel() {
@@ -2248,14 +2263,16 @@ function initAdminPanel() {
     const openButton = document.getElementById("openAdminPanelBtn");
     const mobileNotificationButton = document.getElementById("mobileNotificationBtn");
     const closeButton = document.getElementById("closeAdminPanelBtn");
+    const mobileCloseButton = document.getElementById("adminMobileCloseBtn");
     const loginForm = document.getElementById("adminLoginForm");
     const signOutButton = document.getElementById("adminSignOutBtn");
     const loginSignOutButton = document.getElementById("adminLoginSignOutBtn");
     const refreshButton = document.getElementById("adminRefreshBtn");
 
     if (openButton) openButton.addEventListener("click", openAdminPanel);
-    if (mobileNotificationButton) mobileNotificationButton.addEventListener("click", openAdminPanel);
+    if (mobileNotificationButton) mobileNotificationButton.addEventListener("click", toggleAdminPanel);
     if (closeButton) closeButton.addEventListener("click", closeAdminPanel);
+    if (mobileCloseButton) mobileCloseButton.addEventListener("click", closeAdminPanel);
     if (loginForm) loginForm.addEventListener("submit", signInAdmin);
     if (signOutButton) signOutButton.addEventListener("click", signOutAdmin);
     if (loginSignOutButton) loginSignOutButton.addEventListener("click", signOutAdmin);
