@@ -19,3 +19,12 @@ test("mobile landing page keeps the hero first and hides repetitive highlights",
   assert.doesNotMatch(landingHtml, /#tools\s*\{[^}]*order:\s*-2/s);
   assert.match(landingHtml, /@media \(max-width:\s*760px\)[\s\S]*\.feature-grid\s*\{[^}]*display:\s*none/s);
 });
+
+test("landing page uses concise non-repetitive header copy", () => {
+  assert.match(landingHtml, /Combat Rotation Tools/);
+  assert.match(landingHtml, /Forge the perfect rotation\./);
+  assert.match(landingHtml, /Build your team, plan every skill, and share the result\./);
+  assert.match(landingHtml, /<h2 id="tools-title">Choose your tool<\/h2>/);
+  assert.doesNotMatch(landingHtml, /RotationForge Tools/);
+  assert.doesNotMatch(landingHtml, /Available tools/);
+});
