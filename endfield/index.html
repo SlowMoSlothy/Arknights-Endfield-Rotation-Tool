@@ -120,12 +120,18 @@
         <span class="app-beta-chip">Open Beta</span>
       </div>
       <div class="account-bar" aria-label="Account actions">
-        <img id="accountAvatar" class="account-avatar" alt="" hidden>
-        <span id="accountUserLabel" class="account-user-label" hidden></span>
-        <button id="accountSignInBtn" class="account-action-btn" type="button">Sign In</button>
-        <button id="accountCreateBtn" class="account-action-btn account-action-primary" type="button">Create
-          Account</button>
-        <button id="accountSignOutBtn" class="account-action-btn" type="button" hidden>Sign Out</button>
+        <button id="accountMenuToggle" class="account-menu-toggle" type="button" aria-expanded="false"
+          aria-controls="accountMenuPanel" hidden>
+          <img id="accountAvatar" class="account-avatar" alt="" hidden>
+          <span id="accountUserLabel" class="account-user-label" hidden></span>
+          <span class="account-menu-chevron" aria-hidden="true">⌄</span>
+        </button>
+        <div id="accountMenuPanel" class="account-menu-panel">
+          <button id="accountSignInBtn" class="account-action-btn" type="button">Sign In</button>
+          <button id="accountCreateBtn" class="account-action-btn account-action-primary" type="button">Create
+            Account</button>
+          <button id="accountSignOutBtn" class="account-action-btn" type="button" hidden>Sign Out</button>
+        </div>
       </div>
     </header>
 
@@ -944,7 +950,7 @@
   <script src="js/ui/teamSelection.js"></script>
   <script src="js/ui/communityRotations.js"></script>
   <script src="js/ui/operatorGallery.js?v=2"></script>
-  <script src="js/ui/myRotations.js?v=2"></script>
+  <script src="js/ui/myRotations.js?v=3"></script>
   <script src="js/ui/adminPanel.js?v=14"></script>
   <script src="js/ui/reportIssue.js?v=3"></script>
   <script src="js/main.js?v=6"></script>

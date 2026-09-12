@@ -5,6 +5,7 @@ import test from "node:test";
 const plannerHtml = fs.readFileSync("endfield/index.html", "utf8");
 const myRotationsScript = fs.readFileSync("endfield/js/ui/myRotations.js", "utf8");
 const myRotationsStyles = fs.readFileSync("endfield/css/my-rotations.css", "utf8");
+const layoutStyles = fs.readFileSync("endfield/css/layout.css", "utf8");
 
 test("My Rotations locks the background at its current scroll position", () => {
   assert.match(myRotationsScript, /document\.documentElement\?\.classList\.add\("my-rotations-modal-open"\)/);
@@ -20,5 +21,13 @@ test("My Rotations uses one contained scroll area without backdrop blur", () => 
   assert.match(myRotationsStyles, /\.my-rotations-list\s*{[^}]*overflow-y:\s*auto[^}]*overscroll-behavior:\s*contain[^}]*contain:\s*layout paint/s);
   assert.match(myRotationsStyles, /\.my-rotation-card\s*{[^}]*contain:\s*layout paint/s);
   assert.match(plannerHtml, /css\/style\.css\?v=\d+/);
-  assert.match(plannerHtml, /js\/ui\/myRotations\.js\?v=2/);
+  assert.match(plannerHtml, /js\/ui\/myRotations\.js\?v=3/);
+});
+
+test("signed-in mobile account controls collapse into a compact menu", () => {
+  assert.match(plannerHtml, /id="accountMenuToggle"[^>]*aria-expanded="false"[^>]*aria-controls="accountMenuPanel"/s);
+  assert.match(myRotationsScript, /classList\.toggle\("is-menu-open"\)/);
+  assert.match(myRotationsScript, /setAttribute\("aria-expanded", String\(isOpen\)\)/);
+  assert.match(layoutStyles, /\.account-bar\.is-signed-in \.account-menu-panel\s*\{[^}]*position:\s*absolute[^}]*display:\s*none/s);
+  assert.match(layoutStyles, /\.account-bar\.is-signed-in\.is-menu-open \.account-menu-panel\s*\{[^}s]*display:\s*flex/s);
 });

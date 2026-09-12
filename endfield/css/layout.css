@@ -146,6 +146,7 @@
 }
 
 .account-bar {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -153,6 +154,30 @@
     gap: 8px;
     min-width: 0;
     max-width: min(560px, 48vw);
+}
+
+.account-menu-toggle,
+.account-menu-panel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.account-menu-toggle {
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+}
+
+.account-menu-toggle[hidden] {
+    display: none;
+}
+
+.account-menu-chevron {
+    display: none;
 }
 
 .account-user-label {
@@ -594,6 +619,61 @@
     .account-bar {
         justify-content: flex-start;
         max-width: 100%;
+        width: auto;
+    }
+
+    .account-bar.is-signed-in .account-menu-toggle {
+        min-height: 42px;
+        padding: 5px 9px 5px 5px;
+        border: 1px solid rgba(160,170,169,0.30);
+        border-radius: 999px;
+        background: linear-gradient(180deg, rgba(160,170,169,0.16), rgba(18,20,22,0.94));
+        cursor: pointer;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.035), 0 5px 14px rgba(0,0,0,0.18);
+    }
+
+    .account-bar.is-signed-in .account-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+    }
+
+    .account-bar.is-signed-in .account-user-label {
+        max-width: min(46vw, 180px);
+        flex-basis: auto;
+    }
+
+    .account-bar.is-signed-in .account-menu-chevron {
+        display: inline-block;
+        color: #F8F546;
+        font-size: 16px;
+        line-height: 1;
+        transition: transform 0.16s ease;
+    }
+
+    .account-bar.is-menu-open .account-menu-chevron {
+        transform: rotate(180deg);
+    }
+
+    .account-bar.is-signed-in .account-menu-panel {
+        position: absolute;
+        left: 0;
+        top: calc(100% + 6px);
+        z-index: 30;
+        display: none;
+        min-width: 132px;
+        padding: 7px;
+        border: 1px solid rgba(160,170,169,0.30);
+        border-radius: 12px;
+        background: rgba(20,24,25,0.98);
+        box-shadow: 0 12px 28px rgba(0,0,0,0.36);
+    }
+
+    .account-bar.is-signed-in.is-menu-open .account-menu-panel {
+        display: flex;
+    }
+
+    .account-bar.is-signed-in .account-menu-panel .account-action-btn {
         width: 100%;
     }
 
@@ -603,11 +683,7 @@
         font-size: 10px;
     }
 
-    .account-user-label {
-        max-width: 100%;
-        flex-basis: 100%;
-        text-align: left;
-    }
+    .account-user-label { text-align: left; }
 
     .builder-shell {
         padding-bottom: 10px;

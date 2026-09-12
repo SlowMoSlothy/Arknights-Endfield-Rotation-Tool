@@ -349,6 +349,8 @@ function renderMyAuthPanel() {
 }
 
 function updateAccountBar() {
+    const accountBar = document.querySelector(".account-bar");
+    const menuToggle = document.getElementById("accountMenuToggle");
     const signInButton = document.getElementById("accountSignInBtn");
     const createButton = document.getElementById("accountCreateBtn");
     const signOutButton = document.getElementById("accountSignOutBtn");
@@ -359,6 +361,15 @@ function updateAccountBar() {
     const isSignedIn = Boolean(myRotationsState.session);
     const displayName = getMyDisplayName();
     const avatarUrl = myRotationsState.profile?.avatar_url || "";
+
+    if (accountBar) accountBar.classList.toggle("is-signed-in", isSignedIn);
+    if (menuToggle) {
+        menuToggle.hidden = !isSignedIn;
+        if (!isSignedIn) {
+            menuToggle.setAttribute("aria-expanded", "false");
+            accountBar?.classList.remove("is-menu-open");
+        }
+    }
 
     if (signInButton) signInButton.hidden = isSignedIn;
     if (createButton) createButton.hidden = isSignedIn;
@@ -1683,6 +1694,8 @@ function initMyRotations() {
     const accountSignInButton = document.getElementById("accountSignInBtn");
     const accountCreateButton = document.getElementById("accountCreateBtn");
     const accountSignOutButton = document.getElementById("accountSignOutBtn");
+    const accountMenuToggle = document.getElementById("accountMenuToggle");
+    const accountBar = document.querySelector(".account-bar");
     const closeButton = document.getElementById("closeMyRotationsModalBtn");
     const closeProfileButton = document.getElementById("closeProfileModalBtn");
     const closePasswordResetButton = document.getElementById("closePasswordResetModalBtn");
@@ -1705,6 +1718,21 @@ function initMyRotations() {
     if (accountSignInButton) accountSignInButton.addEventListener("click", () => openMyRotationsModal({ mode: "signIn" }));
     if (accountCreateButton) accountCreateButton.addEventListener("click", () => openMyRotationsModal({ mode: "create" }));
     if (accountSignOutButton) accountSignOutButton.addEventListener("click", signOutMyAccount);
+    if (accountMenuToggle) accountMenuToggle.addEventListener("click", event => {
+        event.stopPropagation();
+        const isOpen = accountBar?.classList.toggle("is-menu-open") || false;
+        accountMenuToggle.setAttribute("aria-expanded", String(isOpen));
+    });
+    document.addEventListener("click", event => {
+        if (!accountBar?.classList.contains("is-menu-open") || accountBar.contains(event.target)) return;
+        accountBar.classList.remove("is-menu-open");
+        accountMenuToggle?.setAttribute("aria-expanded", "false");
+    });
+    document.addEventListener("keydown", event => {
+        if (event.key !== "Escape") return;
+        accountBar?.classList.remove("is-menu-open");
+        accountMenuToggle?.setAttribute("aria-expanded", "false");
+    });
     if (closeButton) closeButton.addEventListener("click", closeMyRotationsModal);
     if (closeProfileButton) closeProfileButton.addEventListener("click", closeProfileModal);
     if (closePasswordResetButton) closePasswordResetButton.addEventListener("click", closePasswordResetModal);
