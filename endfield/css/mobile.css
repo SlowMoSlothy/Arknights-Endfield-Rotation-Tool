@@ -107,15 +107,15 @@
     }
 
     .builder-sidebar {
-        display: flex;
-        flex-direction: row;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
         align-items: stretch;
-        flex-wrap: nowrap;
-        gap: 5px;
-        padding: 14px 7px 7px;
+        gap: 6px;
+        padding: 8px;
         width: 100%;
         min-width: 0;
         box-sizing: border-box;
+        overflow: visible;
     }
 
     .builder-panel {
@@ -133,18 +133,19 @@
     }
 
     .builder-sidebar .sidebar-command {
-        width: auto;
-        text-align: left;
+        width: 100%;
+        text-align: center;
     }
 
     .sidebar-command {
-        flex: 0 0 auto;
-        min-width: max-content;
-        min-height: 44px;
-        grid-template-columns: 22px max-content;
-        justify-items: start;
-        gap: 5px;
-        padding: 5px 10px 5px 6px;
+        min-width: 0;
+        min-height: 58px;
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: 27px minmax(18px, auto);
+        place-items: center;
+        align-content: center;
+        gap: 3px;
+        padding: 5px 3px;
     }
 
     .sidebar-command:hover {
@@ -152,22 +153,37 @@
     }
 
     .sidebar-command-icon {
-        width: 22px;
-        height: 22px;
+        width: 27px;
+        height: 27px;
         font-size: 11px;
     }
 
+    .sidebar-command-icon svg {
+        width: 16px;
+        height: 16px;
+    }
+
     .sidebar-command-label {
-        max-width: none;
-        display: block;
-        font-size: 10px;
-        font-weight: 700;
-        line-height: 1;
-        white-space: nowrap;
+        width: 100%;
+        max-width: 100%;
+        display: -webkit-box;
+        font-size: 8px;
+        font-weight: 800;
+        line-height: 1.05;
+        text-align: center;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
     }
 
     .sidebar-command-signal {
         display: block;
+        left: 50%;
+        right: auto;
+        width: 14px;
+        transform: translateX(-50%) skewX(-28deg);
     }
 
     .builder-main {
