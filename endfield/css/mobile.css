@@ -466,7 +466,8 @@
     }
 
     .operator-skill-owner:has(.operator-attribute-variant) {
-        top: -17px;
+        top: auto;
+        bottom: calc(100% - 1px);
     }
 
     .operator-attribute-variant-btn {

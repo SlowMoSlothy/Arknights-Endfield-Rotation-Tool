@@ -4,6 +4,7 @@ import fs from "node:fs";
 
 const skillsPanelScript = fs.readFileSync("endfield/js/ui/skillsPanel.js", "utf8");
 const skillsStyles = fs.readFileSync("endfield/css/skills.css", "utf8");
+const rotationStyles = fs.readFileSync("endfield/css/rotation.css", "utf8");
 const mobileStyles = fs.readFileSync("endfield/css/mobile.css", "utf8");
 
 test("operator skill rows expose a visible owner label and element accent", () => {
@@ -20,9 +21,9 @@ test("attribute-dependent operators expose a persisted INT/WILL skill switch", (
   assert.match(skillsPanelScript, /getOperatorAttributeVariantSelection/);
   assert.match(skillsPanelScript, /setOperatorAttributeVariantSelection/);
   assert.match(skillsStyles, /\.operator-attribute-variant-btn\.active/);
-  assert.match(skillsStyles, /\.operator-skill-owner:has\(\.operator-attribute-variant\)[^}]*top:\s*-15px[^}]*pointer-events:\s*none/s);
+  assert.match(skillsStyles, /\.operator-skill-owner:has\(\.operator-attribute-variant\)[^}]*width:\s*calc\(100% - 16px\)[^}]*top:\s*auto[^}]*bottom:\s*calc\(100% - 1px\)[^}]*pointer-events:\s*none/s);
   assert.match(skillsStyles, /\.operator-attribute-variant\s*\{[^}]*pointer-events:\s*auto/s);
-  assert.match(mobileStyles, /\.operator-skill-owner:has\(\.operator-attribute-variant\)[^}]*top:\s*-17px/s);
+  assert.match(mobileStyles, /\.operator-skill-owner:has\(\.operator-attribute-variant\)[^}]*top:\s*auto[^}]*bottom:\s*calc\(100% - 1px\)/s);
 });
 
 test("operator skill rows are centered below the visible avatar area", () => {
@@ -38,6 +39,7 @@ test("mobile skill icons use a larger tap-friendly size", () => {
 
 test("planner skill icons stay compact on desktop and become tap-friendly on mobile", () => {
   assert.match(skillsStyles, /\.skill-small\s*\{[^}]*width:\s*24px;[^}]*height:\s*24px;/s);
+  assert.match(rotationStyles, /#rotationBuilderPanel \.skill-small\s*\{[^}]*width:\s*26px;[^}]*height:\s*26px;/s);
   assert.match(mobileStyles, /\.skill-small\s*\{[^}]*width:\s*26px;[^}]*height:\s*26px;/s);
 });
 
