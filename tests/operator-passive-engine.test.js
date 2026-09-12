@@ -34,6 +34,7 @@ test("attribute variants select database overrides from current loadout stats", 
   const skill = {
     id: 2802,
     operatorId: 28,
+    icon: "Arcane.png",
     damageProfile: { atkMultiplier: 5, element: "nature" },
     attributeVariants: [
       { key: "intellect", condition: { leftStat: "intellect", comparison: "gte", rightStat: "will" }, actionOverride: { iconSmall: "arcane-int.png", damageProfile: { atkMultiplier: 5 } } },
@@ -46,6 +47,7 @@ test("attribute variants select database overrides from current loadout stats", 
   assert.equal(intellectContext.window.resolveSimulationAttributeVariant(skill, 28).attributeVariantKey, "intellect");
   const resolvedWill = willContext.window.resolveSimulationAttributeVariant(skill, 28);
   assert.equal(resolvedWill.attributeVariantKey, "will");
+  assert.equal(resolvedWill.icon, "Arcane.png");
   assert.equal(resolvedWill.iconSmall, "arcane-will.png");
   assert.equal(resolvedWill.damageProfile.atkMultiplier, 3);
   assert.equal(resolvedWill.debuffs[0].appliesEffect, "pull");
@@ -228,6 +230,7 @@ test("Batch 08 keeps new operator mechanics and pre-release uncertainty in Supab
   assert.match(arcaneMigration, /jadecrushing-grid-will\.png/);
   assert.match(arcaneMigration, /yinglung-stance-iv-will\.png/);
   assert.match(arcaneMigration, /gloompurge-will\.png/);
+  assert.match(arcaneMigration, /variant #- '\{actionOverride,icon\}'/);
   assert.match(migration, /camille_hunter_pursuit/);
   assert.match(migration, /"dataStatus":"pre_release"/);
   assert.match(migration, /3003[\s\S]*"comboTriggerMode":"all"/);

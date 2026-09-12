@@ -21,12 +21,7 @@ set raw_data = jsonb_set(
       (
         select jsonb_agg(
           jsonb_set(
-            jsonb_set(variant, '{actionOverride,icon}', to_jsonb(
-              case variant ->> 'key'
-                when 'will' then icon_paths.will_icon
-                else icon_paths.int_icon
-              end
-            ), true),
+            variant #- '{actionOverride,icon}',
             '{actionOverride,iconSmall}', to_jsonb(
               case variant ->> 'key'
                 when 'will' then icon_paths.will_icon
