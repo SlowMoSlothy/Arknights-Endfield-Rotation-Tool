@@ -801,6 +801,39 @@ function metaDescriptionFor(operator) {
   return `${text.slice(0, 157).replace(/\s+\S*$/, "")}...`;
 }
 
+function mergeSkillVariantValue(baseValue, overrideValue) {
+  if (!isPlainObject(overrideValue)) return overrideValue;
+  const base = isPlainObject(baseValue) ? baseValue : {};
+  return Object.entries(overrideValue).reduce((result, [key, value]) => ({
+    ...result,
+    [key]: isPlainObject(value) ? mergeSkillVariantValue(base[key], value) : value
+  }), { ...base });
+}
+
+function operatorSkillVariantKeys(skills) {
+  return uniqueValues(skills.flatMap((skill) => {
+    const rawData = isPlainObject(skill.raw_data) ? skill.raw_data : {};
+    return asArray(rawData.attributeVariants)
+      .map((variant) => formatValue(variant?.key || variant?.variantKey, "").toLowerCase())
+      .filter(Boolean);
+  }));
+}
+
+function skillForAttributeVariant(skill, variantKey) {
+  const rawData = isPlainObject(skill.raw_data) ? skill.raw_data : {};
+  const variant = asArray(rawData.attributeVariants).find((entry) =>
+    formatValue(entry?.key || entry?.variantKey, "").toLowerCase() === variantKey
+  );
+  if (!variant) return skill;
+  const override = variant.actionOverride || variant.override || {};
+  return {
+    ...skill,
+    ...override,
+    raw_data: mergeSkillVariantValue(rawData, override),
+    attribute_variant_label: variant.label || variant.name || variantKey.toUpperCase()
+  };
+}
+
 function skillCard(skill) {
   const iconPath = skill.icon_small_path || skill.icon_path;
   const icon = iconPath ? normalizeAssetPath(iconPath) : "";
@@ -808,6 +841,7 @@ function skillCard(skill) {
   const skillElement = skillElementKey(skill.element_type);
   const fillMode = skillFillMode(skill);
   const skillType = formatLabel(skill.skill_type || skill.short_type || "Skill");
+  const variantLabel = formatValue(skill.attribute_variant_label, "");
   const description = formatValue(skill.description, "No description available yet.");
   const skillMetaMarkup = [
     skill.cooldown !== null && skill.cooldown !== undefined
@@ -831,7 +865,7 @@ function skillCard(skill) {
         </div>
       </div>
       <div>
-        <span class="skill-type">${escapeHtml(skillType)}</span>
+        <span class="skill-type">${escapeHtml(skillType)}${variantLabel ? ` · ${escapeHtml(variantLabel)}` : ""}</span>
         <h3>${escapeHtml(skill.name)}</h3>
       </div>
     </div>
@@ -1043,6 +1077,43 @@ function siteHeader({ showOperatorLink = true, showToolCta = true } = {}) {
   </header>`;
 }
 
+function attributeVariantStyles() {
+  return `<style>
+    .attribute-variant-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.attribute-variant-heading h2{margin:0}
+    .attribute-variant-switch{display:inline-flex;padding:3px;border:1px solid rgba(160,170,169,.28);border-radius:999px;background:rgba(12,15,16,.72)}
+    .attribute-variant-switch button{min-width:58px;padding:7px 12px;border:0;border-radius:999px;background:transparent;color:#b9c1bd;font:inherit;font-size:.76rem;font-weight:900;cursor:pointer}
+    .attribute-variant-switch button.active{background:linear-gradient(135deg,rgba(101,113,54,.8),rgba(248,245,70,.18));color:var(--yellow);box-shadow:inset 0 0 0 1px rgba(248,245,70,.45)}
+    [data-attribute-variant-panel][hidden]{display:none}
+    @media(max-width:640px){.attribute-variant-heading{align-items:flex-start;flex-direction:column}.attribute-variant-switch{width:100%}.attribute-variant-switch button{flex:1}}
+  </style>`;
+}
+
+function attributeVariantScript(defaultKey, operatorId) {
+  if (!defaultKey) return "";
+  return `<script>
+    (() => {
+      const storageKey = "rotationforge.operatorAttributeVariants.v1";
+      const buttons = [...document.querySelectorAll("[data-attribute-variant]")];
+      const panels = [...document.querySelectorAll("[data-attribute-variant-panel]")];
+      let saved = {};
+      try { saved = JSON.parse(localStorage.getItem(storageKey) || "{}"); } catch (_) {}
+      const select = (key) => {
+        buttons.forEach((button) => {
+          const active = button.dataset.attributeVariant === key;
+          button.classList.toggle("active", active);
+          button.setAttribute("aria-pressed", String(active));
+        });
+        panels.forEach((panel) => { panel.hidden = panel.dataset.attributeVariantPanel !== key; });
+        saved[${JSON.stringify(String(operatorId))}] = key;
+        try { localStorage.setItem(storageKey, JSON.stringify(saved)); } catch (_) {}
+      };
+      buttons.forEach((button) => button.addEventListener("click", () => select(button.dataset.attributeVariant)));
+      const savedKey = saved[${JSON.stringify(String(operatorId))}];
+      select(buttons.some((button) => button.dataset.attributeVariant === savedKey) ? savedKey : ${JSON.stringify(defaultKey)});
+    })();
+  </script>`;
+}
+
 export function createOperatorPage(
   operator,
   allOperators,
@@ -1065,6 +1136,15 @@ export function createOperatorPage(
   const classIcon = classIconPath(operator.operator_class);
   const elementIcon = elementIconPath(operator.element_type);
   const skills = skillsByOperator.get(operator.id) || [];
+  const skillVariantKeys = operatorSkillVariantKeys(skills);
+  const defaultSkillVariant = skillVariantKeys[0] || "";
+  const skillVariantButtons = skillVariantKeys.map((key) => {
+    const label = key === "intellect" ? "INT" : key === "will" ? "WILL" : key.toUpperCase();
+    return `<button type="button" data-attribute-variant="${escapeHtml(key)}" aria-pressed="false">${escapeHtml(label)}</button>`;
+  }).join("");
+  const skillPanelsMarkup = skillVariantKeys.length > 1
+    ? skillVariantKeys.map((key) => `<div class="skills-grid" data-attribute-variant-panel="${escapeHtml(key)}" hidden>${skills.map((skill) => skillCard(skillForAttributeVariant(skill, key))).join("\n")}</div>`).join("\n")
+    : `<div class="skills-grid">${skills.length > 0 ? skills.map(skillCard).join("\n") : "<p>No skills are available in the database yet.</p>"}</div>`;
   const basicAttackForms = basicAttackFormsByOperator.get(operator.id) || [];
   const relatedOperators = getRelatedOperators(operator, allOperators);
   const profile = buildRotationProfile(operator, skills);
@@ -1159,6 +1239,7 @@ export function createOperatorPage(
   <script type="application/ld+json">${JSON.stringify(breadcrumbSchema)}</script>
   <script type="application/ld+json">${JSON.stringify(webPageSchema)}</script>
   ${baseStyles()}
+  ${attributeVariantStyles()}
 </head>
 <body class="operator-page">
   ${siteHeader({ showOperatorLink: false, showToolCta: false })}
@@ -1240,8 +1321,11 @@ export function createOperatorPage(
     ${basicAttackTimelineMarkup(operator, basicAttackForms, skills)}
 
     <section class="panel skills-section" id="skills">
-      <h2>${escapeHtml(name)} Skills</h2>
-      <div class="skills-grid">${skills.length > 0 ? skills.map(skillCard).join("\n") : "<p>No skills are available in the database yet.</p>"}</div>
+      <div class="attribute-variant-heading">
+        <h2>${escapeHtml(name)} Skills</h2>
+        ${skillVariantKeys.length > 1 ? `<div class="attribute-variant-switch" role="group" aria-label="${escapeHtml(name)} attribute stance">${skillVariantButtons}</div>` : ""}
+      </div>
+      ${skillPanelsMarkup}
     </section>
 
     <section class="panel related-section" id="related">
@@ -1255,6 +1339,7 @@ export function createOperatorPage(
   <script src="/endfield/supabaseClient.js?v=14"></script>
   <script src="/endfield/js/ui/operatorShares.js?v=2"></script>
   <script src="/endfield/js/ui/operatorBatkExport.js?v=13"></script>
+  ${attributeVariantScript(defaultSkillVariant, operator.id)}
   ${operatorHeadingScript()}
 </body>
 </html>`;

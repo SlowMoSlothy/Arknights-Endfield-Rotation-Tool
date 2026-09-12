@@ -597,6 +597,32 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.doesNotMatch(page, /-webkit-line-clamp/);
 });
 
+test("operator database renders switchable attribute skill variants", () => {
+  const entry = operator({ id: 28, slug: "arcane", name: "Arcane" });
+  const skills = new Map([[28, [{
+    id: 2802,
+    operator_id: 28,
+    slot_index: 2,
+    name: "Jadecrushing Grid",
+    skill_type: "battle_skill",
+    element_type: "nature",
+    description: "Attribute-dependent skill.",
+    raw_data: {
+      attributeVariants: [
+        { key: "intellect", label: "Array Arcana: INT", actionOverride: { description: "INT damage form." } },
+        { key: "will", label: "Array Arcana: WILL", actionOverride: { description: "WILL pull form." } }
+      ]
+    }
+  }]]]);
+  const page = createOperatorPage(entry, [entry], skills);
+
+  assert.match(page, /data-attribute-variant="intellect"[^>]*>INT<\/button>/);
+  assert.match(page, /data-attribute-variant="will"[^>]*>WILL<\/button>/);
+  assert.match(page, /data-attribute-variant-panel="intellect"/);
+  assert.match(page, /INT damage form\./);
+  assert.match(page, /WILL pull form\./);
+});
+
 test("half-filled skill icons use the complete lower semicircle", () => {
   const css = fs.readFileSync("endfield/css/skill-elements.css", "utf8");
   const generator = fs.readFileSync("tools/build-operator-pages.js", "utf8");

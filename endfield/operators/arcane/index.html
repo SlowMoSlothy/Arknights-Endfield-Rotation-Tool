@@ -70,6 +70,13 @@
     @media(max-width:520px){.operator-page .batk-track{height:128px}.operator-page .batk-details{margin-top:12px}.operator-page .batk-detail-card{padding:10px}.operator-page .batk-detail-data>div{grid-template-columns:116px minmax(0,1fr)}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.related-card,.operator-tile{transition:none}}
   </style>
+  <style>
+    .attribute-variant-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.attribute-variant-heading h2{margin:0}
+    .attribute-variant-switch{display:inline-flex;padding:3px;border:1px solid rgba(160,170,169,.28);border-radius:999px;background:rgba(12,15,16,.72)}
+    .attribute-variant-switch button{min-width:58px;padding:7px 12px;border:0;border-radius:999px;background:transparent;color:#b9c1bd;font:inherit;font-size:.76rem;font-weight:900;cursor:pointer}
+    .attribute-variant-switch button.active{background:linear-gradient(135deg,rgba(101,113,54,.8),rgba(248,245,70,.18));color:var(--yellow);box-shadow:inset 0 0 0 1px rgba(248,245,70,.45)}
+    @media(max-width:640px){.attribute-variant-heading{align-items:flex-start;flex-direction:column}.attribute-variant-switch{width:100%}.attribute-variant-switch button{flex:1}}
+  </style>
 </head>
 <body class="operator-page">
   <header class="top">
@@ -371,7 +378,13 @@
   </section>
 
     <section class="panel skills-section" id="skills">
-      <h2>Arcane Skills</h2>
+      <div class="attribute-variant-heading">
+        <h2>Arcane Skills</h2>
+        <div class="attribute-variant-switch" role="group" aria-label="Arcane attribute stance">
+          <button type="button" data-attribute-variant="intellect" aria-pressed="false">INT</button>
+          <button type="button" data-attribute-variant="will" aria-pressed="false">WILL</button>
+        </div>
+      </div>
       <div class="skills-grid"><article class="skill-card skill-element-nature">
     <div class="skill-head">
       <div class="skill-icon-wrap">
@@ -516,6 +529,56 @@
   <script src="/endfield/supabaseClient.js?v=14"></script>
   <script src="/endfield/js/ui/operatorShares.js?v=2"></script>
   <script src="/endfield/js/ui/operatorBatkExport.js?v=13"></script>
+  <script>
+    (() => {
+      const storageKey = "rotationforge.operatorAttributeVariants.v1";
+      const buttons = [...document.querySelectorAll("[data-attribute-variant]")];
+      const cards = [...document.querySelectorAll("#skills .skill-card")];
+      const variants = {
+        intellect: {
+          labels: ["Battle Skill · Array Arcana: INT", "Combo Skill · Array Arcana: INT", "Ultimate · Array Arcana: INT"],
+          descriptions: [
+            "Array Arcana: INT deals 500% ATK as Nature DMG and applies Nature Infliction.",
+            "INT form: 13s cooldown. Requires Nature Infliction or 2 stacks of another Arts Infliction; applies 4s Imprisonment and 4% Arts Susceptibility.",
+            "INT form: the second cast deals 1440% Nature DMG, applies Corrosion for 15s, and grants the team 24% Arts DMG."
+          ],
+          comboCooldown: "13s"
+        },
+        will: {
+          labels: ["Battle Skill · Array Arcana: WILL", "Combo Skill · Array Arcana: WILL", "Ultimate · Array Arcana: WILL"],
+          descriptions: [
+            "Array Arcana: WILL deals 300% ATK as Nature DMG, applies Nature Infliction, and pulls enemies toward the center.",
+            "WILL form: 19s cooldown. Requires 1 stack of any Arts Infliction; applies 6s Imprisonment and 12% Arts Susceptibility.",
+            "WILL form: the second cast deals 360% Nature DMG, duplicates the current Arts Infliction, and applies 12.8% Nature and Cryo Susceptibility for 10s."
+          ],
+          comboCooldown: "19s"
+        }
+      };
+      let saved = {};
+      try { saved = JSON.parse(localStorage.getItem(storageKey) || "{}"); } catch (_) {}
+      const select = (key) => {
+        const variant = variants[key] || variants.intellect;
+        buttons.forEach((button) => {
+          const active = button.dataset.attributeVariant === key;
+          button.classList.toggle("active", active);
+          button.setAttribute("aria-pressed", String(active));
+        });
+        [cards[1], cards[2], cards[3]].forEach((card, index) => {
+          if (!card) return;
+          const type = card.querySelector(".skill-type");
+          const description = card.querySelector("p");
+          if (type) type.textContent = variant.labels[index];
+          if (description) description.textContent = variant.descriptions[index];
+        });
+        const comboCooldown = cards[2]?.querySelector(".skill-meta strong");
+        if (comboCooldown) comboCooldown.textContent = variant.comboCooldown;
+        saved["28"] = key;
+        try { localStorage.setItem(storageKey, JSON.stringify(saved)); } catch (_) {}
+      };
+      buttons.forEach((button) => button.addEventListener("click", () => select(button.dataset.attributeVariant)));
+      select(saved["28"] === "will" ? "will" : "intellect");
+    })();
+  </script>
   <script>
     (() => {
       const heading = document.querySelector(".operator-name");

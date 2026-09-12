@@ -785,6 +785,40 @@
     pointer-events: none;
 }
 
+.operator-skill-owner:has(.operator-attribute-variant) {
+    max-width: calc(100% - 8px);
+    overflow: visible;
+    pointer-events: auto;
+}
+
+.operator-attribute-variant {
+    display: inline-flex;
+    gap: 1px;
+    margin-left: 3px;
+    padding-left: 4px;
+    border-left: 1px solid rgba(255,255,255,0.18);
+}
+
+.operator-attribute-variant-btn {
+    min-width: 25px;
+    min-height: 18px;
+    padding: 1px 4px;
+    border: 1px solid rgba(160,170,169,0.32);
+    border-radius: 999px;
+    background: rgba(49,55,57,0.88);
+    color: rgba(244,245,242,0.72);
+    font: inherit;
+    font-size: 7px;
+    cursor: pointer;
+}
+
+.operator-attribute-variant-btn.active {
+    border-color: var(--element-color, #f8f546);
+    background: color-mix(in srgb, var(--element-color, #777) 25%, #111);
+    color: #fff;
+    box-shadow: 0 0 7px color-mix(in srgb, var(--element-color, #777) 35%, transparent);
+}
+
 .operator-skill-owner-dot {
     flex: 0 0 auto;
     width: 5px;

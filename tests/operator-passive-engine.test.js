@@ -3,7 +3,7 @@ import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 
-function createContext({ team, rules, potential = 0, intellect = 0, will = 0 }) {
+function createContext({ team, rules, potential = 0, intellect = 0, will = 0, attributeVariants = {} }) {
   const context = {
     window: {},
     console,
@@ -19,7 +19,11 @@ function createContext({ team, rules, potential = 0, intellect = 0, will = 0 }) 
       { id: 17, name: "Ember", elementType: "heat" }
     ],
     getOperatorLoadout: () => ({ operatorPotential: potential }),
-    getOperatorSimulationLoadoutStats: () => ({ intellect, will })
+    getOperatorSimulationLoadoutStats: () => ({ intellect, will }),
+    localStorage: {
+      getItem: () => JSON.stringify(attributeVariants),
+      setItem: (_key, value) => { attributeVariants = JSON.parse(value); }
+    }
   };
   vm.createContext(context);
   vm.runInContext(fs.readFileSync("endfield/js/logic/operatorPassiveEngine.js", "utf8"), context);
@@ -44,6 +48,22 @@ test("attribute variants select database overrides from current loadout stats", 
   assert.equal(resolvedWill.attributeVariantKey, "will");
   assert.equal(resolvedWill.damageProfile.atkMultiplier, 3);
   assert.equal(resolvedWill.debuffs[0].appliesEffect, "pull");
+});
+
+test("manual attribute stance selection overrides Arcane's current stats", () => {
+  const skill = {
+    id: 2802,
+    operatorId: 28,
+    damageProfile: { atkMultiplier: 5 },
+    attributeVariants: [
+      { key: "intellect", condition: { leftStat: "intellect", comparison: "gte", rightStat: "will" }, actionOverride: { damageProfile: { atkMultiplier: 5 } } },
+      { key: "will", condition: { leftStat: "will", comparison: "gt", rightStat: "intellect" }, actionOverride: { damageProfile: { atkMultiplier: 3 }, debuffs: [{ appliesEffect: "pull" }] } }
+    ]
+  };
+  const context = createContext({ team: [28], rules: [], intellect: 200, will: 100, attributeVariants: { 28: "will" } });
+  const resolved = context.window.resolveSimulationAttributeVariant(skill, 28);
+  assert.equal(resolved.attributeVariantKey, "will");
+  assert.equal(resolved.damageProfile.atkMultiplier, 3);
 });
 
 test("Akekuri's Supabase talent rule scales Combo SP recovery from Intellect", () => {
@@ -202,6 +222,7 @@ test("Batch 08 keeps new operator mechanics and pre-release uncertainty in Supab
   assert.match(migration, /'camille', 'Camille'/);
   assert.match(migration, /'liino', 'Liino'/);
   assert.match(migration, /"attributeVariants"/);
+  assert.match(fs.readFileSync("supabase/arcane_attribute_stance_switch.sql", "utf8"), /Array Arcana: WILL/);
   assert.match(migration, /camille_hunter_pursuit/);
   assert.match(migration, /"dataStatus":"pre_release"/);
   assert.match(migration, /3003[\s\S]*"comboTriggerMode":"all"/);

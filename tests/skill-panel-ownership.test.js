@@ -14,6 +14,13 @@ test("operator skill rows expose a visible owner label and element accent", () =
   assert.match(skillsStyles, /var\(--element-color/);
 });
 
+test("attribute-dependent operators expose a persisted INT/WILL skill switch", () => {
+  assert.match(skillsPanelScript, /createOperatorAttributeVariantControl/);
+  assert.match(skillsPanelScript, /getOperatorAttributeVariantSelection/);
+  assert.match(skillsPanelScript, /setOperatorAttributeVariantSelection/);
+  assert.match(skillsStyles, /\.operator-attribute-variant-btn\.active/);
+});
+
 test("operator skill rows are centered below the visible avatar area", () => {
   assert.match(skillsStyles, /\.operator-owned-skill-row\s*\{[^}]*width:\s*calc\(100% - 8px\)[^}]*align-self:\s*center/s);
   assert.match(skillsStyles, /\.operator-skill-wrapper\.leader \.operator-owned-skill-row\s*\{[^}]*translateX\(8px\)/s);

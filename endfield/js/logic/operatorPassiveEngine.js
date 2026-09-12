@@ -58,6 +58,33 @@ function getOperatorPassiveStat(operatorId, stat) {
     return Number.isFinite(value) ? value : 0;
 }
 
+const OPERATOR_ATTRIBUTE_VARIANT_STORAGE_KEY = "rotationforge.operatorAttributeVariants.v1";
+let operatorAttributeVariantSelections = (() => {
+    try {
+        if (typeof localStorage === "undefined") return {};
+        const saved = JSON.parse(localStorage.getItem(OPERATOR_ATTRIBUTE_VARIANT_STORAGE_KEY) || "{}");
+        return saved && typeof saved === "object" && !Array.isArray(saved) ? saved : {};
+    } catch (_) {
+        return {};
+    }
+})();
+
+function getOperatorAttributeVariantSelection(operatorId) {
+    return operatorAttributeVariantSelections[String(operatorId)] || null;
+}
+
+function setOperatorAttributeVariantSelection(operatorId, variantKey) {
+    const key = String(operatorId);
+    if (variantKey) operatorAttributeVariantSelections[key] = String(variantKey);
+    else delete operatorAttributeVariantSelections[key];
+    try {
+        if (typeof localStorage === "undefined") return;
+        localStorage.setItem(OPERATOR_ATTRIBUTE_VARIANT_STORAGE_KEY, JSON.stringify(operatorAttributeVariantSelections));
+    } catch (_) {
+        // Keep the in-memory selection when browser storage is unavailable.
+    }
+}
+
 function mergeSimulationAttributeOverride(baseValue, overrideValue) {
     if (!overrideValue || typeof overrideValue !== "object" || Array.isArray(overrideValue)) {
         return overrideValue;
@@ -90,7 +117,10 @@ function simulationAttributeConditionMatches(condition, operatorId) {
 
 function resolveSimulationAttributeVariant(skillData, operatorId = skillData?.operatorId) {
     const variants = Array.isArray(skillData?.attributeVariants) ? skillData.attributeVariants : [];
-    const variant = variants.find(candidate => {
+    const selectedVariantKey = getOperatorAttributeVariantSelection(operatorId);
+    const variant = variants.find(candidate => selectedVariantKey
+        && String(candidate?.key || candidate?.variantKey) === selectedVariantKey)
+        || variants.find(candidate => {
         const conditions = Array.isArray(candidate?.conditions)
             ? candidate.conditions
             : [candidate?.condition].filter(Boolean);
@@ -371,6 +401,8 @@ function resolveSimulationOperatorPassives(events) {
 if (typeof window !== "undefined") {
     window.getSimulationOperatorPassiveRules = getSimulationOperatorPassiveRules;
     window.getSimulationOperatorPotential = getSimulationOperatorPotential;
+    window.getOperatorAttributeVariantSelection = getOperatorAttributeVariantSelection;
+    window.setOperatorAttributeVariantSelection = setOperatorAttributeVariantSelection;
     window.resolveSimulationAttributeVariant = resolveSimulationAttributeVariant;
     window.resolveSimulationOperatorPassiveActionModifiers = resolveSimulationOperatorPassiveActionModifiers;
     window.resolveSimulationOperatorPassiveStateProcs = resolveSimulationOperatorPassiveStateProcs;

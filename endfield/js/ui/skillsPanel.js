@@ -555,6 +555,66 @@ function createWeaponLoadoutControl(op) {
     return control;
 }
 
+function getOperatorAttributeVariantOptions(op) {
+    const options = new Map();
+    (Array.isArray(op?.skills) ? op.skills : []).forEach(skill => {
+        (Array.isArray(skill?.attributeVariants) ? skill.attributeVariants : []).forEach(variant => {
+            const key = String(variant?.key || variant?.variantKey || "").trim().toLowerCase();
+            if (!key || options.has(key)) return;
+            options.set(key, {
+                key,
+                label: key === "intellect" ? "INT" : key === "will" ? "WILL" : (variant.label || key).toUpperCase()
+            });
+        });
+    });
+    return [...options.values()];
+}
+
+function createOperatorAttributeVariantControl(op) {
+    const options = getOperatorAttributeVariantOptions(op);
+    if (options.length < 2) return null;
+
+    const control = document.createElement("div");
+    control.className = "operator-attribute-variant";
+    control.setAttribute("role", "group");
+    control.setAttribute("aria-label", `${op.name} attribute stance`);
+    const selected = typeof getOperatorAttributeVariantSelection === "function"
+        ? getOperatorAttributeVariantSelection(op.id)
+        : null;
+    const representativeSkill = (op.skills || []).find(skill => Array.isArray(skill?.attributeVariants));
+    const automaticSelection = representativeSkill && typeof resolveSimulationAttributeVariant === "function"
+        ? resolveSimulationAttributeVariant(representativeSkill, op.id)?.attributeVariantKey
+        : null;
+    const activeKey = selected || automaticSelection || options[0].key;
+    options.forEach((option, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = option.label;
+        button.className = "operator-attribute-variant-btn";
+        const isActive = option.key === activeKey;
+        button.classList.toggle("active", isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+        button.addEventListener("click", event => {
+            event.preventDefault();
+            event.stopPropagation();
+            if (typeof setOperatorAttributeVariantSelection === "function") {
+                setOperatorAttributeVariantSelection(op.id, option.key);
+            }
+            renderSkills();
+            if (typeof initSkillDragDrop === "function") initSkillDragDrop();
+            if (typeof updateSelectedUI === "function") updateSelectedUI();
+        });
+        control.appendChild(button);
+    });
+    return control;
+}
+
+function resolveSkillForAttributeSelection(skill, op) {
+    return typeof resolveSimulationAttributeVariant === "function"
+        ? resolveSimulationAttributeVariant(skill, op?.id)
+        : skill;
+}
+
 function renderSkills() {
     const list = document.getElementById("skillList");
     if (!list) return;
@@ -616,8 +676,11 @@ function renderSkills() {
         const skillOwnerName = document.createElement("span");
         skillOwnerName.textContent = `${op.name} skills`;
         skillOwner.append(skillOwnerDot, skillOwnerName);
+        const attributeVariantControl = createOperatorAttributeVariantControl(op);
+        if (attributeVariantControl) skillOwner.appendChild(attributeVariantControl);
         skillRow.appendChild(skillOwner);
         getDisplaySkillsForOperator(op).forEach(({ skill, switchGroup }) => {
+            skill = resolveSkillForAttributeSelection(skill, op);
             if (uiSettings?.timelineMode === "simulation" && isFinalStrikeSkillForPanel(skill)) return;
             const div = document.createElement("div");
             div.className = "skill skill-small";
@@ -744,7 +807,7 @@ function renderRotationQuickSkills() {
         const operator = operators.find(candidate => candidate.id === operatorId);
         if (!operator) return;
         const skills = getDisplaySkillsForOperator(operator)
-            .map(entry => entry.skill)
+            .map(entry => resolveSkillForAttributeSelection(entry.skill, operator))
             .filter(skill => !isFinalStrikeSkillForPanel(skill));
         if (!skills.length) return;
 
