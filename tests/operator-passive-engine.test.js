@@ -207,6 +207,10 @@ test("Batch 08 keeps new operator mechanics and pre-release uncertainty in Supab
   assert.match(migration, /3003[\s\S]*"comboTriggerMode":"all"/);
   assert.match(migration, /skills\/arcane\/jadecrushing-grid\.png/);
   assert.match(migration, /skills\/camille\/heartstake-thorn\.png/);
+  assert.match(migration, /skills\/liino\/starry-heart-throb\.png/);
+  assert.match(migration, /skills\/liino\/dazzling-focus\.png/);
+  assert.match(migration, /skills\/liino\/delightful-harmonics\.png/);
+  assert.match(migration, /skills\/liino\/dawnstar-concerto\.png/);
   assert.match(iconPatch, /jsonb_build_object/);
   assert.match(iconPatch, /where public\.operator_skills\.id = values_map\.skill_id/);
   assert.match(iconPatch, /900028, 'assets\/operators\/skills\/shared\/dive_attack\.png'/);
