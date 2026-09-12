@@ -630,7 +630,7 @@ test("non-Ultimate skill fills use an enlarged lower circle", () => {
   const generator = fs.readFileSync("tools/build-operator-pages.js", "utf8");
 
   assert.match(css, /\.ef-fill-half \.ef-skill-fill\s*\{[\s\S]*?top:\s*43%;[\s\S]*?width:\s*116%;[\s\S]*?height:\s*116%;[\s\S]*?border-radius:\s*50%;/);
-  assert.match(generator, /\.ef-fill-half \.ef-skill-fill\{inset:auto!important;left:50%;top:43%;width:116%;height:116%;border-radius:50%/);
+  assert.match(generator, /\.ef-fill-half \.ef-skill-fill\{inset:auto!important;left:50%!important;right:auto!important;top:43%!important;bottom:auto!important;width:116%;height:116%;border-radius:50%/);
   assert.match(css, /\.ef-fill-full \.ef-skill-fill\s*\{[\s\S]*?inset:\s*0;[\s\S]*?border-radius:\s*50%;/);
 });
 
