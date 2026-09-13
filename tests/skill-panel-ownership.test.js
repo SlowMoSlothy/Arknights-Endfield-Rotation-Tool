@@ -47,3 +47,9 @@ test("desktop operator cards use the available skills panel width", () => {
   assert.match(skillsStyles, /@media \(min-width: 1100px\)[\s\S]*\.operators-skills-grid\s*\{[^}]*grid-template-columns:\s*repeat\(4, minmax\(148px, 260px\)\)[^}]*justify-content:\s*space-between[^}]*width:\s*100%/s);
   assert.match(skillsStyles, /@media \(min-width: 1100px\)[\s\S]*\.operator-skill-wrapper\s*\{[^}]*width:\s*100%[^}]*min-width:\s*0/s);
 });
+
+test("Liino operator card reuses the large Battle Skill image", () => {
+  assert.match(skillsPanelScript, /function getOperatorSkillCardBackground\(op\)/);
+  assert.match(skillsPanelScript, /operatorSlug === "liino"[\s\S]*shortType[\s\S]*=== "BS"[\s\S]*return battleSkill\?\.icon \|\| op\?\.icon/s);
+  assert.match(skillsPanelScript, /const bgPath = getOperatorSkillCardBackground\(op\);/);
+});

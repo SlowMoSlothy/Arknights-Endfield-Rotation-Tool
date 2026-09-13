@@ -615,6 +615,17 @@ function resolveSkillForAttributeSelection(skill, op) {
         : skill;
 }
 
+function getOperatorSkillCardBackground(op) {
+    const operatorSlug = String(op?.slug || "").trim().toLowerCase();
+    if (operatorSlug === "liino") {
+        const battleSkill = Array.isArray(op?.skills)
+            ? op.skills.find(skill => String(skill?.shortType || "").trim().toUpperCase() === "BS")
+            : null;
+        return battleSkill?.icon || op?.icon || op?.background;
+    }
+    return op?.background || op?.icon;
+}
+
 function renderSkills() {
     const list = document.getElementById("skillList");
     if (!list) return;
@@ -643,7 +654,7 @@ function renderSkills() {
 
         const card = document.createElement("div");
         card.className = "operator-skill-card";
-        const bgPath = op.background || op.icon;
+        const bgPath = getOperatorSkillCardBackground(op);
         const bgUrl = new URL(bgPath, document.baseURI).href;
 
         card.style.setProperty("--operator-bg", `url("${bgUrl}")`);
