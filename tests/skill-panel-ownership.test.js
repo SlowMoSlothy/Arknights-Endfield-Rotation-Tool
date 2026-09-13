@@ -6,6 +6,7 @@ const skillsPanelScript = fs.readFileSync("endfield/js/ui/skillsPanel.js", "utf8
 const skillsStyles = fs.readFileSync("endfield/css/skills.css", "utf8");
 const rotationStyles = fs.readFileSync("endfield/css/rotation.css", "utf8");
 const mobileStyles = fs.readFileSync("endfield/css/mobile.css", "utf8");
+const liinoAvatarMigration = fs.readFileSync("supabase/liino_avatar_png_update.sql", "utf8");
 
 test("operator skill rows expose a visible owner label and element accent", () => {
   assert.match(skillsPanelScript, /operator-owned-skill-row/);
@@ -52,4 +53,11 @@ test("Liino operator card reuses the large Battle Skill image", () => {
   assert.match(skillsPanelScript, /function getOperatorSkillCardBackground\(op\)/);
   assert.match(skillsPanelScript, /operatorSlug === "liino"[\s\S]*shortType[\s\S]*=== "BS"[\s\S]*return battleSkill\?\.icon \|\| op\?\.icon/s);
   assert.match(skillsPanelScript, /const bgPath = getOperatorSkillCardBackground\(op\);/);
+});
+
+test("Liino avatar migration copies the current Battle Skill image path", () => {
+  assert.match(liinoAvatarMigration, /from public\.operator_skills[\s\S]*upper\(coalesce\(short_type, ''\)\) = 'BS'/s);
+  assert.match(liinoAvatarMigration, /icon_path = battle_skill_icon/);
+  assert.match(liinoAvatarMigration, /'\{icon\}'[\s\S]*'\{background\}'/s);
+  assert.doesNotMatch(liinoAvatarMigration, /icon_path = 'assets\/operators\/avatars\/Liino\.png'/);
 });
