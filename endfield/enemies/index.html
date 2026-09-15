@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Enemy Database · RotationForge</title>
+  <meta name="description" content="Browse Arknights: Endfield enemies, combat values, abilities and sources in the RotationForge Enemy Database.">
+  <link rel="icon" href="/favicon-flat.png">
+  <link rel="canonical" href="https://rotationforge.gg/endfield/enemies/">
+  <link rel="stylesheet" href="../css/enemyDatabase.css">
+</head>
+<body class="enemy-db-page">
+<main class="enemy-db">
+  <nav aria-label="Main navigation"><a href="/">RotationForge</a><a href="../">Rotation Planner</a><a href="../operators/">Operator Database</a></nav>
+  <span class="enemy-db-kicker">Arknights: Endfield</span>
+  <h1>Enemy Database</h1>
+  <p>Explore enemy profiles, combat values and abilities. Unrecorded values are shown as unknown.</p>
+  <p>Damage multipliers: 1 = normal damage, 0.5 = half damage, 1.5 = increased damage.</p>
+  <div class="enemy-db-toolbar">
+    <label>Search enemies<input id="enemySearch" type="search" placeholder="Name, location or ability"></label>
+    <label>Category<select id="enemyCategory"><option value="">All categories</option><option value="normal">Normal</option><option value="elite">Elite</option><option value="boss">Boss</option><option value="test">Training / test</option></select></label>
+  </div>
+  <p id="enemyStatus" class="enemy-db-status" role="status">Loading enemy database…</p>
+  <button id="enemyRetry" type="button" hidden>Try again</button>
+  <div id="enemyResults" class="enemy-db-grid"></div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../supabaseClient.js?v=14"></script>
+<script src="../js/data/enemyDatabase.js"></script>
+<script src="../js/ui/enemyDatabasePage.js"></script>
+</body>
+</html>

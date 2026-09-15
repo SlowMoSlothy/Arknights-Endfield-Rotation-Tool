@@ -1,4 +1,5 @@
 const ADMIN_REVIEW_TABS = [
+    { id: "enemies", label: "Enemies", loadingTitle: "Loading enemies", loadingMessage: "Fetching enemy profiles.", emptyTitle: "No enemies yet", emptyMessage: "Create your first enemy profile." },
     {
         id: "pending",
         label: "Pending",
@@ -1459,6 +1460,7 @@ function renderAdminReviewList() {
 
     list.classList.toggle("is-operators", adminPanelState.activeTab === "operators");
     list.classList.toggle("is-batk", adminPanelState.activeTab === "batk");
+    list.classList.toggle("is-enemies", adminPanelState.activeTab === "enemies");
     list.innerHTML = "";
 
     if (adminPanelState.loading) {
@@ -1496,6 +1498,11 @@ function renderAdminReviewList() {
                 ? "Operator visibility settings will appear here after the first refresh."
                 : "Pending rotations will appear here after the first refresh."
         });
+        return;
+    }
+
+    if (adminPanelState.activeTab === "enemies") {
+        renderAdminEnemyEditor(list);
         return;
     }
 
@@ -1946,6 +1953,7 @@ async function setAdminIssueReportStatus(reportId, status) {
 }
 
 async function fetchAdminActiveContent() {
+    if (adminPanelState.activeTab === "enemies") return fetchAdminEnemies();
     if (adminPanelState.activeTab === "reports") return fetchAdminIssueReports();
     if (adminPanelState.activeTab === "operators") return fetchAdminOperators();
     if (adminPanelState.activeTab === "batk") return fetchAdminBatkData();

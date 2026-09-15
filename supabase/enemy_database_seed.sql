@@ -1,0 +1,8 @@
+-- Optional starter profiles: synthetic planner test enemies, not verified game enemies.
+-- Apply after enemy_database.sql. Stable IDs make reruns safe without overwriting edits.
+insert into public.enemies (id,name,category,description,skills,is_visible) values ('10000000-0000-4000-8000-000000000001','Training Dummy','test','Generic test enemy for trigger validation.','[{"name":"Basic Attack","description":""}]'::jsonb,true) on conflict (id) do nothing;
+insert into public.enemies (id,name,category,description,skills,is_visible) values ('10000000-0000-4000-8000-000000000002','Heat Attacker','test','Enemy with Heat attacks.','[{"name":"Scorching Hit","description":""}]'::jsonb,true) on conflict (id) do nothing;
+insert into public.enemies (id,name,category,description,skills,is_visible) values ('10000000-0000-4000-8000-000000000003','Frost Attacker','test','Enemy with Frost attacks.','[{"name":"Frozen Strike","description":""}]'::jsonb,true) on conflict (id) do nothing;
+insert into public.enemies (id,name,category,description,skills,is_visible) values ('10000000-0000-4000-8000-000000000004','Electric Attacker','test','Enemy with Electric attacks.','[{"name":"Thunder Strike","description":""}]'::jsonb,true) on conflict (id) do nothing;
+insert into public.enemies (id,name,category,description,skills,is_visible) values ('10000000-0000-4000-8000-000000000005','Physical Attacker','test','Enemy with Physical attacks.','[{"name":"Heavy Slash","description":""}]'::jsonb,true) on conflict (id) do nothing;
+insert into public.enemies (id,name,category,description,skills,is_visible) values ('10000000-0000-4000-8000-000000000006','Boss Dummy','test','Boss test enemy.','[{"name":"Boss Slam","description":""}]'::jsonb,true) on conflict (id) do nothing;

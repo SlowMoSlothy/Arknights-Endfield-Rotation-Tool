@@ -30,7 +30,7 @@ test("landing page uses concise non-repetitive header copy", () => {
 });
 
 test("tool cards use a shared text-only Endfield game identity", () => {
-  assert.equal((landingHtml.match(/class="game-name">Arknights: Endfield/g) || []).length, 2);
+  assert.equal((landingHtml.match(/class="game-name">Arknights: Endfield/g) || []).length, 3);
   assert.match(landingHtml, /class="game-tool-name">Rotation Planner/);
   assert.match(landingHtml, /class="game-tool-name">Operator Database/);
   assert.match(landingHtml, /\.game-card\.featured \.game-identity h3\s*\{[^}]*margin:\s*0/s);
