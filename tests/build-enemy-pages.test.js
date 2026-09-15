@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { createEnemyIndex, createEnemyPage, createEnemySitemap, fetchEnemies, writeEnemyOutput, enemyPath, portrait } from '../tools/build-enemy-pages.js';
+import { createEnemyIndex, createEnemyPage, createEnemySitemap, fetchEnemies, writeEnemyOutput, enemyPath, portrait, fetchAvatarImages } from '../tools/build-enemy-pages.js';
 import { baseStyles } from '../tools/build-operator-pages.js';
 
 const enemy = { id: '10000000-0000-4000-8000-000000000001', name: 'Training Dummy', category: 'test', description: 'Synthetic target.', hp: null, defense: 0, location: '', resistances: { heat: 0.5 }, skills: [{ name: 'Hit', description: 'A test attack.' }], is_visible: true, updated_at: '2026-09-15T10:00:00Z' };
@@ -11,11 +11,27 @@ const enemy = { id: '10000000-0000-4000-8000-000000000001', name: 'Training Dumm
 test('uploaded avatars appear on cards, profiles and share metadata with a safe fallback', () => {
     const url = `https://ftssllxdkqvmlxhfeqmy.supabase.co/storage/v1/object/public/enemy-avatars/${enemy.id}/${'a'.repeat(64)}.png`;
     const custom = { ...enemy, avatar_url: url };
-    assert.equal(portrait(custom), url);
-    assert.ok(createEnemyIndex([custom]).includes(`src="${url}"`));
-    assert.ok(createEnemyPage(custom, [custom]).includes(`property="og:image" content="${url}"`));
+    const local = `/endfield/enemies/${enemy.id}/avatar.png?v=${'a'.repeat(64)}`;
+    assert.equal(portrait(custom), local);
+    assert.ok(createEnemyIndex([custom]).includes(`src="${local}"`));
+    assert.ok(createEnemyPage(custom, [custom]).includes(`property="og:image" content="https://rotationforge.gg${local}"`));
     assert.equal(portrait({...enemy, avatar_url:'javascript:alert(1)'}), portrait(enemy));
     assert.equal(portrait({...enemy, avatar_url:''}), portrait(enemy));
+});
+
+test('generated avatar copies survive removal of the old upload; missing copies fail safely', async () => {
+    const custom = {...enemy, avatar_url:`https://ftssllxdkqvmlxhfeqmy.supabase.co/storage/v1/object/public/enemy-avatars/${enemy.id}/${'a'.repeat(64)}.png`};
+    const bytes = Buffer.from([137,80,78,71,13,10,26,10,0]);
+    const images = await fetchAvatarImages([custom], async () => new Response(bytes));
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'enemy-copy-'));
+    const options = {outputDir:path.join(root,'enemies'),sitemapPath:path.join(root,'sitemap.xml'),avatarImages:images};
+    try {
+        writeEnemyOutput([custom], options);
+        assert.deepEqual(fs.readFileSync(path.join(options.outputDir,enemy.id,'avatar.png')),bytes);
+        assert.throws(() => writeEnemyOutput([custom], {...options,avatarImages:new Map()}), /Missing avatar copy/);
+        assert.ok(fs.existsSync(path.join(options.outputDir,enemy.id,'avatar.png')));
+        await assert.rejects(fetchAvatarImages([custom], async () => new Response('missing',{status:404})), /download failed/);
+    } finally { fs.rmSync(root,{recursive:true,force:true}); }
 });
 
 test('enemy pages expose crawlable profiles and full content without database JavaScript', () => {

@@ -26,9 +26,32 @@ export function validateEnemies(rows) {
 }
 
 export function portrait(row) {
-    if (/^https:\/\/ftssllxdkqvmlxhfeqmy\.supabase\.co\/storage\/v1\/object\/public\/enemy-avatars\/[0-9a-f-]{36}\/[0-9a-f]{64}\.png$/.test(row.avatar_url || '')) return row.avatar_url;
+    if (hasUploadedAvatar(row)) return `${enemyPath(row)}avatar.png?v=${row.avatar_url.split('/').at(-1).slice(0, 64)}`;
     const index = TEST_IMAGES.findIndex((_, i) => row.id === `10000000-0000-4000-8000-${String(i + 1).padStart(12, '0')}`);
     return index >= 0 ? `/endfield/assets/enemies/${TEST_IMAGES[index]}.svg` : '/favicon-flat.png';
+}
+
+function hasUploadedAvatar(row) {
+    return /^https:\/\/ftssllxdkqvmlxhfeqmy\.supabase\.co\/storage\/v1\/object\/public\/enemy-avatars\/[0-9a-f-]{36}\/[0-9a-f]{64}\.png$/.test(row.avatar_url || '');
+}
+
+export async function fetchAvatarImages(rows, fetcher = fetch) {
+    const images = new Map();
+    // Download the current profile images before changing any generated output.
+    for (const row of rows.filter(row => row.is_visible === true && hasUploadedAvatar(row))) {
+        const response = await fetcher(row.avatar_url, { signal: AbortSignal.timeout(20000), redirect: 'error' });
+        if (!response.ok) throw new Error(`Avatar download failed for ${row.name}: ${response.status}`);
+        const chunks = []; let length = 0;
+        for await (const chunk of response.body) {
+            length += chunk.length;
+            if (length > 2097152) throw new Error(`Avatar too large: ${row.name}`);
+            chunks.push(chunk);
+        }
+        const bytes = Buffer.concat(chunks);
+        if (!bytes.subarray(0, 8).equals(Buffer.from([137,80,78,71,13,10,26,10]))) throw new Error(`Invalid avatar PNG: ${row.name}`);
+        images.set(row.id, bytes);
+    }
+    return images;
 }
 
 function head(title, description, url, schema, image = `${SITE}/favicon-flat.png`) {
@@ -116,7 +139,7 @@ export async function fetchEnemies(client) {
     return rows.sort((a,b) => a.name.localeCompare(b.name, 'en'));
 }
 
-export function writeEnemyOutput(rows, { outputDir = path.resolve('endfield/enemies'), sitemapPath = path.resolve('sitemap-enemies.xml') } = {}) {
+export function writeEnemyOutput(rows, { outputDir = path.resolve('endfield/enemies'), sitemapPath = path.resolve('sitemap-enemies.xml'), avatarImages = new Map() } = {}) {
     rows = rows.filter(row => row.is_visible === true);
     validateEnemies(rows);
     const suffix = `${process.pid}-${Date.now()}`;
@@ -133,7 +156,14 @@ export function writeEnemyOutput(rows, { outputDir = path.resolve('endfield/enem
     try {
         fs.mkdirSync(temp, { recursive: true });
         fs.writeFileSync(path.join(temp, 'index.html'), createEnemyIndex(rows));
-        for (const row of rows) { fs.mkdirSync(path.join(temp, row.id)); fs.writeFileSync(path.join(temp, row.id, 'index.html'), createEnemyPage(row, rows)); }
+        for (const row of rows) {
+            fs.mkdirSync(path.join(temp, row.id));
+            fs.writeFileSync(path.join(temp, row.id, 'index.html'), createEnemyPage(row, rows));
+            if (hasUploadedAvatar(row)) {
+                if (!avatarImages.has(row.id)) throw new Error(`Missing avatar copy: ${row.name}`);
+                fs.writeFileSync(path.join(temp, row.id, 'avatar.png'), avatarImages.get(row.id));
+            }
+        }
         fs.writeFileSync(temporaryMap, createEnemySitemap(rows));
         if (fs.existsSync(outputDir)) { fs.renameSync(outputDir, backup); moved = true; }
         fs.renameSync(temp, outputDir); committed = true;
@@ -152,7 +182,8 @@ export function writeEnemyOutput(rows, { outputDir = path.resolve('endfield/enem
 
 export async function build({ supabase = createSupabaseClient() } = {}) {
     const rows = await fetchEnemies(supabase);
-    writeEnemyOutput(rows);
+    const avatarImages = await fetchAvatarImages(rows);
+    writeEnemyOutput(rows, { avatarImages });
     console.log(`Created ${rows.length} enemy pages and enemy sitemap.`);
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
