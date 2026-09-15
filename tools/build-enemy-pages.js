@@ -25,19 +25,20 @@ export function validateEnemies(rows) {
     }
 }
 
-function portrait(row) {
+export function portrait(row) {
+    if (/^https:\/\/ftssllxdkqvmlxhfeqmy\.supabase\.co\/storage\/v1\/object\/public\/enemy-avatars\/[0-9a-f-]{36}\/[0-9a-f]{64}\.png$/.test(row.avatar_url || '')) return row.avatar_url;
     const index = TEST_IMAGES.findIndex((_, i) => row.id === `10000000-0000-4000-8000-${String(i + 1).padStart(12, '0')}`);
     return index >= 0 ? `/endfield/assets/enemies/${TEST_IMAGES[index]}.svg` : '/favicon-flat.png';
 }
 
-function head(title, description, url, schema) {
+function head(title, description, url, schema, image = `${SITE}/favicon-flat.png`) {
     return `<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escape(title)}</title><meta name="description" content="${escape(description)}">
 <meta name="theme-color" content="#313739"><link rel="icon" href="/favicon-flat.png">
 <link rel="canonical" href="${escape(url)}">
 <meta property="og:title" content="${escape(title)}"><meta property="og:description" content="${escape(description)}">
 <meta property="og:type" content="website"><meta property="og:url" content="${escape(url)}">
-<meta property="og:image" content="${SITE}/favicon-flat.png"><meta name="twitter:card" content="summary">
+<meta property="og:image" content="${escape(image)}"><meta name="twitter:card" content="summary">
 <script type="application/ld+json">${json(schema)}</script>
 ${baseStyles()}<link rel="stylesheet" href="/endfield/css/enemyCatalog.css?v=1">`;
 }
@@ -85,7 +86,8 @@ export function createEnemyPage(row, rows) {
     let source = '';
     try { const parsed = new URL(row.source_url); if (['https:', 'http:'].includes(parsed.protocol)) source = `<a href="${escape(parsed.href)}" target="_blank" rel="noopener noreferrer">View source ↗</a>`; } catch { /* No usable source recorded. */ }
     const stats = [['HP', row.hp], ['Defense', row.defense], ...ELEMENTS.map(key => [`${key} damage multiplier`, row.resistances[key]])];
-    return `<!doctype html><html lang="en"><head>${head(`${row.name} – Arknights Endfield Enemy | RotationForge`, description, url, schema)}</head>
+    const avatar = portrait(row);
+    return `<!doctype html><html lang="en"><head>${head(`${row.name} – Arknights Endfield Enemy | RotationForge`, description, url, schema, avatar.startsWith('/') ? SITE + avatar : avatar)}</head>
 <body class="operator-index enemy-index enemy-profile">${siteHeader()}<main class="page">
 <div class="breadcrumbs"><a href="/">Home</a><span>›</span><a href="${BASE}">Enemies</a><span>›</span><strong>${escape(row.name)}</strong></div>
 <section class="index-hero enemy-hero"><img src="${portrait(row)}" alt="" width="200" height="200"><div><div class="eyebrow">${escape(category(row))} enemy</div><h1>${escape(row.name)}</h1><p>${escape(row.description || 'No description has been recorded yet.')}</p><p>Location: ${escape(row.location || 'Unknown')}</p></div></section>
