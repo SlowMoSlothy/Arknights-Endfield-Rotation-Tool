@@ -1,6 +1,8 @@
-name: Build Operator SEO Pages
+name: Build Database SEO Pages
 
 on:
+  schedule:
+    - cron: '23 * * * *'
   workflow_dispatch:
   push:
     branches:
@@ -39,10 +41,16 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
 
+      - name: Enemy-Seiten bauen
+        run: npm run build:enemies
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
       - name: Änderungen speichern
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
-          commit_message: "Build operator SEO pages"
+          commit_message: "Build database SEO pages"
 
       - name: GitHub Pages mit dem neuen Stand bauen
         uses: actions/github-script@v8

@@ -23,7 +23,7 @@ async function fetchAdminEnemies() {
 function renderAdminEnemyEditor(container) {
     const { node, elements } = EnemyDatabase;
     const root = node('section', null, 'enemy-db');
-    root.append(node('h2', 'Enemy Database'), node('p', 'Create and edit enemy profiles. Publish a profile when it is ready to appear in the public database.'));
+    root.append(node('h2', 'Enemy Database'), node('p', 'Create and edit enemy profiles. Public pages update after the next successful website build, scheduled hourly. Unpublishing also takes effect after that build.'));
     const toolbar = node('div', null, 'enemy-db-toolbar');
     const selectLabel = node('label', 'Enemy');
     const select = node('select');
@@ -111,7 +111,7 @@ function renderAdminEnemyEditor(container) {
             if (error) throw error;
             adminEnemyState.rows = adminEnemyState.rows.filter(item => item.id !== data.id).concat(data).sort((a, b) => a.name.localeCompare(b.name));
             adminEnemyState.selected = data.id; dirty = false;
-            feedback.textContent = data.is_visible ? 'Saved and published. Reload the public database to view this profile.' : 'Saved as draft.';
+            feedback.textContent = data.is_visible ? 'Saved for publication. Public pages update after the next successful website build.' : 'Saved as draft. Previously published pages are removed after the next successful website build.';
             // Rebind the saved identity for repeated saves, including newly created profiles.
             Object.assign(row, data);
             if (!Array.from(select.options).some(option => option.value === data.id)) {
