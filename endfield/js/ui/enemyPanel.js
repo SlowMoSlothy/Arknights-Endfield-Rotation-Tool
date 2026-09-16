@@ -1,3 +1,6 @@
+function escapeEnemyHtml(value) {
+    return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
+}
 function getEffectIcon(effect) {
     if (effect.stackable) {
         const stacks = effect.stacks || 1;
@@ -22,7 +25,9 @@ function getEnemyCombatMeta(enemy) {
         .filter(([element, multiplier]) => element !== "neutral" && Number(multiplier) !== 1)
         .map(([element, multiplier]) => `${element.toUpperCase()} ${Math.round(Number(multiplier) * 100)}%`)
         .join(" / ");
-    return `DEF ${profile.defense} / ${resistanceSummary || "Neutral resistance"} / ${profile.verified ? "Verified" : "Unverified"}`;
+    const defense = enemy.combatProfile?.defense == null ? `DEF unknown (calculation: ${profile.defense})` : `DEF ${profile.defense}`;
+    const known = Object.keys(enemy.combatProfile?.resistanceMultipliers || {}).length;
+    return `${defense} / ${resistanceSummary || (known ? "Recorded resistances: neutral" : "Resistances unknown (calculation: neutral)")}${known > 0 && known < 5 ? " / unrecorded elements assumed neutral" : ""}`;
 }
 
 function renderEnemySelectionControl() {
@@ -30,9 +35,15 @@ function renderEnemySelectionControl() {
     const name = document.getElementById("selectedEnemyName");
     const meta = document.getElementById("selectedEnemyMeta");
     const enemy = getSelectedEnemy();
-    if (!button || !enemy) return;
+    if (!button) return;
+    if (!enemy) {
+        if (name) name.textContent = enemyCatalogState === "loading" ? "Loading enemies…" : "No enemy selected";
+        if (meta) meta.textContent = enemyCatalogState === "error" ? enemyCatalogError : (enemies.length ? "Choose a published enemy. Calculation defaults: DEF 100, neutral resistance." : "No published enemies. Calculation defaults: DEF 100, neutral resistance.");
+        button.setAttribute("aria-label", "Choose enemy");
+        return;
+    }
 
-    button.classList.remove("enemy-rank-normal", "enemy-rank-elite", "enemy-rank-boss");
+    button.classList.remove("enemy-rank-normal", "enemy-rank-elite", "enemy-rank-boss", "enemy-rank-test");
     button.classList.add(`enemy-rank-${getEnemyRank(enemy)}`);
     if (name) name.textContent = enemy.name;
     if (meta) meta.textContent = getEnemyCombatMeta(enemy).replace(/ \/ (Verified|Unverified)$/, "");
@@ -107,10 +118,10 @@ function renderEnemySkillBar() {
     const header = document.createElement("div");
     header.className = `enemy-card enemy-rank-${getEnemyRank(enemy)} enemy-type-${getEnemyType(enemy)}`;
     header.innerHTML = `
-        <img class="enemy-card-icon" src="${enemy.icon}" alt="${enemy.name}">
+        <img class="enemy-card-icon" src="${escapeEnemyHtml(enemy.icon)}" alt="${escapeEnemyHtml(enemy.name)}">
         <div class="enemy-card-info">
-            <div class="enemy-card-name">${enemy.name}</div>
-            <div class="enemy-card-meta">${getEnemyRank(enemy).toUpperCase()} / ${getEnemyType(enemy).toUpperCase()} / ${getEnemyCombatMeta(enemy)}</div>
+            <div class="enemy-card-name">${escapeEnemyHtml(enemy.name)}</div>
+            <div class="enemy-card-meta">${getEnemyRank(enemy).toUpperCase()} / ${getEnemyType(enemy).toUpperCase()} / ${escapeEnemyHtml(getEnemyCombatMeta(enemy))}</div>
         </div>
     `;
     container.appendChild(header);
@@ -119,6 +130,11 @@ function renderEnemySkillBar() {
     skillRow.className = "enemy-skill-row";
 
     enemy.skills.forEach(skill => {
+        if (!Number.isSafeInteger(skill.id) || skill.id <= 0) {
+            const note = document.createElement("span");
+            note.textContent = `${skill.name} — description only`;
+            skillRow.appendChild(note); return;
+        }
         const div = document.createElement("div");
         div.className = `skill skill-small enemy-skill enemy-skill-rank-${getEnemyRank(enemy)} enemy-skill-type-${getEnemyType(enemy)}`;
         div.dataset.id = String(skill.id);
@@ -149,16 +165,32 @@ function renderEnemyModal() {
 
     list.innerHTML = "";
 
+    if (!enemies.length) {
+        const message = document.createElement("p");
+        message.textContent = enemyCatalogState === "loading" ? "Loading enemies…" : enemyCatalogState === "error" ? enemyCatalogError : "No enemies have been published yet.";
+        list.appendChild(message);
+    }
+    const refresh = document.createElement("button");
+    refresh.type = "button"; refresh.className = "settings-option-btn";
+    refresh.textContent = enemyCatalogState === "error" ? "Retry" : "Refresh Enemy Database";
+    refresh.disabled = enemyCatalogState === "loading";
+    refresh.addEventListener("click", async () => {
+        refresh.disabled = true;
+        await hydrateEnemyDatabaseFromSupabase();
+        renderEnemyModal(); renderEnemySkillBar();
+        if (typeof renderRotation === "function") renderRotation();
+    });
+    list.appendChild(refresh);
     enemies.forEach(enemy => {
         const btn = document.createElement("button");
         btn.className = `settings-option-btn enemy-select-btn enemy-rank-${getEnemyRank(enemy)} enemy-type-${getEnemyType(enemy)}`;
         btn.type = "button";
         btn.innerHTML = `
-            <img class="enemy-select-icon" src="${enemy.icon}" alt="${enemy.name}">
+            <img class="enemy-select-icon" src="${escapeEnemyHtml(enemy.icon)}" alt="${escapeEnemyHtml(enemy.name)}">
             <div class="enemy-select-text">
-                <div class="settings-option-title">${enemy.name}</div>
-                <div class="enemy-select-meta">${getEnemyRank(enemy).toUpperCase()} / ${getEnemyType(enemy).toUpperCase()} / ${getEnemyCombatMeta(enemy)}</div>
-                <div style="font-size:12px;opacity:.8;">${enemy.description || ""}</div>
+                <div class="settings-option-title">${escapeEnemyHtml(enemy.name)}</div>
+                <div class="enemy-select-meta">${getEnemyRank(enemy).toUpperCase()} / ${getEnemyType(enemy).toUpperCase()} / ${escapeEnemyHtml(getEnemyCombatMeta(enemy))}</div>
+                <div style="font-size:12px;opacity:.8;">${escapeEnemyHtml(enemy.description || "")}</div>
             </div>
         `;
 

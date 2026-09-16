@@ -2173,7 +2173,7 @@ function applyBuildShareCode(code) {
     if (
         payload.enemyId
         && typeof setSelectedEnemy === "function"
-        && (typeof enemies === "undefined" || !Array.isArray(enemies) || enemies.some(enemy => enemy.id === payload.enemyId))
+        && (typeof enemies === "undefined" || !Array.isArray(enemies) || enemies.some(enemy => enemy.id === (typeof resolveEnemyId === "function" ? resolveEnemyId(payload.enemyId) : payload.enemyId)))
     ) {
         setSelectedEnemy(payload.enemyId);
     }

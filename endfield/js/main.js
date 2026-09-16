@@ -431,8 +431,8 @@ async function initApp() {
             await hydrateOperatorsFromSupabase();
         }
 
-        if (typeof hydrateEnemyCombatProfilesFromSupabase === "function") {
-            await hydrateEnemyCombatProfilesFromSupabase();
+        if (typeof hydrateEnemyDatabaseFromSupabase === "function") {
+            await hydrateEnemyDatabaseFromSupabase();
         }
 
         loadOperatorUltimateStates();

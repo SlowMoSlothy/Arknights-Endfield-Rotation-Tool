@@ -1026,64 +1026,6 @@ async function loadWeaponEssenceProfilesFromSupabase() {
     return Array.isArray(data) ? data.map(mapDatabaseWeaponEssenceProfile) : [];
 }
 
-async function loadEnemyCombatProfilesFromSupabase() {
-    if (!supabaseClient) throw new Error("Supabase client is not available. Cannot load enemy profiles.");
-    const { data, error } = await supabaseClient
-        .from("enemy_combat_profiles")
-        .select("*")
-        .eq("game", "arknights_endfield")
-        .order("sort_order", { ascending: true })
-        .order("name", { ascending: true });
-    if (error) throw error;
-    return Array.isArray(data) ? data.map(mapDatabaseEnemyCombatProfile) : [];
-}
-
-async function hydrateEnemyCombatProfilesFromSupabase() {
-    if (typeof enemies === "undefined" || !Array.isArray(enemies)) return false;
-
-    let profiles;
-    try {
-        profiles = await loadEnemyCombatProfilesFromSupabase();
-    } catch (error) {
-        console.info("Supabase enemy profiles are not available yet; using local defaults.", error?.message || error);
-        return false;
-    }
-    if (!profiles.length) return false;
-
-    const localEnemies = new Map(enemies.map(enemy => [String(enemy.id), enemy]));
-    const hydrated = profiles.map(profile => {
-        const baseEnemy = localEnemies.get(String(profile.enemyKey));
-        const displayName = profile.difficultyLabel && profile.difficultyLabel !== "Standard"
-            ? `${profile.name} · ${profile.difficultyLabel}`
-            : profile.name;
-        return {
-            ...(baseEnemy || {}),
-            id: profile.profileKey,
-            baseEnemyId: profile.enemyKey,
-            name: displayName,
-            enemyRank: profile.enemyRank,
-            enemyType: profile.enemyType,
-            icon: profile.icon || baseEnemy?.icon || "",
-            description: profile.description || baseEnemy?.description || "",
-            skills: Array.isArray(baseEnemy?.skills) ? baseEnemy.skills : [],
-            combatProfile: {
-                defense: profile.defense,
-                resistanceMultipliers: profile.resistanceMultipliers,
-                verified: profile.verified,
-                sourceUrl: profile.sourceUrl,
-                sourceNote: profile.sourceNote,
-                difficultyLabel: profile.difficultyLabel
-            }
-        };
-    });
-
-    const profileKeys = new Set(profiles.map(profile => String(profile.profileKey)));
-    const localFallbacks = enemies.filter(enemy => !profileKeys.has(String(enemy.id)));
-    enemies.splice(0, enemies.length, ...hydrated, ...localFallbacks);
-    window.enemies = enemies;
-    console.info(`Enemy combat profiles loaded from Supabase: ${hydrated.length}`);
-    return true;
-}
 async function hydrateOperatorsFromSupabase() {
     if (typeof useSupabaseOperators !== "undefined" && !useSupabaseOperators) {
         console.info("Supabase operator loading is disabled.");
