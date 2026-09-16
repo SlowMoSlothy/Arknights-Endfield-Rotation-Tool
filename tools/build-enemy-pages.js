@@ -7,7 +7,7 @@ const SITE = 'https://rotationforge.gg';
 const BASE = '/endfield/enemies/';
 const ELEMENTS = ['physical', 'heat', 'cryo', 'electric', 'nature'];
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const TEST_IMAGES = ['training_dummy', 'heat_attacker', 'frost_attacker', 'electric_attacker', 'physical_attacker', 'boss_dummy'];
+const TEST_IMAGES = ['training_dummy', 'heat_attacker', 'frost_attacker', 'electric_attacker', 'physical_attacker', 'boss_dummy', 'nature_attacker'];
 const escape = value => String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 const json = value => JSON.stringify(value).replaceAll('<', '\\u003c');
 const category = row => ({ normal: 'Normal', elite: 'Elite', boss: 'Boss', test: 'Training / test' })[row.category] || 'Unknown';
