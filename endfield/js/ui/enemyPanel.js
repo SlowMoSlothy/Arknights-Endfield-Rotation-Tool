@@ -36,6 +36,18 @@ function renderEnemySelectionControl() {
     const meta = document.getElementById("selectedEnemyMeta");
     const enemy = getSelectedEnemy();
     if (!button) return;
+    const portrait = document.getElementById("selectedEnemyPortrait");
+    if (portrait) {
+        portrait.replaceChildren();
+        if (enemy?.icon) {
+            const image = document.createElement("img");
+            image.src = enemy.icon; image.alt = "";
+            image.addEventListener("error", () => { if (image.parentNode === portrait) portrait.textContent = "DEF"; }, { once: true });
+            portrait.appendChild(image);
+        } else {
+            portrait.textContent = "DEF";
+        }
+    }
     if (!enemy) {
         if (name) name.textContent = enemyCatalogState === "loading" ? "Loading enemies…" : "No enemy selected";
         if (meta) meta.textContent = enemyCatalogState === "error" ? enemyCatalogError : (enemies.length ? "Choose a published enemy. Calculation defaults: DEF 100, neutral resistance." : "No published enemies. Calculation defaults: DEF 100, neutral resistance.");

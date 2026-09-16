@@ -263,3 +263,6 @@
     #enemyModalList .enemy-select-btn > img { width: 64px; height: 64px; }
 }
 @media(max-width:360px) { #enemyModalList { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.enemy-profile-picker-icon { overflow: hidden; flex-shrink: 0; }
+.enemy-profile-picker-icon > img { width: 100%; height: 100%; object-fit: cover; display: block; }
