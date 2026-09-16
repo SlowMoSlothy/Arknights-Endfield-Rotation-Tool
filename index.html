@@ -315,47 +315,16 @@
     .enemy-card .game-card-content p { margin-top: 13px; }
     .enemy-card > .database-status { position: absolute; top: 14px; left: 14px; z-index: 2; margin: 0; }
 
-    .operator-card {
-      background:
-        radial-gradient(circle at 74% 12%, rgba(252, 111, 2, 0.2), transparent 14rem),
-        linear-gradient(135deg, rgba(66, 49, 40, 0.98), rgba(24, 29, 31, 0.98));
+    .game-card.featured.operator-card { min-height: 280px; background: #181d1f; }
+    .operator-card::before {
+      content: ""; position: absolute; inset: 0;
+      background: url("endfield/assets/operators/database-background-v1.webp") center top / 100% auto no-repeat;
     }
-
     .operator-card::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      pointer-events: none;
-      background:
-        linear-gradient(105deg, rgba(24, 29, 31, 0.42), rgba(24, 29, 31, 0.18)),
-        linear-gradient(180deg, rgba(24, 29, 31, 0.34) 0%, rgba(24, 29, 31, 0.62) 42%, rgba(24, 29, 31, 0.98) 82%);
+      content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      background: linear-gradient(180deg, rgba(24,29,31,.08) 0%, rgba(24,29,31,.12) 32%, rgba(24,29,31,.92) 76%, #181d1f 100%);
     }
-
-    .operator-gallery {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0;
-      overflow: hidden;
-      transition: transform 0.3s ease;
-    }
-
-    .operator-gallery img {
-      width: 27%;
-      height: 250px;
-      margin: 0 -3.5%;
-      object-fit: cover;
-      object-position: center 12%;
-      filter: brightness(0.72) saturate(0.82) drop-shadow(0 16px 16px rgba(0, 0, 0, 0.48));
-    }
-
-    .operator-gallery img:nth-child(2),
-    .operator-gallery img:nth-child(4) {
-      transform: translateY(16px) scale(1.04);
-    }
+    .operator-card .game-card-content { padding-top: 180px; }
 
     .game-card-content {
       position: relative;
@@ -371,9 +340,7 @@
     }
 
     .planner-card:hover::before,
-    .planner-card:focus-visible::before,
-    .operator-card:hover .operator-gallery,
-    .operator-card:focus-visible .operator-gallery {
+    .planner-card:focus-visible::before {
       transform: scale(1.035);
     }
 
@@ -481,11 +448,6 @@
       color: var(--accent);
     }
 
-    @media (max-width: 980px) {
-      .operator-gallery img {
-        height: 240px;
-      }
-    }
 
     @media (max-width: 760px) {
       #tools {
@@ -566,11 +528,6 @@
         padding: 20px;
       }
 
-      .operator-gallery img {
-        width: 29%;
-        height: 280px;
-        margin: 0 -4.5%;
-      }
 
       .feature-card {
         min-height: 76px;
@@ -641,13 +598,6 @@
         </a>
 
         <a class="game-card featured operator-card" href="endfield/operators/">
-          <div class="operator-gallery" aria-hidden="true">
-            <img src="endfield/assets/operators/avatars/Ardelia.png" alt="">
-            <img src="endfield/assets/operators/avatars/Antal.png" alt="">
-            <img src="endfield/assets/operators/avatars/Alesh.png" alt="">
-            <img src="endfield/assets/operators/avatars/Chen.png" alt="">
-            <img src="endfield/assets/operators/avatars/Catcher.png" alt="">
-          </div>
           <div class="game-card-content">
             <div class="game-identity">
               <span class="game-identity-copy">
