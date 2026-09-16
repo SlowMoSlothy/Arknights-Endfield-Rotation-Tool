@@ -63,7 +63,7 @@ function head(title, description, url, schema, image = `${SITE}/favicon-flat.png
 <meta property="og:type" content="website"><meta property="og:url" content="${escape(url)}">
 <meta property="og:image" content="${escape(image)}"><meta name="twitter:card" content="summary">
 <script type="application/ld+json">${json(schema)}</script>
-${baseStyles()}<link rel="stylesheet" href="/endfield/css/enemyCatalog.css?v=1">`;
+${baseStyles()}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=1"><link rel="stylesheet" href="/endfield/css/enemyCatalog.css?v=1">`;
 }
 
 function tile(row) {
@@ -74,28 +74,30 @@ function tile(row) {
 <p>${escape(row.location || 'Location unknown')}</p><p>${row.skills.length} ${row.skills.length === 1 ? 'ability' : 'abilities'}</p></div></a>`;
 }
 
-export function createEnemyIndex(rows) {
+export function createEnemyIndex(rows, workInProgress = true) {
     const url = `${SITE}${BASE}`;
     const schema = { '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'Arknights: Endfield Enemy Database', url,
         mainEntity: { '@type': 'ItemList', itemListElement: rows.map((row, index) => ({ '@type': 'ListItem', position: index + 1, name: row.name, url: SITE + enemyPath(row) })) } };
     return `<!doctype html><html lang="en"><head>${head('Arknights Endfield Enemy Database | RotationForge', 'Browse Arknights: Endfield enemy profiles, combat values, abilities, locations and sources. Explore the RotationForge Enemy Database.', url, schema)}</head>
 <body class="operator-index enemy-index">${siteHeader()}<main class="page">
 <div class="breadcrumbs"><a href="/">Home</a><span>›</span><strong>Enemies</strong></div>
-<section class="index-hero"><div class="eyebrow">RotationForge Database</div><h1>Arknights: Endfield Enemies</h1>
+${statusBadge(workInProgress)}<section class="index-hero"><div class="eyebrow">RotationForge Database</div><h1>Arknights: Endfield Enemies</h1>
 <p>Browse enemy profiles, combat values, locations and abilities. Training and test profiles are labeled; unrecorded values are shown as unknown.</p></section>
+<details class="database-filters" open><summary><span class="filter-show">Show filters</span><span class="filter-hide">Hide filters</span></summary>
 <form class="operator-toolbar" aria-label="Filter and sort enemies">
 <div class="operator-summary" aria-live="polite"><strong id="enemy-count">${rows.length} ${rows.length === 1 ? 'Enemy' : 'Enemies'}</strong><span>Filter the database</span></div>
 <label class="control search-control"><span>Search</span><input type="search" name="search" placeholder="Enemy, location or ability" autocomplete="off"></label>
 <label class="control"><span>Category</span><select name="category"><option value="">All categories</option>${['normal','elite','boss','test'].map(key => `<option value="${key}">${category({category:key})}</option>`).join('')}</select></label>
 <label class="control"><span>Sort</span><select name="sort"><option value="name">Name A-Z</option><option value="name-desc">Name Z-A</option></select></label>
-<button class="filter-reset" type="reset">Reset</button></form>
+<button class="filter-reset" type="reset">Reset</button></form></details>
 <section class="operator-grid" aria-label="Enemy profiles">${rows.map(tile).join('\n')}</section>
 <p class="empty-state"${rows.length ? ' hidden' : ''}>${rows.length ? 'No enemies match the selected filters.' : 'No enemies have been published yet.'}</p>
 <footer>RotationForge is an unofficial fan-made tool for Arknights: Endfield.</footer></main>
+<script src="/endfield/js/ui/databaseFilters.js?v=1"></script>
 <script src="/endfield/js/ui/enemyCatalog.js?v=1"></script></body></html>`;
 }
 
-export function createEnemyPage(row, rows) {
+export function createEnemyPage(row, rows, workInProgress = true) {
     const url = SITE + enemyPath(row);
     const description = `${row.name} enemy profile for Arknights: Endfield: ${category(row).toLowerCase()}, combat values, abilities and sources.`;
     const schema = { '@context': 'https://schema.org', '@graph': [
@@ -113,7 +115,7 @@ export function createEnemyPage(row, rows) {
     return `<!doctype html><html lang="en"><head>${head(`${row.name} – Arknights Endfield Enemy | RotationForge`, description, url, schema, avatar.startsWith('/') ? SITE + avatar : avatar)}</head>
 <body class="operator-index enemy-index enemy-profile">${siteHeader()}<main class="page">
 <div class="breadcrumbs"><a href="/">Home</a><span>›</span><a href="${BASE}">Enemies</a><span>›</span><strong>${escape(row.name)}</strong></div>
-<section class="index-hero enemy-hero"><img src="${portrait(row)}" alt="" width="200" height="200"><div><div class="eyebrow">${escape(category(row))} enemy</div><h1>${escape(row.name)}</h1><p>${escape(row.description || 'No description has been recorded yet.')}</p><p>Location: ${escape(row.location || 'Unknown')}</p></div></section>
+${statusBadge(workInProgress)}<section class="index-hero enemy-hero"><img src="${portrait(row)}" alt="" width="200" height="200"><div><div class="eyebrow">${escape(category(row))} enemy</div><h1>${escape(row.name)}</h1><p>${escape(row.description || 'No description has been recorded yet.')}</p><p>Location: ${escape(row.location || 'Unknown')}</p></div></section>
 ${row.category === 'test' ? '<p class="enemy-test-note">This is a synthetic training / test profile used by RotationForge, not a verified game enemy.</p>' : ''}
 <div class="enemy-detail-grid"><section class="panel"><h2>Combat values</h2><dl class="enemy-stats">${stats.map(([label, input]) => `<dt>${escape(label)}</dt><dd>${value(input)}</dd>`).join('')}</dl>
 <p class="enemy-help">Damage multipliers: 1 = normal damage, 0.5 = half damage, 1.5 = increased damage. Unknown values have not been recorded.</p></section>
@@ -139,7 +141,7 @@ export async function fetchEnemies(client) {
     return rows.sort((a,b) => a.name.localeCompare(b.name, 'en'));
 }
 
-export function writeEnemyOutput(rows, { outputDir = path.resolve('endfield/enemies'), sitemapPath = path.resolve('sitemap-enemies.xml'), avatarImages = new Map() } = {}) {
+export function writeEnemyOutput(rows, { outputDir = path.resolve('endfield/enemies'), sitemapPath = path.resolve('sitemap-enemies.xml'), avatarImages = new Map(), workInProgress = true } = {}) {
     rows = rows.filter(row => row.is_visible === true);
     validateEnemies(rows);
     const suffix = `${process.pid}-${Date.now()}`;
@@ -155,10 +157,10 @@ export function writeEnemyOutput(rows, { outputDir = path.resolve('endfield/enem
     }
     try {
         fs.mkdirSync(temp, { recursive: true });
-        fs.writeFileSync(path.join(temp, 'index.html'), createEnemyIndex(rows));
+        fs.writeFileSync(path.join(temp, 'index.html'), createEnemyIndex(rows, workInProgress));
         for (const row of rows) {
             fs.mkdirSync(path.join(temp, row.id));
-            fs.writeFileSync(path.join(temp, row.id, 'index.html'), createEnemyPage(row, rows));
+            fs.writeFileSync(path.join(temp, row.id, 'index.html'), createEnemyPage(row, rows, workInProgress));
             if (hasUploadedAvatar(row)) {
                 if (!avatarImages.has(row.id)) throw new Error(`Missing avatar copy: ${row.name}`);
                 fs.writeFileSync(path.join(temp, row.id, 'avatar.png'), avatarImages.get(row.id));
@@ -180,10 +182,31 @@ export function writeEnemyOutput(rows, { outputDir = path.resolve('endfield/enem
     }
 }
 
+export function statusBadge(enabled) {
+    return enabled ? '<span class="database-status">Work in progress</span>' : '';
+}
+
+export async function fetchDatabaseStatus(client) {
+    const { data, error } = await client.from('database_settings').select('work_in_progress').eq('id', 'enemy_database').single();
+    // Initial rollout remains labeled until the settings migration is installed.
+    if (error?.code === 'PGRST205' || error?.code === '42P01') return true;
+    if (error || typeof data?.work_in_progress !== 'boolean') throw new Error('Database status could not be loaded: ' + (error?.message || 'Invalid response'));
+    return data.work_in_progress;
+}
+
+export function updateHomeStatus(html, enabled) {
+    const marker = /<!-- enemy-database-status:start -->[\s\S]*?<!-- enemy-database-status:end -->/;
+    if (!marker.test(html)) throw new Error('Homepage status marker missing');
+    return html.replace(marker, '<!-- enemy-database-status:start -->' + statusBadge(enabled) + '<!-- enemy-database-status:end -->');
+}
+
 export async function build({ supabase = createSupabaseClient() } = {}) {
+    const workInProgress = await fetchDatabaseStatus(supabase);
+    const home = updateHomeStatus(fs.readFileSync("index.html", "utf8"), workInProgress);
     const rows = await fetchEnemies(supabase);
     const avatarImages = await fetchAvatarImages(rows);
-    writeEnemyOutput(rows, { avatarImages });
+    writeEnemyOutput(rows, { avatarImages, workInProgress });
+    fs.writeFileSync("index.html", home);
     console.log(`Created ${rows.length} enemy pages and enemy sitemap.`);
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {

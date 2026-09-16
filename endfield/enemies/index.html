@@ -53,7 +53,7 @@
     @media(max-width:760px){.operator-page .batk-detail-grid{grid-template-columns:1fr}}
     @media(max-width:520px){.operator-page .batk-track{height:128px}.operator-page .batk-details{margin-top:12px}.operator-page .batk-detail-card{padding:10px}.operator-page .batk-detail-data>div{grid-template-columns:116px minmax(0,1fr)}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.related-card,.operator-tile{transition:none}}
-  </style><link rel="stylesheet" href="/endfield/css/enemyCatalog.css?v=1"></head>
+  </style><link rel="stylesheet" href="/endfield/css/databaseControls.css?v=1"><link rel="stylesheet" href="/endfield/css/enemyCatalog.css?v=1"></head>
 <body class="operator-index enemy-index"><header class="top">
     <nav class="nav">
       <a class="brand" href="https://rotationforge.gg/"><span class="mark"><img src="/favicon-flat.png" alt=""></span><span>RotationForge</span></a>
@@ -65,14 +65,15 @@
     </nav>
   </header><main class="page">
 <div class="breadcrumbs"><a href="/">Home</a><span>›</span><strong>Enemies</strong></div>
-<section class="index-hero"><div class="eyebrow">RotationForge Database</div><h1>Arknights: Endfield Enemies</h1>
+<span class="database-status">Work in progress</span><section class="index-hero"><div class="eyebrow">RotationForge Database</div><h1>Arknights: Endfield Enemies</h1>
 <p>Browse enemy profiles, combat values, locations and abilities. Training and test profiles are labeled; unrecorded values are shown as unknown.</p></section>
+<details class="database-filters" open><summary><span class="filter-show">Show filters</span><span class="filter-hide">Hide filters</span></summary>
 <form class="operator-toolbar" aria-label="Filter and sort enemies">
 <div class="operator-summary" aria-live="polite"><strong id="enemy-count">6 Enemies</strong><span>Filter the database</span></div>
 <label class="control search-control"><span>Search</span><input type="search" name="search" placeholder="Enemy, location or ability" autocomplete="off"></label>
 <label class="control"><span>Category</span><select name="category"><option value="">All categories</option><option value="normal">Normal</option><option value="elite">Elite</option><option value="boss">Boss</option><option value="test">Training / test</option></select></label>
 <label class="control"><span>Sort</span><select name="sort"><option value="name">Name A-Z</option><option value="name-desc">Name Z-A</option></select></label>
-<button class="filter-reset" type="reset">Reset</button></form>
+<button class="filter-reset" type="reset">Reset</button></form></details>
 <section class="operator-grid" aria-label="Enemy profiles"><a class="operator-tile" href="/endfield/enemies/10000000-0000-4000-8000-000000000006/" data-name="boss dummy" data-search="boss dummy  boss test enemy. boss slam" data-category="test">
 <span class="tile-avatar-frame"><img class="tile-avatar" src="/endfield/assets/enemies/boss_dummy.svg" alt="" loading="lazy" width="256" height="256"></span>
 <div class="tile-body"><span class="enemy-category">Training / test</span><h2>Boss Dummy</h2>
@@ -99,4 +100,5 @@
 <p>Location unknown</p><p>1 ability</p></div></a></section>
 <p class="empty-state" hidden>No enemies match the selected filters.</p>
 <footer>RotationForge is an unofficial fan-made tool for Arknights: Endfield.</footer></main>
+<script src="/endfield/js/ui/databaseFilters.js?v=1"></script>
 <script src="/endfield/js/ui/enemyCatalog.js?v=1"></script></body></html>

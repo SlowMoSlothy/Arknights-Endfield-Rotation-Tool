@@ -1241,6 +1241,7 @@ export function createOperatorPage(
   <script type="application/ld+json">${JSON.stringify(breadcrumbSchema)}</script>
   <script type="application/ld+json">${JSON.stringify(webPageSchema)}</script>
   ${baseStyles()}
+  <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=1">
   ${attributeVariantStyles()}
 </head>
 <body class="operator-page">
@@ -1385,6 +1386,7 @@ export function createIndexPage(operators) {
   <meta property="og:type" content="website">
   <script type="application/ld+json">${JSON.stringify(itemListSchema)}</script>
   ${baseStyles()}
+  <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=1">
 </head>
 <body class="operator-index">
   ${siteHeader({ showOperatorLink: false })}
@@ -1395,6 +1397,7 @@ export function createIndexPage(operators) {
       <h1>Arknights: Endfield Operators</h1>
       <p>Browse all operators stored in the RotationForge database. Each page includes operator stats, class and element icons, skills, related operators and a direct link into the rotation planner.</p>
     </section>
+    <details class="database-filters" open><summary><span class="filter-show">Show filters</span><span class="filter-hide">Hide filters</span></summary>
     <form class="operator-toolbar" aria-label="Filter and sort operators">
       <div class="operator-summary" aria-live="polite">
         <strong id="operator-count">${operators.length} ${operators.length === 1 ? "Operator" : "Operators"}</strong>
@@ -1426,11 +1429,12 @@ export function createIndexPage(operators) {
         </select>
       </label>
       <button class="filter-reset" type="reset">Reset</button>
-    </form>
+    </form></details>
     <section class="operator-grid">${operators.map(indexCard).join("\n")}</section>
     <p class="empty-state" hidden>No operators match the selected filters.</p>
     <footer>RotationForge is an unofficial fan-made tool for Arknights: Endfield.</footer>
   </div>
+  <script src="/endfield/js/ui/databaseFilters.js?v=1"></script>
   ${operatorIndexScript()}
 </body>
 </html>`;

@@ -61,6 +61,7 @@
     @media(max-width:520px){.operator-page .batk-track{height:128px}.operator-page .batk-details{margin-top:12px}.operator-page .batk-detail-card{padding:10px}.operator-page .batk-detail-data>div{grid-template-columns:116px minmax(0,1fr)}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.related-card,.operator-tile{transition:none}}
   </style>
+  <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=1">
 </head>
 <body class="operator-index">
   <header class="top">
@@ -80,6 +81,7 @@
       <h1>Arknights: Endfield Operators</h1>
       <p>Browse all operators stored in the RotationForge database. Each page includes operator stats, class and element icons, skills, related operators and a direct link into the rotation planner.</p>
     </section>
+    <details class="database-filters" open><summary><span class="filter-show">Show filters</span><span class="filter-hide">Hide filters</span></summary>
     <form class="operator-toolbar" aria-label="Filter and sort operators">
       <div class="operator-summary" aria-live="polite">
         <strong id="operator-count">31 Operators</strong>
@@ -111,7 +113,7 @@
         </select>
       </label>
       <button class="filter-reset" type="reset">Reset</button>
-    </form>
+    </form></details>
     <section class="operator-grid"><a class="operator-tile" href="/endfield/operators/typhoeus/" data-name="typhoeus" data-class="striker" data-element="nature" data-rarity="6" data-order="0">
     <span class="tile-avatar-frame"><img class="tile-avatar" src="/endfield/assets/operators/avatars/typhoeus.png" alt="Typhoeus" loading="lazy"></span>
     <div class="tile-body">
@@ -456,6 +458,7 @@
     <p class="empty-state" hidden>No operators match the selected filters.</p>
     <footer>RotationForge is an unofficial fan-made tool for Arknights: Endfield.</footer>
   </div>
+  <script src="/endfield/js/ui/databaseFilters.js?v=1"></script>
   <script>
     (() => {
       const grid = document.querySelector(".operator-grid");

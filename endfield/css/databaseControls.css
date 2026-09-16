@@ -1,0 +1,7 @@
+
+.database-filters>summary{display:none;cursor:pointer;color:#fc6f02;font-weight:800;padding:14px 18px;border:1px solid var(--border);border-radius:14px;background:var(--charcoal-2)}
+.database-filters .filter-hide{display:none}
+.database-filters[open] .filter-show{display:none}
+.database-filters[open] .filter-hide{display:inline}
+.database-status{display:inline-block;color:#fc6f02;border:1px solid #fc6f0280;background:#fc6f0214;border-radius:8px;padding:6px 10px;font-size:.85rem;font-weight:800;margin:8px 0}
+@media(max-width:760px){.database-filters>summary{display:list-item;list-style-position:inside}.database-filters{margin:16px 0}.database-filters .operator-toolbar{margin-top:8px}}
