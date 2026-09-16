@@ -3,5 +3,6 @@
 .database-filters .filter-hide{display:none}
 .database-filters[open] .filter-show{display:none}
 .database-filters[open] .filter-hide{display:inline}
-.database-status{display:inline-block;color:#fc6f02;border:1px solid #fc6f0280;background:#fc6f0214;border-radius:8px;padding:6px 10px;font-size:.85rem;font-weight:800;margin:8px 0}
+.database-status{display:inline-flex;align-items:center;gap:7px;color:#edc09e;border:1px solid rgba(252,111,2,.26);background:rgba(24,29,31,.9);border-radius:999px;padding:6px 10px;font-size:12px;font-weight:600;line-height:1.3;letter-spacing:.015em;margin:8px 0}
+.database-status::before{content:"";width:6px;height:6px;flex-shrink:0;border-radius:50%;background:#fc6f02}
 @media(max-width:760px){.database-filters>summary{display:list-item;list-style-position:inside}.database-filters{margin:16px 0}.database-filters .operator-toolbar{margin-top:8px}}

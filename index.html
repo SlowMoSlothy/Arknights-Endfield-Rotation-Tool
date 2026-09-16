@@ -305,6 +305,16 @@
       transition: transform 0.3s ease;
     }
 
+    .game-card.featured.enemy-card { min-height: 280px; background: #181d1f; }
+    .enemy-card::before {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(24,29,31,.08) 0%, rgba(24,29,31,.32) 32%, rgba(24,29,31,.94) 76%, #181d1f 100%),
+        url("endfield/assets/enemies/database-background-v1.webp") center 30% / cover no-repeat;
+    }
+    .enemy-card .game-card-content { padding-top: 90px; }
+    .enemy-card .game-card-content p { margin-top: 13px; }
+    .enemy-card > .database-status { position: absolute; top: 14px; left: 14px; z-index: 2; margin: 0; }
+
     .operator-card {
       background:
         radial-gradient(circle at 74% 12%, rgba(252, 111, 2, 0.2), transparent 14rem),
@@ -579,7 +589,7 @@
       }
     }
   </style>
-<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=1">
+<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=2">
 </head>
 <body>
   <header class="top">
@@ -653,6 +663,7 @@
           </div>
         </a>
         <a class="game-card featured enemy-card" href="endfield/enemies/">
+          <!-- enemy-database-status:start --><span class="database-status">Work in progress</span><!-- enemy-database-status:end -->
           <div class="game-card-content">
             <div class="game-identity">
               <span class="game-identity-copy">
@@ -660,7 +671,7 @@
                 <h3 class="game-tool-name">Enemy Database</h3>
               </span>
             </div>
-            <!-- enemy-database-status:start --><span class="database-status">Work in progress</span><!-- enemy-database-status:end -->
+            
             <p>Explore enemy profiles, combat values, abilities and sources.</p>
             <span class="game-action">Browse enemies &nearr;</span>
           </div>
