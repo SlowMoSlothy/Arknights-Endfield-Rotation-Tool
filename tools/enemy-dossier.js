@@ -20,13 +20,23 @@ export function parseEnemyDescription(description) {
 }
 export function renderEnemyDossier(row) {
  const parsed=parseEnemyDescription(row.description);
+ const details=row.combat_details;
+ if(details && typeof details==='object' && !Array.isArray(details) && Object.keys(details).length) {
+  const numeric=value=>typeof value==='number' && Number.isFinite(value) && value>=0;
+  const format=value=>numeric(value)?value.toLocaleString('en-US'):'Unknown';
+  parsed.levels=Array.isArray(details.levels)?details.levels.filter(entry=>entry && Number.isInteger(entry.level) && entry.level>0).map(entry=>[String(entry.level),...['hp','atk','defense'].map(key=>format(entry[key]))]):[];
+  parsed.attributes=[];
+  for(const [key,label,unit] of [['stagger_hp','Stagger HP',''],['stagger_recovery','Stagger recovery',' seconds'],['finisher_atk_multiplier','Finisher ATK multiplier','×'],['finisher_sp_gain','Finisher SP gain',''],['attack_range','Attack range',' meters'],['weight','Weight','']]) {
+   if(numeric(details[key])) parsed.attributes.push([label,format(details[key])+unit]);
+  }
+ }
  const table=parsed.levels.length ? `<section class="panel enemy-levels"><div class="eyebrow">Level scaling</div><h2>Attributes by level</h2><div class="level-table-wrap"><table class="level-table"><caption>Recorded HP, ATK and DEF at each level</caption><thead><tr>${['Level','HP','ATK','DEF'].map(k=>`<th scope="col">${icon(k)}${k}</th>`).join('')}</tr></thead><tbody>${parsed.levels.map(values=>`<tr>${values.map((v,i)=>i===0?`<th scope="row"><span class="level-badge">LV ${escape(v)}</span></th>`:`<td>${escape(v)}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section>` : '';
  const primary=[...(parsed.levels.length?[]:[['HP',row.hp??'Unknown']]),['Defense',row.defense??'Unknown'],...parsed.attributes];
  const resistances=['physical','heat','cryo','electric','nature','aether'].map(k=>card(k,row.resistances?.[k]==null?'Unknown':`${row.resistances[k]}×`,k)).join('');
  const groups=new Map();
  for(const skill of row.skills || []) {
-  const match=/^([^—]+)\s+—\s+(.+)$/.exec(skill.name);
-  const group=match?match[1].trim():'Abilities';
+  const match=skill.phase == null ? /^([^—]+)\s+—\s+(.+)$/.exec(skill.name) : null;
+  const group=skill.phase != null ? (String(skill.phase).trim() || 'Abilities') : (match?match[1].trim():'Abilities');
   if(!groups.has(group)) groups.set(group,[]);
   groups.get(group).push({...skill,name:match?match[2]:skill.name});
  }

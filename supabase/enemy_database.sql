@@ -9,6 +9,7 @@ create table if not exists public.enemies (
     hp numeric check (hp >= 0 and hp < 'Infinity'::numeric),
     defense numeric check (defense >= 0 and defense < 'Infinity'::numeric),
     resistances jsonb not null default '{}' check (jsonb_typeof(resistances) = 'object'),
+    combat_details jsonb not null default '{}' check (jsonb_typeof(combat_details) = 'object'),
     skills jsonb not null default '[]' check (jsonb_typeof(skills) = 'array'),
     source_url text not null default '' check (source_url = '' or source_url ~ '^https?://'),
     is_visible boolean not null default false,
