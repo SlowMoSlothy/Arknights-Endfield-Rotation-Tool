@@ -24,7 +24,7 @@ function mapDatabaseEnemy(row) {
         type: "Enemy Skill", shortType: "Enemy", isEnemySkill: true
     }));
     const multipliers = Object.fromEntries(Object.entries(row.resistances || {}).filter(([key, value]) =>
-        ['physical','heat','cryo','electric','nature','neutral'].includes(key) && typeof value === "number" && Number.isFinite(value) && value >= 0));
+        ['physical','heat','cryo','electric','nature','aether','neutral'].includes(key) && typeof value === "number" && Number.isFinite(value) && value >= 0));
     return {
         id: row.id, name: String(row.name), description: String(row.description || ""),
         icon: safeEnemyImage(row.avatar_url),

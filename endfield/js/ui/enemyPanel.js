@@ -30,6 +30,22 @@ function getEnemyCombatMeta(enemy) {
     return `${defense} / ${resistanceSummary || (known ? "Recorded resistances: neutral" : "Resistances unknown (calculation: neutral)")}${known > 0 && known < 5 ? " / unrecorded elements assumed neutral" : ""}`;
 }
 
+// Values are incoming damage multipliers, not resistance percentages.
+function renderEnemyCombatChips(enemy) {
+    const chip = (label, value, icon) => `<span class="enemy-stat-chip" title="${escapeEnemyHtml(label)}" aria-label="${escapeEnemyHtml(label)}">${icon}<span>${escapeEnemyHtml(value)}</span></span>`;
+    const shield = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 20 6v6c0 5-8 9-8 9s-8-4-8-9V6z" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+    const defense = enemy.combatProfile?.defense;
+    let html = chip(defense == null ? 'Defense unknown; calculation uses 100' : `Defense: ${defense}`, defense ?? '?', shield);
+    for (const element of ['physical', 'heat', 'cryo', 'electric', 'nature', 'aether']) {
+        const value = enemy.combatProfile?.resistanceMultipliers?.[element];
+        // Aether has no bundled game icon. Use its readable element abbreviation.
+        if (element === 'aether' && value == null) continue;
+        const icon = element === 'aether' ? '<span aria-hidden="true">Æ</span>' : `<img src="assets/ui/elements/${element}.webp" alt="" width="14" height="14">`;
+        html += chip(value == null ? `${element}: unknown; calculation assumes 1× incoming damage` : `${element}: ${value}× incoming damage`, value == null ? '?' : `${value}×`, icon);
+    }
+    return html;
+}
+
 function renderEnemySelectionControl() {
     const button = document.getElementById("selectEnemyBtn");
     const name = document.getElementById("selectedEnemyName");
@@ -49,6 +65,7 @@ function renderEnemySelectionControl() {
         }
     }
     if (!enemy) {
+        button.removeAttribute("title");
         if (name) name.textContent = enemyCatalogState === "loading" ? "Loading enemies…" : "No enemy selected";
         if (meta) meta.textContent = enemyCatalogState === "error" ? enemyCatalogError : (enemies.length ? "Choose a published enemy. Calculation defaults: DEF 100, neutral resistance." : "No published enemies. Calculation defaults: DEF 100, neutral resistance.");
         button.setAttribute("aria-label", "Choose enemy");
@@ -58,8 +75,9 @@ function renderEnemySelectionControl() {
     button.classList.remove("enemy-rank-normal", "enemy-rank-elite", "enemy-rank-boss", "enemy-rank-test");
     button.classList.add(`enemy-rank-${getEnemyRank(enemy)}`);
     if (name) name.textContent = enemy.name;
-    if (meta) meta.textContent = getEnemyCombatMeta(enemy).replace(/ \/ (Verified|Unverified)$/, "");
-    button.setAttribute("aria-label", `Choose enemy. Current profile: ${enemy.name}`);
+    if (meta) meta.innerHTML = renderEnemyCombatChips(enemy);
+    button.title = `${enemy.name} — ${getEnemyCombatMeta(enemy)}`;
+    button.setAttribute("aria-label", `Choose enemy. Current profile: ${enemy.name}. ${getEnemyCombatMeta(enemy)}`);
 }
 
 function collectEnemyEffects() {

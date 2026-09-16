@@ -19,3 +19,6 @@
 .enemy-index .breadcrumbs{flex-wrap:wrap}
 @media(max-width:900px){.enemy-index .operator-toolbar{grid-template-columns:1fr 1fr}.enemy-index .operator-summary{grid-column:1/-1}.enemy-index .search-control{grid-column:1/-1}}
 @media(max-width:520px){.enemy-index .operator-toolbar{grid-template-columns:1fr}.enemy-index .enemy-hero{grid-template-columns:1fr;gap:16px}.enemy-hero>img{width:110px;height:110px}.enemy-detail-grid{grid-template-columns:1fr}.enemy-profile .panel{padding:18px}.enemy-index .enemy-category{font-size:.55rem}}
+
+.enemy-overview { margin-bottom: 18px; }
+.enemy-overview p { white-space: pre-line; overflow-wrap: anywhere; }

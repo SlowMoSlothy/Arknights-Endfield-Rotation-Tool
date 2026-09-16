@@ -37,3 +37,21 @@ test('pagination loads all rows and repeated skill IDs fail safely',async()=>{
  const first=Array.from({length:1000},(_,i)=>({...row,id:String(i),skills:[]}));const ctx=context([{data:first},{data:[row]}]);await vm.runInContext('hydrateEnemyDatabaseFromSupabase()',ctx);assert.equal(vm.runInContext('enemies.length',ctx),1001);
  const duplicate=context([{data:[row,{...row,id:'duplicate'}]}]);assert.equal(await vm.runInContext('hydrateEnemyDatabaseFromSupabase()',duplicate),false);
 });
+
+test('compact stats distinguish unknown, neutral and immune incoming damage',()=>{
+ const ctx=context();
+ vm.runInContext(fs.readFileSync('endfield/js/ui/enemyPanel.js','utf8'),ctx);
+ const html=vm.runInContext(`renderEnemyCombatChips({combatProfile:{defense:0,resistanceMultipliers:{physical:0,heat:1,nature:0.8,aether:1}}})`,ctx);
+ assert.match(html,/Defense: 0/);
+ assert.match(html,/physical: 0× incoming damage/);
+ assert.match(html,/heat: 1× incoming damage/);
+ assert.match(html,/cryo: unknown; calculation assumes 1× incoming damage/);
+ assert.match(html,/aether: 1× incoming damage/);
+ assert.doesNotMatch(html,/Defense unknown/);
+});
+test('database mapping retains Aether multiplier without treating it as neutral damage',()=>{
+ const ctx=context();
+ const profile=vm.runInContext(`mapDatabaseEnemy({id:'test',name:'Boss',skills:[],resistances:{aether:0.8}}).combatProfile`,ctx);
+ assert.equal(profile.resistanceMultipliers.aether,0.8);
+ assert.equal(profile.resistanceMultipliers.neutral,undefined);
+});
