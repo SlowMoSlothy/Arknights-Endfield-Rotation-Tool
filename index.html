@@ -291,17 +291,20 @@
       transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
     }
 
-    .planner-card {
+    .game-card.featured.planner-card {
+      min-height: 280px;
       background: #181d1f;
     }
+
+    .planner-card .game-card-content { padding-top: 180px; }
 
     .planner-card::before {
       content: "";
       position: absolute;
       inset: 0;
       background:
-        linear-gradient(105deg, rgba(24, 29, 31, 0.96), rgba(24, 29, 31, 0.42)),
-        url("endfield/assets/banner.png") center / cover no-repeat;
+        linear-gradient(180deg, rgba(24,29,31,.05) 0%, rgba(24,29,31,.12) 35%, rgba(24,29,31,.94) 76%, #181d1f 100%),
+        url("endfield/assets/rotation-planner-background-v1.webp") center top / 100% auto no-repeat;
       transition: transform 0.3s ease;
     }
 
