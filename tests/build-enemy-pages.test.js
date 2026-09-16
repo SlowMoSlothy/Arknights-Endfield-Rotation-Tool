@@ -41,8 +41,8 @@ test('enemy pages expose crawlable profiles and full content without database Ja
     assert.match(html, /<link rel="canonical"/);
     assert.match(html, /BreadcrumbList/);
     assert.match(html, /A test attack\./);
-    assert.match(html, /<dd>Unknown<\/dd>/);
-    assert.match(html, /<dd>0<\/dd>/);
+    assert.match(html, /<strong>Unknown<\/strong>/);
+    assert.match(html, /<strong>0<\/strong>/);
     assert.doesNotMatch(html, /supabaseClient\.js/);
     assert.equal(enemyPath(enemy), enemyPath({ ...enemy, name: 'Renamed Enemy' }));
 });
@@ -91,3 +91,4 @@ test('database theme uses anvil orange and enemy sitemap remains independent', (
     assert.match(createEnemySitemap([enemy]), /https:\/\/rotationforge.gg\/endfield\/enemies\//);
     assert.match(fs.readFileSync('robots.txt','utf8'), /sitemap-enemies\.xml/);
 });
+

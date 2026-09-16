@@ -1,3 +1,4 @@
+import { renderEnemyDossier } from './enemy-dossier.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -61,7 +62,7 @@ function head(title, description, url, schema, image = `${SITE}/favicon-flat.png
 <meta property="og:type" content="website"><meta property="og:url" content="${escape(url)}">
 <meta property="og:image" content="${escape(image)}"><meta name="twitter:card" content="summary">
 <script type="application/ld+json">${json(schema)}</script>
-${baseStyles()}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=2"><link rel="stylesheet" href="/endfield/css/enemyCatalog.css?v=2">`;
+${baseStyles()}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=2"><link rel="stylesheet" href="/endfield/css/enemyCatalog.css?v=3">`;
 }
 
 function tile(row) {
@@ -115,11 +116,8 @@ export function createEnemyPage(row, rows, workInProgress = true) {
 <div class="breadcrumbs"><a href="/">Home</a><span>›</span><a href="${BASE}">Enemies</a><span>›</span><strong>${escape(row.name)}</strong></div>
 ${statusBadge(workInProgress)}<section class="index-hero enemy-hero"><img src="${portrait(row)}" alt="" width="200" height="200"><div><div class="eyebrow">${escape(category(row))} enemy</div><h1>${escape(row.name)}</h1><p>Location: ${escape(row.location || 'Unknown')}</p></div></section>
 ${row.category === 'test' ? '<p class="enemy-test-note">This is a synthetic training / test profile used by RotationForge, not a verified game enemy.</p>' : ''}
-<section class="panel enemy-overview"><h2>Overview and attributes</h2><p>${escape(row.description || 'No description has been recorded yet.')}</p></section>
-<div class="enemy-detail-grid"><section class="panel"><h2>Combat values</h2><dl class="enemy-stats">${stats.map(([label, input]) => `<dt>${escape(label)}</dt><dd>${value(input)}</dd>`).join('')}</dl>
-<p class="enemy-help">Damage multipliers: 1 = normal damage, 0.5 = half damage, 1.5 = increased damage. Unknown values have not been recorded.</p></section>
-<section class="panel"><h2>Abilities</h2>${row.skills.length ? row.skills.map(skill => `<article class="enemy-ability"><h3>${escape(skill.name)}</h3><p>${escape(skill.description || 'No description has been recorded yet.')}</p></article>`).join('') : '<p>No abilities have been recorded yet.</p>'}</section></div>
-<section class="panel enemy-source"><h2>Source</h2>${source || '<p>No source has been recorded yet.</p>'}</section>
+${renderEnemyDossier(row)}
+<section id="enemy-source" class="panel enemy-source"><h2>Source</h2>${source || '<p>No source has been recorded yet.</p>'}<p class="enemy-help">Stat icons: Arknights: Endfield artwork via <a href="https://endfield.wiki.gg/wiki/Triaggelos">Endfield Talos Wiki</a>, recolored for RotationForge.</p></section>
 <section class="enemy-related"><h2>More enemies</h2><div class="operator-grid">${rows.filter(item => item.id !== row.id).slice(0,6).map(tile).join('')}</div><p><a href="${BASE}">Browse all enemies ↗</a></p></section>
 <footer>RotationForge is an unofficial fan-made tool for Arknights: Endfield.</footer></main></body></html>`;
 }
