@@ -170,29 +170,32 @@ function renderEnemyModal() {
         message.textContent = enemyCatalogState === "loading" ? "Loading enemies…" : enemyCatalogState === "error" ? enemyCatalogError : "No enemies have been published yet.";
         list.appendChild(message);
     }
-    const refresh = document.createElement("button");
-    refresh.type = "button"; refresh.className = "settings-option-btn";
-    refresh.textContent = enemyCatalogState === "error" ? "Retry" : "Refresh Enemy Database";
-    refresh.disabled = enemyCatalogState === "loading";
-    refresh.addEventListener("click", async () => {
-        refresh.disabled = true;
-        await hydrateEnemyDatabaseFromSupabase();
-        renderEnemyModal(); renderEnemySkillBar();
-        if (typeof renderRotation === "function") renderRotation();
-    });
-    list.appendChild(refresh);
+    if (enemyCatalogState === "error") {
+        const retry = document.createElement("button");
+        retry.type = "button"; retry.className = "settings-option-btn enemy-load-retry";
+        retry.textContent = "Retry";
+        retry.addEventListener("click", async () => {
+            retry.disabled = true;
+            await hydrateEnemyDatabaseFromSupabase();
+            renderEnemyModal(); renderEnemySkillBar();
+            if (typeof renderRotation === "function") renderRotation();
+        });
+        list.appendChild(retry);
+    }
     enemies.forEach(enemy => {
         const btn = document.createElement("button");
-        btn.className = `settings-option-btn enemy-select-btn enemy-rank-${getEnemyRank(enemy)} enemy-type-${getEnemyType(enemy)}`;
+        const selected = getSelectedEnemy()?.id === enemy.id;
+        btn.className = `operator-card enemy-select-btn${selected ? " selected" : ""}`;
         btn.type = "button";
-        btn.innerHTML = `
-            <img class="enemy-select-icon" src="${escapeEnemyHtml(enemy.icon)}" alt="${escapeEnemyHtml(enemy.name)}">
-            <div class="enemy-select-text">
-                <div class="settings-option-title">${escapeEnemyHtml(enemy.name)}</div>
-                <div class="enemy-select-meta">${getEnemyRank(enemy).toUpperCase()} / ${getEnemyType(enemy).toUpperCase()} / ${escapeEnemyHtml(getEnemyCombatMeta(enemy))}</div>
-                <div style="font-size:12px;opacity:.8;">${escapeEnemyHtml(enemy.description || "")}</div>
-            </div>
-        `;
+        btn.setAttribute("aria-pressed", String(selected));
+        btn.setAttribute("aria-label", enemy.name);
+        btn.title = `${enemy.name} · ${getEnemyRank(enemy).toUpperCase()}\n${getEnemyCombatMeta(enemy)}\n${enemy.description || ""}`;
+        const image = document.createElement("img");
+        image.className = "enemy-select-icon"; image.src = enemy.icon; image.alt = "";
+        image.addEventListener("error", () => { image.src = "/favicon-flat.png"; }, {once:true});
+        const name = document.createElement("span");
+        name.className = "operator-name"; name.textContent = enemy.name;
+        btn.append(image, name);
 
         btn.addEventListener("click", () => {
             setSelectedEnemy(enemy.id);

@@ -279,7 +279,7 @@ This project is licensed under the MIT License.
 
 ## Enemy Database im Rotation Planner
 
-Der Planner lädt veröffentlichte Gegner ausschließlich aus `public.enemies`, derselben Tabelle wie die lokale Admin Suite. Namen, Beschreibung, Kategorie, Avatare, Fähigkeiten, Defense und Schadensmultiplikatoren werden bei jedem Seitenstart geladen; die Gegnerauswahl bietet zusätzlich „Refresh Enemy Database“. Entwürfe bleiben ausgeblendet. Bei Ladefehlern zeigt die Auswahl einen Wiederholen-Schalter ohne lokale Ersatzgegner.
+Der Planner lädt veröffentlichte Gegner ausschließlich aus `public.enemies`, derselben Tabelle wie die lokale Admin Suite. Namen, Beschreibung, Kategorie, Avatare, Fähigkeiten, Defense und Schadensmultiplikatoren werden bei jedem Seitenstart geladen. Entwürfe bleiben ausgeblendet. Bei Ladefehlern zeigt die Auswahl einen Wiederholen-Schalter ohne lokale Ersatzgegner.
 
 Die bisherigen sechs Testgegner-Skills wurden mit ihren numerischen IDs und Triggerdaten in `skills` übernommen. Alte Gegnernamen als gespeicherte IDs werden über eine reine Kompatibilitätszuordnung auf Datenbank-UUIDs aufgelöst. Fehlende Defense/Resistenzen bleiben unbekannt; die Berechnung nutzt dann ausdrücklich angezeigte Annahmen (DEF 100, Multiplikator 1). Ein nicht mehr veröffentlichter gewählter Gegner wird nicht still durch einen anderen ersetzt.
 
