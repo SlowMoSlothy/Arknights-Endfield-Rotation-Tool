@@ -28,7 +28,7 @@ export function validateEnemies(rows) {
 export function portrait(row) {
     if (hasUploadedAvatar(row)) return `${enemyPath(row)}avatar.png?v=${row.avatar_url.split('/').at(-1).slice(0, 64)}`;
     const index = TEST_IMAGES.findIndex((_, i) => row.id === `10000000-0000-4000-8000-${String(i + 1).padStart(12, '0')}`);
-    return index >= 0 ? `/endfield/assets/enemies/${TEST_IMAGES[index]}.svg` : '/favicon-flat.png';
+    return index >= 0 ? `/endfield/assets/enemies/${TEST_IMAGES[index]}-v2.webp` : '/favicon-flat.png';
 }
 
 function hasUploadedAvatar(row) {
