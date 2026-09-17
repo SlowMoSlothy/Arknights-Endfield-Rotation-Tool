@@ -52,7 +52,7 @@
 .level-badge{display:inline-block;border-radius:4px;padding:4px 7px;background:#ff861d12;color:#ffad65;font-size:.7rem}
 .resistance-panel{margin-bottom:28px}
 .resistance-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
-.tone-physical{--tone:#dce1dd}.tone-heat{--tone:#ff8860}.tone-cryo{--tone:#78dce9}.tone-electric{--tone:#c1a2fa}.tone-nature{--tone:#a5dc75}.tone-aether{--tone:#ef9bc7}
+.tone-physical{--tone:#dce1dd}.tone-heat{--tone:#ff8860}.tone-cryo{--tone:#78dce9}.tone-electric{--tone:#ffd338}.tone-nature{--tone:#a5dc75}.tone-aether{--tone:#ef9bc7}
 .enemy-abilities{margin:28px 0}
 .phase-section{--phase:#ffab65;margin:16px 0;border:1px solid #ffffff14;border-top:2px solid var(--phase);border-radius:12px;background:#20282a;overflow:hidden}
 .phase-1{--phase:#7acdd8}.phase-2{--phase:#c2a0ee}
@@ -121,3 +121,4 @@
 .enemy-profile .attribute-card{background:linear-gradient(135deg,rgba(126,128,124,.16),rgba(37,44,46,.72))}
 @media(max-width:760px){.enemy-profile .enemy-profile-layout{grid-template-columns:150px minmax(0,1fr);grid-template-areas:"portrait copy" "info info";gap:14px}.enemy-portrait-card{min-height:230px;padding:16px 12px;border-left-width:8px;gap:16px}.enemy-card-caption{font-size:.45rem;letter-spacing:0}.enemy-hero-actions{gap:7px;margin-top:8px}.enemy-hero-actions .button{font-size:.74rem;padding:8px 12px}.enemy-profile .enemy-hero h1{font-size:2rem}.enemy-profile .enemy-hero .eyebrow{font-size:.55rem;letter-spacing:.12em}}
 @media(max-width:520px){.enemy-profile .enemy-profile-layout{grid-template-columns:105px minmax(0,1fr);gap:12px}.enemy-portrait-card{padding:12px 8px;min-height:160px;gap:12px;border-left-width:6px;border-radius:10px}.enemy-card-brand{font-size:.5rem}.enemy-card-caption{font-size:.4rem;padding:4px}.enemy-profile .enemy-hero h1{font-size:1.7rem}.enemy-guide-label{font-size:.6rem;margin-bottom:8px}.enemy-hero-copy{padding-top:0}.enemy-profile-info>div{padding:9px 7px}.enemy-profile-info strong{font-size:.76rem}.enemy-profile-info span{font-size:.5rem}.enemy-section-nav a{padding:7px 10px;font-size:.7rem}}
+
