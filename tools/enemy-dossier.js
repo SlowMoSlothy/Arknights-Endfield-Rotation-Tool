@@ -41,8 +41,8 @@ export function renderEnemyDossier(row) {
   groups.get(group).push({...skill,name:match?match[2]:skill.name});
  }
  const abilities=[...groups].map(([name,skills],i)=>`<section class="phase-section phase-${i%3}"><header><span class="phase-number">${String(i+1).padStart(2,'0')}</span><div><div class="eyebrow">${name==='Abilities'?'Enemy abilities':'Combat form'}</div><h3>${escape(name)}</h3></div><span class="phase-count">${skills.length} abilities</span></header><div class="phase-abilities">${skills.map(skill=>`<article class="enemy-ability"><h4>${escape(skill.name)}</h4><p>${escape(skill.description || 'No description has been recorded yet.')}</p></article>`).join('')}</div></section>`).join('');
- return `<nav class="enemy-section-nav" aria-label="Enemy profile sections"><a href="#enemy-attributes">Attributes</a><a href="#enemy-resistances">Resistances</a><a href="#enemy-abilities">Abilities</a><a href="#enemy-source">Sources</a></nav>
- <section class="panel enemy-overview"><div class="eyebrow">Field notes</div><h2>Overview</h2><p>${escape(parsed.prose || 'No description has been recorded yet.')}</p></section>
+ return `
+ <section id="enemy-overview" class="panel enemy-overview"><div class="eyebrow">Field notes</div><h2>Overview</h2><p>${escape(parsed.prose || 'No description has been recorded yet.')}</p></section>
  <div id="enemy-attributes" class="dossier-attributes">${table}<section class="panel"><div class="eyebrow">Combat profile</div><h2>Combat values</h2><div class="attribute-grid">${primary.map(([k,v])=>card(k,v)).join('')}</div></section></div>
  <section id="enemy-resistances" class="panel resistance-panel"><div class="eyebrow">Incoming damage</div><h2>Resistances</h2><div class="resistance-grid">${resistances}</div><p class="enemy-help">Multipliers: 1× = normal damage · 0.8× = 20% less damage · Unknown = not recorded.</p></section>
  <section id="enemy-abilities" class="enemy-abilities"><div class="eyebrow">Encounter guide</div><h2>Abilities &amp; combat forms</h2>${abilities || '<p>No abilities have been recorded yet.</p>'}</section>

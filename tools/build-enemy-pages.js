@@ -62,7 +62,7 @@ function head(title, description, url, schema, image = `${SITE}/favicon-flat.png
 <meta property="og:type" content="website"><meta property="og:url" content="${escape(url)}">
 <meta property="og:image" content="${escape(image)}"><meta name="twitter:card" content="summary">
 <script type="application/ld+json">${json(schema)}</script>
-${baseStyles()}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=2"><link rel="stylesheet" href="/endfield/css/enemyCatalog.css?v=8">`;
+${baseStyles()}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=2"><link rel="stylesheet" href="/endfield/css/enemyCatalog.css?v=9">`;
 }
 
 function tile(row) {
@@ -114,11 +114,16 @@ export function createEnemyPage(row, rows, workInProgress = true) {
     return `<!doctype html><html lang="en"><head>${head(`${row.name} – Arknights Endfield Enemy | RotationForge`, description, url, schema, avatar.startsWith('/') ? SITE + avatar : avatar)}</head>
 <body class="operator-index enemy-index enemy-profile">${siteHeader()}<main class="page">
 <div class="breadcrumbs"><a href="/">Home</a><span>›</span><a href="${BASE}">Enemies</a><span>›</span><strong>${escape(row.name)}</strong></div>
-${statusBadge(workInProgress)}<section class="index-hero enemy-hero"><span class="enemy-portrait-frame"><img src="${portrait(row)}" alt="" width="200" height="200"></span><div><div class="eyebrow">${escape(category(row))} enemy</div><h1>${escape(row.name)}</h1><p>Location: ${escape(row.location || 'Unknown')}</p></div></section>
+<nav class="enemy-section-nav" aria-label="Enemy profile sections"><a href="#enemy-overview">Overview</a><a href="#enemy-attributes">Attributes</a><a href="#enemy-resistances">Resistances</a><a href="#enemy-abilities">Abilities</a><a href="#enemy-source">Sources</a></nav>
+<section class="enemy-hero enemy-profile-layout">
+  <div class="enemy-portrait-card"><span class="enemy-card-brand">ENDFIELD</span><span class="enemy-portrait-frame"><img src="${portrait(row)}" alt="" width="200" height="200"></span><span class="enemy-card-caption">ROTATIONFORGE DATABASE</span></div>
+  <div class="enemy-hero-copy"><div class="eyebrow">Arknights: Endfield Enemy</div><h1>${escape(row.name)}</h1><span class="enemy-guide-label">Enemy profile</span>${statusBadge(workInProgress)}<div class="enemy-hero-actions"><a class="button primary" href="/endfield/">Open Rotation Planner ↗</a><a class="button secondary" href="${BASE}">All enemies ↗</a></div></div>
+  <div class="enemy-profile-info">${[['Category',category(row)],['Location',row.location || 'Unknown'],['Abilities',String(row.skills.length)]].map(([label,text])=>`<div><span>${escape(label)}</span><strong>${escape(text)}</strong></div>`).join('')}</div>
+</section>
 ${row.category === 'test' ? '<p class="enemy-test-note">This is a synthetic training / test profile used by RotationForge, not a verified game enemy.</p>' : ''}
 ${renderEnemyDossier(row)}
 <section id="enemy-source" class="panel enemy-source"><h2>Source</h2>${source || '<p>No source has been recorded yet.</p>'}<p class="enemy-help">Stat icons: Arknights: Endfield artwork via <a href="https://endfield.wiki.gg/wiki/Triaggelos">Endfield Talos Wiki</a>, recolored for RotationForge.</p></section>
-<section class="enemy-related"><h2>More enemies</h2><div class="operator-grid">${rows.filter(item => item.id !== row.id).slice(0,6).map(tile).join('')}</div><p><a href="${BASE}">Browse all enemies ↗</a></p></section>
+<section id="enemy-related" class="enemy-related"><h2>More enemies</h2><div class="operator-grid">${rows.filter(item => item.id !== row.id).slice(0,6).map(tile).join('')}</div><p><a href="${BASE}">Browse all enemies ↗</a></p></section>
 <footer>RotationForge is an unofficial fan-made tool for Arknights: Endfield.</footer></main><script src="/endfield/js/ui/enemySectionNav.js?v=1" defer></script></body></html>`;
 }
 
@@ -209,6 +214,7 @@ export async function build({ supabase = createSupabaseClient() } = {}) {
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
     build().catch(error => { console.error(error.message); process.exitCode = 1; });
 }
+
 
 
 
