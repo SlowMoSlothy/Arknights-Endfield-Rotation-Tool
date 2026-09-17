@@ -4,3 +4,5 @@ Files: MaxHP, ATK, DEF, Stagger, Attack_Range, Weight, Physical, Heat, Electric,
 
 ## Vector replacements
 The SVG files are original RotationForge geometric drawings, authored 2026-09-17. Enemy profiles now use these resolution-independent symbols, including separate recovery, finisher and SP icons. PNG files above are legacy assets and are no longer used by the dossier.
+
+The six elemental SVGs (Physical, Heat, Cryo, Electric, Nature, Ether) were redrawn to follow the original Endfield silhouettes on 2026-09-17, using the full-size wiki PNG references at https://endfield.wiki.gg/images/Physical.png (and the equivalent element filenames). These are game-icon adaptations; rights to the original designs remain with their owners. The other stat SVGs remain original geometric drawings.
