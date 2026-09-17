@@ -62,7 +62,7 @@ function head(title, description, url, schema, image = `${SITE}/favicon-flat.png
 <meta property="og:type" content="website"><meta property="og:url" content="${escape(url)}">
 <meta property="og:image" content="${escape(image)}"><meta name="twitter:card" content="summary">
 <script type="application/ld+json">${json(schema)}</script>
-${baseStyles()}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=2"><link rel="stylesheet" href="/endfield/css/enemyCatalog.css?v=6">`;
+${baseStyles()}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=2"><link rel="stylesheet" href="/endfield/css/enemyCatalog.css?v=7">`;
 }
 
 function tile(row) {
@@ -209,6 +209,7 @@ export async function build({ supabase = createSupabaseClient() } = {}) {
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
     build().catch(error => { console.error(error.message); process.exitCode = 1; });
 }
+
 
 
 
