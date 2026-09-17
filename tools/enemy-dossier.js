@@ -1,6 +1,6 @@
 const escape = value => String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
 const icons = {HP:'MaxHP',ATK:'ATK',DEF:'DEF',Defense:'DEF','Stagger HP':'Stagger','Stagger recovery':'Recovery','Finisher ATK multiplier':'Finisher','Finisher SP gain':'SP','Attack range':'Attack_Range',Weight:'Weight',physical:'Physical',heat:'Heat',cryo:'Cryo',electric:'Electric',nature:'Nature',aether:'Ether'};
-const icon = label => icons[label] ? `<span class="stat-symbol" style="--stat-icon:url('/endfield/assets/ui/enemy-stats/${icons[label]}.svg?v=2')" aria-hidden="true"></span>` : '';
+const icon = label => icons[label] ? `<span class="stat-symbol" style="--stat-icon:url('/endfield/assets/ui/enemy-stats/${icons[label]}.svg?v=3')" aria-hidden="true"></span>` : '';
 const card = (label,value,tone='orange') => `<div class="attribute-card tone-${tone}">${icon(label)}<span>${escape(label)}</span><strong>${escape(value)}</strong></div>`;
 // Recognize the editor's existing plain-text format; preserve every unrecognized line.
 export function parseEnemyDescription(description) {
@@ -48,3 +48,4 @@ export function renderEnemyDossier(row) {
  <section id="enemy-abilities" class="enemy-abilities"><div class="eyebrow">Encounter guide</div><h2>Abilities &amp; combat forms</h2>${abilities || '<p>No abilities have been recorded yet.</p>'}</section>
  ${parsed.notes.length?`<details class="panel enemy-record-notes"><summary>Record history &amp; attribution</summary>${parsed.notes.map(n=>`<p>${escape(n)}</p>`).join('')}</details>`:''}`;
 }
+
