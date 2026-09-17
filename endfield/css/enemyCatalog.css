@@ -93,3 +93,8 @@
  .enemy-index .database-filters{margin:10px 0}
  .enemy-index .database-filters>summary{padding:10px 12px;min-height:44px;font-size:.85rem;border-radius:10px}
 }
+/* Recessed portrait frame: dark inner bevel and a fine lower light edge. */
+.enemy-portrait-frame{position:relative;display:block;width:160px;height:160px;padding:9px;overflow:hidden;border-radius:16px;border:1px solid #111719;background:radial-gradient(ellipse at 50% 65%,#ff861d0b,transparent 75%),linear-gradient(145deg,#111719,#242d2f);box-shadow:inset 3px 4px 9px #000a,inset -1px -1px 2px #d8e7e419,0 1px 0 #d8e7e433,0 -1px 0 #0005}
+.enemy-portrait-frame::after{content:"";position:absolute;inset:4px;border-radius:12px;border:1px solid #ffffff0d;box-shadow:inset 0 2px 4px #0005;pointer-events:none}
+.enemy-portrait-frame>img{display:block;width:100%;height:100%;object-fit:contain;border-radius:8px}
+@media(max-width:520px){.enemy-portrait-frame{width:90px;height:110px;padding:6px;border-radius:12px}.enemy-portrait-frame::after{inset:3px;border-radius:9px}}
