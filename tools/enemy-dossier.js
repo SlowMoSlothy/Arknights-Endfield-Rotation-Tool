@@ -33,7 +33,7 @@ export function renderEnemyDossier(row) {
  }
  const table=parsed.levels.length ? `<section class="panel enemy-levels"><div class="eyebrow">Level scaling</div><h2>Attributes by level</h2><div class="level-table-wrap"><table class="level-table"><caption>Recorded HP, ATK and DEF at each level</caption><thead><tr>${['Level','HP','ATK','DEF'].map(k=>`<th scope="col">${icon(k)}${k}</th>`).join('')}</tr></thead><tbody>${parsed.levels.map(values=>`<tr>${values.map((v,i)=>i===0?`<th scope="row"><span class="level-badge">LV ${escape(v)}</span></th>`:`<td>${escape(v)}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section>` : '';
  const primary=[...(parsed.levels.length?[]:[['HP',row.hp??'Unknown']]),['Defense',row.defense??'Unknown'],...parsed.attributes];
- const resistances=['physical','heat','cryo','electric','nature','aether'].map(k=>card(k,row.resistances?.[k]==null?'Unknown':`${row.resistances[k]}×`,k)).join('');
+ const resistances=['physical','heat','cryo','electric','nature','aether'].map(k=>card(k,formatResistance(row.resistances?.[k], row.combat_details?.resistance_grades?.[k]),k)).join('');
  const groups=new Map();
  for(const skill of row.skills || []) {
   const match=skill.phase == null ? /^([^—]+)\s+—\s+(.+)$/.exec(skill.name) : null;
@@ -45,8 +45,14 @@ export function renderEnemyDossier(row) {
  return `
  <section id="enemy-overview" class="panel enemy-overview"><div class="eyebrow">Field notes</div><h2>Overview</h2><div class="enemy-formatted-text">${renderFormattedText(parsed.prose || 'No description has been recorded yet.')}</div></section>
  <div id="enemy-attributes" class="dossier-attributes">${table}<section class="panel"><div class="eyebrow">Combat profile</div><h2>Combat values</h2><div class="attribute-grid">${primary.map(([k,v])=>card(k,v)).join('')}</div></section></div>
- <section id="enemy-resistances" class="panel resistance-panel"><div class="eyebrow">Incoming damage</div><h2>Resistances</h2><div class="resistance-grid">${resistances}</div><p class="enemy-help">Multipliers: 1× = normal damage · 0.8× = 20% less damage · Unknown = not recorded.</p></section>
+ <section id="enemy-resistances" class="panel resistance-panel"><div class="eyebrow">Incoming damage</div><h2>Resistances</h2><div class="resistance-grid">${resistances}</div><p class="enemy-help">Resistance: 0% = normal damage · 20% = 20% less damage · Negative = increased damage taken. Letter ranks are recorded separately; Unknown = not recorded.</p></section>
  <section id="enemy-abilities" class="enemy-abilities"><div class="eyebrow">Encounter guide</div><h2>Abilities &amp; combat forms</h2>${abilities || '<p>No abilities have been recorded yet.</p>'}</section>
  ${parsed.notes.length?`<details class="panel enemy-record-notes"><summary>Record history &amp; attribution</summary>${parsed.notes.map(n=>`<p>${escape(n)}</p>`).join('')}</details>`:''}`;
 }
 
+
+export function formatResistance(multiplier, grade) {
+ const rank = ['A','B','C','D'].includes(grade) ? grade : '';
+ const value = typeof multiplier === 'number' && Number.isFinite(multiplier) && multiplier >= 0 ? `${Number(((1-multiplier)*100).toFixed(6))}%` : 'Unknown';
+ return rank ? `${rank} · ${value}` : value;
+}
