@@ -70,3 +70,7 @@
 @media(max-width:900px){.dossier-attributes{grid-template-columns:1fr}.resistance-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:520px){.enemy-profile .enemy-hero{grid-template-columns:90px minmax(0,1fr);padding:20px 16px;gap:12px}.enemy-profile .enemy-hero>img{width:90px;height:110px}.enemy-profile .enemy-hero h1{font-size:1.8rem}.enemy-profile .enemy-hero p{font-size:.78rem}.enemy-profile .panel{padding:16px}.phase-abilities{grid-template-columns:1fr}.resistance-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.phase-section>header{padding:16px}.phase-abilities .enemy-ability{padding:16px}.enemy-section-nav{gap:6px}.enemy-section-nav a{padding:8px 11px;font-size:.75rem}.level-table th,.level-table td{padding:10px 5px;font-size:.8rem}.attribute-card{padding:12px 8px;gap:5px 6px}.attribute-card strong{font-size:1.05rem}}
 .enemy-profile .enemy-hero{grid-template-areas:none;grid-template-rows:auto}
+/* Keep section navigation below the responsive site header. */
+.enemy-section-nav{position:sticky;top:var(--enemy-header-height,67px);z-index:4;padding:10px 0;background:rgba(29,36,38,.96);box-shadow:0 8px 20px #0003;border-bottom:1px solid #ff861d26;backdrop-filter:blur(14px)}
+.enemy-section-nav a[aria-current="location"]{color:#fff2df;background:#a84810;border-color:#ff963d;box-shadow:0 0 14px #ff79004d,inset 0 0 10px #ff99221f}
+.enemy-profile section[id],.enemy-profile .dossier-attributes{scroll-margin-top:var(--enemy-section-offset,140px)}

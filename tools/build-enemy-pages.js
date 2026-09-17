@@ -62,7 +62,7 @@ function head(title, description, url, schema, image = `${SITE}/favicon-flat.png
 <meta property="og:type" content="website"><meta property="og:url" content="${escape(url)}">
 <meta property="og:image" content="${escape(image)}"><meta name="twitter:card" content="summary">
 <script type="application/ld+json">${json(schema)}</script>
-${baseStyles()}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=2"><link rel="stylesheet" href="/endfield/css/enemyCatalog.css?v=3">`;
+${baseStyles()}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=2"><link rel="stylesheet" href="/endfield/css/enemyCatalog.css?v=4">`;
 }
 
 function tile(row) {
@@ -119,7 +119,7 @@ ${row.category === 'test' ? '<p class="enemy-test-note">This is a synthetic trai
 ${renderEnemyDossier(row)}
 <section id="enemy-source" class="panel enemy-source"><h2>Source</h2>${source || '<p>No source has been recorded yet.</p>'}<p class="enemy-help">Stat icons: Arknights: Endfield artwork via <a href="https://endfield.wiki.gg/wiki/Triaggelos">Endfield Talos Wiki</a>, recolored for RotationForge.</p></section>
 <section class="enemy-related"><h2>More enemies</h2><div class="operator-grid">${rows.filter(item => item.id !== row.id).slice(0,6).map(tile).join('')}</div><p><a href="${BASE}">Browse all enemies ↗</a></p></section>
-<footer>RotationForge is an unofficial fan-made tool for Arknights: Endfield.</footer></main></body></html>`;
+<footer>RotationForge is an unofficial fan-made tool for Arknights: Endfield.</footer></main><script src="/endfield/js/ui/enemySectionNav.js?v=1" defer></script></body></html>`;
 }
 
 export function createEnemySitemap(rows) {
@@ -209,3 +209,4 @@ export async function build({ supabase = createSupabaseClient() } = {}) {
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
     build().catch(error => { console.error(error.message); process.exitCode = 1; });
 }
+
