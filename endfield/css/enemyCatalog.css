@@ -132,3 +132,15 @@
 .enemy-formatted-text li{margin:.25em 0}
 .enemy-formatted-text li::marker{color:#ffad65}
 .enemy-ability .enemy-formatted-text{font-size:.85rem}
+
+/* Combat forms and elemental ability cards share the operator card hierarchy. */
+.phase-section h3{font-size:clamp(1.65rem,2.6vw,2.15rem);line-height:1.15;margin-top:6px}
+.phase-section>header .eyebrow{font-size:.65rem;letter-spacing:.16em}
+.phase-number{font-size:2.2rem}
+.phase-abilities{gap:14px;padding:16px;background:transparent}
+.phase-abilities .enemy-ability{border:1px solid color-mix(in srgb,var(--tone) 40%,transparent);border-radius:14px;background:linear-gradient(125deg,color-mix(in srgb,var(--tone) 13%,transparent),transparent 65%),#2a3234;padding:20px}
+.enemy-ability.tone-unknown{--tone:#86918f}
+.enemy-ability h4{font-size:1.1rem;line-height:1.35}
+.ability-element{display:inline-flex;align-items:center;gap:7px;border:1px solid color-mix(in srgb,var(--tone) 35%,transparent);border-radius:99px;padding:5px 10px;margin:4px 0 14px;font-size:.78rem;color:var(--tone);background:#151b1d40}
+.ability-element .stat-symbol{width:19px;height:19px;background:var(--tone)}
+@media(max-width:520px){.phase-abilities{padding:10px;gap:10px}.phase-abilities .enemy-ability{padding:16px}.phase-count{max-width:75px;text-align:right}.phase-section>header{gap:10px}}

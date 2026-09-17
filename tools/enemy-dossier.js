@@ -41,7 +41,7 @@ export function renderEnemyDossier(row) {
   if(!groups.has(group)) groups.set(group,[]);
   groups.get(group).push({...skill,name:match?match[2]:skill.name});
  }
- const abilities=[...groups].map(([name,skills],i)=>`<section class="phase-section phase-${i%3}"><header><span class="phase-number">${String(i+1).padStart(2,'0')}</span><div><div class="eyebrow">${name==='Abilities'?'Enemy abilities':'Combat form'}</div><h3>${escape(name)}</h3></div><span class="phase-count">${skills.length} abilities</span></header><div class="phase-abilities">${skills.map(skill=>`<article class="enemy-ability"><h4>${escape(skill.name)}</h4><div class="enemy-formatted-text">${renderFormattedText(skill.description || 'No description has been recorded yet.')}</div></article>`).join('')}</div></section>`).join('');
+ const abilities=[...groups].map(([name,skills],i)=>`<section class="phase-section phase-${i%3}"><header><span class="phase-number">${String(i+1).padStart(2,'0')}</span><div><div class="eyebrow">${name==='Abilities'?'Enemy abilities':'Combat form'}</div><h3>${escape(name)}</h3></div><span class="phase-count">${skills.length} abilities</span></header><div class="phase-abilities">${skills.map(skill=>renderEnemyAbility(skill)).join('')}</div></section>`).join('');
  return `
  <section id="enemy-overview" class="panel enemy-overview"><div class="eyebrow">Field notes</div><h2>Overview</h2><div class="enemy-formatted-text">${renderFormattedText(parsed.prose || 'No description has been recorded yet.')}</div></section>
  <div id="enemy-attributes" class="dossier-attributes">${table}<section class="panel"><div class="eyebrow">Combat profile</div><h2>Combat values</h2><div class="attribute-grid">${primary.map(([k,v])=>card(k,v)).join('')}</div></section></div>
@@ -55,4 +55,11 @@ export function formatResistance(multiplier, grade) {
  const rank = ['A','B','C','D'].includes(grade) ? grade : '';
  const value = typeof multiplier === 'number' && Number.isFinite(multiplier) && multiplier >= 0 ? `${Number(((1-multiplier)*100).toFixed(6))}%` : 'Unknown';
  return rank ? `${rank} · ${value}` : value;
+}
+
+export function renderEnemyAbility(skill) {
+ const elements={physical:'Physical',heat:'Heat',cryo:'Cryo',electric:'Electric',nature:'Nature',aether:'Ether'};
+ const element=Object.hasOwn(elements,skill.damage_element)?skill.damage_element:'';
+ const badge=element?`<span class="ability-element"><span class="stat-symbol" style="--stat-icon:url('/endfield/assets/ui/enemy-stats/${elements[element]}.svg?v=3')" aria-hidden="true"></span>${element==='aether'?'Aether':elements[element]}</span>`:'';
+ return `<article class="enemy-ability tone-${element || 'unknown'}"><h4>${escape(skill.name)}</h4>${badge}<div class="enemy-formatted-text">${renderFormattedText(skill.description || 'No description has been recorded yet.')}</div></article>`;
 }

@@ -10,7 +10,7 @@ test('editor data becomes a level table without losing unrecognized notes',()=>{
 test('dossier escapes descriptions, skills and stat values and preserves zero values',()=>{
  const html=renderEnemyDossier({description:'<script>alert(1)</script>',hp:0,defense:0,resistances:{physical:0},skills:[{name:'Phase — <img>',description:'<script>'}]});
  assert.doesNotMatch(html,/<script>|<img>/);
- assert.match(html,/0×/);assert.match(html,/<strong>0<\/strong>/);
+ assert.match(html,/100%/);assert.match(html,/<strong>0<\/strong>/);
  assert.match(html,/&lt;script&gt;/);
 });
 
