@@ -78,7 +78,7 @@ test('enemy reads paginate and do not treat a database error as an empty catalog
     const rangeCalls = [];
     const client = { from: () => ({ select: () => ({ eq: () => ({ order: () => ({ range: async (start, end) => {
         rangeCalls.push([start, end]);
-        return { data: start === 0 ? Array.from({length:1000}, (_,i) => ({...enemy, id:`10000000-0000-4000-8000-${String(i).padStart(12,'0')}`})) : [] };
+        return { data: start === 0 ? Array.from({length:1000}, (_,i) => ({...enemy, id:`10000000-0000-4000-8000-${String(i).padStart(12,'0')}`, name:`Training Dummy ${i}`})) : [] };
     } }) }) }) }) };
     assert.equal((await fetchEnemies(client)).length, 1000);
     assert.deepEqual(rangeCalls, [[0,999],[1000,1999]]);
