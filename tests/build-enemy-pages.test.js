@@ -11,7 +11,7 @@ const enemy = { id: '10000000-0000-4000-8000-000000000001', name: 'Training Dumm
 test('uploaded avatars appear on cards, profiles and share metadata with a safe fallback', () => {
     const url = `https://ftssllxdkqvmlxhfeqmy.supabase.co/storage/v1/object/public/enemy-avatars/${enemy.id}/${'a'.repeat(64)}.png`;
     const custom = { ...enemy, avatar_url: url };
-    const local = `/endfield/enemies/${enemy.id}/avatar.png?v=${'a'.repeat(64)}`;
+    const local = `/endfield/enemies/training-dummy/avatar.png?v=${'a'.repeat(64)}`;
     assert.equal(portrait(custom), local);
     assert.ok(createEnemyIndex([custom]).includes(`src="${local}"`));
     assert.ok(createEnemyPage(custom, [custom]).includes(`property="og:image" content="https://rotationforge.gg${local}"`));
@@ -27,9 +27,9 @@ test('generated avatar copies survive removal of the old upload; missing copies 
     const options = {outputDir:path.join(root,'enemies'),sitemapPath:path.join(root,'sitemap.xml'),avatarImages:images};
     try {
         writeEnemyOutput([custom], options);
-        assert.deepEqual(fs.readFileSync(path.join(options.outputDir,enemy.id,'avatar.png')),bytes);
+        assert.deepEqual(fs.readFileSync(path.join(options.outputDir,'training-dummy','avatar.png')),bytes);
         assert.throws(() => writeEnemyOutput([custom], {...options,avatarImages:new Map()}), /Missing avatar copy/);
-        assert.ok(fs.existsSync(path.join(options.outputDir,enemy.id,'avatar.png')));
+        assert.ok(fs.existsSync(path.join(options.outputDir,'training-dummy','avatar.png')));
         await assert.rejects(fetchAvatarImages([custom], async () => new Response('missing',{status:404})), /download failed/);
     } finally { fs.rmSync(root,{recursive:true,force:true}); }
 });
@@ -44,7 +44,8 @@ test('enemy pages expose crawlable profiles and full content without database Ja
     assert.match(html, /<strong>Unknown<\/strong>/);
     assert.match(html, /<strong>0<\/strong>/);
     assert.doesNotMatch(html, /supabaseClient\.js/);
-    assert.equal(enemyPath(enemy), enemyPath({ ...enemy, name: 'Renamed Enemy' }));
+    assert.equal(enemyPath(enemy), '/endfield/enemies/training-dummy/');
+    assert.equal(enemyPath({ ...enemy, name: 'Triaggelos' }), '/endfield/enemies/triaggelos/');
 });
 
 test('enemy metadata escapes stored text and rejects unsafe source URLs', () => {
@@ -62,10 +63,10 @@ test('enemy build removes unpublished pages and sitemap URLs on the next generat
     const options = { outputDir: path.join(root, 'enemies'), sitemapPath: path.join(root, 'sitemap-enemies.xml') };
     try {
         writeEnemyOutput([enemy], options);
-        assert.ok(fs.existsSync(path.join(options.outputDir, enemy.id, 'index.html')));
+        assert.ok(fs.existsSync(path.join(options.outputDir, 'training-dummy', 'index.html')));
         assert.match(fs.readFileSync(options.sitemapPath, 'utf8'), /<lastmod>2026-09-15T10:00:00.000Z<\/lastmod>/);
         writeEnemyOutput([{ ...enemy, is_visible: false }], options);
-        assert.equal(fs.existsSync(path.join(options.outputDir, enemy.id)), false);
+        assert.equal(fs.existsSync(path.join(options.outputDir, 'training-dummy')), false);
         assert.doesNotMatch(fs.readFileSync(options.sitemapPath, 'utf8'), new RegExp(enemy.id));
         assert.match(fs.readFileSync(path.join(options.outputDir, 'index.html'), 'utf8'), /No enemies have been published yet/);
         assert.throws(() => writeEnemyOutput([{ ...enemy, id: '../outside' }], options));
