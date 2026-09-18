@@ -12,16 +12,24 @@ const escape = value => String(value ?? '').replaceAll('&', '&amp;').replaceAll(
 const json = value => JSON.stringify(value).replaceAll('<', '\\u003c');
 const category = row => ({ normal: 'Normal', elite: 'Elite', boss: 'Boss', test: 'Training / test' })[row.category] || 'Unknown';
 const value = input => input == null ? 'Unknown' : escape(input);
-// Database IDs keep links stable when an enemy is renamed.
-export const enemyPath = row => `${BASE}${row.id}/`;
+const slugify = value => String(value || '').trim().toLowerCase()
+    .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+// Public URLs use readable slugs; UUIDs remain the internal database identity.
+export const enemySlug = row => String(row.slug || '').trim() || slugify(row.name) || row.id;
+export const enemyPath = row => `${BASE}${enemySlug(row)}/`;
 
 export function validateEnemies(rows) {
     if (!Array.isArray(rows)) throw new Error('Enemy response must be an array.');
     const ids = new Set();
+    const slugs = new Set();
     for (const row of rows) {
         if (!UUID.test(row.id) || ids.has(row.id) || !String(row.name || '').trim()) throw new Error('Invalid or duplicate enemy identity.');
         if (!Array.isArray(row.skills) || !row.resistances || typeof row.resistances !== 'object') throw new Error(`Invalid profile: ${row.name}`);
+        const slug = enemySlug(row);
+        if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || slugs.has(slug)) throw new Error(`Invalid or duplicate enemy slug: ${slug}`);
         ids.add(row.id);
+        slugs.add(slug);
     }
 }
 
@@ -158,11 +166,12 @@ export function writeEnemyOutput(rows, { outputDir = path.resolve('endfield/enem
         fs.mkdirSync(temp, { recursive: true });
         fs.writeFileSync(path.join(temp, 'index.html'), createEnemyIndex(rows, workInProgress));
         for (const row of rows) {
-            fs.mkdirSync(path.join(temp, row.id));
-            fs.writeFileSync(path.join(temp, row.id, 'index.html'), createEnemyPage(row, rows, workInProgress));
+            const slug = enemySlug(row);
+            fs.mkdirSync(path.join(temp, slug));
+            fs.writeFileSync(path.join(temp, slug, 'index.html'), createEnemyPage(row, rows, workInProgress));
             if (hasUploadedAvatar(row)) {
                 if (!avatarImages.has(row.id)) throw new Error(`Missing avatar copy: ${row.name}`);
-                fs.writeFileSync(path.join(temp, row.id, 'avatar.png'), avatarImages.get(row.id));
+                fs.writeFileSync(path.join(temp, slug, 'avatar.png'), avatarImages.get(row.id));
             }
         }
         fs.writeFileSync(temporaryMap, createEnemySitemap(rows));
