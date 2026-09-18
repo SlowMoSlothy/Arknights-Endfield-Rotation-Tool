@@ -133,7 +133,11 @@ ${renderEnemyDossier(row)}
 }
 
 export function createEnemySitemap(rows) {
-    return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n<url><loc>${SITE}${BASE}</loc></url>\n${rows.map(row => `<url><loc>${SITE}${enemyPath(row)}</loc>${row.updated_at && Number.isFinite(Date.parse(row.updated_at)) ? `<lastmod>${new Date(row.updated_at).toISOString()}</lastmod>` : ''}</url>`).join('\n')}\n</urlset>\n`;
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n<url><loc>${SITE}${BASE}</loc></url>\n${rows.map(row => {
+        const image = hasUploadedAvatar(row) ? `<image:image><image:loc>${SITE}${enemyPath(row)}avatar.png</image:loc></image:image>` : '';
+        const lastmod = row.updated_at && Number.isFinite(Date.parse(row.updated_at)) ? `<lastmod>${new Date(row.updated_at).toISOString()}</lastmod>` : '';
+        return `<url><loc>${SITE}${enemyPath(row)}</loc>${image}${lastmod}</url>`;
+    }).join('\n')}\n</urlset>\n`;
 }
 
 export async function fetchEnemies(client) {
