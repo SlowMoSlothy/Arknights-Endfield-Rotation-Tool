@@ -70,7 +70,7 @@ function head(title, description, url, schema, image = `${SITE}/favicon-flat.png
 <meta property="og:type" content="website"><meta property="og:url" content="${escape(url)}">
 <meta property="og:image" content="${escape(image)}"><meta name="twitter:card" content="summary">
 <script type="application/ld+json">${json(schema)}</script>
-${baseStyles()}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=2"><link rel="stylesheet" href="/endfield/css/enemyCatalog.css?v=13">`;
+${baseStyles()}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=2"><link rel="stylesheet" href="/endfield/css/enemyCatalog.css?v=16">`;
 }
 
 function tile(row) {
@@ -122,8 +122,8 @@ export function createEnemyPage(row, rows, workInProgress = true) {
 <div class="breadcrumbs"><a href="/">Home</a><span>›</span><a href="${BASE}">Enemies</a><span>›</span><strong>${escape(row.name)}</strong></div>
 <nav class="enemy-section-nav" aria-label="Enemy profile sections"><a href="#enemy-overview">Overview</a><a href="#enemy-attributes">Attributes</a><a href="#enemy-resistances">Resistances</a><a href="#enemy-abilities">Abilities</a></nav>
 <section class="enemy-hero enemy-profile-layout">
-  <div class="enemy-portrait-card"><span class="enemy-card-brand">ENDFIELD</span><span class="enemy-portrait-frame"><img src="${portrait(row)}" alt="" width="200" height="200"></span><span class="enemy-card-caption">ROTATIONFORGE DATABASE</span></div>
-  <div class="enemy-hero-copy"><div class="eyebrow">Arknights: Endfield Enemy</div><h1>${escape(row.name)}</h1><span class="enemy-guide-label">Enemy profile</span>${statusBadge(workInProgress)}<div class="enemy-hero-actions"><a class="button primary" href="/endfield/">Open Rotation Planner ↗</a><a class="button secondary" href="${BASE}">All enemies ↗</a></div></div>
+  <div class="enemy-portrait-card"><span class="enemy-card-brand">ENDFIELD</span>${statusBadge(workInProgress)}<span class="enemy-portrait-frame"><img src="${portrait(row)}" alt="" width="200" height="200"></span><span class="enemy-card-caption">ROTATIONFORGE DATABASE</span></div>
+  <div class="enemy-hero-copy"><div class="eyebrow">Arknights: Endfield Enemy</div><h1>${escape(row.name)}</h1><span class="enemy-guide-label">Enemy profile</span></div>
   <div class="enemy-profile-info">${[['Category',category(row)],['Location',row.location || 'Unknown'],['Abilities',String(row.skills.length)]].map(([label,text])=>`<div><span>${escape(label)}</span><strong>${escape(text)}</strong></div>`).join('')}</div>
 </section>
 ${row.category === 'test' ? '<p class="enemy-test-note">This is a synthetic training / test profile used by RotationForge, not a verified game enemy.</p>' : ''}

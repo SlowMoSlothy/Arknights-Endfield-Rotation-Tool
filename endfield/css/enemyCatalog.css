@@ -104,13 +104,15 @@
 .enemy-profile .enemy-profile-layout{display:grid;grid-template-columns:250px minmax(0,1fr);grid-template-areas:"portrait copy" "portrait info";gap:20px 24px;align-items:start;padding:0;margin:0 0 20px;background:none;border:0;box-shadow:none;border-radius:0}
 .enemy-portrait-card{grid-area:portrait;position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:22px;min-height:330px;padding:24px 18px 20px 28px;overflow:hidden;border:1px solid var(--border);border-left:12px solid var(--accent);border-radius:14px;background:linear-gradient(135deg,rgba(126,128,124,.32),rgba(49,55,57,.92));box-shadow:var(--shadow)}
 .enemy-card-brand{font-size:.72rem;font-weight:950;letter-spacing:.18em;color:#fff}
-.enemy-card-caption{align-self:flex-start;background:var(--accent);color:#171c1e;font-size:.55rem;font-weight:950;letter-spacing:.1em;padding:5px 7px;border-radius:3px}
+.enemy-card-caption{position:absolute;left:12px;bottom:26px;z-index:3;writing-mode:vertical-rl;white-space:nowrap;background:var(--accent);color:#313739;font-size:.58rem;font-weight:900;letter-spacing:.1em;padding:8px 4px;border-radius:3px}
 .enemy-portrait-card .enemy-portrait-frame{width:100%;height:auto;aspect-ratio:1}
+.enemy-profile .enemy-portrait-card > .database-status{align-self:flex-start;max-width:100%;margin:-6px 0;padding:4px 6px;gap:4px;font-size:10px;line-height:1.25}
+.enemy-profile .enemy-portrait-card > .database-status::before{flex-shrink:0}
 .enemy-hero-copy{grid-area:copy;min-width:0;padding-top:8px}
 .enemy-profile .enemy-hero h1{font-size:clamp(2rem,4.2vw,3.6rem);margin:12px 0 3px;line-height:1.03}
 .enemy-guide-label{display:block;margin:0 0 14px;color:var(--accent);font-size:.78rem;font-weight:950;text-transform:uppercase;letter-spacing:.12em}
-.enemy-hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
-.enemy-hero-actions .button{min-height:42px;padding:10px 16px;font-size:.83rem}
+
+
 .enemy-profile-info{grid-area:info;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:8px;border:1px solid var(--border);border-radius:10px;background:rgba(49,55,57,.84)}
 .enemy-profile-info>div{padding:12px;min-width:0;border:1px solid rgba(160,170,169,.2);border-radius:8px;background:linear-gradient(135deg,rgba(126,128,124,.2),rgba(49,55,57,.82))}
 .enemy-profile-info span{display:block;color:var(--muted);font-size:.58rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
@@ -119,8 +121,43 @@
 .enemy-section-nav a{border-radius:999px;padding:7px 12px;font-size:.72rem;color:#d2d9d5;background:rgba(37,44,46,.55);border-color:rgba(160,170,169,.24);letter-spacing:.035em}
 .enemy-profile .panel{background:rgba(49,55,57,.84);border-color:var(--border);border-radius:12px}
 .enemy-profile .attribute-card{background:linear-gradient(135deg,rgba(126,128,124,.16),rgba(37,44,46,.72))}
-@media(max-width:760px){.enemy-profile .enemy-profile-layout{grid-template-columns:150px minmax(0,1fr);grid-template-areas:"portrait copy" "info info";gap:14px}.enemy-portrait-card{min-height:230px;padding:16px 12px;border-left-width:8px;gap:16px}.enemy-card-caption{font-size:.45rem;letter-spacing:0}.enemy-hero-actions{gap:7px;margin-top:8px}.enemy-hero-actions .button{font-size:.74rem;padding:8px 12px}.enemy-profile .enemy-hero h1{font-size:2rem}.enemy-profile .enemy-hero .eyebrow{font-size:.55rem;letter-spacing:.12em}}
-@media(max-width:520px){.enemy-profile .enemy-profile-layout{grid-template-columns:105px minmax(0,1fr);gap:12px}.enemy-portrait-card{padding:12px 8px;min-height:160px;gap:12px;border-left-width:6px;border-radius:10px}.enemy-card-brand{font-size:.5rem}.enemy-card-caption{font-size:.4rem;padding:4px}.enemy-profile .enemy-hero h1{font-size:1.7rem}.enemy-guide-label{font-size:.6rem;margin-bottom:8px}.enemy-hero-copy{padding-top:0}.enemy-profile-info>div{padding:9px 7px}.enemy-profile-info strong{font-size:.76rem}.enemy-profile-info span{font-size:.5rem}.enemy-section-nav a{padding:7px 10px;font-size:.7rem}}
+@media (max-width: 760px) {
+  .enemy-profile .enemy-profile-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "portrait" "copy" "info";
+    gap: 24px;
+  }
+  .enemy-portrait-card {
+    min-height: 0;
+    padding: 24px 20px 18px;
+    border-left-width: 12px;
+    gap: 16px;
+  }
+  .enemy-portrait-card .enemy-portrait-frame {
+    width: min(100%, 340px);
+    align-self: center;
+  }
+  .enemy-card-brand { font-size: .72rem; }
+  .enemy-card-caption { left: max(8px, calc(50% - 182px)); bottom: 26px; }
+  .enemy-profile .enemy-portrait-card > .database-status {
+    margin: 0;
+    font-size: 11px;
+    padding: 5px 8px;
+  }
+  .enemy-hero-copy { padding-top: 0; }
+  .enemy-profile .enemy-hero h1 {
+    font-size: clamp(2.4rem, 10vw, 3.5rem);
+    overflow-wrap: anywhere;
+  }
+  .enemy-profile .enemy-hero .eyebrow { font-size: .65rem; letter-spacing: .16em; }
+  .enemy-guide-label { font-size: .8rem; margin-bottom: 0; }
+}
+@media (max-width: 520px) {
+  .enemy-profile-info>div { padding: 9px 7px; }
+  .enemy-profile-info strong { font-size: .76rem; }
+  .enemy-profile-info span { font-size: .5rem; }
+  .enemy-section-nav a { padding: 7px 10px; font-size: .7rem; }
+}
 
 .enemy-formatted-text{color:#c6cecc;font-size:.9rem;line-height:1.7;overflow-wrap:anywhere}
 .enemy-formatted-text p{white-space:normal;margin:0 0 1em}
