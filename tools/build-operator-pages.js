@@ -1241,7 +1241,7 @@ export function createOperatorPage(
   <script type="application/ld+json">${JSON.stringify(breadcrumbSchema)}</script>
   <script type="application/ld+json">${JSON.stringify(webPageSchema)}</script>
   ${baseStyles()}
-  <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=2">
+  <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=3">
   ${attributeVariantStyles()}
 </head>
 <body class="operator-page">
@@ -1386,7 +1386,7 @@ export function createIndexPage(operators) {
   <meta property="og:type" content="website">
   <script type="application/ld+json">${JSON.stringify(itemListSchema)}</script>
   ${baseStyles()}
-  <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=2">
+  <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=3">
 </head>
 <body class="operator-index">
   ${siteHeader({ showOperatorLink: false })}
