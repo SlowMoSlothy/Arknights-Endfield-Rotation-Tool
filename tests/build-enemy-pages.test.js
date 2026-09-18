@@ -90,6 +90,10 @@ test('database theme uses anvil orange and enemy sitemap remains independent', (
     assert.match(baseStyles(), /--accent:#fc6f02/);
     assert.doesNotMatch(baseStyles(), /248,245,70|#F8F546/);
     assert.match(createEnemySitemap([enemy]), /https:\/\/rotationforge.gg\/endfield\/enemies\//);
+    const avatarUrl = `https://ftssllxdkqvmlxhfeqmy.supabase.co/storage/v1/object/public/enemy-avatars/${enemy.id}/${'a'.repeat(64)}.png`;
+    const sitemap = createEnemySitemap([{ ...enemy, name: 'Triaggelos', avatar_url: avatarUrl }]);
+    assert.match(sitemap, /xmlns:image="http:\/\/www\.google\.com\/schemas\/sitemap-image\/1\.1"/);
+    assert.match(sitemap, /<image:loc>https:\/\/rotationforge\.gg\/endfield\/enemies\/triaggelos\/avatar\.png<\/image:loc>/);
     assert.match(fs.readFileSync('robots.txt','utf8'), /sitemap-enemies\.xml/);
 });
 
