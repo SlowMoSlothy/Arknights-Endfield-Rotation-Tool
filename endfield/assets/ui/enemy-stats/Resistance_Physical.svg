@@ -1,1 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 68" fill="currentColor"><path fill-rule="evenodd" d="M0,0H48V48L24,68 0,48ZM39,23 39,24 38,24 38,25 37,25 37,26 36,26 36,27 35,27 35,28 34,28 34,29 28,34 28,35 32,38 32,40 21,40 21,39 20,39 20,38 19,38 19,37 18,37 18,36 12,31 12,20 13,20 16,24 19,24 19,23 20,23 20,22 21,22 21,21 22,21 22,20 23,20 23,19 24,19 24,18 25,18 25,17 26,17 26,16 27,16 27,15 28,15 33,9 43,9 43,10 44,10 44,18 43,18 43,20ZM11,45 11,46 9,47 9,39 10,39 12,36 14,36 17,40ZM2,51 2,49 3,49 3,50 6,51 7,53 2,53ZM42,52 46,49 46,53 42,53Z"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 68">
+  <defs>
+    <mask id="cutout" x="0" y="0" width="48" height="68" maskUnits="userSpaceOnUse" style="mask-type:luminance">
+      <rect width="48" height="68" fill="white"/>
+      <g transform="translate(8 10)" fill="black"><path d="M4 9 8 13 20 1h7v7L15 20l4 4H11l-7-7ZM4 20l4 4-6 6v-7Z"/></g>
+    </mask>
+  </defs>
+  <path d="M0 0H48V48L24 68L0 48Z" fill="white" mask="url(#cutout)"/>
+</svg>

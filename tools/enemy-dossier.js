@@ -1,7 +1,7 @@
 import { renderFormattedText } from './formatted-text.js';
 const escape = value => String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
 const icons = {HP:'MaxHP',ATK:'ATK',DEF:'DEF',Defense:'DEF','Stagger HP':'Stagger','Stagger recovery':'Recovery','Finisher ATK multiplier':'Finisher','Finisher SP gain':'SP','Attack range':'Attack_Range',Weight:'Weight',physical:'Resistance_Physical',heat:'Resistance_Heat',cryo:'Resistance_Cryo',electric:'Resistance_Electric',nature:'Resistance_Nature',aether:'Resistance_Ether'};
-const icon = label => icons[label] ? `<span class="stat-symbol" style="--stat-icon:url('/endfield/assets/ui/enemy-stats/${icons[label]}.svg?v=3')" aria-hidden="true"></span>` : '';
+const icon = label => icons[label] ? `<span class="stat-symbol" style="--stat-icon:url('/endfield/assets/ui/enemy-stats/${icons[label]}.svg?v=4')" aria-hidden="true"></span>` : '';
 const card = (label,value,tone='orange') => `<div class="attribute-card tone-${tone}">${icon(label)}<span>${escape(label)}</span><strong>${escape(value)}</strong></div>`;
 // Recognize the editor's existing plain-text format; preserve every unrecognized line.
 export function parseEnemyDescription(description) {
