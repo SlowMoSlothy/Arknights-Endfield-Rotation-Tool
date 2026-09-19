@@ -49,7 +49,7 @@ export function renderEnemyDossier(row, { includeResistances = true } = {}) {
  const abilities=[...groups].map(([name,skills],i)=>`<section class="phase-section phase-${i%3}"><header><span class="phase-number">${String(i+1).padStart(2,'0')}</span><div><div class="eyebrow">${name==='Abilities'?'Enemy abilities':'Combat form'}</div><h3>${escape(name)}</h3></div><span class="phase-count">${skills.length} abilities</span></header><div class="phase-abilities">${skills.map(skill=>renderEnemyAbility(skill)).join('')}</div></section>`).join('');
  return `
  <section id="enemy-overview" class="panel enemy-overview"><div class="eyebrow">Field notes</div><h2>Overview</h2><div class="enemy-formatted-text">${renderFormattedText(parsed.prose || 'No description has been recorded yet.')}</div></section>
- <div id="enemy-attributes" class="dossier-attributes">${table}<section class="panel"><div class="eyebrow">Combat profile</div><h2>Combat values</h2><div class="attribute-grid">${primary.map(([k,v])=>card(k,v)).join('')}</div></section></div>
+ <div id="enemy-attributes" class="dossier-attributes">${table}<section id="enemy-combat-values" class="panel"><div class="eyebrow">Combat profile</div><h2>Combat values</h2><div class="attribute-grid">${primary.map(([k,v])=>card(k,v)).join('')}</div></section></div>
  ${includeResistances ? renderEnemyResistances(row) : ''}
  <section id="enemy-abilities" class="enemy-abilities"><div class="eyebrow">Encounter guide</div><h2>Abilities &amp; combat forms</h2>${abilities || '<p>No abilities have been recorded yet.</p>'}</section>
  ${parsed.notes.length?`<details class="panel enemy-record-notes"><summary>Record history &amp; attribution</summary>${parsed.notes.map(n=>`<p>${escape(n)}</p>`).join('')}</details>`:''}`;
