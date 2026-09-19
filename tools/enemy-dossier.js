@@ -19,7 +19,12 @@ export function parseEnemyDescription(description) {
  }
  return {levels,attributes,prose:prose.join('\n').trim(),notes};
 }
-export function renderEnemyDossier(row) {
+export function renderEnemyResistances(row) {
+ const resistances=['physical','heat','cryo','electric','nature','aether'].map(k=>card(k,formatResistance(row.resistances?.[k], row.combat_details?.resistance_grades?.[k]),k)).join('');
+ return `<section id="enemy-resistances" class="panel resistance-panel"><div class="eyebrow">Incoming damage</div><h2>Resistances</h2><div class="resistance-grid">${resistances}</div></section>`;
+}
+
+export function renderEnemyDossier(row, { includeResistances = true } = {}) {
  const parsed=parseEnemyDescription(row.description);
  const details=row.combat_details;
  if(details && typeof details==='object' && !Array.isArray(details) && Object.keys(details).length) {
@@ -45,7 +50,7 @@ export function renderEnemyDossier(row) {
  return `
  <section id="enemy-overview" class="panel enemy-overview"><div class="eyebrow">Field notes</div><h2>Overview</h2><div class="enemy-formatted-text">${renderFormattedText(parsed.prose || 'No description has been recorded yet.')}</div></section>
  <div id="enemy-attributes" class="dossier-attributes">${table}<section class="panel"><div class="eyebrow">Combat profile</div><h2>Combat values</h2><div class="attribute-grid">${primary.map(([k,v])=>card(k,v)).join('')}</div></section></div>
- <section id="enemy-resistances" class="panel resistance-panel"><div class="eyebrow">Incoming damage</div><h2>Resistances</h2><div class="resistance-grid">${resistances}</div></section>
+ ${includeResistances ? renderEnemyResistances(row) : ''}
  <section id="enemy-abilities" class="enemy-abilities"><div class="eyebrow">Encounter guide</div><h2>Abilities &amp; combat forms</h2>${abilities || '<p>No abilities have been recorded yet.</p>'}</section>
  ${parsed.notes.length?`<details class="panel enemy-record-notes"><summary>Record history &amp; attribution</summary>${parsed.notes.map(n=>`<p>${escape(n)}</p>`).join('')}</details>`:''}`;
 }

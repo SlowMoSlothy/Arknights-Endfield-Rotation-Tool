@@ -1,4 +1,4 @@
-import { renderEnemyDossier } from './enemy-dossier.js';
+import { renderEnemyDossier, renderEnemyResistances } from './enemy-dossier.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -70,7 +70,7 @@ function head(title, description, url, schema, image = `${SITE}/favicon-flat.png
 <meta property="og:type" content="website"><meta property="og:url" content="${escape(url)}">
 <meta property="og:image" content="${escape(image)}"><meta name="twitter:card" content="summary">
 <script type="application/ld+json">${json(schema)}</script>
-${baseStyles()}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=2"><link rel="stylesheet" href="/endfield/css/enemyCatalog.css?v=16">`;
+${baseStyles()}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=2"><link rel="stylesheet" href="/endfield/css/enemyCatalog.css?v=19">`;
 }
 
 function tile(row) {
@@ -120,14 +120,15 @@ export function createEnemyPage(row, rows, workInProgress = true) {
     return `<!doctype html><html lang="en"><head>${head(`${row.name} – Arknights Endfield Enemy | RotationForge`, description, url, schema, avatar.startsWith('/') ? SITE + avatar : avatar)}</head>
 <body class="operator-index enemy-index enemy-profile">${siteHeader()}<main class="page">
 <div class="breadcrumbs"><a href="/">Home</a><span>›</span><a href="${BASE}">Enemies</a><span>›</span><strong>${escape(row.name)}</strong></div>
-<nav class="enemy-section-nav" aria-label="Enemy profile sections"><a href="#enemy-overview">Overview</a><a href="#enemy-attributes">Attributes</a><a href="#enemy-resistances">Resistances</a><a href="#enemy-abilities">Abilities</a></nav>
+<nav class="enemy-section-nav" aria-label="Enemy profile sections"><a href="#enemy-resistances">Resistances</a><a href="#enemy-overview">Overview</a><a href="#enemy-attributes">Attributes</a><a href="#enemy-abilities">Abilities</a></nav>
 <section class="enemy-hero enemy-profile-layout">
   <div class="enemy-portrait-card"><span class="enemy-card-brand">ENDFIELD</span>${statusBadge(workInProgress)}<span class="enemy-portrait-frame"><img src="${portrait(row)}" alt="" width="200" height="200"></span><span class="enemy-card-caption">ROTATIONFORGE DATABASE</span></div>
   <div class="enemy-hero-copy"><div class="eyebrow">Arknights: Endfield Enemy</div><h1>${escape(row.name)}</h1><span class="enemy-guide-label">Enemy profile</span></div>
-  <div class="enemy-profile-info">${[['Category',category(row)],['Location',row.location || 'Unknown'],['Abilities',String(row.skills.length)]].map(([label,text])=>`<div><span>${escape(label)}</span><strong>${escape(text)}</strong></div>`).join('')}</div>
+  <div class="enemy-profile-info">${[['Category',category(row)],['Type',row.combat_details?.enemy_type || (enemySlug(row) === 'triaggelos' ? 'Aggeloi' : 'Unknown')],['Location',row.location || 'Unknown'],['Abilities',String(row.skills.length)]].map(([label,text])=>`<div><span>${escape(label)}</span><strong>${escape(text)}</strong></div>`).join('')}</div>
+  ${renderEnemyResistances(row)}
 </section>
 ${row.category === 'test' ? '<p class="enemy-test-note">This is a synthetic training / test profile used by RotationForge, not a verified game enemy.</p>' : ''}
-${renderEnemyDossier(row)}
+${renderEnemyDossier(row, { includeResistances: false })}
 <section id="enemy-related" class="enemy-related"><h2>More enemies</h2><div class="operator-grid">${rows.filter(item => item.id !== row.id).slice(0,6).map(tile).join('')}</div><p><a href="${BASE}">Browse all enemies ↗</a></p></section>
 <footer>RotationForge is an unofficial fan-made tool for Arknights: Endfield.</footer></main><script src="/endfield/js/ui/enemySectionNav.js?v=1" defer></script></body></html>`;
 }

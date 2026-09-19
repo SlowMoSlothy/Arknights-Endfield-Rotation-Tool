@@ -101,8 +101,12 @@
 
 
 /* Match the operator profile's portrait / title / information-strip layout. */
-.enemy-profile .enemy-profile-layout{display:grid;grid-template-columns:250px minmax(0,1fr);grid-template-areas:"portrait copy" "portrait info";gap:20px 24px;align-items:start;padding:0;margin:0 0 20px;background:none;border:0;box-shadow:none;border-radius:0}
-.enemy-portrait-card{grid-area:portrait;position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:22px;min-height:330px;padding:24px 18px 20px 28px;overflow:hidden;border:1px solid var(--border);border-left:12px solid var(--accent);border-radius:14px;background:linear-gradient(135deg,rgba(126,128,124,.32),rgba(49,55,57,.92));box-shadow:var(--shadow)}
+.enemy-profile .enemy-profile-layout{display:grid;grid-template-columns:250px minmax(0,1fr);grid-template-areas:"portrait copy" "portrait info" "resistances resistances";gap:20px 24px;align-items:start;padding:0;margin:0 0 20px;background:none;border:0;box-shadow:none;border-radius:0}
+.enemy-profile-layout > .resistance-panel{grid-area:resistances;min-width:0;margin:0;padding:16px}
+.enemy-profile-layout > .resistance-panel .eyebrow{margin-bottom:8px}
+.enemy-profile-layout > .resistance-panel h2{margin:0 0 12px;font-size:1.2rem}
+.enemy-profile-layout .resistance-grid{grid-template-columns:repeat(6,minmax(0,1fr))}
+.enemy-portrait-card{grid-area:portrait;align-self:stretch;position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:22px;min-height:330px;padding:24px 18px 20px 28px;overflow:hidden;border:1px solid var(--border);border-left:12px solid var(--accent);border-radius:14px;background:linear-gradient(135deg,rgba(126,128,124,.32),rgba(49,55,57,.92));box-shadow:var(--shadow)}
 .enemy-card-brand{font-size:.72rem;font-weight:950;letter-spacing:.18em;color:#fff}
 .enemy-card-caption{position:absolute;left:12px;bottom:26px;z-index:3;writing-mode:vertical-rl;white-space:nowrap;background:var(--accent);color:#313739;font-size:.58rem;font-weight:900;letter-spacing:.1em;padding:8px 4px;border-radius:3px}
 .enemy-portrait-card .enemy-portrait-frame{width:100%;height:auto;aspect-ratio:1}
@@ -113,7 +117,7 @@
 .enemy-guide-label{display:block;margin:0 0 14px;color:var(--accent);font-size:.78rem;font-weight:950;text-transform:uppercase;letter-spacing:.12em}
 
 
-.enemy-profile-info{grid-area:info;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:8px;border:1px solid var(--border);border-radius:10px;background:rgba(49,55,57,.84)}
+.enemy-profile-info{grid-area:info;align-self:end;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:8px;border:1px solid var(--border);border-radius:10px;background:rgba(49,55,57,.84)}
 .enemy-profile-info>div{padding:12px;min-width:0;border:1px solid rgba(160,170,169,.2);border-radius:8px;background:linear-gradient(135deg,rgba(126,128,124,.2),rgba(49,55,57,.82))}
 .enemy-profile-info span{display:block;color:var(--muted);font-size:.58rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
 .enemy-profile-info strong{font-size:.9rem;overflow-wrap:anywhere}
@@ -122,9 +126,11 @@
 .enemy-profile .panel{background:rgba(49,55,57,.84);border-color:var(--border);border-radius:12px}
 .enemy-profile .attribute-card{background:linear-gradient(135deg,rgba(126,128,124,.16),rgba(37,44,46,.72))}
 @media (max-width: 760px) {
+  .enemy-profile-info { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .enemy-profile-layout .resistance-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .enemy-profile .enemy-profile-layout {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: "portrait" "copy" "info";
+    grid-template-areas: "portrait" "copy" "info" "resistances";
     gap: 24px;
   }
   .enemy-portrait-card {
@@ -153,6 +159,7 @@
   .enemy-guide-label { font-size: .8rem; margin-bottom: 0; }
 }
 @media (max-width: 520px) {
+  .enemy-profile-layout .resistance-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .enemy-profile-info>div { padding: 9px 7px; }
   .enemy-profile-info strong { font-size: .76rem; }
   .enemy-profile-info span { font-size: .5rem; }
