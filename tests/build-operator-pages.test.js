@@ -16,6 +16,7 @@ import {
   getBasicAttackTimeline,
   groupBasicAttackSequences,
   normalizeAssetPath,
+  profileEngagementMarkup,
   validateOperators,
   writeGeneratedOutput
 } from "../tools/build-operator-pages.js";
@@ -24,6 +25,8 @@ const checkedInOperatorIndex = fs.readFileSync("endfield/operators/index.html", 
 const actionTimingMigration = fs.readFileSync("supabase/operator_action_timings.sql", "utf8");
 const operatorSharesScript = fs.readFileSync("endfield/js/ui/operatorShares.js", "utf8");
 const operatorBatkExportScript = fs.readFileSync("endfield/js/ui/operatorBatkExport.js", "utf8");
+const profileEngagementScript = fs.readFileSync("endfield/js/ui/profileEngagement.js", "utf8");
+const profileEngagementMigration = fs.readFileSync("supabase/profile_engagement.sql", "utf8");
 
 test("checked-in operator index contains no unresolved merge conflicts", () => {
   assert.doesNotMatch(checkedInOperatorIndex, /^(?:<<<<<<<|=======|>>>>>>>)/m);
@@ -690,6 +693,33 @@ test("operator share browser loads live counts and safe public share cards", () 
   assert.match(operatorSharesScript, /open\.href = `\/endfield\/#share=/);
   assert.match(operatorSharesScript, /list\.replaceChildren/);
   assert.doesNotMatch(operatorSharesScript, /innerHTML/);
+});
+
+test("operator profiles include unique views and reversible like or dislike controls", () => {
+  const page = createOperatorPage(operator(), [operator()], new Map());
+
+  assert.match(page, /data-profile-engagement data-content-type="operator" data-content-id="1"/);
+  assert.match(page, /data-engagement-count="views"/);
+  assert.match(page, /data-profile-reaction="like"/);
+  assert.match(page, /data-profile-reaction="dislike"/);
+  assert.match(page, /js\/ui\/profileEngagement\.js\?v=1/);
+  assert.match(page, /\.profile-reaction-button\[aria-pressed="true"\]/);
+  assert.throws(() => profileEngagementMarkup("weapon", "test"), /Unsupported engagement content type/);
+});
+
+test("profile engagement keeps visitor identities private and uses guarded RPCs", () => {
+  assert.match(profileEngagementScript, /rpc\("record_profile_view"/);
+  assert.match(profileEngagementScript, /rpc\("set_profile_reaction"/);
+  assert.match(profileEngagementScript, /currentReaction === selectedReaction \? null : selectedReaction/);
+  assert.match(profileEngagementScript, /rotationforge\.profileVisitorId\.v1/);
+  assert.doesNotMatch(profileEngagementScript, /innerHTML/);
+
+  assert.match(profileEngagementMigration, /alter table public\.profile_engagement enable row level security/);
+  assert.match(profileEngagementMigration, /revoke all on public\.profile_engagement from public, anon, authenticated/);
+  assert.match(profileEngagementMigration, /primary key \(content_type, content_id, visitor_id\)/);
+  assert.match(profileEngagementMigration, /coalesce\(public\.profile_engagement\.viewed_at, excluded\.viewed_at\)/);
+  assert.match(profileEngagementMigration, /is_visible is not false/);
+  assert.match(profileEngagementMigration, /is_visible = true/);
 });
 
 test("BATK timing falls back to summed sequence durations and supports missing data", () => {

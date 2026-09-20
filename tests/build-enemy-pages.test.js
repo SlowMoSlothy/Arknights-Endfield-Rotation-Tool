@@ -34,7 +34,7 @@ test('generated avatar copies survive removal of the old upload; missing copies 
     } finally { fs.rmSync(root,{recursive:true,force:true}); }
 });
 
-test('enemy pages expose crawlable profiles and full content without database JavaScript', () => {
+test('enemy pages expose crawlable profiles and full content before engagement JavaScript loads', () => {
     const index = createEnemyIndex([enemy]);
     assert.ok(index.includes(`href="${enemyPath(enemy)}"`));
     const html = createEnemyPage(enemy, [enemy]);
@@ -43,7 +43,9 @@ test('enemy pages expose crawlable profiles and full content without database Ja
     assert.match(html, /A test attack\./);
     assert.match(html, /<strong>Unknown<\/strong>/);
     assert.match(html, /<strong>0<\/strong>/);
-    assert.doesNotMatch(html, /supabaseClient\.js/);
+    assert.match(html, new RegExp(`data-profile-engagement data-content-type="enemy" data-content-id="${enemy.id}"`));
+    assert.match(html, /supabaseClient\.js\?v=14/);
+    assert.match(html, /js\/ui\/profileEngagement\.js\?v=1/);
     assert.equal(enemyPath(enemy), '/endfield/enemies/training-dummy/');
     assert.equal(enemyPath({ ...enemy, name: 'Triaggelos' }), '/endfield/enemies/triaggelos/');
 });
@@ -96,4 +98,3 @@ test('database theme uses anvil orange and enemy sitemap remains independent', (
     assert.match(sitemap, /<image:loc>https:\/\/rotationforge\.gg\/endfield\/enemies\/triaggelos\/avatar\.png<\/image:loc>/);
     assert.match(fs.readFileSync('robots.txt','utf8'), /sitemap-enemies\.xml/);
 });
-

@@ -2,7 +2,7 @@ import { renderEnemyDossier, renderEnemyResistances } from './enemy-dossier.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { baseStyles, siteHeader, createSupabaseClient } from './build-operator-pages.js';
+import { baseStyles, siteHeader, createSupabaseClient, profileEngagementMarkup } from './build-operator-pages.js';
 
 const SITE = 'https://rotationforge.gg';
 const BASE = '/endfield/enemies/';
@@ -123,14 +123,18 @@ export function createEnemyPage(row, rows, workInProgress = true) {
 <nav class="enemy-section-nav" aria-label="Enemy profile sections"><a href="#enemy-resistances">Resistances</a><a href="#enemy-attributes">Attributes</a><a href="#enemy-combat-values">Combat values</a><a href="#enemy-overview">Overview</a><a href="#enemy-abilities">Abilities</a></nav>
 <section class="enemy-hero enemy-profile-layout">
   <div class="enemy-portrait-card"><span class="enemy-card-brand">ENDFIELD</span>${statusBadge(workInProgress)}<span class="enemy-portrait-frame"><img src="${portrait(row)}" alt="" width="200" height="200"></span><span class="enemy-card-caption">ROTATIONFORGE DATABASE</span></div>
-  <div class="enemy-hero-copy"><div class="eyebrow">Arknights: Endfield Enemy</div><h1>${escape(row.name)}</h1><span class="enemy-guide-label">Enemy profile</span></div>
+  <div class="enemy-hero-copy"><div class="eyebrow">Arknights: Endfield Enemy</div><h1>${escape(row.name)}</h1><span class="enemy-guide-label">Enemy profile</span>${profileEngagementMarkup('enemy', row.id)}</div>
   <div class="enemy-profile-info">${[['Category',category(row)],['Type',row.combat_details?.enemy_type || (enemySlug(row) === 'triaggelos' ? 'Aggeloi' : 'Unknown')],['Location',row.location || 'Unknown'],['Abilities',String(row.skills.length)]].map(([label,text])=>`<div><span>${escape(label)}</span><strong>${escape(text)}</strong></div>`).join('')}</div>
   ${renderEnemyResistances(row)}
 </section>
 ${row.category === 'test' ? '<p class="enemy-test-note">This is a synthetic training / test profile used by RotationForge, not a verified game enemy.</p>' : ''}
 ${renderEnemyDossier(row, { includeResistances: false })}
 <section id="enemy-related" class="enemy-related"><h2>More enemies</h2><div class="operator-grid">${rows.filter(item => item.id !== row.id).slice(0,6).map(tile).join('')}</div><p><a href="${BASE}">Browse all enemies ↗</a></p></section>
-<footer>RotationForge is an unofficial fan-made tool for Arknights: Endfield.</footer></main><script src="/endfield/js/ui/enemySectionNav.js?v=1" defer></script></body></html>`;
+<footer>RotationForge is an unofficial fan-made tool for Arknights: Endfield.</footer></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/endfield/supabaseClient.js?v=14"></script>
+<script src="/endfield/js/ui/profileEngagement.js?v=1"></script>
+<script src="/endfield/js/ui/enemySectionNav.js?v=1" defer></script></body></html>`;
 }
 
 export function createEnemySitemap(rows) {
@@ -225,7 +229,6 @@ export async function build({ supabase = createSupabaseClient() } = {}) {
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
     build().catch(error => { console.error(error.message); process.exitCode = 1; });
 }
-
 
 
 
