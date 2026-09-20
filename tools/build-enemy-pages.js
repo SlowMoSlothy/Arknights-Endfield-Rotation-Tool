@@ -2,7 +2,7 @@ import { renderEnemyDossier, renderEnemyResistances } from './enemy-dossier.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { baseStyles, siteHeader, createSupabaseClient, profileEngagementMarkup } from './build-operator-pages.js';
+import { baseStyles, siteHeader, createSupabaseClient, profileEngagementMarkup, profileEngagementSummaryMarkup } from './build-operator-pages.js';
 
 const SITE = 'https://rotationforge.gg';
 const BASE = '/endfield/enemies/';
@@ -78,7 +78,7 @@ function tile(row) {
     return `<a class="operator-tile" href="${enemyPath(row)}" data-name="${escape(row.name.toLowerCase())}" data-search="${escape(search)}" data-category="${escape(row.category)}">
 <span class="tile-avatar-frame"><img class="tile-avatar" src="${portrait(row)}" alt="" loading="lazy" width="256" height="256"></span>
 <div class="tile-body"><span class="enemy-category">${escape(category(row))}</span><h2>${escape(row.name)}</h2>
-<p>${escape(row.location || 'Location unknown')}</p><p>${row.skills.length} ${row.skills.length === 1 ? 'ability' : 'abilities'}</p></div></a>`;
+<p>${escape(row.location || 'Location unknown')}</p><p>${row.skills.length} ${row.skills.length === 1 ? 'ability' : 'abilities'}</p>${profileEngagementSummaryMarkup('enemy', row.id)}</div></a>`;
 }
 
 export function createEnemyIndex(rows, workInProgress = true) {
@@ -100,6 +100,9 @@ ${statusBadge(workInProgress)}<section class="index-hero"><div class="eyebrow">R
 <section class="operator-grid" aria-label="Enemy profiles">${rows.map(tile).join('\n')}</section>
 <p class="empty-state"${rows.length ? ' hidden' : ''}>${rows.length ? 'No enemies match the selected filters.' : 'No enemies have been published yet.'}</p>
 <footer>RotationForge is an unofficial fan-made tool for Arknights: Endfield.</footer></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/endfield/supabaseClient.js?v=14"></script>
+<script src="/endfield/js/ui/profileEngagement.js?v=2"></script>
 <script src="/endfield/js/ui/databaseFilters.js?v=1"></script>
 <script src="/endfield/js/ui/enemyCatalog.js?v=1"></script></body></html>`;
 }
@@ -133,7 +136,7 @@ ${renderEnemyDossier(row, { includeResistances: false })}
 <footer>RotationForge is an unofficial fan-made tool for Arknights: Endfield.</footer></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/endfield/supabaseClient.js?v=14"></script>
-<script src="/endfield/js/ui/profileEngagement.js?v=1"></script>
+<script src="/endfield/js/ui/profileEngagement.js?v=2"></script>
 <script src="/endfield/js/ui/enemySectionNav.js?v=1" defer></script></body></html>`;
 }
 
@@ -229,7 +232,6 @@ export async function build({ supabase = createSupabaseClient() } = {}) {
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
     build().catch(error => { console.error(error.message); process.exitCode = 1; });
 }
-
 
 
 

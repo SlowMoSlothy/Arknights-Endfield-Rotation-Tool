@@ -43,12 +43,14 @@
     function initialize(root, visitorId) {
         const contentType = root.dataset.contentType;
         const contentId = root.dataset.contentId;
+        const summaryOnly = root.dataset.engagementMode === "summary";
         const buttons = Array.from(root.querySelectorAll("[data-profile-reaction]"));
         const status = root.querySelector("[data-engagement-status]");
         let currentReaction = null;
         let busy = false;
 
-        if (!["operator", "enemy"].includes(contentType) || !contentId || !status || buttons.length !== 2) return;
+        if (!["operator", "enemy"].includes(contentType) || !contentId) return Promise.resolve();
+        if (summaryOnly ? buttons.length !== 0 : (!status || buttons.length !== 2)) return Promise.resolve();
 
         function setBusy(nextBusy) {
             busy = nextBusy;
@@ -60,7 +62,7 @@
             root.classList.remove("is-loading");
             root.classList.add("has-error");
             buttons.forEach(button => { button.disabled = true; });
-            status.textContent = message;
+            if (status) status.textContent = message;
         }
 
         function setCount(name, value) {
@@ -85,12 +87,12 @@
         async function load() {
             const client = getClient();
             if (!client?.rpc) {
-                setUnavailable("Page reactions are unavailable right now.");
+                setUnavailable(summaryOnly ? "Engagement summary is unavailable right now." : "Page reactions are unavailable right now.");
                 return;
             }
 
             setBusy(true);
-            const { data, error } = await client.rpc("record_profile_view", {
+            const { data, error } = await client.rpc(summaryOnly ? "get_profile_engagement" : "record_profile_view", {
                 p_content_type: contentType,
                 p_content_id: contentId,
                 p_visitor_id: visitorId
@@ -98,12 +100,12 @@
 
             if (error) {
                 console.warn("Profile engagement could not be loaded:", error);
-                setUnavailable("Page reactions could not be loaded.");
+                setUnavailable(summaryOnly ? "Engagement summary could not be loaded." : "Page reactions could not be loaded.");
                 return;
             }
 
             render(data || {});
-            status.textContent = "Page engagement loaded.";
+            if (status) status.textContent = "Page engagement loaded.";
             setBusy(false);
         }
 
@@ -137,10 +139,22 @@
             setBusy(false);
         }
 
-        buttons.forEach(button => button.addEventListener("click", () => updateReaction(button)));
-        load();
+        if (!summaryOnly) buttons.forEach(button => button.addEventListener("click", () => updateReaction(button)));
+        return load();
     }
 
     const visitorId = getVisitorId();
-    roots.forEach(root => initialize(root, visitorId));
+    const profileRoots = roots.filter(root => root.dataset.engagementMode !== "summary");
+    const summaryRoots = roots.filter(root => root.dataset.engagementMode === "summary");
+    profileRoots.forEach(root => { void initialize(root, visitorId); });
+
+    let nextSummary = 0;
+    async function loadSummaryQueue() {
+        while (nextSummary < summaryRoots.length) {
+            const root = summaryRoots[nextSummary++];
+            await initialize(root, visitorId);
+        }
+    }
+    const workerCount = Math.min(6, summaryRoots.length);
+    for (let index = 0; index < workerCount; index += 1) void loadSummaryQueue();
 })();

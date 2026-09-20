@@ -17,6 +17,7 @@ import {
   groupBasicAttackSequences,
   normalizeAssetPath,
   profileEngagementMarkup,
+  profileEngagementSummaryMarkup,
   validateOperators,
   writeGeneratedOutput
 } from "../tools/build-operator-pages.js";
@@ -702,13 +703,26 @@ test("operator profiles include unique views and reversible like or dislike cont
   assert.match(page, /data-engagement-count="views"/);
   assert.match(page, /data-profile-reaction="like"/);
   assert.match(page, /data-profile-reaction="dislike"/);
-  assert.match(page, /js\/ui\/profileEngagement\.js\?v=1/);
+  assert.match(page, /js\/ui\/profileEngagement\.js\?v=2/);
   assert.match(page, /\.profile-reaction-button\[aria-pressed="true"\]/);
   assert.throws(() => profileEngagementMarkup("weapon", "test"), /Unsupported engagement content type/);
 });
 
+test("operator index cards show read-only engagement labels", () => {
+  const index = createIndexPage([operator()]);
+
+  assert.match(index, /data-engagement-mode="summary" data-content-type="operator" data-content-id="1"/);
+  assert.match(index, />Views<\/span>/);
+  assert.match(index, />Likes<\/span>/);
+  assert.match(index, />Dislikes<\/span>/);
+  assert.doesNotMatch(profileEngagementSummaryMarkup("operator", "1"), /<button|data-profile-reaction/);
+  assert.match(index, /supabaseClient\.js\?v=14/);
+  assert.match(index, /profileEngagement\.js\?v=2/);
+});
+
 test("profile engagement keeps visitor identities private and uses guarded RPCs", () => {
-  assert.match(profileEngagementScript, /rpc\("record_profile_view"/);
+  assert.match(profileEngagementScript, /"record_profile_view"/);
+  assert.match(profileEngagementScript, /summaryOnly \? "get_profile_engagement" : "record_profile_view"/);
   assert.match(profileEngagementScript, /rpc\("set_profile_reaction"/);
   assert.match(profileEngagementScript, /currentReaction === selectedReaction \? null : selectedReaction/);
   assert.match(profileEngagementScript, /rotationforge\.profileVisitorId\.v1/);

@@ -37,6 +37,9 @@ test('generated avatar copies survive removal of the old upload; missing copies 
 test('enemy pages expose crawlable profiles and full content before engagement JavaScript loads', () => {
     const index = createEnemyIndex([enemy]);
     assert.ok(index.includes(`href="${enemyPath(enemy)}"`));
+    assert.match(index, new RegExp(`data-engagement-mode="summary" data-content-type="enemy" data-content-id="${enemy.id}"`));
+    assert.doesNotMatch(index.match(/<div class="tile-engagement[\s\S]*?<\/div>/)?.[0] || '', /<button|data-profile-reaction/);
+    assert.match(index, /profileEngagement\.js\?v=2/);
     const html = createEnemyPage(enemy, [enemy]);
     assert.match(html, /<link rel="canonical"/);
     assert.match(html, /BreadcrumbList/);
@@ -45,7 +48,7 @@ test('enemy pages expose crawlable profiles and full content before engagement J
     assert.match(html, /<strong>0<\/strong>/);
     assert.match(html, new RegExp(`data-profile-engagement data-content-type="enemy" data-content-id="${enemy.id}"`));
     assert.match(html, /supabaseClient\.js\?v=14/);
-    assert.match(html, /js\/ui\/profileEngagement\.js\?v=1/);
+    assert.match(html, /js\/ui\/profileEngagement\.js\?v=2/);
     assert.equal(enemyPath(enemy), '/endfield/enemies/training-dummy/');
     assert.equal(enemyPath({ ...enemy, name: 'Triaggelos' }), '/endfield/enemies/triaggelos/');
 });
