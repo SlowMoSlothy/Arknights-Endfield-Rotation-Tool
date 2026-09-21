@@ -1119,8 +1119,8 @@ export function siteHeader({ showOperatorLink = true, showToolCta = true, showEn
     <nav class="nav">
       <a class="brand" href="${SITE_URL}/"><span class="mark"><img src="${BRAND_ICON_PATH}" alt=""></span><span>RotationForge</span></a>
       ${showOperatorLink || showToolCta || showEnemyLink ? `<div class="nav-links">
-        ${showOperatorLink ? `<a href="${SITE_URL}${BASE_PATH}/operators/">Operators</a>` : ""}
-        ${showEnemyLink ? `<a href="${SITE_URL}${BASE_PATH}/enemies/">Enemies</a>` : ""}
+        ${showOperatorLink ? `<a class="database-nav-link" href="${SITE_URL}${BASE_PATH}/operators/">Operator Database</a>` : ""}
+        ${showEnemyLink ? `<a class="database-nav-link" href="${SITE_URL}${BASE_PATH}/enemies/">Enemy Database</a>` : ""}
         ${showToolCta ? `<a class="nav-cta" href="${SITE_URL}${BASE_PATH}/">Open Rotation Tool ↗</a>` : ""}
       </div>` : ""}
     </nav>
@@ -1289,7 +1289,7 @@ export function createOperatorPage(
   <script type="application/ld+json">${JSON.stringify(breadcrumbSchema)}</script>
   <script type="application/ld+json">${JSON.stringify(webPageSchema)}</script>
   ${baseStyles()}
-  <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=5">
+  <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6">
   ${attributeVariantStyles()}
 </head>
 <body class="operator-page">
@@ -1436,7 +1436,7 @@ export function createIndexPage(operators) {
   <meta property="og:type" content="website">
   <script type="application/ld+json">${JSON.stringify(itemListSchema)}</script>
   ${baseStyles()}
-  <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=5">
+  <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6">
 </head>
 <body class="operator-index">
   ${siteHeader({ showOperatorLink: false })}

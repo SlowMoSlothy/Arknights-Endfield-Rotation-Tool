@@ -7,6 +7,11 @@
 .database-status::before{content:"";width:6px;height:6px;flex-shrink:0;border-radius:50%;background:#fc6f02}
 @media(max-width:760px){.database-filters>summary{display:list-item;list-style-position:inside}.database-filters{margin:16px 0}.database-filters .operator-toolbar{margin-top:8px}}
 
+.operator-index .database-nav-link{position:relative;display:inline-flex;min-height:34px;align-items:center;padding:6px 28px 6px 12px;border:1px solid rgba(160,170,169,.28);border-radius:8px;color:#e5e9e6;background:linear-gradient(135deg,rgba(126,128,124,.16),rgba(20,25,26,.58));box-shadow:inset 2px 0 0 var(--accent),0 6px 16px rgba(0,0,0,.14);font-size:.74rem;font-weight:850;letter-spacing:.025em;transition:border-color .16s ease,color .16s ease,background .16s ease,transform .16s ease}
+.operator-index .database-nav-link::after{content:"›";position:absolute;right:10px;color:var(--accent);font-size:1.05rem;font-weight:950;line-height:1;transition:transform .16s ease}
+.operator-index .database-nav-link:hover,.operator-index .database-nav-link:focus-visible{border-color:rgba(252,111,2,.58);color:#fff;background:linear-gradient(135deg,rgba(167,71,0,.2),rgba(20,25,26,.7));outline:none;transform:translateY(-1px)}
+.operator-index .database-nav-link:hover::after,.operator-index .database-nav-link:focus-visible::after{transform:translateX(2px)}
+
 /* Keep both database catalogs on the same compact two-row mobile header. */
 @media(max-width:600px){
   .operator-index .nav{position:relative;height:auto;min-height:0;padding:6px 0;gap:3px;flex-direction:column;align-items:stretch}

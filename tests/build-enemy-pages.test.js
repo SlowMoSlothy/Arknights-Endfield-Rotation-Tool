@@ -36,7 +36,7 @@ test('generated avatar copies survive removal of the old upload; missing copies 
 
 test('enemy pages expose crawlable profiles and full content before engagement JavaScript loads', () => {
     const index = createEnemyIndex([enemy]);
-    assert.match(index, />Operators<\/a>/);
+    assert.match(index, /class="database-nav-link"[^>]*>Operator Database<\/a>/);
     assert.match(index, /Open Rotation Tool ↗/);
     assert.doesNotMatch(index, /href="https:\/\/rotationforge\.gg\/endfield\/enemies\/">Enemies<\/a>/);
     assert.ok(index.includes(`href="${enemyPath(enemy)}"`));
@@ -44,7 +44,7 @@ test('enemy pages expose crawlable profiles and full content before engagement J
     assert.doesNotMatch(index.match(/<div class="tile-engagement[\s\S]*?<\/div>/)?.[0] || '', /<button|data-profile-reaction/);
     assert.match(index, /profileEngagement\.js\?v=2/);
     const html = createEnemyPage(enemy, [enemy]);
-    assert.match(html, />Operators<\/a>/);
+    assert.match(html, /class="database-nav-link"[^>]*>Operator Database<\/a>/);
     assert.doesNotMatch(html, /href="https:\/\/rotationforge\.gg\/endfield\/enemies\/">Enemies<\/a>/);
     assert.match(html, /<link rel="canonical"/);
     assert.match(html, /BreadcrumbList/);
