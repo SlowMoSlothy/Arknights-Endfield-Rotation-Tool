@@ -270,7 +270,12 @@
 /* Compact profile values stay readable on narrow screens. */
 #selectedEnemyMeta { display: flex; flex-wrap: wrap; gap: 3px 5px; white-space: normal; overflow: visible; }
 .enemy-stat-chip { display: inline-flex; align-items: center; gap: 3px; color: #e8ebe7; font-size: 10px; line-height: 16px; }
-.enemy-stat-chip img, .enemy-stat-chip svg { width: 14px; height: 14px; object-fit: contain; flex-shrink: 0; }
+.enemy-stat-chip-icon { width: 12px; height: 17px; flex: 0 0 12px; background: currentColor; -webkit-mask: var(--enemy-stat-icon) center/contain no-repeat; mask: var(--enemy-stat-icon) center/contain no-repeat; }
+.enemy-stat-chip-defense, .enemy-stat-chip-physical { color: #dce1dd; }
+.enemy-stat-chip-heat { color: #ff8860; }
+.enemy-stat-chip-cryo { color: #78dce9; }
+.enemy-stat-chip-electric { color: #ffd338; }
+.enemy-stat-chip-nature { color: #a5dc75; }
+.enemy-stat-chip-aether { color: #ef9bc7; }
 .enemy-profile-picker { max-width: 340px; }
 @media(max-width: 900px) { .enemy-profile-picker { max-width: none; } }
-

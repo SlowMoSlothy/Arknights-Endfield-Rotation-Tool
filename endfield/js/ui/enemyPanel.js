@@ -18,30 +18,42 @@ function getEnemyType(enemy) {
     return enemy.enemyType || enemy.elementType || "neutral";
 }
 
+const ENEMY_STAT_ICONS = Object.freeze({
+    defense: "/endfield/assets/ui/enemy-stats/DEF.svg?v=4",
+    physical: "/endfield/assets/ui/enemy-stats/Resistance_Physical.svg?v=4",
+    heat: "/endfield/assets/ui/enemy-stats/Resistance_Heat.svg?v=4",
+    cryo: "/endfield/assets/ui/enemy-stats/Resistance_Cryo.svg?v=4",
+    electric: "/endfield/assets/ui/enemy-stats/Resistance_Electric.svg?v=4",
+    nature: "/endfield/assets/ui/enemy-stats/Resistance_Nature.svg?v=4",
+    aether: "/endfield/assets/ui/enemy-stats/Resistance_Ether.svg?v=4"
+});
+
+function formatEnemyResistancePercent(multiplier) {
+    const numeric = typeof multiplier === "number" ? multiplier : Number.NaN;
+    if (!Number.isFinite(numeric) || numeric < 0) return "?";
+    return `${Number(((1 - numeric) * 100).toFixed(6))}%`;
+}
+
 function getEnemyCombatMeta(enemy) {
     if (typeof getEnemyCombatProfile !== "function") return "";
     const profile = getEnemyCombatProfile(enemy);
     const resistanceSummary = Object.entries(profile.resistanceMultipliers || {})
         .filter(([element, multiplier]) => element !== "neutral" && Number(multiplier) !== 1)
-        .map(([element, multiplier]) => `${element.toUpperCase()} ${Math.round(Number(multiplier) * 100)}%`)
+        .map(([element, multiplier]) => `${element.toUpperCase()} ${formatEnemyResistancePercent(multiplier)}`)
         .join(" / ");
     const defense = enemy.combatProfile?.defense == null ? `DEF unknown (calculation: ${profile.defense})` : `DEF ${profile.defense}`;
     const known = Object.keys(enemy.combatProfile?.resistanceMultipliers || {}).length;
     return `${defense} / ${resistanceSummary || (known ? "Recorded resistances: neutral" : "Resistances unknown (calculation: neutral)")}${known > 0 && known < 5 ? " / unrecorded elements assumed neutral" : ""}`;
 }
 
-// Values are incoming damage multipliers, not resistance percentages.
 function renderEnemyCombatChips(enemy) {
-    const chip = (label, value, icon) => `<span class="enemy-stat-chip" title="${escapeEnemyHtml(label)}" aria-label="${escapeEnemyHtml(label)}">${icon}<span>${escapeEnemyHtml(value)}</span></span>`;
-    const shield = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 20 6v6c0 5-8 9-8 9s-8-4-8-9V6z" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+    const chip = (label, value, tone) => `<span class="enemy-stat-chip enemy-stat-chip-${tone}" title="${escapeEnemyHtml(label)}" aria-label="${escapeEnemyHtml(label)}"><span class="enemy-stat-chip-icon" style="--enemy-stat-icon:url('${ENEMY_STAT_ICONS[tone]}')" aria-hidden="true"></span><span>${escapeEnemyHtml(value)}</span></span>`;
     const defense = enemy.combatProfile?.defense;
-    let html = chip(defense == null ? 'Defense unknown; calculation uses 100' : `Defense: ${defense}`, defense ?? '?', shield);
+    let html = chip(defense == null ? 'Defense unknown; calculation uses 100' : `Defense: ${defense}`, defense ?? '?', 'defense');
     for (const element of ['physical', 'heat', 'cryo', 'electric', 'nature', 'aether']) {
         const value = enemy.combatProfile?.resistanceMultipliers?.[element];
-        // Aether has no bundled game icon. Use its readable element abbreviation.
-        if (element === 'aether' && value == null) continue;
-        const icon = element === 'aether' ? '<span aria-hidden="true">Æ</span>' : `<img src="assets/ui/elements/${element}.webp" alt="" width="14" height="14">`;
-        html += chip(value == null ? `${element}: unknown; calculation assumes 1× incoming damage` : `${element}: ${value}× incoming damage`, value == null ? '?' : `${value}×`, icon);
+        const percent = formatEnemyResistancePercent(value);
+        html += chip(value == null ? `${element}: unknown; calculation assumes 0% resistance` : `${element}: ${percent} resistance`, percent, element);
     }
     return html;
 }

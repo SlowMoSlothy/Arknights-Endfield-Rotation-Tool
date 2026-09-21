@@ -41,12 +41,18 @@ test('pagination loads all rows and repeated skill IDs fail safely',async()=>{
 test('compact stats distinguish unknown, neutral and immune incoming damage',()=>{
  const ctx=context();
  vm.runInContext(fs.readFileSync('endfield/js/ui/enemyPanel.js','utf8'),ctx);
+ assert.equal(vm.runInContext('formatEnemyResistancePercent(null)',ctx),'?');
  const html=vm.runInContext(`renderEnemyCombatChips({combatProfile:{defense:0,resistanceMultipliers:{physical:0,heat:1,nature:0.8,aether:1}}})`,ctx);
  assert.match(html,/Defense: 0/);
- assert.match(html,/physical: 0× incoming damage/);
- assert.match(html,/heat: 1× incoming damage/);
- assert.match(html,/cryo: unknown; calculation assumes 1× incoming damage/);
- assert.match(html,/aether: 1× incoming damage/);
+ assert.match(html,/Resistance_Physical\.svg\?v=4/);
+ assert.match(html,/Resistance_Ether\.svg\?v=4/);
+ assert.match(html,/physical: 100% resistance/);
+ assert.match(html,/heat: 0% resistance/);
+ assert.match(html,/nature: 20% resistance/);
+ assert.match(html,/cryo: unknown; calculation assumes 0% resistance/);
+ assert.match(html,/aether: 0% resistance/);
+ assert.doesNotMatch(html,/assets\/ui\/elements/);
+ assert.doesNotMatch(html,/× incoming damage/);
  assert.doesNotMatch(html,/Defense unknown/);
 });
 test('database mapping retains Aether multiplier without treating it as neutral damage',()=>{

@@ -9,7 +9,7 @@
 @import url("rotation.css?v=35");
 @import url("dragdrop.css");
 @import url("effects.css?v=2");
-@import url("enemy.css?v=8");
+@import url("enemy.css?v=9");
 @import url("mobile.css?v=24");
 @import url("tooltip.css");
 @import url("skill-elements.css?v=10");
@@ -961,4 +961,3 @@
         height: 88px;
     }
 }
-
