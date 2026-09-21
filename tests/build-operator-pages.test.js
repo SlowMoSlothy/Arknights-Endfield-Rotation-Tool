@@ -37,9 +37,10 @@ test("checked-in operator index contains no unresolved merge conflicts", () => {
   assert.match(checkedInOperatorIndex, /class="tile-stars">★★★★/);
   assert.match(checkedInOperatorIndex, /class="tile-chips"/);
   assert.match(checkedInOperatorIndex, /class="tile-chip tile-element-chip element-heat"/);
-  assert.match(checkedInOperatorIndex, /databaseControls\.css\?v=4/);
+  assert.match(checkedInOperatorIndex, /databaseControls\.css\?v=5/);
   assert.match(databaseControlsStyles, /@media\(max-width:600px\)/);
-  assert.match(databaseControlsStyles, /\.operator-index \.nav\{height:auto;min-height:0;padding:6px 0/);
+  assert.match(databaseControlsStyles, /\.operator-index \.nav\{position:relative;height:auto;min-height:0;padding:6px 0/);
+  assert.match(databaseControlsStyles, /\.operator-index \.nav-cta\{position:absolute;top:6px;right:0/);
 });
 
 function operator(overrides = {}) {

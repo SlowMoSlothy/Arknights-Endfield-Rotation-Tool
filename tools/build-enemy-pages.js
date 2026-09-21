@@ -70,7 +70,7 @@ function head(title, description, url, schema, image = `${SITE}/favicon-flat.png
 <meta property="og:type" content="website"><meta property="og:url" content="${escape(url)}">
 <meta property="og:image" content="${escape(image)}"><meta name="twitter:card" content="summary">
 <script type="application/ld+json">${json(schema)}</script>
-${baseStyles()}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=2"><link rel="stylesheet" href="/endfield/css/enemyCatalog.css?v=20">`;
+${baseStyles()}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=3"><link rel="stylesheet" href="/endfield/css/enemyCatalog.css?v=21">`;
 }
 
 function tile(row) {
@@ -86,7 +86,7 @@ export function createEnemyIndex(rows, workInProgress = true) {
     const schema = { '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'Arknights: Endfield Enemy Database', url,
         mainEntity: { '@type': 'ItemList', itemListElement: rows.map((row, index) => ({ '@type': 'ListItem', position: index + 1, name: row.name, url: SITE + enemyPath(row) })) } };
     return `<!doctype html><html lang="en"><head>${head('Arknights Endfield Enemy Database | RotationForge', 'Browse Arknights: Endfield enemy profiles, combat values, abilities, locations and sources. Explore the RotationForge Enemy Database.', url, schema)}</head>
-<body class="operator-index enemy-index">${siteHeader()}<main class="page">
+<body class="operator-index enemy-index">${siteHeader({ showEnemyLink: false })}<main class="page">
 <div class="breadcrumbs"><a href="/">Home</a><span>›</span><strong>Enemies</strong></div>
 ${statusBadge(workInProgress)}<section class="index-hero"><div class="eyebrow">RotationForge Database</div><h1>Arknights: Endfield Enemies</h1>
 <p>Browse enemy profiles, combat values, locations and abilities. Training and test profiles are labeled; unrecorded values are shown as unknown.</p></section>
@@ -121,7 +121,7 @@ export function createEnemyPage(row, rows, workInProgress = true) {
     const stats = [['HP', row.hp], ['Defense', row.defense], ...ELEMENTS.map(key => [`${key} damage multiplier`, row.resistances[key]])];
     const avatar = portrait(row);
     return `<!doctype html><html lang="en"><head>${head(`${row.name} – Arknights Endfield Enemy | RotationForge`, description, url, schema, avatar.startsWith('/') ? SITE + avatar : avatar)}</head>
-<body class="operator-index enemy-index enemy-profile">${siteHeader()}<main class="page">
+<body class="operator-index enemy-index enemy-profile">${siteHeader({ showEnemyLink: false })}<main class="page">
 <div class="breadcrumbs"><a href="/">Home</a><span>›</span><a href="${BASE}">Enemies</a><span>›</span><strong>${escape(row.name)}</strong></div>
 <nav class="enemy-section-nav" aria-label="Enemy profile sections"><a href="#enemy-resistances">Resistances</a><a href="#enemy-attributes">Attributes</a><a href="#enemy-combat-values">Combat values</a><a href="#enemy-overview">Overview</a><a href="#enemy-abilities">Abilities</a></nav>
 <section class="enemy-hero enemy-profile-layout">
@@ -232,7 +232,6 @@ export async function build({ supabase = createSupabaseClient() } = {}) {
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
     build().catch(error => { console.error(error.message); process.exitCode = 1; });
 }
-
 
 
 
