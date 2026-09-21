@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { createHash } from "node:crypto";
 import fs from "fs";
 import path from "path";
 import { pathToFileURL } from "url";
@@ -75,10 +76,19 @@ export function normalizeAssetPath(assetPath) {
 }
 
 function operatorAvatarPath(operator) {
-  return normalizeAssetPath(
-    OPERATOR_AVATAR_OVERRIDES.get(String(operator?.slug || "").toLowerCase())
-      || operator?.icon_path
-  );
+  const slug = String(operator?.slug || "").toLowerCase();
+  const sourcePath = OPERATOR_AVATAR_OVERRIDES.get(slug) || operator?.icon_path;
+  const normalizedPath = normalizeAssetPath(sourcePath);
+  if (!normalizedPath || normalizedPath.includes("?")) return normalizedPath;
+
+  const localPath = path.join(process.cwd(), normalizedPath.replace(/^\//, ""));
+  if (!fs.existsSync(localPath) || !fs.statSync(localPath).isFile()) return normalizedPath;
+
+  const version = createHash("sha256")
+    .update(fs.readFileSync(localPath))
+    .digest("hex")
+    .slice(0, 12);
+  return `${normalizedPath}?v=${version}`;
 }
 
 export function validateOperators(operators) {

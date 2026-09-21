@@ -6,6 +6,7 @@ import test from "node:test";
 
 import {
   buildBasicAttackConfig,
+  createSitemap,
   createSupabaseClient,
   createIndexPage,
   createOperatorPage,
@@ -645,7 +646,7 @@ test("non-Ultimate skill fills use an enlarged lower circle", () => {
   assert.match(css, /\.ef-fill-full \.ef-skill-fill\s*\{[\s\S]*?inset:\s*0;[\s\S]*?border-radius:\s*50%;/);
 });
 
-test("Liino pages use the current PNG avatar despite a stale SVG database path", () => {
+test("Liino pages use the current versioned PNG avatar despite a stale SVG database path", () => {
   const liino = operator({
     id: 30,
     slug: "liino",
@@ -655,10 +656,26 @@ test("Liino pages use the current PNG avatar despite a stale SVG database path",
   const page = createOperatorPage(liino, [liino], new Map());
   const index = createIndexPage([liino]);
 
-  assert.match(page, /avatars\/Liino\.png/);
+  assert.match(page, /avatars\/Liino\.png\?v=[a-f0-9]{12}/);
   assert.doesNotMatch(page, /avatars\/Liino\.svg/);
-  assert.match(index, /avatars\/Liino\.png/);
+  assert.match(index, /avatars\/Liino\.png\?v=[a-f0-9]{12}/);
   assert.doesNotMatch(index, /avatars\/Liino\.svg/);
+});
+
+test("operator pages expose local avatars as content-versioned image URLs", () => {
+  const miFu = operator({
+    id: 28,
+    slug: "mi_fu",
+    name: "Mi Fu",
+    icon_path: "assets/operators/avatars/Mi_Fu.png"
+  });
+  const page = createOperatorPage(miFu, [miFu], new Map());
+  const index = createIndexPage([miFu]);
+  const sitemap = createSitemap([miFu]);
+
+  assert.match(page, /avatars\/Mi_Fu\.png\?v=[a-f0-9]{12}/);
+  assert.match(index, /avatars\/Mi_Fu\.png\?v=[a-f0-9]{12}/);
+  assert.match(sitemap, /avatars\/Mi_Fu\.png\?v=[a-f0-9]{12}/);
 });
 
 test("BATK PNG export renders a complete standalone canvas and downloads it", () => {
