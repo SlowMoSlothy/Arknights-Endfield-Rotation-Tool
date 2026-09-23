@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#181d1f">
+  <title>ZZZ · Interaktive Karte | RotationForge</title>
+  <link rel="icon" href="/favicon-flat.png"><link rel="stylesheet" href="map.css">
+</head>
+<body>
+<header><a href="/">ROTATION<span>FORGE</span></a><span>ZENLESS ZONE ZERO / KARTEN</span><a href="/endfield/">Zum Planner</a></header>
+<main>
+  <div class="heading"><div><p class="eyebrow">DEIN EXPLORATION-LOGBUCH</p><h1>Enigma des Irrgartens</h1><p>Orte festhalten. Geheimnisse sammeln. Deinen Weg finden.</p></div><span id="visibility" class="badge">Privater Kartenbereich</span></div>
+  <p id="status" role="status" aria-live="polite">Zugriff wird geprüft …</p>
+  <section id="login" hidden><h2>Admin-Anmeldung</h2><p>Private Karten sind nur für ihren Besitzer sichtbar.</p><form id="login-form"><label>E-Mail<input id="email" type="email" autocomplete="username" required></label><label>Passwort<input id="password" type="password" autocomplete="current-password" required></label><button>Anmelden</button></form></section>
+  <section id="workspace" hidden>
+    <div class="toolbar"><label>Karte<select id="maps"></select></label><button id="create" hidden>+ Karte anlegen</button><button id="publish" hidden>Für alle freigeben</button><button id="logout" hidden>Abmelden</button></div>
+    <div class="layout"><aside>
+      <h2>Orte entdecken <span id="count"></span></h2>
+      <label>Suche<input id="search" type="search" placeholder="Titel oder Notiz …"></label>
+      <label>Kategorie<select id="filter"><option value="">Alle Kategorien</option></select></label>
+      <label class="check"><input type="checkbox" id="hide-completed"> Erledigte ausblenden</label>
+      <button id="add" class="primary" hidden>+ Punkt setzen</button><p id="hint" class="muted">Punkt anklicken, um Details zu öffnen.</p>
+      <div id="points" class="point-list"></div>
+    </aside><div class="map-shell"><div class="map-controls"><button id="zoom-in" aria-label="Vergrößern">+</button><button id="zoom-out" aria-label="Verkleinern">−</button><button id="fit">Einpassen</button></div>
+      <div id="viewport" tabindex="0" aria-label="Interaktive Karte. Mit Pfeiltasten verschieben, mit Plus und Minus zoomen."><div id="world"><img id="background" alt="Kartenhintergrund" draggable="false"><div id="markers"></div></div></div>
+      <div class="map-footer"><span>Scrollen zum Zoomen · Ziehen zum Verschieben</span><span id="credit"></span></div>
+    </div></div>
+  </section>
+</main>
+<dialog id="new-map"><form id="map-form"><h2>Private Karte anlegen</h2><label>Name<input name="title" value="Suburbs Illusion" maxlength="120" required></label><label>Urheber / Quelle<input name="attribution" value="@KELZERO · Vorlage: Suburbs Illusion" maxlength="300"></label><label>Kartenbild (PNG, JPG, WebP · max. 10 MB)<input name="image" type="file" accept="image/png,image/jpeg,image/webp" required></label><p>Wähle dein Kartenbild. Es wird im privaten Speicher abgelegt.</p><div class="actions"><button type="button" data-close>Abbrechen</button><button class="primary">Karte speichern</button></div><p class="error" role="alert"></p></form></dialog>
+<dialog id="point-dialog"><form id="point-form"><h2 id="point-heading">Ort bearbeiten</h2><fieldset id="point-fields"><label>Titel<input name="title" maxlength="120" required></label><label>Kategorie<select name="category" id="category"></select></label><label>Notizen<textarea name="notes" maxlength="5000" rows="4"></textarea></label><label class="check"><input name="completed" type="checkbox"> Erledigt</label></fieldset><div id="screenshots"></div><label id="upload-label">Screenshots hinzufügen (je max. 10 MB)<input id="uploads" type="file" accept="image/png,image/jpeg,image/webp" multiple></label><div class="actions"><button type="button" data-close>Schließen</button><button type="button" id="delete" class="danger">Löschen</button><button id="save" class="primary">Speichern</button></div><p class="error" role="alert"></p></form></dialog>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/endfield/supabaseClient.js"></script><script type="module" src="map.js"></script>
+</body></html>
