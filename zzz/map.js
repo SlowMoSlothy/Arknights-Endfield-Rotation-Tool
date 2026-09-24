@@ -1,10 +1,16 @@
 import { categories, mapPosition, filterPoints, validateImage } from './map-model.js';
+import { createVectorEditor } from './vector-editor.js';
 const $ = id => document.getElementById(id);
 const client = typeof supabaseClient !== 'undefined' ? supabaseClient : null;
 const bucket = client?.storage.from('zzz-maps');
 let user, admin = false, maps = [], current, points = [], editing, placing = false;
 let view = { x: 0, y: 0, scale: 1 }, width = 1, height = 1, generation = 0;
 const blobURLs = new Set();
+const vectorEditor = createVectorEditor({ client, getUser: () => user,
+ geometry: () => ({ width, height, scale: view.scale }),
+ locate: event => mapPosition(event.clientX, event.clientY, $('viewport').getBoundingClientRect(), view, width, height),
+ onSaved: map => { maps = maps.map(item => item.id === map.id ? map : item); }
+});
 const editable = () => admin && current?.owner_id === user?.id;
 const status = text => { $('status').textContent = text; };
 function unwrap(result) { if (result.error) throw result.error; return result.data; }
@@ -34,6 +40,7 @@ async function upload(file, mapId) {
 function transform() {
  $('world').style.transform = `translate(${view.x}px,${view.y}px) scale(${view.scale})`;
  document.querySelectorAll('.marker').forEach(n => n.style.transform = `translate(-50%,-50%) scale(${1 / view.scale})`);
+ vectorEditor.transformed();
 }
 function fit() {
  const rect = $('viewport').getBoundingClientRect();
@@ -72,6 +79,7 @@ function render() {
 }
 async function loadMap(id) {
  const ticket = ++generation;
+ vectorEditor.reset();
  current = maps.find(m => m.id === id); points = []; setPlacing(false); releaseImages();
  $('background').removeAttribute('src'); $('markers').replaceChildren(); $('points').replaceChildren();
  $('add').hidden = $('publish').hidden = true;
@@ -89,6 +97,7 @@ async function loadMap(id) {
   $('visibility').textContent = selected.is_public ? 'Öffentlich · Nur Besitzer kann bearbeiten' : 'Privat · Nur für dich sichtbar';
   $('publish').textContent = selected.is_public ? 'Wieder privat machen' : 'Für alle freigeben';
   $('add').hidden = $('publish').hidden = !editable();
+  vectorEditor.load(selected, editable());
   fit(); render(); status(`${selected.title} · ${points.length} eigene Punkte`);
  } catch (e) { status(`Karte konnte nicht geladen werden: ${e.message}`); }
 }
@@ -147,9 +156,9 @@ $('login-form').onsubmit = e => { e.preventDefault(); action(e.target, async () 
  $('password').value = ''; await initialize();
  if (!admin) status('Dieses Konto hat keinen Admin-Zugriff.');
 }); };
-$('logout').onclick = () => action($('workspace'), async () => { unwrap(await client.auth.signOut()); location.reload(); });
+$('logout').onclick = () => action($('workspace'), async () => { if (!vectorEditor.confirmLeave()) return; unwrap(await client.auth.signOut()); location.reload(); });
 client?.auth.onAuthStateChange(event => { if (event === 'SIGNED_OUT') location.reload(); });
-$('create').onclick = () => { $('map-form').querySelector('.error').textContent = ''; $('new-map').showModal(); };
+$('create').onclick = () => { if (!vectorEditor.confirmLeave()) return; $('map-form').querySelector('.error').textContent = ''; $('new-map').showModal(); };
 $('map-form').onsubmit = e => { e.preventDefault(); action(e.target, async () => {
  if (!admin) throw new Error('Admin-Zugriff erforderlich.');
  const form = e.target, file = form.elements.image.files[0]; validateImage(file);
@@ -194,12 +203,14 @@ $('delete').onclick = () => action($('point-form'), async () => {
 });
 $('publish').onclick = () => action($('workspace'), async () => {
  if (!editable()) return;
+ if (!vectorEditor.confirmLeave()) return;
  if (!current.is_public && !confirm('Diese Karte einschließlich aller Notizen und Screenshots für alle Besucher freigeben?')) return;
  unwrap(await client.from('zzz_maps').update({ is_public: !current.is_public }).eq('id', current.id).select().single()); await refresh();
 });
-$('maps').onchange = () => loadMap($('maps').value);
+$('maps').onchange = () => { if (vectorEditor.confirmLeave()) loadMap($('maps').value); else $('maps').value = current?.id || ''; };
 for (const id of ['search','filter','hide-completed']) $(id).addEventListener('input', render);
-$('add').onclick = () => setPlacing(!placing);
+$('add').onclick = () => { vectorEditor.close(); setPlacing(!placing); };
+$('toggle-editor').addEventListener('click', () => setPlacing(false));
 $('fit').onclick = fit; $('zoom-in').onclick = () => zoom(1.25); $('zoom-out').onclick = () => zoom(.8);
 const viewport = $('viewport'); let drag;
 viewport.addEventListener('wheel', e => { e.preventDefault(); const rect = viewport.getBoundingClientRect(); zoom(Math.exp(-e.deltaY * .001), e.clientX - rect.left, e.clientY - rect.top); }, { passive: false });

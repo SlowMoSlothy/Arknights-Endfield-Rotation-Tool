@@ -1,0 +1,27 @@
+.layout:has(#drawing-editor:not([hidden])){grid-template-columns:310px minmax(0,1fr)}
+#toggle-editor{width:100%;margin-bottom:12px;border-color:#fc6f0280;color:#ffa75f}
+#drawing-editor{font-size:13px;max-height:80vh;overflow:auto;padding-right:4px}
+#drawing-editor h2{margin-top:8px}#drawing-editor p{font-size:12px;line-height:1.5}
+.vector-actions{display:flex;gap:6px;flex-wrap:wrap}.vector-actions button{font-size:12px;padding:8px}
+#vector-status{min-height:18px}#vector-status[data-error=true]{color:#ffa5a5}
+#area-tree{display:grid;gap:8px;margin:16px 0}.area-folder{border:1px solid #ffffff25;border-radius:8px;padding:6px}
+.area-folder.active{border-color:#fc6f02}.area-row{display:flex;align-items:center;gap:4px}
+.area-row button{padding:6px;font-size:12px}.area-row .area-title{flex:1;min-width:0;text-align:left;overflow-wrap:anywhere}
+.area-row .area-toggle{font-size:14px}.area-paths{display:grid;gap:4px;margin:6px 0 0 14px}
+.area-paths button{text-align:left;font-size:12px;padding:7px;overflow-wrap:anywhere}.area-paths button.selected{background:#fc6f0225;border-color:#fc6f02}
+#area-settings{border-top:1px solid #ffffff20;padding-top:4px}#area-color{height:38px;padding:4px}
+#path-settings{border-top:1px solid #ffffff20;margin-top:16px;padding-top:8px}#path-settings legend{color:#ffa75f}
+#drawing-editor details{margin-top:18px;border-top:1px solid #ffffff20;padding-top:12px}summary{cursor:pointer}
+.vector-import{font-size:12px}.vector-import input{font-size:11px;max-width:100%}
+#vector-tools{padding:12px;background:#252c2e;border-bottom:1px solid #ffffff20}
+#vector-tools button[aria-pressed=true]{background:#fc6f02;color:#211006;border-color:#fc6f02}
+#draw-help{font-size:12px;margin:8px 0 0;min-height:18px}
+.map-shell:has(#vector-tools:not([hidden])) .map-controls{top:120px}
+#vector-layer{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+#vector-layer .vector-shape{pointer-events:none}#vector-layer .vector-handle{pointer-events:all;cursor:move}
+.editing-vectors[data-tool=select] #vector-layer .vector-shape{pointer-events:visiblePainted;cursor:pointer}
+.editing-vectors #markers{opacity:.3}.editing-vectors #markers .marker{pointer-events:none}
+.editing-vectors[data-tool=line] #viewport,.editing-vectors[data-tool=polygon] #viewport{cursor:crosshair}
+.editing-vectors[data-tool=select] #viewport{cursor:default}
+#background{transition:opacity .1s}
+@media(max-width:760px){.layout:has(#drawing-editor:not([hidden])){grid-template-columns:1fr}#drawing-editor{max-height:420px}#vector-tools{padding-right:8px}.map-shell:has(#vector-tools:not([hidden])) .map-controls{top:140px}}

@@ -1,0 +1,306 @@
+import { emptyDrawing, validateDrawing, DrawingHistory, nearestSegment, snapPoint, exportDrawingSVG } from './vector-model.js';
+const $ = id => document.getElementById(id);
+const copy = value => JSON.parse(JSON.stringify(value));
+const make = (tag, text, className) => { const n = document.createElement(tag); n.textContent = text; if (className) n.className = className; return n; };
+const svg = (tag, attrs) => { const n = document.createElementNS('http://www.w3.org/2000/svg', tag); for (const [k,v] of Object.entries(attrs)) n.setAttribute(k, v); return n; };
+const uuid = () => crypto.randomUUID();
+
+export function createVectorEditor({ client, getUser, geometry, locate, onSaved }) {
+ const history = new DrawingHistory();
+ let map = null, canEdit = false, active = false, mode = 'pan', areaId = null, pathId = null, vertex = null;
+ let draft = [], pointer = null, preview = null, saved = '', revision = 0, saving = false, ready = false, failed = false, pendingDraft = null;
+ const collapsed = new Set();
+ let lastClick = null;
+ const drawing = () => history.value;
+ const area = () => drawing().areas.find(a => a.id === areaId);
+ const path = () => drawing().paths.find(p => p.id === pathId);
+ const writable = () => canEdit && ready && !failed;
+ const unlocked = () => writable() && area()?.visible && !area()?.locked;
+ const dirty = () => JSON.stringify(drawing()) !== saved;
+ const storageKey = () => `rotationforge:zzz-vector:${getUser()?.id}:${map?.id}`;
+ function message(text, error = false) { $('vector-status').textContent = text; $('vector-status').dataset.error = String(error); }
+ function remember() {
+  if (!canEdit || !map) return;
+  try {
+   if (dirty()) localStorage.setItem(storageKey(), JSON.stringify({ revision, drawing: drawing() }));
+   else localStorage.removeItem(storageKey());
+   message(dirty() ? 'Entwurf lokal gesichert · noch nicht in der Cloud.' : 'Keine ungespeicherten Änderungen.');
+  } catch { message('Lokaler Speicher nicht verfügbar. Bitte speichern oder den Entwurf exportieren.', true); }
+ }
+ function commit(next) {
+  try { const clean = validateDrawing(next); if (history.commit(clean)) remember(); render(); }
+  catch (e) { preview = null; message(e.message, true); render(); }
+ }
+ function mutate(fn) { if (!writable()) return; const next = copy(drawing()); fn(next); commit(next); }
+ function download(name, body, type) {
+  const url = URL.createObjectURL(new Blob([body], { type })); const link = document.createElement('a');
+  link.href = url; link.download = name; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+ }
+ function cancel() { draft = []; preview = null; pointer = null; renderCanvas(); renderTools(); }
+ function setMode(value) { cancel(); lastClick = null; mode = value; vertex = null; render(); }
+ function toggle(value = !active) {
+  if (!canEdit || !ready || failed) value = false;
+  active = value; setMode('pan');
+  $('drawing-editor').hidden = $('vector-tools').hidden = !active;
+  $('places-panel').hidden = active;
+  $('toggle-editor').textContent = active ? '← Fundstellen anzeigen' : 'Karte zeichnen';
+  document.querySelector('.layout').classList.toggle('editing-vectors', active);
+  render();
+ }
+ function renderTools() {
+  document.querySelector('.layout').dataset.tool = mode;
+  document.querySelectorAll('[data-tool]').forEach(b => {
+   b.setAttribute('aria-pressed', String(b.dataset.tool === mode));
+   b.disabled = ['line','polygon'].includes(b.dataset.tool) && !unlocked();
+  });
+  $('draw-finish').disabled = draft.length < (mode === 'polygon' ? 3 : 2);
+  $('draw-cancel').disabled = !draft.length;
+  $('draw-help').textContent = mode === 'pan' ? 'Ziehen zum Verschieben · Scrollen zum Zoomen.'
+   : mode === 'select' ? 'Pfad auswählen · Eckpunkte ziehen · Doppelklick auf eine Kante fügt einen Punkt ein.'
+   : `${mode === 'line' ? 'Straße' : 'Fläche'}: klicken setzt Eckpunkte · Enter oder Doppelklick schließt ab · Escape bricht ab (${draft.length} Punkte).`;
+ }
+ function renderCanvas() {
+  const root = $('vector-layer'), { width, height, scale } = geometry();
+  root.replaceChildren(); root.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  const data = preview || drawing();
+  // View-only users see the saved presentation but can never select or edit geometry.
+  $('background').style.opacity = data.background.visible ? String(data.background.opacity) : '0';
+  for (const a of data.areas.filter(a => a.visible)) {
+   const group = svg('g', { 'data-area-id': a.id });
+   const title = svg('title', {}); title.textContent = a.name; group.append(title);
+   for (const p of data.paths.filter(p => p.areaId === a.id)) {
+    const coords = p.points.map(pt => `${pt.x * width},${pt.y * height}`).join(' ');
+    const node = svg(p.type === 'line' ? 'polyline' : 'polygon', { points: coords,
+     fill: p.type === 'polygon' ? a.color : 'none', stroke: a.color,
+     'stroke-width': p.type === 'line' ? p.width : 1, 'stroke-linejoin': 'round', 'stroke-linecap': 'round',
+     'data-path-id': p.id, class: 'vector-shape' });
+    const title = svg('title', {}); title.textContent = p.name; node.append(title); group.append(node);
+    if (active && p.id === pathId && mode === 'select') {
+     group.append(svg(p.type === 'line' ? 'polyline' : 'polygon', { points: coords, fill: 'none', stroke: '#fc6f02', 'stroke-width': 2 / scale, 'stroke-dasharray': `${5 / scale} ${4 / scale}`, 'pointer-events': 'none' }));
+     if (!a.locked) p.points.forEach((pt, index) => group.append(svg('circle', { cx: pt.x * width, cy: pt.y * height,
+      r: (index === vertex ? 6 : 5) / scale, fill: index === vertex ? '#fc6f02' : '#fff', stroke: '#181d1f',
+      'stroke-width': 1.5 / scale, class: 'vector-handle', 'data-vertex': index, 'data-path-id': p.id })));
+    }
+   }
+   root.append(group);
+  }
+  if (active && draft.length) {
+   root.append(svg('polyline', { points: draft.map(p => `${p.x * width},${p.y * height}`).join(' '), fill: 'none', stroke: '#fc6f02', 'stroke-width': 2 / scale, 'stroke-dasharray': `${6 / scale} ${3 / scale}` }));
+   for (const p of draft) root.append(svg('circle', { cx: p.x * width, cy: p.y * height, r: 4 / scale, fill: '#fc6f02' }));
+  }
+ }
+ function render() {
+  if (pathId && !path()) { pathId = null; vertex = null; }
+  if (areaId && !area()) areaId = null;
+  if (!areaId) areaId = drawing().areas[0]?.id || null;
+  const a = area(), p = path();
+  $('vector-save').disabled = !writable() || saving || !dirty();
+  $('vector-save').textContent = saving ? 'Speichert …' : 'Speichern';
+  $('vector-undo').disabled = !history.past.length || !writable(); $('vector-redo').disabled = !history.future.length || !writable();
+  $('draft-restore').hidden = !pendingDraft;
+  const tree = $('area-tree'); tree.replaceChildren();
+  for (const folder of drawing().areas) {
+   const box = make('div', '', `area-folder${folder.id === areaId ? ' active' : ''}`), row = make('div', '', 'area-row');
+   const expand = make('button', collapsed.has(folder.id) ? '▸' : '▾'); expand.setAttribute('aria-label', `${folder.name} ${collapsed.has(folder.id) ? 'aufklappen' : 'zuklappen'}`);
+   expand.setAttribute('aria-expanded', String(!collapsed.has(folder.id)));
+   expand.onclick = () => { collapsed.has(folder.id) ? collapsed.delete(folder.id) : collapsed.add(folder.id); render(); };
+   const title = make('button', `▰ ${folder.name}`, 'area-title'); title.style.color = folder.color;
+   title.onclick = () => { cancel(); areaId = folder.id; pathId = null; vertex = null; render(); };
+   const visibility = make('button', folder.visible ? '◉' : '○', 'area-toggle'); visibility.setAttribute('aria-label', `${folder.name} ${folder.visible ? 'ausblenden' : 'einblenden'}`);
+   visibility.onclick = () => { cancel(); mutate(d => { d.areas.find(a => a.id === folder.id).visible = !folder.visible; }); };
+   const lock = make('button', folder.locked ? '🔒' : '🔓', 'area-toggle'); lock.setAttribute('aria-label', `${folder.name} ${folder.locked ? 'entsperren' : 'sperren'}`);
+   lock.onclick = () => { cancel(); mutate(d => { d.areas.find(a => a.id === folder.id).locked = !folder.locked; }); };
+   row.append(expand, title, visibility, lock); box.append(row);
+   if (!collapsed.has(folder.id)) {
+    const list = make('div', '', 'area-paths');
+    for (const child of drawing().paths.filter(p => p.areaId === folder.id)) {
+     const button = make('button', `${child.type === 'line' ? '╱' : '▱'} ${child.name}`, child.id === pathId ? 'selected' : '');
+     button.onclick = () => { setMode('select'); areaId = folder.id; pathId = child.id; vertex = null; render(); };
+     list.append(button);
+    }
+    if (!list.children.length) list.append(make('p', 'Noch keine Pfade.', 'muted'));
+    box.append(list);
+   }
+   tree.append(box);
+  }
+  if (!drawing().areas.length) tree.append(make('p', 'Lege ein Gebiet an, z. B. Windworn Highway. Zeichne anschließend darin deine Wege.', 'muted'));
+  $('area-settings').hidden = !a;
+  if (a) { $('area-name').value = a.name; $('area-color').value = a.color; $('area-name').disabled = $('area-color').disabled = $('area-delete').disabled = a.locked; }
+  $('path-settings').hidden = !p; $('path-settings').disabled = !unlocked();
+  if (p) {
+   $('path-name').value = p.name; $('path-width').value = p.width;
+   $('path-width-label').hidden = p.type !== 'line';
+   $('path-area').replaceChildren(...drawing().areas.map(a => { const option = make('option', a.name); option.value = a.id; option.disabled = a.locked; return option; }));
+   $('path-area').value = p.areaId;
+   $('vertex-delete').disabled = vertex === null || p.points.length <= (p.type === 'polygon' ? 3 : 2);
+  }
+  $('background-visible').checked = drawing().background.visible; $('background-opacity').value = Math.round(drawing().background.opacity * 100);
+  renderTools(); renderCanvas();
+ }
+ function finish() {
+  if (!unlocked() || draft.length < (mode === 'polygon' ? 3 : 2)) return;
+  const p = { id: uuid(), areaId, name: `${mode === 'line' ? 'Straße' : 'Fläche'} ${drawing().paths.length + 1}`, type: mode, width: 10, points: copy(draft) };
+  draft = []; pathId = p.id; mode = 'select'; mutate(d => d.paths.push(p));
+ }
+ function removeVertex() {
+  const p = path(); if (!unlocked() || !p || vertex === null || p.points.length <= (p.type === 'polygon' ? 3 : 2)) return;
+  const index = vertex; vertex = null; mutate(d => d.paths.find(p => p.id === pathId).points.splice(index, 1));
+ }
+ function snap(point, exclude) {
+  if (!$('vector-snap').checked) return point;
+  const { width, height, scale } = geometry();
+  const visibleAreas = new Set(drawing().areas.filter(a => a.visible).map(a => a.id));
+  return snapPoint(point, drawing().paths.filter(p => visibleAreas.has(p.areaId)), width, height, 8 / scale, exclude);
+ }
+ async function save() {
+  if (!writable() || saving || !dirty()) return;
+  const target = map, content = copy(drawing()), startRevision = revision; saving = true; render();
+  try {
+   const result = await client.from('zzz_maps').update({ vector_data: content, vector_revision: startRevision + 1 })
+    .eq('id', target.id).eq('vector_revision', startRevision).select('id,vector_revision').maybeSingle();
+   if (result.error) throw result.error;
+   if (!result.data) throw Error('Diese Karte wurde inzwischen in einem anderen Fenster geändert. Exportiere deinen Entwurf, lade die Karte neu und gleiche die Versionen ab.');
+   if (map !== target) return;
+   revision = result.data.vector_revision; saved = JSON.stringify(content); target.vector_data = content; target.vector_revision = revision;
+   onSaved(target); remember(); if (!dirty()) message('In der Cloud gespeichert.');
+  } catch (e) {
+   const missing = /vector_data|vector_revision|schema cache/i.test(e.message || '');
+   message(missing ? 'Cloud-Einrichtung fehlt noch. Bitte zzz_map_vectors.sql ausführen. Dein lokaler Entwurf bleibt erhalten.' : `Speichern fehlgeschlagen: ${e.message}`, true);
+  } finally { saving = false; render(); }
+ }
+ const viewport = $('viewport');
+ viewport.addEventListener('pointerdown', e => {
+  if (!active || mode === 'pan' || e.button !== 0 || e.target.closest('button')) return;
+  const point = locate(e); if (!point) return;
+  e.stopImmediatePropagation(); e.preventDefault(); viewport.focus();
+  const handle = e.target.closest('[data-vertex]'), shape = e.target.closest('[data-path-id]');
+  if (mode === 'select') {
+   if (shape) { pathId = shape.dataset.pathId; areaId = path().areaId; vertex = handle ? Number(handle.dataset.vertex) : null; }
+   else { pathId = null; vertex = null; }
+  }
+  pointer = { id: e.pointerId, x: e.clientX, y: e.clientY, vertex: handle && unlocked() ? vertex : null };
+  viewport.setPointerCapture(e.pointerId); render();
+ }, true);
+ viewport.addEventListener('pointermove', e => {
+  if (!pointer || pointer.id !== e.pointerId || pointer.vertex === null) return;
+  e.stopImmediatePropagation(); const point = locate(e); if (!point || !unlocked()) return;
+  preview = copy(drawing()); preview.paths.find(p => p.id === pathId).points[pointer.vertex] = snap(point, { id: pathId, index: pointer.vertex }); renderCanvas();
+ }, true);
+ viewport.addEventListener('pointerup', e => {
+  if (!pointer || pointer.id !== e.pointerId) return;
+  e.stopImmediatePropagation();
+  const p = pointer; pointer = null;
+  const clicked = Math.hypot(e.clientX - p.x, e.clientY - p.y) < 5;
+  const doubleClick = clicked && lastClick && e.timeStamp - lastClick.time < 400 && Math.hypot(e.clientX - lastClick.x, e.clientY - lastClick.y) < 5;
+  lastClick = clicked && !doubleClick ? { time: e.timeStamp, x: e.clientX, y: e.clientY } : null;
+  if (preview) { const next = preview; preview = null; commit(next); }
+  else if (['line','polygon'].includes(mode) && unlocked() && Math.hypot(e.clientX - p.x, e.clientY - p.y) < 5) {
+   const point = locate(e);
+   if (point) {
+    const next = snap(point), last = draft.at(-1), { width, height, scale } = geometry();
+    if (!last || Math.hypot((next.x - last.x) * width, (next.y - last.y) * height) * scale > 3) draft.push(next);
+    renderCanvas(); renderTools();
+   }
+  }
+  if (doubleClick && p.vertex === null) completeDoubleClick(e);
+ }, true);
+ viewport.addEventListener('pointercancel', () => { pointer = null; preview = null; renderCanvas(); }, true);
+ viewport.addEventListener('dblclick', e => {
+  if (!active || mode === 'pan') return;
+  e.preventDefault(); e.stopPropagation();
+ });
+ // SVG nodes are rebuilt after selection; native dblclick can lose its target.
+ function completeDoubleClick(e) {
+  if (['line','polygon'].includes(mode)) return finish();
+  const point = locate(e), p = path();
+  if (!point || !p || !unlocked() || e.target.closest('[data-vertex]')) return;
+  const { width, height, scale } = geometry(); const edge = nearestSegment(p.points, point, p.type === 'polygon', width, height);
+  if (edge && edge.distance * scale < 16) { vertex = edge.index; mutate(d => d.paths.find(p => p.id === pathId).points.splice(edge.index, 0, edge.position)); }
+ }
+ document.addEventListener('keydown', e => {
+  if (!active || !canEdit || e.target.closest('input,textarea,select,dialog') || document.querySelector('dialog[open]')) return;
+  const ctrl = e.ctrlKey || e.metaKey;
+  if (ctrl && e.key.toLowerCase() === 's') { e.preventDefault(); save(); }
+  else if (ctrl && ['z','y'].includes(e.key.toLowerCase())) {
+   e.preventDefault(); cancel(); const redo = e.shiftKey || e.key.toLowerCase() === 'y';
+   if (redo ? history.redo() : history.undo()) remember(); render();
+  } else if (e.key === 'Escape') { e.preventDefault(); cancel(); }
+  else if (e.key === 'Enter' && e.target === viewport) { e.preventDefault(); finish(); }
+  else if (e.key === 'Delete' && e.target === viewport) { e.preventDefault(); removeVertex(); }
+ });
+ $('toggle-editor').onclick = () => toggle();
+ document.querySelectorAll('[data-tool]').forEach(b => b.onclick = () => setMode(b.dataset.tool));
+ $('draw-finish').onclick = finish; $('draw-cancel').onclick = cancel;
+ $('area-add').onclick = () => {
+  cancel(); areaId = uuid(); pathId = null;
+  mutate(d => d.areas.push({ id: areaId, name: `Gebiet ${d.areas.length + 1}`, color: '#f5f5f0', visible: true, locked: false }));
+  $('area-name').focus(); $('area-name').select();
+ };
+ $('area-name').onchange = e => { if (area() && !area().locked) mutate(d => { d.areas.find(a => a.id === areaId).name = e.target.value; }); };
+ $('area-color').onchange = e => { if (area() && !area().locked) mutate(d => { d.areas.find(a => a.id === areaId).color = e.target.value; }); };
+ $('area-delete').onclick = () => {
+  if (!area() || area().locked || !confirm('Gebiet mit allen enthaltenen Pfaden löschen? Du kannst dies rückgängig machen.')) return;
+  cancel(); const id = areaId; mutate(d => { d.areas = d.areas.filter(a => a.id !== id); d.paths = d.paths.filter(p => p.areaId !== id); });
+ };
+ $('path-name').onchange = e => { if (unlocked() && path()) mutate(d => { d.paths.find(p => p.id === pathId).name = e.target.value; }); };
+ $('path-width').onchange = e => { if (unlocked() && path()) mutate(d => { d.paths.find(p => p.id === pathId).width = Number(e.target.value); }); };
+ // Also commit on blur for input methods that update the value without a change event.
+ for (const id of ['area-name', 'path-name', 'path-width']) $(id).onblur = $(id).onchange;
+ $('path-area').onchange = e => {
+  const target = drawing().areas.find(a => a.id === e.target.value);
+  if (!unlocked() || !target || target.locked || !path()) return;
+  areaId = target.id; mutate(d => { d.paths.find(p => p.id === pathId).areaId = target.id; });
+ };
+ $('path-delete').onclick = () => { if (unlocked() && path()) mutate(d => { d.paths = d.paths.filter(p => p.id !== pathId); }); };
+ $('vertex-delete').onclick = removeVertex;
+ $('background-visible').onchange = e => mutate(d => { d.background.visible = e.target.checked; });
+ $('background-opacity').oninput = e => { $('background').style.opacity = drawing().background.visible ? e.target.value / 100 : '0'; };
+ $('background-opacity').onchange = e => mutate(d => { d.background.opacity = Number(e.target.value) / 100; });
+ $('vector-undo').onclick = () => { cancel(); if (history.undo()) remember(); render(); };
+ $('vector-redo').onclick = () => { cancel(); if (history.redo()) remember(); render(); };
+ $('vector-save').onclick = save;
+ $('vector-svg').onclick = () => { const { width, height } = geometry(); download('rotationforge-map.svg', exportDrawingSVG(drawing(), width, height), 'image/svg+xml'); };
+ $('vector-json').onclick = () => download('rotationforge-map-draft.json', JSON.stringify(drawing(), null, 2), 'application/json');
+ $('vector-import').onchange = async e => {
+  const file = e.target.files[0]; e.target.value = ''; if (!file || !writable()) return;
+  try {
+   if (file.size > 2000000) throw Error('Die Entwurfsdatei darf maximal 2 MB groß sein.');
+   const data = validateDrawing(JSON.parse(await file.text()));
+   if (!confirm('Aktuelle Zeichnung durch diesen Entwurf ersetzen? Rückgängig bleibt möglich.')) return;
+   cancel(); commit(data); areaId = null; pathId = null; render();
+  } catch (e) { message(`Import fehlgeschlagen: ${e.message}`, true); }
+ };
+ $('draft-restore').onclick = () => {
+  if (!pendingDraft || !writable()) return;
+  if (pendingDraft.revision !== revision && !confirm('Der lokale Entwurf basiert auf einem älteren Cloud-Stand. Trotzdem als neue Bearbeitung laden?')) return;
+  const data = pendingDraft.drawing; pendingDraft = null; cancel(); commit(data);
+ };
+ window.addEventListener('beforeunload', e => { if (canEdit && (dirty() || draft.length || saving)) { e.preventDefault(); e.returnValue = ''; } });
+ return {
+  reset() {
+   ready = false; active = false; toggle(false); map = null; canEdit = false; pendingDraft = null;
+   history.reset(emptyDrawing()); saved = JSON.stringify(drawing()); areaId = pathId = vertex = null;
+   $('toggle-editor').hidden = true; render();
+  },
+  load(target, owner) {
+   map = target; canEdit = owner; revision = target.vector_revision ?? 0; failed = false; pendingDraft = null;
+   try { history.reset(target.vector_data ? validateDrawing(target.vector_data) : emptyDrawing()); }
+   catch { failed = true; history.reset(emptyDrawing()); }
+   saved = JSON.stringify(drawing()); ready = true; areaId = pathId = vertex = null;
+   $('toggle-editor').hidden = !owner || failed;
+   if (owner && !failed) {
+    try {
+     const raw = localStorage.getItem(storageKey());
+     if (raw) { const local = JSON.parse(raw); const data = validateDrawing(local.drawing); if (JSON.stringify(data) !== saved) pendingDraft = { revision: local.revision, drawing: data }; }
+    } catch { message('Lokaler Entwurf konnte nicht gelesen werden.', true); }
+   }
+   toggle(false); render();
+   if (failed) message('Die gespeicherte Zeichnung ist ungültig. Bearbeitung wurde zum Schutz deiner Daten gesperrt.', true);
+   else if (pendingDraft) message('Ein lokaler Entwurf ist verfügbar. Öffne den Zeicheneditor, um ihn wiederherzustellen.');
+   else message(target.vector_revision === undefined ? 'Du kannst zeichnen. Cloud-Speicherung benötigt noch zzz_map_vectors.sql.' : 'Zeichnung geladen.');
+  },
+  transformed: renderCanvas,
+  confirmLeave() { return !saving && (!(dirty() || draft.length) || confirm('Karte verlassen? Gesicherte lokale Entwürfe bleiben erhalten; eine gerade begonnene Linie wird verworfen.')); },
+  close: () => toggle(false)
+ };
+}

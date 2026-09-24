@@ -4,7 +4,7 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#181d1f">
   <title>ZZZ · Interaktive Karte | RotationForge</title>
-  <link rel="icon" href="/favicon-flat.png"><link rel="stylesheet" href="map.css">
+  <link rel="icon" href="/favicon-flat.png"><link rel="stylesheet" href="map.css"><link rel="stylesheet" href="vector-editor.css">
 </head>
 <body>
 <header><a href="/">ROTATION<span>FORGE</span></a><span>ZENLESS ZONE ZERO / KARTEN</span><a href="/endfield/">Zum Planner</a></header>
@@ -15,14 +15,48 @@
   <section id="workspace" hidden>
     <div class="toolbar"><label>Karte<select id="maps"></select></label><button id="create" hidden>+ Karte anlegen</button><button id="publish" hidden>Für alle freigeben</button><button id="logout" hidden>Abmelden</button></div>
     <div class="layout"><aside>
+      <button id="toggle-editor" hidden>Karte zeichnen</button>
+      <section id="drawing-editor" hidden aria-label="Vektorkarten-Editor">
+        <h2>Gebiete &amp; Pfade</h2>
+        <div class="vector-actions"><button id="area-add">+ Gebiet</button><button id="vector-save" class="primary">Speichern</button></div>
+        <p id="vector-status" role="status" aria-live="polite"></p>
+        <button id="draft-restore" hidden>Lokalen Entwurf wiederherstellen</button>
+        <div class="vector-actions"><button id="vector-undo" title="Strg+Z">↶ Zurück</button><button id="vector-redo" title="Strg+Umschalt+Z">↷ Vor</button></div>
+        <div id="area-tree" aria-label="Gebietsordner"></div>
+        <div id="area-settings" hidden>
+          <label>Gebietsname<input id="area-name" maxlength="120"></label>
+          <label>Gebietsfarbe<input id="area-color" type="color" value="#f5f5f0"></label>
+          <button id="area-delete" class="danger">Gebiet löschen</button>
+        </div>
+        <fieldset id="path-settings" hidden><legend>Ausgewählter Pfad</legend>
+          <label>Pfadname<input id="path-name" maxlength="120"></label>
+          <label>Gebiet<select id="path-area"></select></label>
+          <label id="path-width-label">Straßenbreite<input id="path-width" type="number" min="1" max="100" step="1"></label>
+          <div class="vector-actions"><button id="vertex-delete">Eckpunkt löschen</button><button id="path-delete" class="danger">Pfad löschen</button></div>
+        </fieldset>
+        <details open><summary>Vorlagenebene · Position gesperrt</summary>
+          <label class="check"><input id="background-visible" type="checkbox" checked> Vorlagenbild anzeigen</label>
+          <label>Deckkraft <input id="background-opacity" type="range" min="0" max="100" value="65"></label>
+          <p class="muted">Bild und Pfade bleiben beim Zoomen und Verschieben deckungsgleich.</p>
+        </details>
+        <label class="check"><input id="vector-snap" type="checkbox" checked> An Eckpunkten einrasten</label>
+        <div class="vector-actions"><button id="vector-svg">SVG exportieren</button><button id="vector-json">Entwurf exportieren</button></div>
+        <label class="vector-import">Entwurf importieren<input id="vector-import" type="file" accept="application/json,.json"></label>
+      </section>
+      <section id="places-panel">
       <h2>Orte entdecken <span id="count"></span></h2>
       <label>Suche<input id="search" type="search" placeholder="Titel oder Notiz …"></label>
       <label>Kategorie<select id="filter"><option value="">Alle Kategorien</option></select></label>
       <label class="check"><input type="checkbox" id="hide-completed"> Erledigte ausblenden</label>
       <button id="add" class="primary" hidden>+ Punkt setzen</button><p id="hint" class="muted">Punkt anklicken, um Details zu öffnen.</p>
-      <div id="points" class="point-list"></div>
-    </aside><div class="map-shell"><div class="map-controls"><button id="zoom-in" aria-label="Vergrößern">+</button><button id="zoom-out" aria-label="Verkleinern">−</button><button id="fit">Einpassen</button></div>
-      <div id="viewport" tabindex="0" aria-label="Interaktive Karte. Mit Pfeiltasten verschieben, mit Plus und Minus zoomen."><div id="world"><img id="background" alt="Kartenhintergrund" draggable="false"><div id="markers"></div></div></div>
+      <div id="points" class="point-list"></div></section>
+    </aside><div class="map-shell">
+      <div id="vector-tools" hidden><div class="vector-actions" role="group" aria-label="Zeichenwerkzeuge">
+        <button data-tool="pan" aria-pressed="true">Hand</button><button data-tool="select" aria-pressed="false">Auswahl</button><button data-tool="line" aria-pressed="false">Linie</button><button data-tool="polygon" aria-pressed="false">Fläche</button>
+        <button id="draw-finish" disabled>Abschließen</button><button id="draw-cancel" disabled>Abbrechen</button>
+      </div><p id="draw-help">Wähle ein Gebiet und ein Zeichenwerkzeug.</p></div>
+      <div class="map-controls"><button id="zoom-in" aria-label="Vergrößern">+</button><button id="zoom-out" aria-label="Verkleinern">−</button><button id="fit">Einpassen</button></div>
+      <div id="viewport" tabindex="0" aria-label="Interaktive Karte. Mit Pfeiltasten verschieben, mit Plus und Minus zoomen."><div id="world"><img id="background" alt="Kartenhintergrund" draggable="false"><svg id="vector-layer" xmlns="http://www.w3.org/2000/svg" aria-label="Gezeichnete Straßen und Flächen"></svg><div id="markers"></div></div></div>
       <div class="map-footer"><span>Scrollen zum Zoomen · Ziehen zum Verschieben</span><span id="credit"></span></div>
     </div></div>
   </section>

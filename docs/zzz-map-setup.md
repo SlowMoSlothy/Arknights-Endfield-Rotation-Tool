@@ -26,3 +26,18 @@ Eine neue Karte hat immer `is_public = false`. Nur der Eigentümer mit bestehend
 - Wieder privat machen: neue anonyme Downloads und Tabellenabfragen dürfen keine Inhalte mehr liefern.
 
 Die automatischen lokalen Tests prüfen Koordinatenberechnung, kombinierte Filter und Datei-Validierung. Die RLS-Prüfung gegen das echte Projekt benötigt die ausgeführte Migration und entsprechende Testkonten.
+
+## Straßen und Flächen nachzeichnen
+
+Zusätzlich einmal `supabase/zzz_map_vectors.sql` im Supabase-SQL-Editor ausführen. Die Migration ergänzt nur Zeichnungsdaten und eine Versionsnummer an bestehenden Karten. Die bisherigen Besitzer- und Veröffentlichungsregeln gelten weiterhin, auch für Vektoren.
+
+1. Eigene Karte öffnen und **Karte zeichnen** wählen.
+2. **+ Gebiet** legt einen Ordner an. Namen und Farbe festlegen.
+3. **Linie** zeichnet Straßen mit einstellbarer Breite; **Fläche** zeichnet gefüllte Umrisse. Klicken setzt Eckpunkte, Enter oder **Abschließen** beendet den Pfad.
+4. **Auswahl** erlaubt das Ziehen von Eckpunkten. Ein Doppelklick auf eine Kante ergänzt einen Eckpunkt; ausgewählte Punkte lassen sich löschen. **Hand** verschiebt die Karte.
+5. Gebiete können zugeklappt, ausgeblendet und gesperrt werden. Ein Pfad lässt sich über seine Gebietsauswahl verschieben.
+6. Die Vorlage lässt sich ausblenden oder transparent stellen. Position und Maßstab bleiben mit den Pfaden verbunden.
+7. **Speichern** sichert die Zeichnung in Supabase. Rückgängig/Wiederholen und lokale Entwürfe helfen während der Bearbeitung. Lokale Entwürfe liegen nur in diesem Browser, nicht geräteübergreifend. Nach Neuladen können sie im Editor wiederhergestellt werden. Eine noch nicht abgeschlossene Linie gehört nicht zum lokalen Entwurf.
+8. **SVG exportieren** exportiert sichtbare Vektoren ohne Vorlagenbild. **Entwurf exportieren/importieren** sichert bzw. lädt die gesamte Zeichnung als JSON.
+
+Gleichzeitige Bearbeitungen werden durch eine Versionsprüfung erkannt. Bei einem Konflikt den eigenen Entwurf exportieren, neu laden und die Versionen abgleichen. Vor Ausführung der Migration ist Zeichnen mit lokalem Entwurf möglich; Cloud-Speichern meldet die fehlende Einrichtung. Die Karte bleibt privat, bis der Besitzer sie ausdrücklich freigibt.
