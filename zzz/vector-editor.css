@@ -24,6 +24,10 @@
 .editing-vectors[data-tool=line] #viewport,.editing-vectors[data-tool=polygon] #viewport{cursor:crosshair}
 .editing-vectors[data-tool=select] #viewport{cursor:default}
 #background{transition:opacity .1s}
+#vector-tools [role=group] button{width:42px;height:42px;padding:9px;display:inline-flex;align-items:center;justify-content:center}
+#vector-tools button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+.editing-vectors[data-tool=insert] #vector-layer .vector-shape{pointer-events:visiblePainted;cursor:crosshair}
+.editing-vectors[data-tool=insert] #viewport{cursor:crosshair}
 #viewport{user-select:none;-webkit-user-select:none;overflow:clip}
 #viewport:active{cursor:grabbing}
 @media(max-width:760px){.layout:has(#drawing-editor:not([hidden])){grid-template-columns:1fr}#drawing-editor{max-height:420px}#vector-tools{padding-right:8px}.map-shell:has(#vector-tools:not([hidden])) .map-controls{top:140px}}

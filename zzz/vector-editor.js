@@ -67,11 +67,13 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved,
   document.querySelectorAll('[data-tool]').forEach(b => {
    b.setAttribute('aria-pressed', String(b.dataset.tool === mode));
    b.disabled = ['line','polygon'].includes(b.dataset.tool) && !unlocked();
+   if (b.dataset.tool === 'insert') b.disabled = !unlocked() || !path();
   });
   $('draw-finish').disabled = draft.length < (extending ? extending.points.length + 1 : draftMode === 'polygon' ? 3 : 2);
   $('draw-cancel').disabled = !draft.length;
   $('draw-help').textContent = mode === 'pan' ? (draft.length ? `Zeichnung pausiert (${draft.length} Punkte). ${draftMode === 'polygon' ? 'Fläche' : 'Linie'} zum Weiterzeichnen wählen oder Abschließen drücken.` : 'Ziehen zum Verschieben · Scrollen zum Zoomen.')
-   : mode === 'select' ? 'Pfad auswählen · Eckpunkte ziehen · Doppelklick auf eine Kante fügt einen Punkt ein.'
+   : mode === 'insert' ? 'Kante des ausgewählten Pfads anklicken, um einen Knoten einzufügen. Knoten anschließend ziehen.'
+   : mode === 'select' ? 'Pfad auswählen · Knoten ziehen · Knoten-plus oder Doppelklick auf eine Kante zum Einfügen.'
    : `${mode === 'line' ? 'Straße' : 'Fläche'}: klicken setzt Eckpunkte · Enter oder Doppelklick schließt ab · Escape bricht ab (${draft.length} Punkte).`;
  }
  function renderCanvas() {
@@ -92,7 +94,7 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved,
      'stroke-width': p.type === 'line' ? p.width : 1, 'stroke-linejoin': 'round', 'stroke-linecap': 'round',
      'data-path-id': p.id, class: 'vector-shape' });
     const title = svg('title', {}); title.textContent = p.name; node.append(title); group.append(node);
-    if (active && p.id === pathId && mode === 'select') {
+    if (active && p.id === pathId && ['select', 'insert'].includes(mode)) {
      group.append(svg(shape.tag, { ...shape.attrs, fill: 'none', stroke: '#fc6f02', 'stroke-width': 2 / scale, 'stroke-dasharray': `${5 / scale} ${4 / scale}`, 'pointer-events': 'none' }));
      if (!a.locked) p.points.forEach((pt, index) => handles.append(svg('circle', { cx: pt.x * width, cy: pt.y * height,
       r: (index === vertex ? 6 : 5) / scale, fill: index === vertex ? '#fc6f02' : '#fff', stroke: '#181d1f',
@@ -225,9 +227,9 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved,
   const point = locate(e); if (!point) return;
   e.stopImmediatePropagation(); e.preventDefault(); viewport.focus({ preventScroll: true });
   const handle = e.target.closest('[data-vertex]'), shape = e.target.closest('[data-path-id]');
-  if (mode === 'select') {
+  if (mode === 'select' || mode === 'insert') {
    if (shape) { pathId = shape.dataset.pathId; areaId = path().areaId; activeFloors.set(areaId, path().floorId); vertex = handle ? Number(handle.dataset.vertex) : null; }
-   else { pathId = null; vertex = null; }
+   else if (mode === 'select') { pathId = null; vertex = null; }
   }
   pointer = { id: e.pointerId, x: e.clientX, y: e.clientY, vertex: handle && unlocked() ? vertex : null };
   viewport.setPointerCapture(e.pointerId); render();
@@ -253,7 +255,8 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved,
     renderCanvas(); renderTools();
    }
   }
-  if (doubleClick && p.vertex === null) completeDoubleClick(e);
+  if (mode === 'insert' && clicked && p.vertex === null) insertNode(e);
+  else if (doubleClick && p.vertex === null) completeDoubleClick(e);
  }, true);
  viewport.addEventListener('pointercancel', () => { pointer = null; preview = null; renderCanvas(); }, true);
  viewport.addEventListener('dblclick', e => {
@@ -263,10 +266,17 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved,
  // SVG nodes are rebuilt after selection; native dblclick can lose its target.
  function completeDoubleClick(e) {
   if (['line','polygon'].includes(mode)) return finish();
+  insertNode(e);
+ }
+ function insertNode(e) {
   const point = locate(e), p = path();
   if (!point || !p || !unlocked() || e.target.closest('[data-vertex]')) return;
   const { width, height, scale } = geometry(); const edge = nearestPathSegment(p, point, width, height);
-  if (edge && edge.distance * scale < 16) { vertex = edge.index; mutate(d => d.paths.find(p => p.id === pathId).points.splice(edge.index, 0, edge.position)); }
+  if (edge && edge.distance * scale < 16) {
+   // Avoid duplicate vertices when double-clicking the insert tool or hitting an existing node.
+   if (p.points.some(pt => Math.hypot((pt.x - edge.position.x) * width, (pt.y - edge.position.y) * height) * scale < 8)) return;
+   vertex = edge.index; mutate(d => d.paths.find(p => p.id === pathId).points.splice(edge.index, 0, edge.position));
+  } else if (mode === 'insert') message('Bitte direkt auf eine Kante klicken.');
  }
  document.addEventListener('keydown', e => {
   if (!active || !canEdit || e.target.closest('input,textarea,select,dialog') || document.querySelector('dialog[open]')) return;

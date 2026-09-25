@@ -73,3 +73,7 @@ Im Punktdialog **Gebiet** und optional **Etage** wählen. Verwendbar sind die be
 ## Zeichnung mit der Hand pausieren
 
 Der Wechsel von Linie/Fläche zur Hand behält die begonnenen Eckpunkte. Zurück zum ursprünglichen Zeichenwerkzeug wechseln, um weiterzuzeichnen. **Abschließen** funktioniert auch während der Hand-Pause. **Speichern** schließt eine gültige begonnene Zeichnung automatisch ab und speichert sie mit; bei zu wenigen Punkten bleibt sie erhalten und ein Hinweis erklärt, was fehlt. Beim Wechsel zu einem anderen Zeichenwerkzeug wird eine gültige Zeichnung abgeschlossen; eine unvollständige Zeichnung muss erst vervollständigt oder ausdrücklich abgebrochen werden. Noch nicht abgeschlossene Zeichnungen sind nur in der geöffneten Sitzung vorhanden.
+
+## Knoten hinzufügen und Werkzeug-Symbole
+
+Die obere Werkzeugleiste nutzt Symbole mit Tooltips und zugänglichen Beschriftungen. Pfad oder Fläche auswählen, **Knoten hinzufügen** (Knoten mit Plus) aktivieren und auf die gewünschte Kante klicken. Der neue Knoten kann direkt gezogen werden. Das funktioniert auch auf der schließenden Flächenkante und auf Kurven. Doppelklick im Auswahlwerkzeug bleibt möglich. Klicks unmittelbar neben bestehenden Knoten erzeugen keine Duplikate. Rückgängig und Speichern gelten wie bei anderen Pfadänderungen.
