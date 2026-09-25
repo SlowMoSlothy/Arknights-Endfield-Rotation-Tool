@@ -1,8 +1,8 @@
 const clone = value => JSON.parse(JSON.stringify(value));
-export const emptyDrawing = () => ({ version: 2, areas: [], paths: [], background: { visible: true, opacity: .65 } });
+export const emptyDrawing = () => ({ version: 3, areas: [], paths: [], background: { visible: true, opacity: .65 } });
 
 export function validateDrawing(value) {
- if (!value || ![1, 2].includes(value.version) || !Array.isArray(value.areas) || !Array.isArray(value.paths)) throw Error('Ungültige Zeichnungsdatei.');
+ if (!value || ![1, 2, 3].includes(value.version) || !Array.isArray(value.areas) || !Array.isArray(value.paths)) throw Error('Ungültige Zeichnungsdatei.');
  if (value.areas.length > 200 || value.paths.length > 2000) throw Error('Maximal 200 Gebiete und 2000 Pfade erlaubt.');
  const ids = new Set();
  const id = v => {
@@ -12,16 +12,25 @@ export function validateDrawing(value) {
  const name = v => { if (typeof v !== 'string' || !v.trim() || v.length > 120) throw Error('Namen müssen 1–120 Zeichen lang sein.'); return v.trim(); };
  const areas = value.areas.map(a => {
   if (!a || !/^#[0-9a-f]{6}$/i.test(a.color)) throw Error('Ungültige Gebietsfarbe.');
-  return { id: id(a.id), name: name(a.name), color: a.color, visible: a.visible !== false, locked: a.locked === true };
+  const rawFloors = a.floors ?? [{ id: 'ground', name: 'Erdgeschoss', visible: true }];
+  if (!Array.isArray(rawFloors) || !rawFloors.length || rawFloors.length > 30) throw Error('Ein Gebiet benötigt 1–30 Etagen.');
+  const floorIds = new Set();
+  const floors = rawFloors.map(f => {
+   if (!f || typeof f.id !== 'string' || !/^[a-zA-Z0-9_-]{1,80}$/.test(f.id) || floorIds.has(f.id)) throw Error('Ungültige oder doppelte Etage.');
+   floorIds.add(f.id); return { id: f.id, name: name(f.name), visible: f.visible !== false };
+  });
+  return { id: id(a.id), name: name(a.name), color: a.color, visible: a.visible !== false, locked: a.locked === true, floors };
  });
  const areaIds = new Set(areas.map(a => a.id)); let vertices = 0;
  const paths = value.paths.map(p => {
   if (!p || !areaIds.has(p.areaId) || !['line', 'polygon'].includes(p.type)) throw Error('Pfad gehört zu keinem gültigen Gebiet.');
   if (!Number.isFinite(p.width) || p.width < 1 || p.width > 100) throw Error('Pfadbreite muss zwischen 1 und 100 liegen.');
   if (!Array.isArray(p.points) || p.points.length < (p.type === 'polygon' ? 3 : 2) || p.points.length > 2000) throw Error('Ungültige Anzahl an Eckpunkten.');
+  const floorId = p.floorId ?? 'ground';
+  if (!areas.find(a => a.id === p.areaId).floors.some(f => f.id === floorId)) throw Error('Pfad gehört zu keiner gültigen Etage.');
   vertices += p.points.length;
   if (p.smooth !== undefined && typeof p.smooth !== 'boolean') throw Error('Ungültiger Kurvenmodus.');
-  return { id: id(p.id), areaId: p.areaId, name: name(p.name), type: p.type, width: p.width, smooth: p.type === 'line' && p.smooth === true,
+  return { id: id(p.id), areaId: p.areaId, floorId, name: name(p.name), type: p.type, width: p.width, smooth: p.type === 'line' && p.smooth === true,
    points: p.points.map(pt => {
     if (!pt || ![pt.x, pt.y].every(n => Number.isFinite(n) && n >= 0 && n <= 1)) throw Error('Eckpunkte müssen innerhalb der Karte liegen.');
     return { x: pt.x, y: pt.y };
@@ -30,7 +39,7 @@ export function validateDrawing(value) {
  if (vertices > 20000) throw Error('Maximal 20.000 Eckpunkte erlaubt.');
  const opacity = value.background?.opacity;
  if (!Number.isFinite(opacity) || opacity < 0 || opacity > 1) throw Error('Ungültige Deckkraft.');
- return { version: 2, areas, paths, background: { visible: value.background.visible !== false, opacity } };
+ return { version: 3, areas, paths, background: { visible: value.background.visible !== false, opacity } };
 }
 
 // Interpolating cubic curves: each editable vertex lies on the road.
@@ -70,7 +79,7 @@ export function splitRoad(path, index, newId) {
   { ...clone(path), id: newId, name: `${path.name.slice(0, 110)} · Teil 2`, points: clone(path.points.slice(index)) }];
 }
 export function joinRoads(first, firstEnd, second, secondEnd) {
- if (first.type !== 'line' || second.type !== 'line' || first.id === second.id || first.areaId !== second.areaId ||
+ if (first.type !== 'line' || second.type !== 'line' || first.id === second.id || first.areaId !== second.areaId || (first.floorId ?? 'ground') !== (second.floorId ?? 'ground') ||
   ![0, first.points.length - 1].includes(firstEnd) || ![0, second.points.length - 1].includes(secondEnd)) throw Error('Zwei Endpunkte verschiedener Straßen im selben Gebiet auswählen.');
  const a = clone(firstEnd === 0 ? [...first.points].reverse() : first.points);
  const b = clone(secondEnd === 0 ? second.points : [...second.points].reverse());
@@ -119,7 +128,7 @@ export function exportDrawingSVG(drawing, width, height) {
  if (![width, height].every(n => Number.isFinite(n) && n > 0)) throw Error('Ungültige Kartengröße.');
  const escape = text => text.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c]));
  const groups = data.areas.filter(a => a.visible).map(a => {
-  const paths = data.paths.filter(p => p.areaId === a.id).map(p => {
+  const paths = data.paths.filter(p => p.areaId === a.id && a.floors.some(f => f.id === p.floorId && f.visible)).map(p => {
    const shape = pathGeometry(p, width, height);
    const attrs = Object.entries(shape.attrs).map(([key, value]) => `${key}="${value}"`).join(' ');
    return `<${shape.tag} ${attrs} fill="${p.type === 'line' ? 'none' : a.color}" stroke="${a.color}" stroke-width="${p.type === 'line' ? p.width : 1}" stroke-linejoin="round" stroke-linecap="round"><title>${escape(p.name)}</title></${shape.tag}>`;

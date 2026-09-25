@@ -26,11 +26,19 @@
         <div id="area-settings" hidden>
           <label>Gebietsname<input id="area-name" maxlength="120"></label>
           <label>Gebietsfarbe<input id="area-color" type="color" value="#f5f5f0"></label>
+          <fieldset id="floor-settings"><legend>Etagen im Gebiet</legend>
+            <label>Aktive Etage<select id="floor-select"></select></label>
+            <label>Etagenname<input id="floor-name" maxlength="120"></label>
+            <label class="check"><input id="floor-visible" type="checkbox">Etage anzeigen</label>
+            <div class="vector-actions"><button id="floor-add">+ Etage</button><button id="floor-delete">Leere Etage löschen</button></div>
+            <p>Neue Pfade entstehen in der aktiven Etage. Andere Etagen lassen sich einzeln ausblenden.</p>
+          </fieldset>
           <button id="area-delete" class="danger">Gebiet löschen</button>
         </div>
         <fieldset id="path-settings" hidden><legend>Ausgewählter Pfad</legend>
           <label>Pfadname<input id="path-name" maxlength="120"></label>
           <label>Gebiet<select id="path-area"></select></label>
+          <label>Etage des Pfads<select id="path-floor"></select></label>
           <label id="path-width-label">Straßenbreite<input id="path-width" type="number" min="1" max="100" step="1"></label>
           <div id="road-settings">
             <label class="check"><input id="path-smooth" type="checkbox">Als weiche Kurve zeichnen</label>
@@ -72,5 +80,5 @@
 <dialog id="new-map"><form id="map-form"><h2>Private Karte anlegen</h2><label>Name<input name="title" value="Suburbs Illusion" maxlength="120" required></label><label>Urheber / Quelle<input name="attribution" value="@KELZERO · Vorlage: Suburbs Illusion" maxlength="300"></label><label>Kartenbild (PNG, JPG, WebP · max. 10 MB)<input name="image" type="file" accept="image/png,image/jpeg,image/webp" required></label><p>Wähle dein Kartenbild. Es wird im privaten Speicher abgelegt.</p><div class="actions"><button type="button" data-close>Abbrechen</button><button class="primary">Karte speichern</button></div><p class="error" role="alert"></p></form></dialog>
 <dialog id="point-dialog"><form id="point-form"><h2 id="point-heading">Ort bearbeiten</h2><fieldset id="point-fields"><label>Titel<input name="title" maxlength="120" required></label><label>Kategorie<select name="category" id="category"></select></label><label>Notizen<textarea name="notes" maxlength="5000" rows="4"></textarea></label><label class="check"><input name="completed" type="checkbox"> Erledigt</label></fieldset><div id="screenshots"></div><label id="upload-label">Screenshots hinzufügen (je max. 10 MB)<input id="uploads" type="file" accept="image/png,image/jpeg,image/webp" multiple></label><div class="actions"><button type="button" data-close>Schließen</button><button type="button" id="delete" class="danger">Löschen</button><button id="save" class="primary">Speichern</button></div><p class="error" role="alert"></p></form></dialog>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/endfield/supabaseClient.js"></script><script type="module" src="map.js?v=2"></script>
+<script src="/endfield/supabaseClient.js"></script><script type="module" src="map.js?v=3"></script>
 </body></html>

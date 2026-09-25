@@ -1,4 +1,4 @@
-import { emptyDrawing, validateDrawing, DrawingHistory, nearestPathSegment, pathGeometry, splitRoad, joinRoads, snapPoint, exportDrawingSVG } from './vector-model.js?v=2';
+import { emptyDrawing, validateDrawing, DrawingHistory, nearestPathSegment, pathGeometry, splitRoad, joinRoads, snapPoint, exportDrawingSVG } from './vector-model.js?v=3';
 const $ = id => document.getElementById(id);
 const copy = value => JSON.parse(JSON.stringify(value));
 const make = (tag, text, className) => { const n = document.createElement(tag); n.textContent = text; if (className) n.className = className; return n; };
@@ -12,11 +12,17 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved 
  const collapsed = new Set();
  let lastClick = null;
  let extending = null;
+ const activeFloors = new Map();
  const drawing = () => history.value;
  const area = () => drawing().areas.find(a => a.id === areaId);
  const path = () => drawing().paths.find(p => p.id === pathId);
  const writable = () => canEdit && ready && !failed;
- const unlocked = () => writable() && area()?.visible && !area()?.locked;
+ const floor = () => area()?.floors.find(f => f.id === activeFloors.get(areaId)) || area()?.floors[0];
+ const unlocked = () => writable() && area()?.visible && !area()?.locked && floor()?.visible;
+ const floorOptions = (select, floors, selected) => {
+  select.replaceChildren(...floors.map(f => { const option = make('option', f.name + (f.visible ? '' : ' (ausgeblendet)')); option.value = f.id; return option; }));
+  select.value = selected;
+ };
  const dirty = () => JSON.stringify(drawing()) !== saved;
  const storageKey = () => `rotationforge:zzz-vector:${getUser()?.id}:${map?.id}`;
  function message(text, error = false) { $('vector-status').textContent = text; $('vector-status').dataset.error = String(error); }
@@ -70,7 +76,7 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved 
   for (const a of data.areas.filter(a => a.visible)) {
    const group = svg('g', { 'data-area-id': a.id });
    const title = svg('title', {}); title.textContent = a.name; group.append(title);
-   for (const p of data.paths.filter(p => p.areaId === a.id)) {
+   for (const p of data.paths.filter(p => p.areaId === a.id && a.floors.some(f => f.id === p.floorId && f.visible))) {
     if (extending?.id === p.id) continue;
     const shape = pathGeometry(p, width, height);
     const node = svg(shape.tag, { ...shape.attrs,
@@ -96,6 +102,7 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved 
  }
  function render() {
   if (pathId && !path()) { pathId = null; vertex = null; }
+  if (path()) { areaId = path().areaId; activeFloors.set(areaId, path().floorId); }
   if (areaId && !area()) areaId = null;
   if (!areaId) areaId = drawing().areas[0]?.id || null;
   const a = area(), p = path();
@@ -119,8 +126,9 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved 
    if (!collapsed.has(folder.id)) {
     const list = make('div', '', 'area-paths');
     for (const child of drawing().paths.filter(p => p.areaId === folder.id)) {
-     const button = make('button', `${child.type === 'line' ? '╱' : '▱'} ${child.name}`, child.id === pathId ? 'selected' : '');
-     button.onclick = () => { setMode('select'); areaId = folder.id; pathId = child.id; vertex = null; render(); };
+     const level = folder.floors.find(f => f.id === child.floorId);
+     const button = make('button', `${child.type === 'line' ? '╱' : '▱'} ${child.name} · ${level.name}`, child.id === pathId ? 'selected' : '');
+     button.onclick = () => { setMode('select'); areaId = folder.id; activeFloors.set(areaId, child.floorId); pathId = child.id; vertex = null; render(); };
      list.append(button);
     }
     if (!list.children.length) list.append(make('p', 'Noch keine Pfade.', 'muted'));
@@ -131,12 +139,20 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved 
   if (!drawing().areas.length) tree.append(make('p', 'Lege ein Gebiet an, z. B. Windworn Highway. Zeichne anschließend darin deine Wege.', 'muted'));
   $('area-settings').hidden = !a;
   if (a) { $('area-name').value = a.name; $('area-color').value = a.color; $('area-name').disabled = $('area-color').disabled = $('area-delete').disabled = a.locked; }
+  if (a) {
+   $('floor-settings').disabled = a.locked || !!extending;
+   floorOptions($('floor-select'), a.floors, floor().id);
+   $('floor-name').value = floor().name; $('floor-visible').checked = floor().visible;
+   $('floor-add').disabled = a.floors.length >= 30;
+   $('floor-delete').disabled = a.floors.length <= 1 || drawing().paths.some(p => p.areaId === a.id && p.floorId === floor().id);
+  }
   $('path-settings').hidden = !p; $('path-settings').disabled = !unlocked() || !!extending;
   if (p) {
    $('path-name').value = p.name; $('path-width').value = p.width;
    $('path-width-label').hidden = p.type !== 'line';
    $('path-area').replaceChildren(...drawing().areas.map(a => { const option = make('option', a.name); option.value = a.id; option.disabled = a.locked; return option; }));
    $('path-area').value = p.areaId;
+   floorOptions($('path-floor'), a.floors, p.floorId);
    $('vertex-delete').disabled = vertex === null || p.points.length <= (p.type === 'polygon' ? 3 : 2);
    $('road-settings').hidden = p.type !== 'line';
    $('path-smooth').checked = !!p.smooth;
@@ -146,7 +162,7 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved 
    $('road-help').textContent = vertex === null ? 'Endpunkt auswählen zum Verlängern oder Verbinden. Inneren Eckpunkt auswählen zum Teilen.'
     : `Ausgewählt: ${endpoint ? (vertex === 0 ? 'Anfang' : 'Ende') : `Eckpunkt ${vertex + 1}`}.`;
    const select = $('path-join-target'), oldTarget = select.value;
-   const choices = drawing().paths.filter(other => other.id !== p.id && other.areaId === p.areaId && other.type === 'line')
+   const choices = drawing().paths.filter(other => other.id !== p.id && other.areaId === p.areaId && other.floorId === p.floorId && other.type === 'line')
     .flatMap(other => [0, other.points.length - 1].map(index => {
      const option = make('option', `${other.name} · ${index === 0 ? 'Anfang' : 'Ende'}`);
      option.value = `${other.id}:${index}`; return option;
@@ -166,7 +182,7 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved 
    draft = []; extending = null; mode = 'select'; vertex = points.length - 1;
    mutate(d => { d.paths.find(p => p.id === id).points = points; }); return;
   }
-  const p = { id: uuid(), areaId, name: `${mode === 'line' ? 'Straße' : 'Fläche'} ${drawing().paths.length + 1}`, type: mode, width: 10, points: copy(draft) };
+  const p = { id: uuid(), areaId, floorId: floor().id, name: `${mode === 'line' ? 'Straße' : 'Fläche'} ${drawing().paths.length + 1}`, type: mode, width: 10, points: copy(draft) };
   draft = []; pathId = p.id; mode = 'select'; mutate(d => d.paths.push(p));
  }
  function removeVertex() {
@@ -176,8 +192,7 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved 
  function snap(point, exclude) {
   if (!$('vector-snap').checked) return point;
   const { width, height, scale } = geometry();
-  const visibleAreas = new Set(drawing().areas.filter(a => a.visible).map(a => a.id));
-  return snapPoint(point, drawing().paths.filter(p => visibleAreas.has(p.areaId)), width, height, 8 / scale, exclude);
+  return snapPoint(point, drawing().paths.filter(p => p.areaId === areaId && p.floorId === floor()?.id), width, height, 8 / scale, exclude);
  }
  async function save() {
   if (!writable() || saving || !dirty()) return;
@@ -202,7 +217,7 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved 
   e.stopImmediatePropagation(); e.preventDefault(); viewport.focus({ preventScroll: true });
   const handle = e.target.closest('[data-vertex]'), shape = e.target.closest('[data-path-id]');
   if (mode === 'select') {
-   if (shape) { pathId = shape.dataset.pathId; areaId = path().areaId; vertex = handle ? Number(handle.dataset.vertex) : null; }
+   if (shape) { pathId = shape.dataset.pathId; areaId = path().areaId; activeFloors.set(areaId, path().floorId); vertex = handle ? Number(handle.dataset.vertex) : null; }
    else { pathId = null; vertex = null; }
   }
   pointer = { id: e.pointerId, x: e.clientX, y: e.clientY, vertex: handle && unlocked() ? vertex : null };
@@ -294,7 +309,26 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved 
  $('path-area').onchange = e => {
   const target = drawing().areas.find(a => a.id === e.target.value);
   if (!unlocked() || !target || target.locked || !path()) return;
-  areaId = target.id; mutate(d => { d.paths.find(p => p.id === pathId).areaId = target.id; });
+  areaId = target.id; mutate(d => { const p = d.paths.find(p => p.id === pathId); p.areaId = target.id; p.floorId = floor().id; });
+ };
+ $('floor-select').onchange = e => { const id = e.target.value; cancel(); activeFloors.set(areaId, id); pathId = null; vertex = null; render(); };
+ $('floor-name').onchange = e => { if (area() && !area().locked) { const name = e.target.value, id = floor().id; mutate(d => { d.areas.find(a => a.id === areaId).floors.find(f => f.id === id).name = name; }); } };
+ $('floor-name').onblur = $('floor-name').onchange;
+ $('floor-visible').onchange = e => { if (!area() || area().locked) return; const visible = e.target.checked, id = floor().id; cancel(); mutate(d => { d.areas.find(a => a.id === areaId).floors.find(f => f.id === id).visible = visible; }); };
+ $('floor-add').onclick = () => {
+  if (!area() || area().locked || area().floors.length >= 30) return;
+  cancel(); const id = uuid(); activeFloors.set(areaId, id); pathId = null; vertex = null;
+  mutate(d => { const a = d.areas.find(a => a.id === areaId); a.floors.push({ id, name: `Etage ${a.floors.length + 1}`, visible: true }); });
+ };
+ $('floor-delete').onclick = () => {
+  if (!area() || area().locked || area().floors.length <= 1) return;
+  const id = floor().id;
+  if (drawing().paths.some(p => p.areaId === areaId && p.floorId === id)) return;
+  cancel(); mutate(d => { const a = d.areas.find(a => a.id === areaId); a.floors = a.floors.filter(f => f.id !== id); });
+ };
+ $('path-floor').onchange = e => {
+  if (!unlocked() || !path()) return; const id = e.target.value;
+  cancel(); activeFloors.set(areaId, id); mutate(d => { d.paths.find(p => p.id === pathId).floorId = id; });
  };
  $('path-delete').onclick = () => { if (unlocked() && path()) mutate(d => { d.paths = d.paths.filter(p => p.id !== pathId); }); };
  $('vertex-delete').onclick = removeVertex;

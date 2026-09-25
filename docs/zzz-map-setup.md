@@ -51,3 +51,13 @@ Gleichzeitige Bearbeitungen werden durch eine Versionsprüfung erkannt. Bei eine
 - Alle abgeschlossenen Operationen unterstützen Rückgängig/Wiederholen, Cloud-Speicherung und Export. SVG enthält echte kubische Kurven. Keine zusätzliche SQL-Migration nötig.
 
 Neue Zeichnungen verwenden das JSON-Format Version 2; Version-1-Zeichnungen werden beim Laden übernommen. Ältere Editor-Versionen lehnen Version 2 ab, damit sie Kurven nicht versehentlich als Geraden speichern. Nach dem Update alte Browser-Tabs neu laden. Die automatische Glättung kann sich beim Einfügen, Teilen und Verbinden in der Umgebung der bearbeiteten Punkte ändern.
+
+## Etagen pro Gebiet
+
+Im Zeicheneditor unter dem gewählten Gebiet **+ Etage** wählen und einen Namen vergeben. **Aktive Etage** bestimmt, wo neue Pfade entstehen. **Etage anzeigen** steuert die gespeicherte Sichtbarkeit; mehrere Etagen können gleichzeitig sichtbar bleiben. Bestehende Zeichnungen erhalten automatisch ein Erdgeschoss, ohne ihre Geometrie zu verändern.
+
+Bei einem ausgewählten Pfad lässt sich **Etage des Pfads** ändern. Beim Verschieben in ein anderes Gebiet wird dessen aktive Etage verwendet. Einrasten und Verbinden gelten nur innerhalb desselben Gebiets und derselben Etage. Teilen und Weiterzeichnen behalten die Etagenzuordnung. Gesperrte Gebiete sperren auch ihre Etagen.
+
+Nur leere Etagen können gelöscht werden; mindestens eine bleibt pro Gebiet erhalten. Alle Änderungen unterstützen Rückgängig und Cloud-Speicherung. SVG exportiert nur sichtbare Etagen. Das Vorlagenbild bleibt für die gesamte Karte gemeinsam; Fundstellen sind noch nicht Etagen zugeordnet.
+
+Das Zeichnungsformat ist jetzt Version 3. Version 1 und 2 werden beim Laden übernommen. Keine SQL-Erweiterung erforderlich; alte Browser-Tabs nach dem Update neu laden.

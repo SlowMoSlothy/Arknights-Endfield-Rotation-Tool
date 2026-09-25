@@ -64,7 +64,7 @@ test('legacy roads remain straight; curves survive validation and SVG export', (
  data.paths[0].smooth = true;
  data.paths[0].points.splice(1, 0, { x: .4, y: .6 });
  const clean = validateDrawing(data);
- assert.equal(clean.version, 2);
+ assert.equal(clean.version, 3);
  assert.equal(clean.paths[0].smooth, true);
  const geometry = pathGeometry(clean.paths[0], 1000, 500);
  assert.equal(geometry.tag, 'path');
@@ -105,4 +105,27 @@ test('split keeps both halves editable and undo restores the entire original roa
  history.commit(validateDrawing(data)); history.undo();
  assert.deepEqual(history.value, original);
  assert.throws(() => splitRoad(original.paths[0], 0, 'new-road'));
+});
+
+test('floors migrate legacy geometry and reject invalid references', () => {
+ const data = fixture(); data.version = 2;
+ const clean = validateDrawing(data);
+ assert.equal(clean.areas[0].floors[0].name, 'Erdgeschoss');
+ assert.equal(clean.paths[0].floorId, 'ground');
+ clean.paths[0].floorId = 'missing'; assert.throws(() => validateDrawing(clean));
+ const bad = validateDrawing(data); bad.areas[0].floors.push({...bad.areas[0].floors[0]});
+ assert.throws(() => validateDrawing(bad));
+});
+test('hidden floors are excluded from SVG and roads cannot join across floors', () => {
+ const data = validateDrawing(fixture());
+ data.areas[0].floors.push({id:'upper',name:'Obergeschoss',visible:false});
+ const other = {...structuredClone(data.paths[0]),id:'up-road',floorId:'upper',name:'Upper road'};
+ data.paths.push(other);
+ assert.doesNotMatch(exportDrawingSVG(data,1000,500), /Upper road/);
+ assert.throws(() => joinRoads(data.paths[0],1,other,0));
+ data.areas[0].floors[1].visible = true;
+ assert.match(exportDrawingSVG(data,1000,500), /Upper road/);
+ const history = new DrawingHistory(data);
+ const moved = structuredClone(data); moved.paths[0].floorId = 'upper'; history.commit(moved); history.undo();
+ assert.equal(history.value.paths[0].floorId, 'ground');
 });
