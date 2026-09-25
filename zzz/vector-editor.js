@@ -1,4 +1,4 @@
-import { emptyDrawing, validateDrawing, DrawingHistory, nearestSegment, snapPoint, exportDrawingSVG } from './vector-model.js';
+import { emptyDrawing, validateDrawing, DrawingHistory, nearestPathSegment, pathGeometry, splitRoad, joinRoads, snapPoint, exportDrawingSVG } from './vector-model.js?v=2';
 const $ = id => document.getElementById(id);
 const copy = value => JSON.parse(JSON.stringify(value));
 const make = (tag, text, className) => { const n = document.createElement(tag); n.textContent = text; if (className) n.className = className; return n; };
@@ -11,6 +11,7 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved 
  let draft = [], pointer = null, preview = null, saved = '', revision = 0, saving = false, ready = false, failed = false, pendingDraft = null;
  const collapsed = new Set();
  let lastClick = null;
+ let extending = null;
  const drawing = () => history.value;
  const area = () => drawing().areas.find(a => a.id === areaId);
  const path = () => drawing().paths.find(p => p.id === pathId);
@@ -36,7 +37,7 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved 
   const url = URL.createObjectURL(new Blob([body], { type })); const link = document.createElement('a');
   link.href = url; link.download = name; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
  }
- function cancel() { draft = []; preview = null; pointer = null; renderCanvas(); renderTools(); }
+ function cancel() { draft = []; extending = null; preview = null; pointer = null; render(); }
  function setMode(value) { cancel(); lastClick = null; mode = value; vertex = null; render(); }
  function toggle(value = !active) {
   if (!canEdit || !ready || failed) value = false;
@@ -53,7 +54,7 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved 
    b.setAttribute('aria-pressed', String(b.dataset.tool === mode));
    b.disabled = ['line','polygon'].includes(b.dataset.tool) && !unlocked();
   });
-  $('draw-finish').disabled = draft.length < (mode === 'polygon' ? 3 : 2);
+  $('draw-finish').disabled = draft.length < (extending ? extending.points.length + 1 : mode === 'polygon' ? 3 : 2);
   $('draw-cancel').disabled = !draft.length;
   $('draw-help').textContent = mode === 'pan' ? 'Ziehen zum Verschieben · Scrollen zum Zoomen.'
    : mode === 'select' ? 'Pfad auswählen · Eckpunkte ziehen · Doppelklick auf eine Kante fügt einen Punkt ein.'
@@ -63,29 +64,33 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved 
   const root = $('vector-layer'), { width, height, scale } = geometry();
   root.replaceChildren(); root.setAttribute('viewBox', `0 0 ${width} ${height}`);
   const data = preview || drawing();
+  const handles = svg('g', {});
   // View-only users see the saved presentation but can never select or edit geometry.
   $('background').style.opacity = data.background.visible ? String(data.background.opacity) : '0';
   for (const a of data.areas.filter(a => a.visible)) {
    const group = svg('g', { 'data-area-id': a.id });
    const title = svg('title', {}); title.textContent = a.name; group.append(title);
    for (const p of data.paths.filter(p => p.areaId === a.id)) {
-    const coords = p.points.map(pt => `${pt.x * width},${pt.y * height}`).join(' ');
-    const node = svg(p.type === 'line' ? 'polyline' : 'polygon', { points: coords,
+    if (extending?.id === p.id) continue;
+    const shape = pathGeometry(p, width, height);
+    const node = svg(shape.tag, { ...shape.attrs,
      fill: p.type === 'polygon' ? a.color : 'none', stroke: a.color,
      'stroke-width': p.type === 'line' ? p.width : 1, 'stroke-linejoin': 'round', 'stroke-linecap': 'round',
      'data-path-id': p.id, class: 'vector-shape' });
     const title = svg('title', {}); title.textContent = p.name; node.append(title); group.append(node);
     if (active && p.id === pathId && mode === 'select') {
-     group.append(svg(p.type === 'line' ? 'polyline' : 'polygon', { points: coords, fill: 'none', stroke: '#fc6f02', 'stroke-width': 2 / scale, 'stroke-dasharray': `${5 / scale} ${4 / scale}`, 'pointer-events': 'none' }));
-     if (!a.locked) p.points.forEach((pt, index) => group.append(svg('circle', { cx: pt.x * width, cy: pt.y * height,
+     group.append(svg(shape.tag, { ...shape.attrs, fill: 'none', stroke: '#fc6f02', 'stroke-width': 2 / scale, 'stroke-dasharray': `${5 / scale} ${4 / scale}`, 'pointer-events': 'none' }));
+     if (!a.locked) p.points.forEach((pt, index) => handles.append(svg('circle', { cx: pt.x * width, cy: pt.y * height,
       r: (index === vertex ? 6 : 5) / scale, fill: index === vertex ? '#fc6f02' : '#fff', stroke: '#181d1f',
       'stroke-width': 1.5 / scale, class: 'vector-handle', 'data-vertex': index, 'data-path-id': p.id })));
     }
    }
    root.append(group);
   }
+  root.append(handles);
   if (active && draft.length) {
-   root.append(svg('polyline', { points: draft.map(p => `${p.x * width},${p.y * height}`).join(' '), fill: 'none', stroke: '#fc6f02', 'stroke-width': 2 / scale, 'stroke-dasharray': `${6 / scale} ${3 / scale}` }));
+   const shape = pathGeometry({ type: 'line', smooth: extending?.smooth, points: draft }, width, height);
+   root.append(svg(shape.tag, { ...shape.attrs, fill: 'none', stroke: '#fc6f02', 'stroke-width': 2 / scale, 'stroke-dasharray': `${6 / scale} ${3 / scale}` }));
    for (const p of draft) root.append(svg('circle', { cx: p.x * width, cy: p.y * height, r: 4 / scale, fill: '#fc6f02' }));
   }
  }
@@ -126,19 +131,41 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved 
   if (!drawing().areas.length) tree.append(make('p', 'Lege ein Gebiet an, z. B. Windworn Highway. Zeichne anschließend darin deine Wege.', 'muted'));
   $('area-settings').hidden = !a;
   if (a) { $('area-name').value = a.name; $('area-color').value = a.color; $('area-name').disabled = $('area-color').disabled = $('area-delete').disabled = a.locked; }
-  $('path-settings').hidden = !p; $('path-settings').disabled = !unlocked();
+  $('path-settings').hidden = !p; $('path-settings').disabled = !unlocked() || !!extending;
   if (p) {
    $('path-name').value = p.name; $('path-width').value = p.width;
    $('path-width-label').hidden = p.type !== 'line';
    $('path-area').replaceChildren(...drawing().areas.map(a => { const option = make('option', a.name); option.value = a.id; option.disabled = a.locked; return option; }));
    $('path-area').value = p.areaId;
    $('vertex-delete').disabled = vertex === null || p.points.length <= (p.type === 'polygon' ? 3 : 2);
+   $('road-settings').hidden = p.type !== 'line';
+   $('path-smooth').checked = !!p.smooth;
+   const endpoint = vertex === 0 || vertex === p.points.length - 1;
+   $('path-extend').disabled = !endpoint;
+   $('path-split').disabled = vertex === null || endpoint;
+   $('road-help').textContent = vertex === null ? 'Endpunkt auswählen zum Verlängern oder Verbinden. Inneren Eckpunkt auswählen zum Teilen.'
+    : `Ausgewählt: ${endpoint ? (vertex === 0 ? 'Anfang' : 'Ende') : `Eckpunkt ${vertex + 1}`}.`;
+   const select = $('path-join-target'), oldTarget = select.value;
+   const choices = drawing().paths.filter(other => other.id !== p.id && other.areaId === p.areaId && other.type === 'line')
+    .flatMap(other => [0, other.points.length - 1].map(index => {
+     const option = make('option', `${other.name} · ${index === 0 ? 'Anfang' : 'Ende'}`);
+     option.value = `${other.id}:${index}`; return option;
+    }));
+   select.replaceChildren(...choices);
+   if (choices.some(o => o.value === oldTarget)) select.value = oldTarget;
+   select.disabled = !endpoint || !choices.length;
+   $('path-join').disabled = !endpoint || !choices.length;
   }
   $('background-visible').checked = drawing().background.visible; $('background-opacity').value = Math.round(drawing().background.opacity * 100);
   renderTools(); renderCanvas();
  }
  function finish() {
-  if (!unlocked() || draft.length < (mode === 'polygon' ? 3 : 2)) return;
+  if (!unlocked() || draft.length < (extending ? extending.points.length + 1 : mode === 'polygon' ? 3 : 2)) return;
+  if (extending) {
+   const id = extending.id, points = copy(draft);
+   draft = []; extending = null; mode = 'select'; vertex = points.length - 1;
+   mutate(d => { d.paths.find(p => p.id === id).points = points; }); return;
+  }
   const p = { id: uuid(), areaId, name: `${mode === 'line' ? 'Straße' : 'Fläche'} ${drawing().paths.length + 1}`, type: mode, width: 10, points: copy(draft) };
   draft = []; pathId = p.id; mode = 'select'; mutate(d => d.paths.push(p));
  }
@@ -214,7 +241,7 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved 
   if (['line','polygon'].includes(mode)) return finish();
   const point = locate(e), p = path();
   if (!point || !p || !unlocked() || e.target.closest('[data-vertex]')) return;
-  const { width, height, scale } = geometry(); const edge = nearestSegment(p.points, point, p.type === 'polygon', width, height);
+  const { width, height, scale } = geometry(); const edge = nearestPathSegment(p, point, width, height);
   if (edge && edge.distance * scale < 16) { vertex = edge.index; mutate(d => d.paths.find(p => p.id === pathId).points.splice(edge.index, 0, edge.position)); }
  }
  document.addEventListener('keydown', e => {
@@ -244,6 +271,24 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved 
  };
  $('path-name').onchange = e => { if (unlocked() && path()) mutate(d => { d.paths.find(p => p.id === pathId).name = e.target.value; }); };
  $('path-width').onchange = e => { if (unlocked() && path()) mutate(d => { d.paths.find(p => p.id === pathId).width = Number(e.target.value); }); };
+ $('path-smooth').onchange = e => { if (unlocked() && path()?.type === 'line') mutate(d => { d.paths.find(p => p.id === pathId).smooth = e.target.checked; }); };
+ $('path-split').onclick = () => {
+  if (!unlocked() || path()?.type !== 'line' || vertex === null || vertex <= 0 || vertex >= path().points.length - 1) return;
+  const parts = splitRoad(path(), vertex, uuid()); vertex = null;
+  mutate(d => { const index = d.paths.findIndex(p => p.id === pathId); d.paths.splice(index, 1, ...parts); });
+ };
+ $('path-join').onclick = () => {
+  const p = path(), [id, endpoint] = $('path-join-target').value.split(':');
+  const other = drawing().paths.find(p => p.id === id);
+  if (!unlocked() || !p || !other || ![0, p.points.length - 1].includes(vertex)) return;
+  const joined = joinRoads(p, vertex, other, Number(endpoint)); vertex = null;
+  mutate(d => { d.paths = d.paths.filter(p => p.id !== other.id).map(p => p.id === joined.id ? joined : p); });
+ };
+ $('path-extend').onclick = () => {
+  const p = path(); if (!unlocked() || p?.type !== 'line' || ![0, p.points.length - 1].includes(vertex)) return;
+  const start = vertex === 0; setMode('line'); extending = copy(p);
+  draft = copy(start ? [...p.points].reverse() : p.points); render();
+ };
  // Also commit on blur for input methods that update the value without a change event.
  for (const id of ['area-name', 'path-name', 'path-width']) $(id).onblur = $(id).onchange;
  $('path-area').onchange = e => {

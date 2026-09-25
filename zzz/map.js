@@ -1,5 +1,5 @@
 import { categories, mapPosition, filterPoints, validateImage } from './map-model.js';
-import { createVectorEditor } from './vector-editor.js';
+import { createVectorEditor } from './vector-editor.js?v=2';
 const $ = id => document.getElementById(id);
 const client = typeof supabaseClient !== 'undefined' ? supabaseClient : null;
 const bucket = client?.storage.from('zzz-maps');

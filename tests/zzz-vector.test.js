@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { emptyDrawing, validateDrawing, DrawingHistory, nearestSegment, snapPoint, exportDrawingSVG } from '../zzz/vector-model.js';
+import { emptyDrawing, validateDrawing, DrawingHistory, nearestSegment, snapPoint, exportDrawingSVG, pathGeometry, curveSegments, nearestPathSegment, splitRoad, joinRoads } from '../zzz/vector-model.js';
 
 function fixture() {
  const data = emptyDrawing();
@@ -56,4 +56,53 @@ test('SVG export contains visible geometry, escapes names and excludes the templ
  assert.match(result, /Highway &lt;West&gt;/); assert.match(result, /Straße &amp; Weg/);
  assert.doesNotMatch(result, /Hidden|<image|<script/);
  assert.equal((result.match(/<polyline/g) || []).length, 1);
+});
+
+test('legacy roads remain straight; curves survive validation and SVG export', () => {
+ const data = fixture(); data.version = 1;
+ assert.equal(validateDrawing(data).paths[0].smooth, false);
+ data.paths[0].smooth = true;
+ data.paths[0].points.splice(1, 0, { x: .4, y: .6 });
+ const clean = validateDrawing(data);
+ assert.equal(clean.version, 2);
+ assert.equal(clean.paths[0].smooth, true);
+ const geometry = pathGeometry(clean.paths[0], 1000, 500);
+ assert.equal(geometry.tag, 'path');
+ assert.match(geometry.attrs.d, /^M 100.000,100.000 C /);
+ assert.match(geometry.attrs.d, /800.000,100.000$/);
+ assert.ok(exportDrawingSVG(clean, 1000, 500).includes(`d="${geometry.attrs.d}"`));
+ data.paths[0].smooth = 'yes'; assert.throws(() => validateDrawing(data));
+});
+test('curve controls stay within image and insertion follows the visible curve', () => {
+ const points = [{ x: 0, y: 0 }, { x: .5, y: 1 }, { x: 1, y: 0 }];
+ const segments = curveSegments(points);
+ assert.ok(segments.flat().every(p => p.x >= 0 && p.x <= 1 && p.y >= 0 && p.y <= 1));
+ const s = segments[0];
+ const midpoint = { x: (s[0].x + 3*s[1].x + 3*s[2].x + s[3].x)/8, y: (s[0].y + 3*s[1].y + 3*s[2].y + s[3].y)/8 };
+ const hit = nearestPathSegment({ type: 'line', smooth: true, points }, midpoint, 1600, 700);
+ assert.equal(hit.index, 1); assert.ok(hit.distance < .001);
+});
+test('joining supports all endpoint directions, removes shared vertex and preserves source data', () => {
+ const first = fixture().paths[0], second = { ...structuredClone(first), id: 'road2', points: [{ x: .8, y: .2 }, { x: .9, y: .7 }] };
+ for (const a of [0, 1]) for (const b of [0, 1]) {
+  const joined = joinRoads(first, a, second, b);
+  assert.deepEqual(joined.points[0], first.points[1-a]);
+  assert.deepEqual(joined.points.at(-1), second.points[1-b]);
+  assert.equal(joined.id, first.id);
+ }
+ assert.equal(joinRoads(first, 1, second, 0).points.length, 3);
+ assert.equal(first.points.length, 2);
+ assert.throws(() => joinRoads(first, 1, first, 0));
+ assert.throws(() => joinRoads(first, 1, { ...second, areaId: 'other' }, 0));
+});
+test('split keeps both halves editable and undo restores the entire original road', () => {
+ const data = fixture(); data.paths[0].smooth = true;
+ data.paths[0].points.splice(1, 0, { x: .5, y: .5 });
+ const original = structuredClone(data), history = new DrawingHistory(data);
+ data.paths = splitRoad(data.paths[0], 1, 'new-road');
+ assert.deepEqual(data.paths[0].points.at(-1), data.paths[1].points[0]);
+ assert.ok(data.paths.every(p => p.smooth && p.points.length === 2));
+ history.commit(validateDrawing(data)); history.undo();
+ assert.deepEqual(history.value, original);
+ assert.throws(() => splitRoad(original.paths[0], 0, 'new-road'));
 });

@@ -41,3 +41,13 @@ Zusätzlich einmal `supabase/zzz_map_vectors.sql` im Supabase-SQL-Editor ausfüh
 8. **SVG exportieren** exportiert sichtbare Vektoren ohne Vorlagenbild. **Entwurf exportieren/importieren** sichert bzw. lädt die gesamte Zeichnung als JSON.
 
 Gleichzeitige Bearbeitungen werden durch eine Versionsprüfung erkannt. Bei einem Konflikt den eigenen Entwurf exportieren, neu laden und die Versionen abgleichen. Vor Ausführung der Migration ist Zeichnen mit lokalem Entwurf möglich; Cloud-Speichern meldet die fehlende Einrichtung. Die Karte bleibt privat, bis der Besitzer sie ausdrücklich freigibt.
+
+## Kurven, Verbindungen und Verlängerungen
+
+- Straße auswählen und **Als weiche Kurve zeichnen** aktivieren. Die Kurve läuft durch die Eckpunkte und wird beim Ziehen automatisch neu berechnet. Gerade Straßen bleiben standardmäßig gerade; Flächen bleiben Polygone.
+- Einen inneren Eckpunkt anklicken und **Am Eckpunkt teilen** wählen. Beide Teile liegen im selben Gebiet. Bei Kurven werden die Endbereiche der beiden Teile neu geglättet.
+- Einen Endpunkt anklicken, unter **Verbinden mit** die zweite Straße und deren Anfang oder Ende auswählen und **Straßen verbinden** wählen. Beide Straßen müssen im selben Gebiet liegen. Die ausgewählte Straße bestimmt Namen, Breite und Kurvenmodus; eine Lücke wird durch ein Verbindungsstück geschlossen. Überlappende Endpunkte werden nur einmal übernommen. Das verbindet zwei Straßen zu einem Pfad, erzeugt aber keinen Routing-Graphen.
+- Einen Endpunkt anklicken und **Am Endpunkt weiterzeichnen** wählen. Weitere Punkte setzen, dann **Abschließen**. **Abbrechen** oder Escape lässt die bestehende Straße unverändert.
+- Alle abgeschlossenen Operationen unterstützen Rückgängig/Wiederholen, Cloud-Speicherung und Export. SVG enthält echte kubische Kurven. Keine zusätzliche SQL-Migration nötig.
+
+Neue Zeichnungen verwenden das JSON-Format Version 2; Version-1-Zeichnungen werden beim Laden übernommen. Ältere Editor-Versionen lehnen Version 2 ab, damit sie Kurven nicht versehentlich als Geraden speichern. Nach dem Update alte Browser-Tabs neu laden. Die automatische Glättung kann sich beim Einfügen, Teilen und Verbinden in der Umgebung der bearbeiteten Punkte ändern.
