@@ -271,6 +271,10 @@
       gap: 12px;
     }
 
+    .game-card[hidden] { display: none !important; }
+    .game-card.zzz-card {
+      background: linear-gradient(135deg, #303329, #181d1f 70%);
+    }
     .game-card {
       position: relative;
       min-height: 205px;
@@ -631,6 +635,19 @@
           </div>
         </a>
 
+        <a id="zzz-admin-card" class="game-card featured zzz-card" href="/zzz/" hidden>
+          <div class="game-card-content">
+            <span class="database-status">Admin only</span>
+            <div class="game-identity">
+              <span class="game-identity-copy">
+                <span class="game-name">Zenless Zone Zero</span>
+                <h3 class="game-tool-name">Interactive Map</h3>
+              </span>
+            </div>
+            <p>Trace roads, organize areas, and save your discoveries with screenshots on your private map.</p>
+            <span class="game-action">Open map editor &nearr;</span>
+          </div>
+        </a>
       </div>
     </section>
 
@@ -660,6 +677,9 @@
       </nav>
     </footer>
   </main>
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="/endfield/supabaseClient.js"></script>
+  <script defer src="/assets/home-admin.js"></script>
 </body>
 
 </html>
