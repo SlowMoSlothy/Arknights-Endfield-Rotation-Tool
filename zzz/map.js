@@ -1,5 +1,5 @@
 import { categories, mapPosition, filterPoints, validateImage } from './map-model.js';
-import { createVectorEditor } from './vector-editor.js?v=4';
+import { createVectorEditor } from './vector-editor.js?v=5';
 import { mapAreas, locationLabel, matchesLocation } from './point-locations.js';
 const $ = id => document.getElementById(id);
 const client = typeof supabaseClient !== 'undefined' ? supabaseClient : null;

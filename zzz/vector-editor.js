@@ -12,6 +12,7 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved,
  const collapsed = new Set();
  let lastClick = null;
  let extending = null;
+ let draftMode = null;
  const activeFloors = new Map();
  const drawing = () => history.value;
  const area = () => drawing().areas.find(a => a.id === areaId);
@@ -43,8 +44,14 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved,
   const url = URL.createObjectURL(new Blob([body], { type })); const link = document.createElement('a');
   link.href = url; link.download = name; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
  }
- function cancel() { draft = []; extending = null; preview = null; pointer = null; render(); }
- function setMode(value) { cancel(); lastClick = null; mode = value; vertex = null; render(); }
+ function cancel() { draft = []; draftMode = null; extending = null; preview = null; pointer = null; render(); }
+ function setMode(value) {
+  // The hand pauses drawing. Only an explicit cancel discards its vertices.
+  if (draft.length && value !== 'pan' && value !== draftMode) {
+   if (!finish()) { message('Bitte die begonnene Zeichnung zuerst abschließen oder ausdrücklich abbrechen.', true); return false; }
+  }
+  preview = null; pointer = null; lastClick = null; mode = value; vertex = null; render(); return true;
+ }
  function toggle(value = !active) {
   if (!canEdit || !ready || failed) value = false;
   active = value; setMode('pan');
@@ -55,14 +62,15 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved,
   render();
  }
  function renderTools() {
+  $('vector-save').disabled = !writable() || saving || (!dirty() && !draft.length);
   document.querySelector('.layout').dataset.tool = mode;
   document.querySelectorAll('[data-tool]').forEach(b => {
    b.setAttribute('aria-pressed', String(b.dataset.tool === mode));
    b.disabled = ['line','polygon'].includes(b.dataset.tool) && !unlocked();
   });
-  $('draw-finish').disabled = draft.length < (extending ? extending.points.length + 1 : mode === 'polygon' ? 3 : 2);
+  $('draw-finish').disabled = draft.length < (extending ? extending.points.length + 1 : draftMode === 'polygon' ? 3 : 2);
   $('draw-cancel').disabled = !draft.length;
-  $('draw-help').textContent = mode === 'pan' ? 'Ziehen zum Verschieben · Scrollen zum Zoomen.'
+  $('draw-help').textContent = mode === 'pan' ? (draft.length ? `Zeichnung pausiert (${draft.length} Punkte). ${draftMode === 'polygon' ? 'Fläche' : 'Linie'} zum Weiterzeichnen wählen oder Abschließen drücken.` : 'Ziehen zum Verschieben · Scrollen zum Zoomen.')
    : mode === 'select' ? 'Pfad auswählen · Eckpunkte ziehen · Doppelklick auf eine Kante fügt einen Punkt ein.'
    : `${mode === 'line' ? 'Straße' : 'Fläche'}: klicken setzt Eckpunkte · Enter oder Doppelklick schließt ab · Escape bricht ab (${draft.length} Punkte).`;
  }
@@ -128,7 +136,7 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved,
     for (const child of drawing().paths.filter(p => p.areaId === folder.id)) {
      const level = folder.floors.find(f => f.id === child.floorId);
      const button = make('button', `${child.type === 'line' ? '╱' : '▱'} ${child.name} · ${level.name}`, child.id === pathId ? 'selected' : '');
-     button.onclick = () => { setMode('select'); areaId = folder.id; activeFloors.set(areaId, child.floorId); pathId = child.id; vertex = null; render(); };
+     button.onclick = () => { if (!setMode('select')) return; areaId = folder.id; activeFloors.set(areaId, child.floorId); pathId = child.id; vertex = null; render(); };
      list.append(button);
     }
     if (!list.children.length) list.append(make('p', 'Noch keine Pfade.', 'muted'));
@@ -176,14 +184,14 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved,
   renderTools(); renderCanvas();
  }
  function finish() {
-  if (!unlocked() || draft.length < (extending ? extending.points.length + 1 : mode === 'polygon' ? 3 : 2)) return;
+  if (!unlocked() || draft.length < (extending ? extending.points.length + 1 : draftMode === 'polygon' ? 3 : 2)) return false;
   if (extending) {
    const id = extending.id, points = copy(draft);
-   draft = []; extending = null; mode = 'select'; vertex = points.length - 1;
-   mutate(d => { d.paths.find(p => p.id === id).points = points; }); return;
+   draft = []; draftMode = null; extending = null; mode = 'select'; vertex = points.length - 1;
+   mutate(d => { d.paths.find(p => p.id === id).points = points; }); return true;
   }
-  const p = { id: uuid(), areaId, floorId: floor().id, name: `${mode === 'line' ? 'Straße' : 'Fläche'} ${drawing().paths.length + 1}`, type: mode, width: 10, points: copy(draft) };
-  draft = []; pathId = p.id; mode = 'select'; mutate(d => d.paths.push(p));
+  const p = { id: uuid(), areaId, floorId: floor().id, name: `${draftMode === 'line' ? 'Straße' : 'Fläche'} ${drawing().paths.length + 1}`, type: draftMode, width: 10, points: copy(draft) };
+  draft = []; draftMode = null; pathId = p.id; mode = 'select'; mutate(d => d.paths.push(p)); return true;
  }
  function removeVertex() {
   const p = path(); if (!unlocked() || !p || vertex === null || p.points.length <= (p.type === 'polygon' ? 3 : 2)) return;
@@ -195,6 +203,7 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved,
   return snapPoint(point, drawing().paths.filter(p => p.areaId === areaId && p.floorId === floor()?.id), width, height, 8 / scale, exclude);
  }
  async function save() {
+  if (draft.length && !finish()) { message('Zum Speichern die begonnene Fläche mit mindestens drei Punkten bzw. Linie mit mindestens zwei Punkten vervollständigen.', true); return; }
   if (!writable() || saving || !dirty()) return;
   const target = map, content = copy(drawing()), startRevision = revision; saving = true; render();
   try {
@@ -240,7 +249,7 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved,
    const point = locate(e);
    if (point) {
     const next = snap(point), last = draft.at(-1), { width, height, scale } = geometry();
-    if (!last || Math.hypot((next.x - last.x) * width, (next.y - last.y) * height) * scale > 3) draft.push(next);
+    if (!last || Math.hypot((next.x - last.x) * width, (next.y - last.y) * height) * scale > 3) { draftMode = mode; draft.push(next); }
     renderCanvas(); renderTools();
    }
   }
@@ -301,8 +310,8 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved,
  };
  $('path-extend').onclick = () => {
   const p = path(); if (!unlocked() || p?.type !== 'line' || ![0, p.points.length - 1].includes(vertex)) return;
-  const start = vertex === 0; setMode('line'); extending = copy(p);
-  draft = copy(start ? [...p.points].reverse() : p.points); render();
+  const start = vertex === 0; if (!setMode('line')) return; extending = copy(p);
+  draftMode = 'line'; draft = copy(start ? [...p.points].reverse() : p.points); render();
  };
  // Also commit on blur for input methods that update the value without a change event.
  for (const id of ['area-name', 'path-name', 'path-width']) $(id).onblur = $(id).onchange;
@@ -357,6 +366,7 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved,
  window.addEventListener('beforeunload', e => { if (canEdit && (dirty() || draft.length || saving)) { e.preventDefault(); e.returnValue = ''; } });
  return {
   reset() {
+   draft = []; draftMode = null; extending = null;
    ready = false; active = false; toggle(false); map = null; canEdit = false; pendingDraft = null;
    history.reset(emptyDrawing()); saved = JSON.stringify(drawing()); areaId = pathId = vertex = null;
    $('toggle-editor').hidden = true; render();
