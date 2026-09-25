@@ -24,4 +24,6 @@
 .editing-vectors[data-tool=line] #viewport,.editing-vectors[data-tool=polygon] #viewport{cursor:crosshair}
 .editing-vectors[data-tool=select] #viewport{cursor:default}
 #background{transition:opacity .1s}
+#viewport{user-select:none;-webkit-user-select:none;overflow:clip}
+#viewport:active{cursor:grabbing}
 @media(max-width:760px){.layout:has(#drawing-editor:not([hidden])){grid-template-columns:1fr}#drawing-editor{max-height:420px}#vector-tools{padding-right:8px}.map-shell:has(#vector-tools:not([hidden])) .map-controls{top:140px}}

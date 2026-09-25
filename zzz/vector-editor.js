@@ -172,7 +172,7 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved 
  viewport.addEventListener('pointerdown', e => {
   if (!active || mode === 'pan' || e.button !== 0 || e.target.closest('button')) return;
   const point = locate(e); if (!point) return;
-  e.stopImmediatePropagation(); e.preventDefault(); viewport.focus();
+  e.stopImmediatePropagation(); e.preventDefault(); viewport.focus({ preventScroll: true });
   const handle = e.target.closest('[data-vertex]'), shape = e.target.closest('[data-path-id]');
   if (mode === 'select') {
    if (shape) { pathId = shape.dataset.pathId; areaId = path().areaId; vertex = handle ? Number(handle.dataset.vertex) : null; }

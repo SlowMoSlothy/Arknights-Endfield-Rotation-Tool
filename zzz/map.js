@@ -216,6 +216,9 @@ const viewport = $('viewport'); let drag;
 viewport.addEventListener('wheel', e => { e.preventDefault(); const rect = viewport.getBoundingClientRect(); zoom(Math.exp(-e.deltaY * .001), e.clientX - rect.left, e.clientY - rect.top); }, { passive: false });
 viewport.onpointerdown = e => {
  if (e.target.closest('button') || e.button !== 0) return;
+ // Keep native selection/focus scrolling from competing with map dragging.
+ e.preventDefault();
+ viewport.focus({ preventScroll: true });
  drag = { id: e.pointerId, x: e.clientX, y: e.clientY, vx: view.x, vy: view.y, moved: false };
  viewport.setPointerCapture(e.pointerId);
 };
@@ -241,5 +244,15 @@ viewport.onkeydown = e => {
  else if (e.key.startsWith('Arrow')) { view.x += ({ ArrowLeft: 40, ArrowRight: -40 }[e.key] || 0); view.y += ({ ArrowUp: 40, ArrowDown: -40 }[e.key] || 0); transform(); }
  else return; e.preventDefault();
 };
-new ResizeObserver(() => { if (current) fit(); }).observe(viewport);
+let viewportSize = { width: viewport.clientWidth, height: viewport.clientHeight };
+new ResizeObserver(() => {
+ const next = { width: viewport.clientWidth, height: viewport.clientHeight };
+ if (current && viewportSize.width && viewportSize.height && next.width && next.height) {
+  // Retain zoom and the point at the center when the sidebar/browser changes size.
+  view.x += (next.width - viewportSize.width) / 2;
+  view.y += (next.height - viewportSize.height) / 2;
+  transform();
+ }
+ viewportSize = next;
+}).observe(viewport);
 initialize();
