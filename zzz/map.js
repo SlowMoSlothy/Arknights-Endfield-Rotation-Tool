@@ -1,5 +1,6 @@
 import { categories, mapPosition, filterPoints, validateImage } from './map-model.js';
-import { createVectorEditor } from './vector-editor.js?v=3';
+import { createVectorEditor } from './vector-editor.js?v=4';
+import { mapAreas, locationLabel, matchesLocation } from './point-locations.js';
 const $ = id => document.getElementById(id);
 const client = typeof supabaseClient !== 'undefined' ? supabaseClient : null;
 const bucket = client?.storage.from('zzz-maps');
@@ -7,9 +8,10 @@ let user, admin = false, maps = [], current, points = [], editing, placing = fal
 let view = { x: 0, y: 0, scale: 1 }, width = 1, height = 1, generation = 0;
 const blobURLs = new Set();
 const vectorEditor = createVectorEditor({ client, getUser: () => user,
+ floorHasPoints: (areaId, floorId) => points.some(p => p.area_id === areaId && p.floor_id === floorId),
  geometry: () => ({ width, height, scale: view.scale }),
  locate: event => mapPosition(event.clientX, event.clientY, $('viewport').getBoundingClientRect(), view, width, height),
- onSaved: map => { maps = maps.map(item => item.id === map.id ? map : item); }
+ onSaved: map => { maps = maps.map(item => item.id === map.id ? map : item); refreshLocationFilters(); render(); }
 });
 const editable = () => admin && current?.owner_id === user?.id;
 const status = text => { $('status').textContent = text; };
@@ -18,6 +20,35 @@ function element(tag, text, className) {
  const node = document.createElement(tag); node.textContent = text;
  if (className) node.className = className;
  return node;
+}
+function setOptions(id, options, value = '') {
+ $(id).replaceChildren(...options.map(([key, label]) => { const o = element('option', label); o.value = key; return o; }));
+ $(id).value = options.some(([key]) => key === value) ? value : '';
+}
+function areaOptions(extras = []) {
+ const result = mapAreas(current).map(a => [a.id, a.name]);
+ for (const id of extras.filter(Boolean)) if (!result.some(([key]) => key === id)) result.push([id, 'Entferntes Gebiet']);
+ return result;
+}
+function floorOptions(areaId, extras = []) {
+ const result = (mapAreas(current).find(a => a.id === areaId)?.floors || []).map(f => [f.id, f.name]);
+ for (const id of extras.filter(Boolean)) if (!result.some(([key]) => key === id)) result.push([id, 'Entfernte Etage']);
+ return result;
+}
+function refreshFloorFilter() {
+ const areaId = $('point-area-filter').value;
+ setOptions('point-floor-filter', [['', 'Alle Etagen'], ...floorOptions(areaId, points.filter(p => p.area_id === areaId).map(p => p.floor_id))], $('point-floor-filter').value);
+ $('point-floor-filter').disabled = !areaId || areaId === '__unassigned';
+ if ($('point-floor-filter').disabled) $('point-floor-filter').value = '';
+}
+function refreshLocationFilters() {
+ setOptions('point-area-filter', [['', 'Alle Gebiete'], ['__unassigned', 'Nicht zugeordnet'], ...areaOptions(points.map(p => p.area_id))], $('point-area-filter').value);
+ refreshFloorFilter();
+}
+function refreshPointFloors(value = '') {
+ const areaId = $('point-area').value;
+ setOptions('point-floor', [['', 'Keine Etage'], ...floorOptions(areaId, areaId === editing?.area_id ? [editing.floor_id] : [])], value);
+ $('point-floor').disabled = !areaId;
 }
 async function action(form, work) {
  const buttons = [...form.querySelectorAll('button')];
@@ -60,7 +91,8 @@ function setPlacing(value) {
 }
 function render() {
  $('markers').replaceChildren(); $('points').replaceChildren();
- const visible = filterPoints(points, $('search').value, $('filter').value, $('hide-completed').checked);
+ const visible = filterPoints(points, $('search').value, $('filter').value, $('hide-completed').checked)
+  .filter(p => matchesLocation(p, $('point-area-filter').value, $('point-floor-filter').value));
  $('count').textContent = `${visible.length} / ${points.length}`;
  for (const point of visible) {
   const kind = categories[point.category];
@@ -70,7 +102,7 @@ function render() {
   marker.onclick = () => openPoint(point);
   $('markers').append(marker);
   const item = element('button', `${point.completed ? '✓ ' : ''}${point.title}`);
-  item.append(element('small', kind.label));
+  item.append(element('small', `${kind.label} · ${locationLabel(point, mapAreas(current))}`));
   item.onclick = () => { view.x = $('viewport').clientWidth / 2 - point.x * width * view.scale; view.y = $('viewport').clientHeight / 2 - point.y * height * view.scale; transform(); openPoint(point); };
   $('points').append(item);
  }
@@ -81,6 +113,7 @@ async function loadMap(id) {
  const ticket = ++generation;
  vectorEditor.reset();
  current = maps.find(m => m.id === id); points = []; setPlacing(false); releaseImages();
+ $('point-area-filter').value = ''; $('point-floor-filter').value = ''; refreshLocationFilters();
  $('background').removeAttribute('src'); $('markers').replaceChildren(); $('points').replaceChildren();
  $('add').hidden = $('publish').hidden = true;
  if (!current) { $('credit').textContent = ''; status(admin ? 'Lege deine erste private Karte an.' : 'Keine freigegebenen Karten verfügbar.'); return; }
@@ -94,6 +127,7 @@ async function loadMap(id) {
   width = $('background').naturalWidth; height = $('background').naturalHeight;
   $('world').style.width = `${width}px`; $('world').style.height = `${height}px`;
   points = rows; $('credit').textContent = selected.attribution;
+  refreshLocationFilters();
   $('visibility').textContent = selected.is_public ? 'Öffentlich · Nur Besitzer kann bearbeiten' : 'Privat · Nur für dich sichtbar';
   $('publish').textContent = selected.is_public ? 'Wieder privat machen' : 'Für alle freigeben';
   $('add').hidden = $('publish').hidden = !editable();
@@ -142,6 +176,9 @@ function openPoint(point) {
  const form = $('point-form'); form.reset(); form.querySelector('.error').textContent = '';
  for (const name of ['title','category','notes']) form.elements[name].value = point[name] || (name === 'category' ? 'note' : '');
  form.elements.completed.checked = !!point.completed;
+ const areaId = point.id ? point.area_id || '' : ($('point-area-filter').value === '__unassigned' ? '' : $('point-area-filter').value);
+ setOptions('point-area', [['', 'Nicht zugeordnet'], ...areaOptions([point.area_id])], areaId);
+ refreshPointFloors(point.id ? point.floor_id || '' : $('point-floor-filter').value);
  $('point-fields').disabled = !editable();
  $('upload-label').hidden = $('save').hidden = !editable(); $('delete').hidden = !editable() || !point.id;
  $('point-heading').textContent = editable() ? (point.id ? 'Ort bearbeiten' : 'Neuer Ort') : point.title;
@@ -187,10 +224,19 @@ $('point-form').onsubmit = e => { e.preventDefault(); action(e.target, async () 
   for (const file of files) uploaded.push(await upload(file, current.id));
   const row = { map_id: current.id, title, category: form.elements.category.value, notes: form.elements.notes.value,
    completed: form.elements.completed.checked, x: editing.x, y: editing.y, screenshots: [...editing.screenshots, ...uploaded] };
+  // Keep ordinary unassigned points compatible before the optional migration.
+  if (form.elements.area_id.value || old && Object.hasOwn(old, 'area_id')) {
+   row.area_id = form.elements.area_id.value || null;
+   row.floor_id = row.area_id ? form.elements.floor_id.value || null : null;
+  }
   saved = unwrap(await (editing.id ? client.from('zzz_map_points').update(row).eq('id', editing.id) : client.from('zzz_map_points').insert(row)).select().single());
- } catch (error) { if (uploaded.length) await bucket.remove(uploaded); throw error; }
+ } catch (error) {
+  if (uploaded.length) await bucket.remove(uploaded);
+  if (/area_id|floor_id/.test(error.message || '')) throw Error('Bitte zuerst zzz_point_locations.sql in Supabase ausführen. Deine Eingaben bleiben geöffnet.');
+  throw error;
+ }
  points = old ? points.map(p => p.id === saved.id ? saved : p) : [...points, saved];
- $('point-dialog').close(); render(); status('Punkt gespeichert.');
+ $('point-dialog').close(); refreshLocationFilters(); render(); status('Punkt gespeichert.');
  const removed = old?.screenshots.filter(p => !saved.screenshots.includes(p)) || [];
  if (removed.length) { const result = await bucket.remove(removed); if (result.error) status('Punkt gespeichert. Entfernte Bilddateien konnten noch nicht bereinigt werden.'); }
 }); };
@@ -209,6 +255,9 @@ $('publish').onclick = () => action($('workspace'), async () => {
 });
 $('maps').onchange = () => { if (vectorEditor.confirmLeave()) loadMap($('maps').value); else $('maps').value = current?.id || ''; };
 for (const id of ['search','filter','hide-completed']) $(id).addEventListener('input', render);
+ $('point-area-filter').onchange = () => { $('point-floor-filter').value = ''; refreshFloorFilter(); render(); };
+ $('point-floor-filter').onchange = render;
+ $('point-area').onchange = () => refreshPointFloors();
 $('add').onclick = () => { vectorEditor.close(); setPlacing(!placing); };
 $('toggle-editor').addEventListener('click', () => setPlacing(false));
 $('fit').onclick = fit; $('zoom-in').onclick = () => zoom(1.25); $('zoom-out').onclick = () => zoom(.8);

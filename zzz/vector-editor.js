@@ -5,7 +5,7 @@ const make = (tag, text, className) => { const n = document.createElement(tag); 
 const svg = (tag, attrs) => { const n = document.createElementNS('http://www.w3.org/2000/svg', tag); for (const [k,v] of Object.entries(attrs)) n.setAttribute(k, v); return n; };
 const uuid = () => crypto.randomUUID();
 
-export function createVectorEditor({ client, getUser, geometry, locate, onSaved }) {
+export function createVectorEditor({ client, getUser, geometry, locate, onSaved, floorHasPoints = () => false }) {
  const history = new DrawingHistory();
  let map = null, canEdit = false, active = false, mode = 'pan', areaId = null, pathId = null, vertex = null;
  let draft = [], pointer = null, preview = null, saved = '', revision = 0, saving = false, ready = false, failed = false, pendingDraft = null;
@@ -144,7 +144,7 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved 
    floorOptions($('floor-select'), a.floors, floor().id);
    $('floor-name').value = floor().name; $('floor-visible').checked = floor().visible;
    $('floor-add').disabled = a.floors.length >= 30;
-   $('floor-delete').disabled = a.floors.length <= 1 || drawing().paths.some(p => p.areaId === a.id && p.floorId === floor().id);
+   $('floor-delete').disabled = a.floors.length <= 1 || floorHasPoints(a.id, floor().id) || drawing().paths.some(p => p.areaId === a.id && p.floorId === floor().id);
   }
   $('path-settings').hidden = !p; $('path-settings').disabled = !unlocked() || !!extending;
   if (p) {
@@ -323,7 +323,7 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved 
  $('floor-delete').onclick = () => {
   if (!area() || area().locked || area().floors.length <= 1) return;
   const id = floor().id;
-  if (drawing().paths.some(p => p.areaId === areaId && p.floorId === id)) return;
+  if (floorHasPoints(areaId, id) || drawing().paths.some(p => p.areaId === areaId && p.floorId === id)) return;
   cancel(); mutate(d => { const a = d.areas.find(a => a.id === areaId); a.floors = a.floors.filter(f => f.id !== id); });
  };
  $('path-floor').onchange = e => {

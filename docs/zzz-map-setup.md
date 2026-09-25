@@ -61,3 +61,11 @@ Bei einem ausgewählten Pfad lässt sich **Etage des Pfads** ändern. Beim Versc
 Nur leere Etagen können gelöscht werden; mindestens eine bleibt pro Gebiet erhalten. Alle Änderungen unterstützen Rückgängig und Cloud-Speicherung. SVG exportiert nur sichtbare Etagen. Das Vorlagenbild bleibt für die gesamte Karte gemeinsam; Fundstellen sind noch nicht Etagen zugeordnet.
 
 Das Zeichnungsformat ist jetzt Version 3. Version 1 und 2 werden beim Laden übernommen. Keine SQL-Erweiterung erforderlich; alte Browser-Tabs nach dem Update neu laden.
+
+## Fundstellen nach Gebiet und Etage
+
+Einmal `supabase/zzz_point_locations.sql` in Supabase ausführen. Die zwei optionalen Spalten verändern die bestehenden RLS-Regeln nicht. Alte Punkte bleiben ohne Zuordnung erhalten; Screenshots bleiben am jeweiligen Punkt gespeichert.
+
+Im Punktdialog **Gebiet** und optional **Etage** wählen. Verwendbar sind die bereits in der Cloud gespeicherten Gebiete und Etagen. Die Filter **Gebiet filtern** und **Etage filtern** wirken gemeinsam mit Suche, Kategorie und Erledigt-Filter auf Punktliste und Marker. Sie verändern weder die Zeichnung noch deren gespeicherte Etagen-Sichtbarkeit. Bei neuen Punkten wird eine konkrete Filterauswahl als Zuordnung vorbelegt.
+
+**Nicht zugeordnet** zeigt ältere oder bewusst nicht zugeordnete Punkte. Nach dem Löschen eines Gebiets oder dem Import einer anderen Zeichnung bleiben betroffene Fundstellen samt Screenshots erhalten; ihre Zuordnung heißt dann **Entferntes Gebiet / Entfernte Etage** und lässt sich ändern. Etagen mit bekannten Fundstellen lassen sich im Editor nicht als leere Etagen löschen. Vor der Migration ist das Speichern ohne Zuordnung weiterhin möglich; beim Speichern einer Zuordnung weist die Oberfläche auf die fehlende SQL-Einrichtung hin und hält die Eingaben geöffnet.
