@@ -1,4 +1,4 @@
-import { emptyDrawing, validateDrawing, DrawingHistory, nearestPathSegment, pathGeometry, splitRoad, joinRoads, snapPoint, exportDrawingSVG } from './vector-model.js?v=3';
+import { emptyDrawing, validateDrawing, DrawingHistory, nearestPathSegment, pathGeometry, splitRoad, joinRoads, snapPoint, snapAngle, exportDrawingSVG } from './vector-model.js?v=4';
 const $ = id => document.getElementById(id);
 const copy = value => JSON.parse(JSON.stringify(value));
 const make = (tag, text, className) => { const n = document.createElement(tag); n.textContent = text; if (className) n.className = className; return n; };
@@ -199,9 +199,13 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved,
   const p = path(); if (!unlocked() || !p || vertex === null || p.points.length <= (p.type === 'polygon' ? 3 : 2)) return;
   const index = vertex; vertex = null; mutate(d => d.paths.find(p => p.id === pathId).points.splice(index, 1));
  }
- function snap(point, exclude) {
-  if (!$('vector-snap').checked) return point;
+ function snap(point, exclude, event) {
   const { width, height, scale } = geometry();
+  const degrees = event?.altKey ? 0 : Number($('vector-angle').value) || (event?.shiftKey ? 45 : 0);
+  const selected = path();
+  const anchor = exclude ? selected.points[exclude.index > 0 ? exclude.index - 1 : selected.type === 'polygon' ? selected.points.length - 1 : 1] : draft.at(-1);
+  if (degrees && anchor) return snapAngle(point, anchor, width, height, degrees);
+  if (event?.altKey || !$('vector-snap').checked) return point;
   return snapPoint(point, drawing().paths.filter(p => p.areaId === areaId && p.floorId === floor()?.id), width, height, 8 / scale, exclude);
  }
  async function save() {
@@ -237,7 +241,7 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved,
  viewport.addEventListener('pointermove', e => {
   if (!pointer || pointer.id !== e.pointerId || pointer.vertex === null) return;
   e.stopImmediatePropagation(); const point = locate(e); if (!point || !unlocked()) return;
-  preview = copy(drawing()); preview.paths.find(p => p.id === pathId).points[pointer.vertex] = snap(point, { id: pathId, index: pointer.vertex }); renderCanvas();
+  preview = copy(drawing()); preview.paths.find(p => p.id === pathId).points[pointer.vertex] = snap(point, { id: pathId, index: pointer.vertex }, e); renderCanvas();
  }, true);
  viewport.addEventListener('pointerup', e => {
   if (!pointer || pointer.id !== e.pointerId) return;
@@ -250,7 +254,7 @@ export function createVectorEditor({ client, getUser, geometry, locate, onSaved,
   else if (['line','polygon'].includes(mode) && unlocked() && Math.hypot(e.clientX - p.x, e.clientY - p.y) < 5) {
    const point = locate(e);
    if (point) {
-    const next = snap(point), last = draft.at(-1), { width, height, scale } = geometry();
+    const next = snap(point, null, e), last = draft.at(-1), { width, height, scale } = geometry();
     if (!last || Math.hypot((next.x - last.x) * width, (next.y - last.y) * height) * scale > 3) { draftMode = mode; draft.push(next); }
     renderCanvas(); renderTools();
    }

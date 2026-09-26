@@ -81,3 +81,7 @@ Die obere Werkzeugleiste nutzt Symbole mit Tooltips und zugänglichen Beschriftu
 ## Vollbildansicht
 
 Das Vollbildsymbol rechts neben **Einpassen** vergrößert Karte und Seitenleiste gemeinsam. Zeichenwerkzeuge und Fundstellen-Dialoge bleiben bedienbar. Erneutes Klicken oder **Escape** verlässt die Ansicht; ein geöffneter Dialog wird zuerst geschlossen. Unterstützt der Browser kein natives Vollbild, füllt die Karte das Browserfenster. Dafür ist keine SQL-Änderung erforderlich.
+
+## Winkelrastung
+
+Unter **Winkelrastung** im Zeicheneditor stehen frei, 90° (12/3/6/9 Uhr), 45° (mit Diagonalen) und 30° (alle zwölf Uhrpositionen) zur Auswahl. Im freien Modus aktiviert gehaltenes **Umschalt** vorübergehend 45°; **Alt** setzt beide Rastungen vorübergehend aus. Beim Zeichnen ist der letzte Knoten der Bezugspunkt. Beim Ziehen ist es der vorherige Knoten, am Linienanfang der nächste und am Flächenanfang der letzte. Die Winkelrastung hat Vorrang vor dem Einrasten an bestehenden Eckpunkten. Auch auf rechteckigen Karten und an Bildrändern bleibt der Winkel korrekt. Die geänderten Knoten unterstützen Rückgängig und Speichern wie bisher; keine SQL-Änderung erforderlich.

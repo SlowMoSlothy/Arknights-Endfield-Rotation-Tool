@@ -101,6 +101,21 @@ export function nearestSegment(points, point, closed, width, height) {
  return best;
 }
 
+// Work in image pixels so diagonal angles stay correct on rectangular maps.
+export function snapAngle(point, anchor, width, height, degrees) {
+ if (!anchor || ![30, 45, 90].includes(degrees)) return point;
+ const dx = (point.x - anchor.x) * width, dy = (point.y - anchor.y) * height;
+ const step = degrees * Math.PI / 180;
+ const angle = Math.round(Math.atan2(dy, dx) / step) * step;
+ const clean = n => Math.abs(n) < 1e-12 ? 0 : n;
+ const ux = clean(Math.cos(angle)), uy = clean(Math.sin(angle));
+ let length = Math.max(0, dx * ux + dy * uy);
+ // Shorten along the ray at image borders; clamping each axis would bend it.
+ if (ux) length = Math.min(length, (ux > 0 ? 1 - anchor.x : anchor.x) * width / Math.abs(ux));
+ if (uy) length = Math.min(length, (uy > 0 ? 1 - anchor.y : anchor.y) * height / Math.abs(uy));
+ return { x: anchor.x + ux * length / width, y: anchor.y + uy * length / height };
+}
+
 export function snapPoint(point, paths, width, height, threshold, exclude) {
  let result = point, distance = threshold;
  for (const path of paths) path.points.forEach((p, i) => {

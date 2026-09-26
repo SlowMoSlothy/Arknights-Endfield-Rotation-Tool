@@ -56,6 +56,8 @@
           <p class="muted">Bild und Pfade bleiben beim Zoomen und Verschieben deckungsgleich.</p>
         </details>
         <label class="check"><input id="vector-snap" type="checkbox" checked> An Eckpunkten einrasten</label>
+        <label>Winkelrastung<select id="vector-angle"><option value="0">Frei · Umschalt für 45°</option><option value="90">90° · 12, 3, 6, 9 Uhr</option><option value="45">45° · mit Diagonalen</option><option value="30">30° · alle Uhrzeiten</option></select></label>
+        <p class="muted">Beim Setzen und Ziehen relativ zum vorherigen Knoten (am Linienanfang zum nächsten). Alt hält das Einrasten vorübergehend an. Winkelrastung hat Vorrang vor dem Einrasten an Eckpunkten.</p>
         <div class="vector-actions"><button id="vector-svg">SVG exportieren</button><button id="vector-json">Entwurf exportieren</button></div>
         <label class="vector-import">Entwurf importieren<input id="vector-import" type="file" accept="application/json,.json"></label>
       </section>
@@ -83,6 +85,6 @@
 <dialog id="new-map"><form id="map-form"><h2>Private Karte anlegen</h2><label>Name<input name="title" value="Suburbs Illusion" maxlength="120" required></label><label>Urheber / Quelle<input name="attribution" value="@KELZERO · Vorlage: Suburbs Illusion" maxlength="300"></label><label>Kartenbild (PNG, JPG, WebP · max. 10 MB)<input name="image" type="file" accept="image/png,image/jpeg,image/webp" required></label><p>Wähle dein Kartenbild. Es wird im privaten Speicher abgelegt.</p><div class="actions"><button type="button" data-close>Abbrechen</button><button class="primary">Karte speichern</button></div><p class="error" role="alert"></p></form></dialog>
 <dialog id="point-dialog"><form id="point-form"><h2 id="point-heading">Ort bearbeiten</h2><fieldset id="point-fields"><label>Titel<input name="title" maxlength="120" required></label><label>Kategorie<select name="category" id="category"></select></label><label>Gebiet<select id="point-area" name="area_id"></select></label><label>Etage<select id="point-floor" name="floor_id"></select></label><p class="muted">Gebiete und Etagen zuerst im Zeicheneditor speichern. Ohne Zuordnung bleibt der Punkt unter allen Fundstellen sichtbar.</p><label>Notizen<textarea name="notes" maxlength="5000" rows="4"></textarea></label><label class="check"><input name="completed" type="checkbox"> Erledigt</label></fieldset><div id="screenshots"></div><label id="upload-label">Screenshots hinzufügen (je max. 10 MB)<input id="uploads" type="file" accept="image/png,image/jpeg,image/webp" multiple></label><div class="actions"><button type="button" data-close>Schließen</button><button type="button" id="delete" class="danger">Löschen</button><button id="save" class="primary">Speichern</button></div><p class="error" role="alert"></p></form></dialog>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/endfield/supabaseClient.js"></script><script type="module" src="map.js?v=6"></script>
+<script src="/endfield/supabaseClient.js"></script><script type="module" src="map.js?v=7"></script>
 <script type="module" src="fullscreen.js"></script>
 </body></html>

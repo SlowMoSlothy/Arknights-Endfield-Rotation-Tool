@@ -1,6 +1,35 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { emptyDrawing, validateDrawing, DrawingHistory, nearestSegment, snapPoint, exportDrawingSVG, pathGeometry, curveSegments, nearestPathSegment, splitRoad, joinRoads } from '../zzz/vector-model.js';
+import { emptyDrawing, validateDrawing, DrawingHistory, nearestSegment, snapPoint, snapAngle, exportDrawingSVG, pathGeometry, curveSegments, nearestPathSegment, splitRoad, joinRoads } from '../zzz/vector-model.js';
+
+test('angle snapping respects clock directions and rectangular image dimensions', () => {
+ const anchor = { x: .5, y: .5 };
+ for (const [point, expected] of [
+  [{ x: .52, y: .1 }, { x: .5, y: .1 }],
+  [{ x: .52, y: .9 }, { x: .5, y: .9 }],
+  [{ x: .1, y: .52 }, { x: .1, y: .5 }],
+  [{ x: .9, y: .52 }, { x: .9, y: .5 }]
+ ]) {
+  const actual = snapAngle(point, anchor, 1000, 500, 90);
+  assert.ok(Math.abs(actual.x - expected.x) < 1e-12);
+  assert.ok(Math.abs(actual.y - expected.y) < 1e-12);
+ }
+ for (const degrees of [30, 45]) {
+  const p = snapAngle({ x: .7, y: .8 }, anchor, 1000, 500, degrees);
+  const angle = Math.atan2((p.y - .5) * 500, (p.x - .5) * 1000) * 180 / Math.PI;
+  assert.ok(Math.abs(angle - degrees) < 1e-10);
+ }
+});
+
+test('angle snapping keeps its direction at borders and leaves free drawing untouched', () => {
+ const point = { x: 1, y: .6 }, anchor = { x: .9, y: .5 };
+ const p = snapAngle(point, anchor, 1000, 2000, 45);
+ assert.ok(Math.abs(p.x - 1) < 1e-12);
+ assert.ok(Math.abs((p.x - anchor.x) * 1000 - (p.y - anchor.y) * 2000) < 1e-10);
+ assert.equal(snapAngle(point, anchor, 1000, 2000, 0), point);
+ assert.equal(snapAngle(point, null, 1000, 2000, 45), point);
+ assert.deepEqual(snapAngle(anchor, anchor, 1000, 2000, 45), anchor);
+});
 
 function fixture() {
  const data = emptyDrawing();
