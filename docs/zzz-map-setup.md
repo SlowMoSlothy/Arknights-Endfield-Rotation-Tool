@@ -77,3 +77,7 @@ Der Wechsel von Linie/Fläche zur Hand behält die begonnenen Eckpunkte. Zurück
 ## Knoten hinzufügen und Werkzeug-Symbole
 
 Die obere Werkzeugleiste nutzt Symbole mit Tooltips und zugänglichen Beschriftungen. Pfad oder Fläche auswählen, **Knoten hinzufügen** (Knoten mit Plus) aktivieren und auf die gewünschte Kante klicken. Der neue Knoten kann direkt gezogen werden. Das funktioniert auch auf der schließenden Flächenkante und auf Kurven. Doppelklick im Auswahlwerkzeug bleibt möglich. Klicks unmittelbar neben bestehenden Knoten erzeugen keine Duplikate. Rückgängig und Speichern gelten wie bei anderen Pfadänderungen.
+
+## Vollbildansicht
+
+Das Vollbildsymbol rechts neben **Einpassen** vergrößert Karte und Seitenleiste gemeinsam. Zeichenwerkzeuge und Fundstellen-Dialoge bleiben bedienbar. Erneutes Klicken oder **Escape** verlässt die Ansicht; ein geöffneter Dialog wird zuerst geschlossen. Unterstützt der Browser kein natives Vollbild, füllt die Karte das Browserfenster. Dafür ist keine SQL-Änderung erforderlich.

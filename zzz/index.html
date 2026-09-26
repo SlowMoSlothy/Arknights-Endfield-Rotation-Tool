@@ -4,7 +4,7 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#181d1f">
   <title>ZZZ · Interaktive Karte | RotationForge</title>
-  <link rel="icon" href="/favicon-flat.png"><link rel="stylesheet" href="map.css"><link rel="stylesheet" href="vector-editor.css?v=6">
+  <link rel="icon" href="/favicon-flat.png"><link rel="stylesheet" href="map.css"><link rel="stylesheet" href="vector-editor.css?v=7">
 </head>
 <body>
 <header><a href="/">ROTATION<span>FORGE</span></a><span>ZENLESS ZONE ZERO / KARTEN</span><a href="/endfield/">Zum Planner</a></header>
@@ -74,7 +74,7 @@
         <button data-tool="insert" aria-pressed="false" aria-label="Knoten hinzufügen – Kante anklicken" title="Knoten hinzufügen – Kante anklicken"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 17h7m6 0h7M12 3v8m-4-4h8"/><rect x="9" y="14" width="6" height="6" rx="1"/></svg></button>
         <button id="draw-finish" disabled aria-label="Zeichnung abschließen" title="Abschließen (Enter)"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m4 12 5 5L20 6"/></svg></button><button id="draw-cancel" disabled aria-label="Zeichnung abbrechen" title="Abbrechen (Escape)"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
       </div><p id="draw-help">Wähle ein Gebiet und ein Zeichenwerkzeug.</p></div>
-      <div class="map-controls"><button id="zoom-in" aria-label="Vergrößern">+</button><button id="zoom-out" aria-label="Verkleinern">−</button><button id="fit">Einpassen</button></div>
+      <div class="map-controls"><button id="zoom-in" aria-label="Vergrößern">+</button><button id="zoom-out" aria-label="Verkleinern">−</button><button id="fit">Einpassen</button><button id="fullscreen" aria-label="Vollbild öffnen" title="Vollbild öffnen" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg></button></div>
       <div id="viewport" tabindex="0" aria-label="Interaktive Karte. Mit Pfeiltasten verschieben, mit Plus und Minus zoomen."><div id="world"><img id="background" alt="Kartenhintergrund" draggable="false"><svg id="vector-layer" xmlns="http://www.w3.org/2000/svg" aria-label="Gezeichnete Straßen und Flächen"></svg><div id="markers"></div></div></div>
       <div class="map-footer"><span>Scrollen zum Zoomen · Ziehen zum Verschieben</span><span id="credit"></span></div>
     </div></div>
@@ -84,4 +84,5 @@
 <dialog id="point-dialog"><form id="point-form"><h2 id="point-heading">Ort bearbeiten</h2><fieldset id="point-fields"><label>Titel<input name="title" maxlength="120" required></label><label>Kategorie<select name="category" id="category"></select></label><label>Gebiet<select id="point-area" name="area_id"></select></label><label>Etage<select id="point-floor" name="floor_id"></select></label><p class="muted">Gebiete und Etagen zuerst im Zeicheneditor speichern. Ohne Zuordnung bleibt der Punkt unter allen Fundstellen sichtbar.</p><label>Notizen<textarea name="notes" maxlength="5000" rows="4"></textarea></label><label class="check"><input name="completed" type="checkbox"> Erledigt</label></fieldset><div id="screenshots"></div><label id="upload-label">Screenshots hinzufügen (je max. 10 MB)<input id="uploads" type="file" accept="image/png,image/jpeg,image/webp" multiple></label><div class="actions"><button type="button" data-close>Schließen</button><button type="button" id="delete" class="danger">Löschen</button><button id="save" class="primary">Speichern</button></div><p class="error" role="alert"></p></form></dialog>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/endfield/supabaseClient.js"></script><script type="module" src="map.js?v=6"></script>
+<script type="module" src="fullscreen.js"></script>
 </body></html>
