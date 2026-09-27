@@ -85,7 +85,7 @@ export function createWeaponIndex(rows) {
     mainEntity: { '@type': 'ItemList', itemListElement: rows.map((row, index) => ({ '@type': 'ListItem', position: index + 1, name: row.name, url: SITE + weaponPath(row) })) } };
   const attributes = [...new Set(rows.map(row => row.main_attribute).filter(Boolean))].sort();
   return `<!doctype html><html lang="en"><head>${head('Arknights Endfield Weapons – Stats & Skills | RotationForge', 'Browse Arknights: Endfield weapons by type, rarity and attribute. Compare base ATK, attribute ranks and weapon skills in the RotationForge Weapon Database.', url, schema)}</head>
-<body class="operator-index weapon-index">${siteHeader({ showWeaponLink: false })}<main class="page">${breadcrumbs()}
+<body class="operator-index weapon-index">${siteHeader({ showWeaponLink: false }).replace(/[ \t]+$/gm, '')}<main class="page">${breadcrumbs()}
 <section class="index-hero"><div class="eyebrow">RotationForge Database</div><h1>Arknights: Endfield Weapons</h1><p>Find your next weapon. Compare base ATK, attributes and weapon skills across all nine ranks.</p></section>
 <details class="database-filters" open><summary><span class="filter-show">Show filters</span><span class="filter-hide">Hide filters</span></summary>
 <form class="operator-toolbar weapon-toolbar" aria-label="Filter and sort weapons">
@@ -133,7 +133,7 @@ export function createWeaponPage(row, rows) {
   const related = rows.filter(other => other.weapon_key !== row.weapon_key && other.weapon_type === row.weapon_type).sort((a,b) => Math.abs(a.rarity-row.rarity)-Math.abs(b.rarity-row.rarity) || a.name.localeCompare(b.name, 'en')).slice(0, 4);
   const source = safeUrl(profile?.source_url || row.raw_data?.catalogImport?.source || row.raw_data?.source);
   return `<!doctype html><html lang="en"><head>${head(`${row.name} – Weapon Stats & Skills | RotationForge`, description, url, schema, absoluteImage(row))}</head>
-<body class="operator-index weapon-index weapon-profile">${siteHeader({ showWeaponLink: false })}<main class="page">${breadcrumbs(row)}
+<body class="operator-index weapon-index weapon-profile">${siteHeader({ showWeaponLink: false }).replace(/[ \t]+$/gm, '')}<main class="page">${breadcrumbs(row)}
 <section class="weapon-hero"><div class="weapon-portrait"><span class="weapon-brand-label">ENDFIELD / ARMORY</span><img src="${escape(weaponImage(row))}" alt="${escape(row.name)}" width="360" height="360" fetchpriority="high"><span class="weapon-portrait-caption">${escape(typeName(row))}</span></div>
 <div class="weapon-hero-copy"><div class="eyebrow">Arknights: Endfield Weapon</div>${stars(row)}<h1>${escape(row.name)}</h1><p class="weapon-subtitle">${escape(typeName(row))} <span aria-hidden="true">/</span> ${escape(row.passive_name || 'Weapon skill not recorded')}</p>
 <dl class="weapon-stat-grid"><div><dt>Base ATK · Level ${number(row.base_stats_level)}</dt><dd>${number(row.base_atk)}</dd></div><div><dt>${escape(profile?.primary_label || row.main_attribute || 'Primary attribute')}${primaryRank ? ` · Rank ${primaryRank}` : ''}</dt><dd>${stat(primaryMax, profile?.primary_is_percent)}</dd></div>${profile?.secondary_label ? `<div><dt>${escape(profile.secondary_label)} · Rank ${profile.secondary_values?.length || '—'}</dt><dd>${stat(secondaryMax, profile.secondary_is_percent)}</dd></div>` : ''}</dl>
