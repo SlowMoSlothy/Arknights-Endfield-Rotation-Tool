@@ -268,6 +268,12 @@ Open:
 http://localhost:4173/index.html
 ```
 
+## Weapon Database SEO pages
+
+The public catalog at `/endfield/weapons/` and one static page per weapon are generated from Supabase `weapons` and `weapon_essence_profiles`. Pages include level ATK, attribute progression, all recorded skill ranks, source links, canonical URLs and structured data. The catalog supports search, filters and sorting. Its independent sitemap is `sitemap-weapons.xml`, registered in `robots.txt`.
+
+Run `npm run build:weapons` with `SUPABASE_URL` and `SUPABASE_ANON_KEY` set. The existing **Build Database SEO Pages** GitHub Actions workflow builds operators, enemies and weapons on pushes to main, hourly and on manual dispatch, then requests a GitHub Pages deployment. It uses the existing repository secrets; no new secret is needed. Equipment imports appear in the next SEO build. Empty or failed weapon reads fail the build and preserve the previously generated weapon pages.
+
 ## Roadmap
 
 - More operators and enemy presets.

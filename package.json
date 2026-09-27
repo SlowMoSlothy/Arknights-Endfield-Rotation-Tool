@@ -3,6 +3,7 @@
   "scripts": {
     "sync:equipment": "node tools/sync-endfield-equipment.js",
     "build:operators": "node tools/build-operator-pages.js",
+    "build:weapons": "node tools/build-weapon-pages.js",
     "test": "node --test tests/*.test.js",
     "build:enemies": "node tools/build-enemy-pages.js"
   },

@@ -1124,13 +1124,14 @@ function operatorIndexScript() {
   </script>`;
 }
 
-export function siteHeader({ showOperatorLink = true, showToolCta = true, showEnemyLink = showToolCta } = {}) {
+export function siteHeader({ showOperatorLink = true, showToolCta = true, showEnemyLink = showToolCta, showWeaponLink = showToolCta } = {}) {
   return `<header class="top">
     <nav class="nav">
       <a class="brand" href="${SITE_URL}/"><span class="mark"><img src="${BRAND_ICON_PATH}" alt=""></span><span>RotationForge</span></a>
-      ${showOperatorLink || showToolCta || showEnemyLink ? `<div class="nav-links">
+      ${showOperatorLink || showToolCta || showEnemyLink || showWeaponLink ? `<div class="nav-links">
         ${showOperatorLink ? `<a class="database-nav-link" href="${SITE_URL}${BASE_PATH}/operators/">Operator Database</a>` : ""}
         ${showEnemyLink ? `<a class="database-nav-link" href="${SITE_URL}${BASE_PATH}/enemies/">Enemy Database</a>` : ""}
+        ${showWeaponLink ? `<a class="database-nav-link" href="${SITE_URL}${BASE_PATH}/weapons/">Weapon Database</a>` : ""}
         ${showToolCta ? `<a class="nav-cta" href="${SITE_URL}${BASE_PATH}/">Open Rotation Tool ↗</a>` : ""}
       </div>` : ""}
     </nav>
