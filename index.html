@@ -333,13 +333,10 @@
     }
     .operator-card .game-card-content { padding-top: 180px; }
 
-    .game-card.featured.weapon-card { min-height: 280px; background: radial-gradient(ellipse at 50% 5%, #74431f, #181d1f 75%); }
+    .game-card.featured.weapon-card { min-height: 280px; background: #181d1f; }
     .weapon-card .game-card-content { padding-top: 180px; }
-    .weapon-card-art { position: absolute; inset: 0 0 auto; height: 230px; display: flex; justify-content: center; gap: 0; overflow: hidden; opacity: .9; }
-    .weapon-card-art img { width: 30%; max-width: 220px; height: 220px; object-fit: contain; filter: drop-shadow(0 12px 12px #0009); transform: rotate(-14deg); }
-    .weapon-card-art img:nth-child(2) { transform: rotate(8deg) translateY(-12px); }
-    .weapon-card-art img:nth-child(3) { transform: rotate(20deg); }
-    .weapon-card::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, transparent 18%, #181d1f22 40%, #181d1ff5 76%); }
+    .weapon-card::before { content: ""; position: absolute; inset: 0; background: url("endfield/assets/weapons/database-background-v1.webp") center top / 100% auto no-repeat; }
+    .weapon-card::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, transparent 20%, #181d1f22 40%, #181d1ff5 76%); }
 
     .game-card-content {
       position: relative;
@@ -644,7 +641,6 @@
         </a>
 
         <a class="game-card featured weapon-card" href="endfield/weapons/">
-          <span class="weapon-card-art" aria-hidden="true"><img src="endfield/assets/weapons/forgeborn_scathe.png" alt="" loading="lazy"><img src="endfield/assets/weapons/chivalric_virtues.png" alt="" loading="lazy"><img src="endfield/assets/weapons/white_night_nova.png" alt="" loading="lazy"></span>
           <div class="game-card-content">
             <div class="game-identity"><span class="game-identity-copy"><span class="game-name">Arknights: Endfield</span><h3 class="game-tool-name">Weapon Database</h3></span></div>
             <p>Compare weapon stats, attributes and skills across all nine ranks. Find weapons by type, rarity and attribute.</p>
