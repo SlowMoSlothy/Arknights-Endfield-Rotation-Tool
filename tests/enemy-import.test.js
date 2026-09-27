@@ -1,9 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { parseSource, mapSource, planImport, stableId, buildSql } from '../tools/sync-endfield-enemies.js';
+import os from 'node:os';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { gunzipSync } from 'node:zlib';
+import { refresh } from '../tools/refresh-enemy-source-snapshot.js';
+import { parseSource, mapSource, planImport, stableId, buildSql, loadSource } from '../tools/sync-endfield-enemies.js';
 
 const fixture=JSON.parse(fs.readFileSync(new URL('./fixtures/enemy-import/ram.json',import.meta.url),'utf8'));
+test('runner access denial uses an explicitly dated, checksum-verified capture, not silent fallback for invalid data',async()=>{
+  const loaded=await loadSource(async()=>{const error=new Error('denied');error.status=403;throw error;});
+  assert.equal(loaded.mode,'snapshot-fallback-http-403');assert.ok(Date.parse(loaded.capturedAt));assert.equal(mapSource(loaded.data).length,87);
+  await assert.rejects(loadSource(async()=>{throw new Error('invalid schema');}),/invalid schema/);
+});
 function sourceData() {
   const data={EnemyTemplateDisplayInfoTable:{},EnemyTable:{},EnemyAttributeTemplateTable:{[fixture.enemy.attrTemplateId]:fixture.attrs},EnemyAbilityDescTable:fixture.abilities,DistributionInfoTable:fixture.distributions,AttributeMetaTable:structuredClone(fixture.meta),text:{...fixture.text},images:[]};
   for(let i=0;i<80;i++) {
@@ -14,6 +24,17 @@ function sourceData() {
   }
   return data;
 }
+test('snapshot refresh validates all downloads before saving a usable source bundle',async()=>{
+  const root=fs.mkdtempSync(path.join(os.tmpdir(),'enemy-snapshot-')),outputUrl=pathToFileURL(root+path.sep);
+  try {
+    await assert.rejects(refresh({data:sourceData(),outputUrl,fetcher:async()=>new Response('denied',{status:403})}),/capture failed/);
+    assert.deepEqual(fs.readdirSync(root),[]);
+    await refresh({data:sourceData(),outputUrl,fetcher:async()=>new Response(Buffer.from('RIFF\x04\x00\x00\x00WEBP'))});
+    const manifest=JSON.parse(fs.readFileSync(path.join(root,'enemy-source-snapshot.json'),'utf8'));
+    assert.equal(Object.keys(manifest.images).length,80);
+    assert.equal(mapSource(JSON.parse(gunzipSync(fs.readFileSync(path.join(root,'enemy-source-snapshot.json.gz'))))).length,80);
+  } finally {fs.rmSync(root,{recursive:true,force:true});}
+});
 test('signed localization hashes survive parsing without rounding',()=>{
   assert.equal(parseSource('{"name":{"id":-2427813328797068423,"text":""}}').name.id,'-2427813328797068423');
   assert.equal(parseSource('{"id":12}').id,12);

@@ -2,6 +2,7 @@ import { renderEnemyDossier, renderEnemyResistances } from './enemy-dossier.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { createHash } from 'node:crypto';
 import { baseStyles, siteHeader, createSupabaseClient, profileEngagementMarkup, profileEngagementSummaryMarkup } from './build-operator-pages.js';
 
 const SITE = 'https://rotationforge.gg';
@@ -52,9 +53,24 @@ function hasUploadedAvatar(row) {
 
 export async function fetchAvatarImages(rows, fetcher = fetch) {
     const images = new Map();
+    let sourceDenied = false;
+    const fallback = row => {
+        const key = importedAvatar(row).split('/').at(-1).replace(/\.png$/, '');
+        if (!/^eny_[a-z0-9_]+$/.test(key)) throw new Error('Invalid fallback image identity');
+        const manifest = JSON.parse(fs.readFileSync(new URL('./data/enemy-source-snapshot.json', import.meta.url), 'utf8'));
+        const bytes = fs.readFileSync(new URL(`./data/enemy-source-images/${key}.webp`, import.meta.url));
+        if (createHash('sha256').update(bytes).digest('hex') !== manifest.images?.[key]) throw new Error(`Invalid fallback image checksum: ${row.name}`);
+        return bytes;
+    };
     // Download the current profile images before changing any generated output.
     for (const row of rows.filter(row => row.is_visible === true && avatarSource(row))) {
+        if (sourceDenied && !hasUploadedAvatar(row)) { images.set(row.id, fallback(row)); continue; }
         const response = await fetcher(avatarSource(row), { signal: AbortSignal.timeout(20000), redirect: 'error' });
+        if (response.status === 403 && !hasUploadedAvatar(row)) {
+            sourceDenied = true;
+            console.log('Source image API denied this runner; using checksum-verified snapshot images.');
+            images.set(row.id, fallback(row)); continue;
+        }
         if (!response.ok) throw new Error(`Avatar download failed for ${row.name}: ${response.status}`);
         const chunks = []; let length = 0;
         for await (const chunk of response.body) {

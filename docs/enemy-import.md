@@ -6,6 +6,8 @@ The **Import Enemy Database** GitHub Actions workflow uses the same `SUPABASE_UR
 
 ## Imported data
 
+**GitHub runner limitation:** the API currently returns HTTP 403 to GitHub-hosted runners. On that specific response, the importer uses the dated, checksum-verified `tools/data/enemy-source-snapshot.json.gz` captured from the same public API. The report explicitly records `sourceMode` and `sourceCapturedAt`. Source images have matching checked-in fallback copies and checksums. Other schema/validation errors still fail; a fallback older than already imported source data is rejected. Consequently, the workflow can import the saved catalog automatically, but cannot guarantee fresh upstream updates while access is denied. Run `node tools/refresh-enemy-source-snapshot.js` from a connection accepted by the API, review and commit the updated snapshot and images to refresh that fallback. Existing secrets are sufficient.
+
 - One row per named `eny_` template in `EnemyTemplateDisplayInfoTable`; training-target records are excluded.
 - English name, description, locations and ability notes using the locale dictionaries. Signed 64-bit localization IDs are preserved as strings before parsing to prevent rounded hashes.
 - HP/ATK/Defense for levels 1–100. Top-level HP/Defense use level 90, explicitly labeled on the SEO page. Encounter-specific modifiers and alternate spawn configurations are not applied.

@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
+import { gunzipSync } from 'node:zlib';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import { requestJson, publicConfiguration, checkDatabaseWriteAccess } from './sync-endfield-equipment.js';
@@ -27,7 +28,9 @@ export async function sourceJson(endpoint, fetcher = fetch) {
     const response = await fetcher(url, {signal:AbortSignal.timeout(30000),redirect:'error'});
     if (response.ok) return parseSource(await response.text());
     if (attempt<2 && (response.status===429 || response.status>=500)) continue;
-    throw new Error(`Enemy source failed (${response.status}): ${endpoint}`);
+    const error = new Error(`Enemy source failed (${response.status}): ${endpoint}`);
+    error.status = response.status;
+    throw error;
   }
 }
 export async function fetchSource(get=sourceJson) {
@@ -42,6 +45,17 @@ export async function fetchSource(get=sourceJson) {
   data.images=await get('vfs/Bundle/search/monstericonbig?suffix=.png');
   requireValue(Array.isArray(data.images) && data.images.length, 'Empty image manifest');
   return data;
+}
+export async function loadSource(fetchTables=fetchSource) {
+  try {return {data:await fetchTables(),mode:'live-api',capturedAt:new Date().toISOString()};}
+  catch(error) {
+    if(error.status!==403) throw error;
+    const manifest=JSON.parse(await fs.readFile(path.join(ROOT,'tools/data/enemy-source-snapshot.json'),'utf8'));
+    const bytes=await fs.readFile(path.join(ROOT,'tools/data/enemy-source-snapshot.json.gz'));
+    requireValue(createHash('sha256').update(bytes).digest('hex')===manifest.sha256 && manifest.source===SOURCE,'Invalid fallback snapshot checksum or source');
+    console.log(`API denied this runner (HTTP 403). Using the validated API snapshot captured ${manifest.capturedAt}. This is not a fresh API response.`);
+    return {data:JSON.parse(gunzipSync(bytes).toString('utf8')),mode:'snapshot-fallback-http-403',capturedAt:manifest.capturedAt};
+  }
 }
 function localize(ref,text,required=false) {
   const value=clean(ref?.text || text[String(ref?.id)] || '');
@@ -89,7 +103,7 @@ export function mapSource(data) {
   return rows;
 }
 
-export function planImport(source, existing, keys={}) {
+export function planImport(source, existing, keys={}, capturedAt) {
   const changes=[],protectedRows=[],retained=[],seen=new Set(),usedSlugs=new Set(existing.map(row=>row.combat_details?.catalog_import?.slug || slug(row.name)));
   const nameCounts=new Map(); for(const item of source) nameCounts.set(nameKey(item.row.name),(nameCounts.get(nameKey(item.row.name))||0)+1);
   for(const item of source) {
@@ -113,7 +127,8 @@ export function planImport(source, existing, keys={}) {
     }
     const oldDetails=old?.combat_details||{},details={...oldDetails}; delete details.catalog_import;
     for(const [field,value] of Object.entries(item.row.combat_details)) details[field]=old && !same(oldDetails[field],prior?.snapshot?.combat_details?.[field])?oldDetails[field]:value;
-    details.catalog_import={provider:PROVIDER,source_id:item.sourceId,slug:route,portrait_url:item.image,snapshot:structuredClone(item.row)};next.combat_details=details;
+    const snapshotAt=prior && same(prior.snapshot,item.row) && prior.portrait_url===item.image ? prior.source_snapshot_at : capturedAt;
+    details.catalog_import={provider:PROVIDER,source_id:item.sourceId,slug:route,portrait_url:item.image,...(snapshotAt?{source_snapshot_at:snapshotAt}:{}),snapshot:structuredClone(item.row)};next.combat_details=details;
     if(!old || COLUMNS.some(field=>!same(next[field],old[field]))) changes.push({before:old?structuredClone(old):null,after:structuredClone(next)});
   }
   for(const row of existing) if(!source.some(item=>item.sourceId===row.combat_details?.catalog_import?.source_id)) retained.push(row.id);
@@ -148,13 +163,14 @@ export async function sync({apply=false,output=path.join(ROOT,'.cache/enemy-impo
   const token=env.SUPABASE_ACCESS_TOKEN;
   if(apply) {requireValue(config.ref && token,'--apply requires SUPABASE_ACCESS_TOKEN');await checkDatabaseWriteAccess(config.ref,token);}
   console.log('Reading enemy tables and English localization from the public community API...');
-  const existing=await readExisting(config,token), data=await fetchSource(), source=mapSource(data);
+  const existing=await readExisting(config,token), loaded=await loadSource(), source=mapSource(loaded.data);
+  if(loaded.mode!=='live-api') requireValue(existing.every(row=>!row.combat_details?.catalog_import?.source_snapshot_at || Date.parse(row.combat_details.catalog_import.source_snapshot_at)<=Date.parse(loaded.capturedAt)), 'Fallback snapshot is older than previously imported data; refusing to roll back. Refresh the snapshot from the API.');
   const keys=JSON.parse(await fs.readFile(path.join(ROOT,'tools/data/enemy-source-keys.json'),'utf8'));
-  const plan=planImport(source,existing,keys),query=buildSql(plan);
+  const plan=planImport(source,existing,keys,loaded.capturedAt),query=buildSql(plan);
   await fs.mkdir(output,{recursive:true});
   await fs.writeFile(path.join(output,'catalog.sql'),query);
   await fs.writeFile(path.join(output,'catalog.json'),JSON.stringify(plan.changes.map(c=>c.after),null,2));
-  const report={fetchedAt:new Date().toISOString(),source:SOURCE,project:config.ref,readScope:token?'all rows including drafts':'public rows only; use the Actions preview for a complete comparison',sha256:createHash('sha256').update(query).digest('hex'),sourceCount:plan.sourceCount,added:plan.changes.filter(c=>!c.before).map(c=>c.after.name),changed:plan.changes.filter(c=>c.before).map(c=>c.after.name),protected:plan.protectedRows,retained:plan.retained,missingImages:plan.missingImages};
+  const report={fetchedAt:new Date().toISOString(),source:SOURCE,sourceMode:loaded.mode,sourceCapturedAt:loaded.capturedAt,project:config.ref,readScope:token?'all rows including drafts':'public rows only; use the Actions preview for a complete comparison',sha256:createHash('sha256').update(query).digest('hex'),sourceCount:plan.sourceCount,added:plan.changes.filter(c=>!c.before).map(c=>c.after.name),changed:plan.changes.filter(c=>c.before).map(c=>c.after.name),protected:plan.protectedRows,retained:plan.retained,missingImages:plan.missingImages};
   await fs.writeFile(path.join(output,'report.json'),JSON.stringify(report,null,2));
   console.log(`${plan.sourceCount} source templates; ${report.added.length} new, ${report.changed.length} changed, ${report.protected.length} manually maintained profiles protected.`);
   if(apply && plan.changes.length) {
