@@ -1,10 +1,20 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
-import { buildSql, diffCatalog, fetchWeaponList, formatSetDescription, mapGear, mapGearStat, mapWeapon, readExisting, requestJson } from '../tools/sync-endfield-equipment.js';
+import { buildSql, diffCatalog, fetchWeaponList, formatSetDescription, mapGear, mapGearStat, mapWeapon, readExisting, requestJson, checkDatabaseWriteAccess } from '../tools/sync-endfield-equipment.js';
 
 const weapon = JSON.parse(fs.readFileSync(new URL('./fixtures/equipment-import/weapon.json', import.meta.url)));
 const empty = () => ({ weapons: [], weapon_essence_profiles: [], gear_sets: [], gear_items: [] });
+
+test('write preflight only reads settings and stops on a read-only session', async () => {
+  await assert.rejects(checkDatabaseWriteAccess('example', 'token', async (url, options) => {
+    const body = JSON.parse(options.body);
+    assert.equal(body.read_only, false);
+    assert.match(body.query, /^select /);
+    return [{ transaction_read_only: 'on', default_transaction_read_only: 'off', in_recovery: false, database_size_bytes: 5000000 }];
+  }), /Database session is read-only/);
+  await checkDatabaseWriteAccess('example', 'token', async () => [{ transaction_read_only: 'off', default_transaction_read_only: 'off', in_recovery: false, database_size_bytes: 5000000 }]);
+});
 
 test('database errors expose useful diagnostics but redact the access token', async () => {
   await assert.rejects(requestJson('https://api.supabase.com/v1/projects/example/database/query', {

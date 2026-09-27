@@ -270,10 +270,27 @@ async function publicConfiguration(env) {
   return { url, key };
 }
 
+export async function checkDatabaseWriteAccess(ref, token, get = requestJson) {
+  const result = await get(`https://api.supabase.com/v1/projects/${ref}/database/query`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      query: "select current_setting('transaction_read_only') as transaction_read_only, current_setting('default_transaction_read_only') as default_transaction_read_only, pg_is_in_recovery() as in_recovery, pg_database_size(current_database()) as database_size_bytes",
+      read_only: false
+    })
+  });
+  const mode = result?.[0];
+  requireValue(mode && ['on', 'off'].includes(mode.transaction_read_only), 'Could not verify database write mode');
+  console.log(`Database mode: transaction_read_only=${mode.transaction_read_only}, default_transaction_read_only=${mode.default_transaction_read_only}, recovery=${mode.in_recovery}, database_size_bytes=${mode.database_size_bytes}`);
+  requireValue(mode.transaction_read_only === 'off' && mode.default_transaction_read_only === 'off' && !mode.in_recovery,
+    'Database session is read-only. Check the token Database Read-write permission and the project read-only/storage status; no import was attempted.');
+}
+
 export async function sync({ output = path.join(ROOT, '.cache/equipment-import'), apply = false, env = process.env, get = requestJson } = {}) {
   const config = await publicConfiguration(env);
   const ref = new URL(config.url).hostname.match(/^([a-z0-9]+)\.supabase\.co$/)?.[1];
   if (apply) requireValue(ref && env.SUPABASE_ACCESS_TOKEN, '--apply requires SUPABASE_ACCESS_TOKEN (Supabase Management API personal access token) and a supabase.co project URL');
+  if (apply) await checkDatabaseWriteAccess(ref, env.SUPABASE_ACCESS_TOKEN, get);
   const keysPath = path.join(ROOT, 'tools/data/equipment-source-keys.json');
   let keys;
   try { keys = JSON.parse(await fs.readFile(keysPath, 'utf8')); } catch (error) { if (error.code !== 'ENOENT') throw error; keys = { weapons: {}, gear_items: {}, gear_sets: {} }; }
