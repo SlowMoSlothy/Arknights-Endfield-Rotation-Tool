@@ -16,7 +16,7 @@ const slugify = value => String(value || '').trim().toLowerCase()
     .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 // Public URLs use readable slugs; UUIDs remain the internal database identity.
-export const enemySlug = row => String(row.slug || '').trim() || slugify(row.name) || row.id;
+export const enemySlug = row => String(row.slug || row.combat_details?.catalog_import?.slug || '').trim() || slugify(row.name) || row.id;
 export const enemyPath = row => `${BASE}${enemySlug(row)}/`;
 
 export function validateEnemies(rows) {
@@ -35,8 +35,16 @@ export function validateEnemies(rows) {
 
 export function portrait(row) {
     if (hasUploadedAvatar(row)) return `${enemyPath(row)}avatar.png?v=${row.avatar_url.split('/').at(-1).slice(0, 64)}`;
+    if (importedAvatar(row)) return `${enemyPath(row)}avatar.webp`;
     return '/favicon-flat.png';
 }
+
+function importedAvatar(row) {
+    const url = row.combat_details?.catalog_import?.portrait_url || '';
+    return /^https:\/\/endfield-assets\.fffdan\.com\/vfs\/Bundle\/file\/assets\/beyond\/dynamicassets\/gameplay\/ui\/sprites\/monstericonbig\/eny_[a-z0-9_]+\.png$/.test(url) ? url : '';
+}
+const avatarSource = row => hasUploadedAvatar(row) ? row.avatar_url : importedAvatar(row);
+const avatarFilename = row => hasUploadedAvatar(row) ? 'avatar.png' : 'avatar.webp';
 
 function hasUploadedAvatar(row) {
     return /^https:\/\/ftssllxdkqvmlxhfeqmy\.supabase\.co\/storage\/v1\/object\/public\/enemy-avatars\/[0-9a-f-]{36}\/[0-9a-f]{64}\.png$/.test(row.avatar_url || '');
@@ -45,8 +53,8 @@ function hasUploadedAvatar(row) {
 export async function fetchAvatarImages(rows, fetcher = fetch) {
     const images = new Map();
     // Download the current profile images before changing any generated output.
-    for (const row of rows.filter(row => row.is_visible === true && hasUploadedAvatar(row))) {
-        const response = await fetcher(row.avatar_url, { signal: AbortSignal.timeout(20000), redirect: 'error' });
+    for (const row of rows.filter(row => row.is_visible === true && avatarSource(row))) {
+        const response = await fetcher(avatarSource(row), { signal: AbortSignal.timeout(20000), redirect: 'error' });
         if (!response.ok) throw new Error(`Avatar download failed for ${row.name}: ${response.status}`);
         const chunks = []; let length = 0;
         for await (const chunk of response.body) {
@@ -55,7 +63,10 @@ export async function fetchAvatarImages(rows, fetcher = fetch) {
             chunks.push(chunk);
         }
         const bytes = Buffer.concat(chunks);
-        if (!bytes.subarray(0, 8).equals(Buffer.from([137,80,78,71,13,10,26,10]))) throw new Error(`Invalid avatar PNG: ${row.name}`);
+        const valid = hasUploadedAvatar(row)
+            ? bytes.subarray(0, 8).equals(Buffer.from([137,80,78,71,13,10,26,10]))
+            : bytes.subarray(0,4).toString() === 'RIFF' && bytes.subarray(8,12).toString() === 'WEBP';
+        if (!valid) throw new Error(`Invalid avatar image: ${row.name}`);
         images.set(row.id, bytes);
     }
     return images;
@@ -131,6 +142,7 @@ export function createEnemyPage(row, rows, workInProgress = true) {
   ${renderEnemyResistances(row)}
 </section>
 ${row.category === 'test' ? '<p class="enemy-test-note">This is a synthetic training / test profile used by RotationForge, not a verified game enemy.</p>' : ''}
+${row.combat_details?.catalog_import?.provider === 'endfield-assets' ? `<p class="enemy-test-note">Imported community game-table data. Base HP and Defense are recorded at level ${escape(row.combat_details.base_stats_level || 'unknown')}; encounter modifiers are not included. Ability notes describe the enemy and do not implement simulator actions. <a href="https://endfield-assets.fffdan.com/table/EnemyTemplateDisplayInfoTable/${escape(row.combat_details.catalog_import.source_id)}" rel="noopener noreferrer" target="_blank">Game-table source ↗</a></p>` : ''}
 ${renderEnemyDossier(row, { includeResistances: false })}
 <section id="enemy-related" class="enemy-related"><h2>More enemies</h2><div class="operator-grid">${rows.filter(item => item.id !== row.id).slice(0,6).map(tile).join('')}</div><p><a href="${BASE}">Browse all enemies ↗</a></p></section>
 <footer>RotationForge is an unofficial fan-made tool for Arknights: Endfield.</footer></main>
@@ -142,7 +154,7 @@ ${renderEnemyDossier(row, { includeResistances: false })}
 
 export function createEnemySitemap(rows) {
     return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n<url><loc>${SITE}${BASE}</loc></url>\n${rows.map(row => {
-        const image = hasUploadedAvatar(row) ? `<image:image><image:loc>${SITE}${enemyPath(row)}avatar.png</image:loc></image:image>` : '';
+        const image = avatarSource(row) ? `<image:image><image:loc>${SITE}${enemyPath(row)}${avatarFilename(row)}</image:loc></image:image>` : '';
         const lastmod = row.updated_at && Number.isFinite(Date.parse(row.updated_at)) ? `<lastmod>${new Date(row.updated_at).toISOString()}</lastmod>` : '';
         return `<url><loc>${SITE}${enemyPath(row)}</loc>${image}${lastmod}</url>`;
     }).join('\n')}\n</urlset>\n`;
@@ -181,9 +193,9 @@ export function writeEnemyOutput(rows, { outputDir = path.resolve('endfield/enem
             const slug = enemySlug(row);
             fs.mkdirSync(path.join(temp, slug));
             fs.writeFileSync(path.join(temp, slug, 'index.html'), createEnemyPage(row, rows, workInProgress));
-            if (hasUploadedAvatar(row)) {
+            if (avatarSource(row)) {
                 if (!avatarImages.has(row.id)) throw new Error(`Missing avatar copy: ${row.name}`);
-                fs.writeFileSync(path.join(temp, slug, 'avatar.png'), avatarImages.get(row.id));
+                fs.writeFileSync(path.join(temp, slug, avatarFilename(row)), avatarImages.get(row.id));
             }
         }
         fs.writeFileSync(temporaryMap, createEnemySitemap(rows));

@@ -8,6 +8,22 @@ import { baseStyles } from '../tools/build-operator-pages.js';
 
 const enemy = { id: '10000000-0000-4000-8000-000000000001', name: 'Training Dummy', category: 'test', description: 'Synthetic target.', hp: null, defense: 0, location: '', resistances: { heat: 0.5 }, skills: [{ name: 'Hit', description: 'A test attack.' }], is_visible: true, updated_at: '2026-09-15T10:00:00Z' };
 
+test('imported portraits use validated WebP copies and stable source routes; uploads take precedence', async () => {
+    const source = 'https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/monstericonbig/eny_0021_agmelee.png';
+    const imported = {...enemy, combat_details:{base_stats_level:90,catalog_import:{provider:'endfield-assets',source_id:'eny_0021_agmelee',slug:'ram-alpha',portrait_url:source}}};
+    assert.equal(enemyPath(imported),'/endfield/enemies/ram-alpha/');
+    assert.equal(portrait(imported),'/endfield/enemies/ram-alpha/avatar.webp');
+    assert.match(createEnemyPage(imported,[imported]),/recorded at level 90/);
+    assert.match(createEnemySitemap([imported]),/ram-alpha\/avatar.webp/);
+    const bytes=Buffer.from('RIFF\x04\x00\x00\x00WEBP');
+    const images=await fetchAvatarImages([imported],async url=>{assert.equal(url,source);return new Response(bytes);});
+    assert.deepEqual(images.get(imported.id),bytes);
+    await assert.rejects(fetchAvatarImages([imported],async()=>new Response('<html>not an image</html>')),/Invalid avatar/);
+    const upload=`https://ftssllxdkqvmlxhfeqmy.supabase.co/storage/v1/object/public/enemy-avatars/${enemy.id}/${'a'.repeat(64)}.png`;
+    assert.match(portrait({...imported,avatar_url:upload}),/avatar.png/);
+    assert.equal(portrait({...imported,combat_details:{catalog_import:{portrait_url:'https://untrusted.example/asset.png'}}}),'/favicon-flat.png');
+});
+
 test('uploaded avatars appear on cards, profiles and share metadata with a safe fallback', () => {
     const url = `https://ftssllxdkqvmlxhfeqmy.supabase.co/storage/v1/object/public/enemy-avatars/${enemy.id}/${'a'.repeat(64)}.png`;
     const custom = { ...enemy, avatar_url: url };

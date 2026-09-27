@@ -261,7 +261,7 @@ export async function readExisting(url, key, get = requestJson) {
   return result;
 }
 
-async function publicConfiguration(env) {
+export async function publicConfiguration(env) {
   if (env.SUPABASE_URL || env.SUPABASE_ANON_KEY) {
     requireValue(env.SUPABASE_URL && env.SUPABASE_ANON_KEY, 'Set both SUPABASE_URL and SUPABASE_ANON_KEY');
     return { url: env.SUPABASE_URL.replace(/\/$/, ''), key: env.SUPABASE_ANON_KEY };
