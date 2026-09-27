@@ -307,7 +307,7 @@ export async function sync({ output = path.join(ROOT, '.cache/equipment-import')
   for (const [table, row] of Object.entries(report)) console.log(`${table}: ${row.count} source rows, ${row.added.length} new, ${row.changed.length} changed, ${row.retained.length} retained`);
   console.log(`Prepared SQL and report: ${output}`);
   if (apply) {
-    await get(`https://api.supabase.com/v1/projects/${ref}/database/query`, { method: 'POST', headers: { Authorization: `Bearer ${env.SUPABASE_ACCESS_TOKEN}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ query }) });
+    await get(`https://api.supabase.com/v1/projects/${ref}/database/query`, { method: 'POST', headers: { Authorization: `Bearer ${env.SUPABASE_ACCESS_TOKEN}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ query, read_only: false }) });
     const after = diffCatalog(catalog, await readExisting(config.url, config.key, get));
     requireValue(Object.values(after).every(table => table.added.length === 0 && table.changed.length === 0), 'Database write returned successfully but read-back differs; inspect the report before retrying');
     console.log('Applied equipment catalog in one database transaction and verified the saved rows.');
