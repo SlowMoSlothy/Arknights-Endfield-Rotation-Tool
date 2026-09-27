@@ -1,10 +1,20 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
-import { buildSql, diffCatalog, fetchWeaponList, formatSetDescription, mapGear, mapGearStat, mapWeapon, readExisting } from '../tools/sync-endfield-equipment.js';
+import { buildSql, diffCatalog, fetchWeaponList, formatSetDescription, mapGear, mapGearStat, mapWeapon, readExisting, requestJson } from '../tools/sync-endfield-equipment.js';
 
 const weapon = JSON.parse(fs.readFileSync(new URL('./fixtures/equipment-import/weapon.json', import.meta.url)));
 const empty = () => ({ weapons: [], weapon_essence_profiles: [], gear_sets: [], gear_items: [] });
+
+test('database errors expose useful diagnostics but redact the access token', async () => {
+  await assert.rejects(requestJson('https://api.supabase.com/v1/projects/example/database/query', {
+    method: 'POST', headers: { Authorization: 'Bearer secret-example-token' }
+  }, async () => ({ ok: false, status: 400, json: async () => ({ message: 'invalid SQL secret-example-token', extra: 'not included' }) })), error => {
+    assert.match(error.message, /invalid SQL \[redacted\]/);
+    assert.doesNotMatch(error.message, /secret-example-token|not included/);
+    return true;
+  });
+});
 
 test('weapon pagination imports all pages and rejects repeated or missing pages', async () => {
   const urls = [];

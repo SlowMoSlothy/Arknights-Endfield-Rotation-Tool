@@ -41,8 +41,21 @@ export async function requestJson(url, options = {}, fetcher = fetch) {
       await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
       continue;
     }
-    // Never echo a response body: database error bodies can contain credentials/SQL.
-    throw new Error(`Request failed (${response.status}): ${new URL(url).origin}${new URL(url).pathname}`);
+    // Only expose a bounded diagnostic message, never the raw response or headers.
+    let diagnostic = '';
+    if (new URL(url).hostname === 'api.supabase.com') {
+      try {
+        const body = await response.json();
+        if (typeof body.message === 'string') {
+          diagnostic = body.message;
+          for (const value of Object.values(options.headers || {})) {
+            if (String(value).startsWith('Bearer ')) diagnostic = diagnostic.replaceAll(String(value).slice(7), '[redacted]');
+          }
+          diagnostic = ': ' + diagnostic.replace(/\s+/g, ' ').slice(0, 1000);
+        }
+      } catch { /* Non-JSON errors have no safe structured diagnostic. */ }
+    }
+    throw new Error(`Request failed (${response.status}): ${new URL(url).origin}${new URL(url).pathname}${diagnostic}`);
   }
 }
 
