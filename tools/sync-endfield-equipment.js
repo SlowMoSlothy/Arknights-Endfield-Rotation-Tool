@@ -240,7 +240,7 @@ export function buildSql(catalog, report) {
     // Let PostgreSQL convert JSON into the target table's actual column types.
     // Existing deployments store skill_descriptions as either jsonb or text[].
     // Selecting only imported columns also preserves defaults for omitted fields.
-    statements.push(`insert into public.${table} (${fields.join(', ')})\nselect ${fields.join(', ')}\nfrom jsonb_populate_recordset(null::public.${table}, ${sql(JSON.stringify(rows))}::jsonb)\non conflict (${key}) do update set\n${assignments.join(',\n')},\nupdated_at = now();`);
+    statements.push(`insert into public.${table} (${fields.join(', ')})\nselect ${fields.join(', ')}\nfrom jsonb_populate_recordset(null::public.${table}, ${sql(JSON.stringify(rows))}::jsonb)\nwhere true\non conflict (${key}) do update set\n${assignments.join(',\n')},\nupdated_at = now();`);
   }
   statements.push('commit;', '');
   return statements.join('\n\n');
