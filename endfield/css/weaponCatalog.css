@@ -20,11 +20,11 @@
 .weapon-passive-name{color:var(--muted);font-size:.7rem;border-top:1px solid var(--border);padding-top:10px;line-height:1.5;min-height:32px}
 .weapon-profile .breadcrumbs{flex-wrap:wrap;font-size:.8rem}
 .weapon-hero{display:grid;grid-template-columns:340px minmax(0,1fr);gap:40px;align-items:center}
-.weapon-portrait{position:relative;display:grid;place-items:center;min-height:380px;border:1px solid var(--border);border-radius:16px;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,#fc6f0225,transparent 68%),linear-gradient(145deg,#3d4545,#191f21);box-shadow:var(--shadow)}
-.weapon-portrait::after{content:"";position:absolute;bottom:0;left:0;right:0;height:4px;background:var(--accent)}
-.weapon-portrait img{width:90%;height:300px;object-fit:contain;filter:drop-shadow(0 20px 16px #0008)}
-.weapon-brand-label{position:absolute;top:20px;left:24px;color:var(--silver);font-size:.64rem;font-weight:900;letter-spacing:.2em}
-.weapon-portrait-caption{position:absolute;bottom:20px;left:24px;color:var(--accent);font-size:.75rem;letter-spacing:.12em;font-weight:850;text-transform:uppercase}
+.weapon-portrait{min-height:380px;isolation:isolate}
+.weapon-portrait::before,.weapon-portrait::after{z-index:2}
+.weapon-portrait .barcode{z-index:3}
+.weapon-portrait-media{position:absolute;left:50%;top:50%;width:min(calc(100% - 64px),270px);aspect-ratio:1;transform:translate(-50%,-43%);overflow:hidden;border:1px solid rgba(216,224,220,.38);border-radius:13px;background:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.035) 32%,rgba(15,19,20,.58)),radial-gradient(circle at 50% 22%,rgba(252,111,2,.13),transparent 48%),linear-gradient(155deg,rgba(42,50,51,.32),rgba(15,19,20,.64));box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -42px 60px rgba(0,0,0,.22),0 16px 34px rgba(0,0,0,.28)}
+.weapon-portrait-media img{display:block;width:100%;height:100%;object-fit:contain;padding:12px;filter:drop-shadow(0 16px 18px rgba(0,0,0,.42))}
 .weapon-hero-copy{min-width:0}
 .weapon-hero-copy .eyebrow{font-size:.68rem;letter-spacing:.2em;margin-bottom:18px}
 .weapon-hero-copy h1{font-size:clamp(2.1rem,4.4vw,4rem);line-height:1.06;letter-spacing:-.05em;overflow-wrap:anywhere;margin:12px 0 16px}
@@ -73,6 +73,6 @@
 .weapon-related .weapon-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
 .weapon-back{margin-top:24px;font-size:.9rem}
 @media(max-width:1100px){.weapon-index .weapon-toolbar{grid-template-columns:repeat(3,minmax(0,1fr))}.weapon-toolbar .operator-summary{grid-column:span 1}.weapon-toolbar .search-control{grid-column:span 2}.weapon-toolbar .filter-reset{grid-column:span 2}}
-@media(max-width:760px){.weapon-hero{grid-template-columns:1fr;gap:24px}.weapon-portrait{min-height:270px}.weapon-portrait img{height:230px;width:70%}.weapon-hero-copy h1{font-size:2.6rem}.weapon-details-grid{grid-template-columns:1fr;gap:0}.weapon-atk-levels{grid-template-columns:repeat(3,minmax(0,1fr))}.weapon-related .weapon-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.weapon-section{padding:18px}.weapon-index .eyebrow{letter-spacing:.2em}}
+@media(max-width:760px){.weapon-hero{grid-template-columns:1fr;gap:24px}.weapon-portrait{min-height:340px}.weapon-hero-copy h1{font-size:2.6rem}.weapon-details-grid{grid-template-columns:1fr;gap:0}.weapon-atk-levels{grid-template-columns:repeat(3,minmax(0,1fr))}.weapon-related .weapon-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.weapon-section{padding:18px}.weapon-index .eyebrow{letter-spacing:.2em}}
 @media(max-width:480px){.weapon-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.weapon-art{height:150px}.weapon-art img{width:120px;height:120px}.weapon-type{font-size:.55rem;left:10px}.weapon-tile-copy{padding:12px}.weapon-tile h2{font-size:.92rem}.weapon-index .weapon-toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}.weapon-toolbar .operator-summary,.weapon-toolbar .search-control{grid-column:1/-1}.weapon-index .nav-links{gap:8px}.weapon-index .database-nav-link{font-size:.66rem}.weapon-stat-grid{gap:6px}.weapon-stat-grid>div{padding:10px}.weapon-stat-grid dd{font-size:1.35rem}.weapon-stat-grid dt{font-size:.6rem}.weapon-source span{display:block;margin-left:0}.weapon-hero-copy h1{font-size:2.1rem}.weapon-table th,.weapon-table td{padding:10px}.weapon-skill-rank summary{gap:10px}}
 @media(prefers-reduced-motion:reduce){.weapon-tile{transition:none}}

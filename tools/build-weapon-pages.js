@@ -66,7 +66,7 @@ function head(title, description, url, schema, image = SITE + '/favicon-flat.png
 <meta property="og:type" content="website"><meta property="og:url" content="${escape(url)}"><meta property="og:image" content="${escape(image)}">
 <meta name="twitter:card" content="summary"><meta name="twitter:title" content="${escape(title)}"><meta name="twitter:description" content="${escape(description)}"><meta name="twitter:image" content="${escape(image)}">
 <script type="application/ld+json">${json(schema)}</script>
-${baseStyles()}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6"><link rel="stylesheet" href="/endfield/css/weaponCatalog.css?v=1">`;
+${baseStyles()}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6"><link rel="stylesheet" href="/endfield/css/weaponCatalog.css?v=2">`;
 }
 
 function footer() { return '<footer>RotationForge is an unofficial fan-made tool for Arknights: Endfield. Game content belongs to its respective owners.</footer>'; }
@@ -134,7 +134,7 @@ export function createWeaponPage(row, rows) {
   const source = safeUrl(profile?.source_url || row.raw_data?.catalogImport?.source || row.raw_data?.source);
   return `<!doctype html><html lang="en"><head>${head(`${row.name} – Weapon Stats & Skills | RotationForge`, description, url, schema, absoluteImage(row))}</head>
 <body class="operator-index weapon-index weapon-profile">${siteHeader({ showWeaponLink: false }).replace(/[ \t]+$/gm, '')}<main class="page">${breadcrumbs(row)}
-<section class="weapon-hero"><div class="weapon-portrait"><span class="weapon-brand-label">ENDFIELD / ARMORY</span><img src="${escape(weaponImage(row))}" alt="${escape(row.name)}" width="360" height="360" fetchpriority="high"><span class="weapon-portrait-caption">${escape(typeName(row))}</span></div>
+<section class="weapon-hero"><div class="portrait-card weapon-portrait"><div class="weapon-portrait-media"><img src="${escape(weaponImage(row))}" alt="${escape(row.name)}" width="360" height="360" fetchpriority="high"></div><span class="barcode">ROTATIONFORGE DATABASE</span></div>
 <div class="weapon-hero-copy"><div class="eyebrow">Arknights: Endfield Weapon</div>${stars(row)}<h1>${escape(row.name)}</h1><p class="weapon-subtitle">${escape(typeName(row))} <span aria-hidden="true">/</span> ${escape(row.passive_name || 'Weapon skill not recorded')}</p>
 <dl class="weapon-stat-grid"><div><dt>Base ATK · Level ${number(row.base_stats_level)}</dt><dd>${number(row.base_atk)}</dd></div><div><dt>${escape(profile?.primary_label || row.main_attribute || 'Primary attribute')}${primaryRank ? ` · Rank ${primaryRank}` : ''}</dt><dd>${stat(primaryMax, profile?.primary_is_percent)}</dd></div>${profile?.secondary_label ? `<div><dt>${escape(profile.secondary_label)} · Rank ${profile.secondary_values?.length || '—'}</dt><dd>${stat(secondaryMax, profile.secondary_is_percent)}</dd></div>` : ''}</dl>
 <nav class="weapon-section-links" aria-label="Weapon sections"><a href="#weapon-atk">ATK by level</a><a href="#weapon-attributes">Attributes</a><a href="#weapon-skill">Weapon skill</a></nav></div></section>
