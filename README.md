@@ -106,6 +106,12 @@ basicAttack: {
 
 ## Supabase Database
 
+Weapon and Armor catalogs can be imported together with
+`node tools/sync-endfield-equipment.js` (or `npm run sync:equipment`). This prepares
+validated SQL and a change report; `--apply` also writes to Supabase when a
+Management API token is configured. See [equipment import](docs/equipment-import.md)
+for setup, the GitHub Actions workflow and data-source limits.
+
 Supabase setup files live in:
 
 ```text

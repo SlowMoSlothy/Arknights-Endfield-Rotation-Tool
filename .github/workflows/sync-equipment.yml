@@ -1,0 +1,49 @@
+name: Import Weapon and Armor Database
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: Apply the validated catalog to Supabase
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: equipment-catalog-import
+  cancel-in-progress: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Test importer
+        run: node --test tests/equipment-import.test.js
+      - name: Fetch and validate catalogs
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          APPLY_CATALOG: ${{ inputs.apply }}
+        run: |
+          if [ "$APPLY_CATALOG" = "true" ]; then
+            node tools/sync-endfield-equipment.js --apply
+          else
+            node tools/sync-endfield-equipment.js
+          fi
+      - name: Save SQL, report and stable source keys
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: equipment-catalog-import
+          include-hidden-files: true
+          path: |
+            .cache/equipment-import/
+            tools/data/equipment-source-keys.json

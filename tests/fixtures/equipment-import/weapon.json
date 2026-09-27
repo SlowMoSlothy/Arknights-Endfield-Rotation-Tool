@@ -1,0 +1,295 @@
+{
+  "atk_stats": [
+    {
+      "atk": 52,
+      "level": 1
+    },
+    {
+      "atk": 149,
+      "level": 20
+    },
+    {
+      "atk": 252,
+      "level": 40
+    },
+    {
+      "atk": 355,
+      "level": 60
+    },
+    {
+      "atk": 458,
+      "level": 80
+    },
+    {
+      "atk": 510,
+      "level": 90
+    }
+  ],
+  "description": "A weapon equipped by Endfield operators to significantly boost their combat capabilities.",
+  "essence_stats": [
+    {
+      "id": "attr_wisd",
+      "name": "Intellect"
+    },
+    {
+      "id": "attr_atk",
+      "name": "Attack"
+    },
+    {
+      "id": "ult",
+      "name": "Twilight"
+    }
+  ],
+  "images": {
+    "full_url": "https://cdn.vallov.com/weapons/forgeborn-scathe/full.webp",
+    "icon_url": "https://cdn.vallov.com/weapons/forgeborn-scathe/icon.webp",
+    "max_url": null
+  },
+  "internal_name": "wpn_sword_0006",
+  "name": "Forgeborn Scathe",
+  "potentials": [
+    {
+      "description": "Twilight: Blazing Wail improved.",
+      "rank": 5
+    }
+  ],
+  "rarity": 6,
+  "scraped_at": "2026-09-20T07:47:32.241588Z",
+  "skill": {
+    "name": "Twilight: Blazing Wail",
+    "ranks": [
+      {
+        "attributes": [
+          {
+            "label": "Intellect [L]",
+            "value": "Intellect+20"
+          },
+          {
+            "label": "ATK [L]",
+            "value": "ATK+5%"
+          },
+          {
+            "label": "Twilight: Blazing Wail",
+            "value": "Heat DMG Dealt +16% . When the wielder casts an ultimate, the wielder gains Basic Attack DMG Dealt +75% for 20.00s. Effects of the same name cannot stack."
+          }
+        ],
+        "rank": 1
+      },
+      {
+        "attributes": [
+          {
+            "label": "Intellect [L]",
+            "value": "Intellect+36"
+          },
+          {
+            "label": "ATK [L]",
+            "value": "ATK+9%"
+          },
+          {
+            "label": "Twilight: Blazing Wail",
+            "value": "Heat DMG Dealt +19.2% . When the wielder casts an ultimate, the wielder gains Basic Attack DMG Dealt +90% for 20.00s. Effects of the same name cannot stack."
+          }
+        ],
+        "rank": 2
+      },
+      {
+        "attributes": [
+          {
+            "label": "Intellect [L]",
+            "value": "Intellect+52"
+          },
+          {
+            "label": "ATK [L]",
+            "value": "ATK+13%"
+          },
+          {
+            "label": "Twilight: Blazing Wail",
+            "value": "Heat DMG Dealt +22.4% . When the wielder casts an ultimate, the wielder gains Basic Attack DMG Dealt +105% for 20.00s. Effects of the same name cannot stack."
+          }
+        ],
+        "rank": 3
+      },
+      {
+        "attributes": [
+          {
+            "label": "Intellect [L]",
+            "value": "Intellect+68"
+          },
+          {
+            "label": "ATK [L]",
+            "value": "ATK+17%"
+          },
+          {
+            "label": "Twilight: Blazing Wail",
+            "value": "Heat DMG Dealt +25.6% . When the wielder casts an ultimate, the wielder gains Basic Attack DMG Dealt +120% for 20.00s. Effects of the same name cannot stack."
+          }
+        ],
+        "rank": 4
+      },
+      {
+        "attributes": [
+          {
+            "label": "Intellect [L]",
+            "value": "Intellect+84"
+          },
+          {
+            "label": "ATK [L]",
+            "value": "ATK+21%"
+          },
+          {
+            "label": "Twilight: Blazing Wail",
+            "value": "Heat DMG Dealt +28.8% . When the wielder casts an ultimate, the wielder gains Basic Attack DMG Dealt +135% for 20.00s. Effects of the same name cannot stack."
+          }
+        ],
+        "rank": 5
+      },
+      {
+        "attributes": [
+          {
+            "label": "Intellect [L]",
+            "value": "Intellect+100"
+          },
+          {
+            "label": "ATK [L]",
+            "value": "ATK+25%"
+          },
+          {
+            "label": "Twilight: Blazing Wail",
+            "value": "Heat DMG Dealt +32% . When the wielder casts an ultimate, the wielder gains Basic Attack DMG Dealt +150% for 20.00s. Effects of the same name cannot stack."
+          }
+        ],
+        "rank": 6
+      },
+      {
+        "attributes": [
+          {
+            "label": "Intellect [L]",
+            "value": "Intellect+116"
+          },
+          {
+            "label": "ATK [L]",
+            "value": "ATK+29%"
+          },
+          {
+            "label": "Twilight: Blazing Wail",
+            "value": "Heat DMG Dealt +35.2% . When the wielder casts an ultimate, the wielder gains Basic Attack DMG Dealt +165% for 20.00s. Effects of the same name cannot stack."
+          }
+        ],
+        "rank": 7
+      },
+      {
+        "attributes": [
+          {
+            "label": "Intellect [L]",
+            "value": "Intellect+132"
+          },
+          {
+            "label": "ATK [L]",
+            "value": "ATK+33%"
+          },
+          {
+            "label": "Twilight: Blazing Wail",
+            "value": "Heat DMG Dealt +38.4% . When the wielder casts an ultimate, the wielder gains Basic Attack DMG Dealt +180% for 20.00s. Effects of the same name cannot stack."
+          }
+        ],
+        "rank": 8
+      },
+      {
+        "attributes": [
+          {
+            "label": "Intellect [L]",
+            "value": "Intellect+156"
+          },
+          {
+            "label": "ATK [L]",
+            "value": "ATK+39%"
+          },
+          {
+            "label": "Twilight: Blazing Wail",
+            "value": "Heat DMG Dealt +44.8% . When the wielder casts an ultimate, the wielder gains Basic Attack DMG Dealt +210% for 20.00s. Effects of the same name cannot stack."
+          }
+        ],
+        "rank": 9
+      }
+    ]
+  },
+  "slug": "forgeborn-scathe",
+  "source": "Acquisition Center: Arsenal Exchange",
+  "tuning": [
+    {
+      "level_target": 20,
+      "materials": [
+        {
+          "icon_url": "https://cdn.vallov.com/icons/tuning-materials/cast-die.webp",
+          "name": "Cast Die",
+          "qty": 5
+        },
+        {
+          "icon_url": "https://cdn.vallov.com/icons/tuning-materials/kalkonyx.webp",
+          "name": "Kalkonyx",
+          "qty": 3
+        }
+      ],
+      "rank": 1,
+      "t_creds": 2200
+    },
+    {
+      "level_target": 40,
+      "materials": [
+        {
+          "icon_url": "https://cdn.vallov.com/icons/tuning-materials/cast-die.webp",
+          "name": "Cast Die",
+          "qty": 18
+        },
+        {
+          "icon_url": "https://cdn.vallov.com/icons/tuning-materials/auronyx.webp",
+          "name": "Auronyx",
+          "qty": 5
+        }
+      ],
+      "rank": 2,
+      "t_creds": 8500
+    },
+    {
+      "level_target": 60,
+      "materials": [
+        {
+          "icon_url": "https://cdn.vallov.com/icons/tuning-materials/heavy-cast-die.webp",
+          "name": "Heavy Cast Die",
+          "qty": 20
+        },
+        {
+          "icon_url": "https://cdn.vallov.com/icons/tuning-materials/umbronyx.webp",
+          "name": "Umbronyx",
+          "qty": 5
+        }
+      ],
+      "rank": 3,
+      "t_creds": 25000
+    },
+    {
+      "level_target": 80,
+      "materials": [
+        {
+          "icon_url": "https://cdn.vallov.com/icons/tuning-materials/heavy-cast-die.webp",
+          "name": "Heavy Cast Die",
+          "qty": 30
+        },
+        {
+          "icon_url": "https://cdn.vallov.com/icons/tuning-materials/d96-steel-sample-4.webp",
+          "name": "D96 Steel Sample 4",
+          "qty": 16
+        },
+        {
+          "icon_url": "https://cdn.vallov.com/icons/tuning-materials/wulingstone.webp",
+          "name": "Wulingstone",
+          "qty": 8
+        }
+      ],
+      "rank": 4,
+      "t_creds": 90000
+    }
+  ],
+  "type": "Sword",
+  "updated_at": "2026-09-06T07:11:19.663578Z"
+}
