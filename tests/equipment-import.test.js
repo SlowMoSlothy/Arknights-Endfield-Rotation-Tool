@@ -109,6 +109,16 @@ test('duplicate keys abort the import', () => {
   assert.throws(() => diffCatalog(catalog, empty()), /duplicate/);
 });
 
+test('SQL lets the live schema decode descriptions as jsonb or text[] and preserves omitted defaults', () => {
+  const catalog = empty();
+  catalog.weapon_essence_profiles = [{ weapon_key: 'example', primary_values: [20, 36], skill_descriptions: ['ATK +10%', "Wielder's bonus"] }];
+  const query = buildSql(catalog, diffCatalog(catalog, empty()));
+  assert.match(query, /select weapon_key, primary_values, skill_descriptions\nfrom jsonb_populate_recordset\(null::public.weapon_essence_profiles,/);
+  assert.match(query, /"primary_values":\[20,36\]/);
+  assert.match(query, /"skill_descriptions":\["ATK \+10%","Wielder''s bonus"\]/);
+  assert.doesNotMatch(query, /array\[|primary_base_ranks/);
+});
+
 test('database reads paginate instead of silently accepting a capped response', async () => {
   const requests = [];
   const result = await readExisting('https://example.supabase.co', 'public-key', async url => {

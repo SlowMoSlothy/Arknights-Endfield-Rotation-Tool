@@ -237,7 +237,10 @@ export function buildSql(catalog, report) {
     if (!rows.length) continue;
     const fields = Object.keys(rows[0]);
     const assignments = fields.filter(f => f !== key).map(f => `${f} = ${f === 'raw_data' ? `coalesce(public.${table}.raw_data, '{}'::jsonb) || excluded.raw_data` : `excluded.${f}`}`);
-    statements.push(`insert into public.${table} (${fields.join(', ')})\nvalues\n${rows.map(r => '(' + fields.map(f => sql(r[f])).join(', ') + ')').join(',\n')}\non conflict (${key}) do update set\n${assignments.join(',\n')},\nupdated_at = now();`);
+    // Let PostgreSQL convert JSON into the target table's actual column types.
+    // Existing deployments store skill_descriptions as either jsonb or text[].
+    // Selecting only imported columns also preserves defaults for omitted fields.
+    statements.push(`insert into public.${table} (${fields.join(', ')})\nselect ${fields.join(', ')}\nfrom jsonb_populate_recordset(null::public.${table}, ${sql(JSON.stringify(rows))}::jsonb)\non conflict (${key}) do update set\n${assignments.join(',\n')},\nupdated_at = now();`);
   }
   statements.push('commit;', '');
   return statements.join('\n\n');
