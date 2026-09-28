@@ -6,7 +6,15 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { gunzipSync } from 'node:zlib';
 import { refresh } from '../tools/refresh-enemy-source-snapshot.js';
-import { parseSource, mapSource, planImport, stableId, buildSql, loadSource } from '../tools/sync-endfield-enemies.js';
+import { parseSource, mapSource, planImport, stableId, buildSql, loadSource, verifySaved } from '../tools/sync-endfield-enemies.js';
+
+test('write verification tolerates a stale read but rejects persistent missing or changed data',async()=>{
+  const after={id:stableId('verification'),name:'Ram'};
+  let reads=0;
+  await verifySaved([{after}],async()=>++reads===1?[]:[after],async()=>{});
+  assert.equal(reads,2);
+  await assert.rejects(verifySaved([{after}],async()=>[{...after,name:'Changed'}],async()=>{}),/Read-back differs.*name/);
+});
 
 const fixture=JSON.parse(fs.readFileSync(new URL('./fixtures/enemy-import/ram.json',import.meta.url),'utf8'));
 test('runner access denial uses an explicitly dated, checksum-verified capture, not silent fallback for invalid data',async()=>{

@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { gunzipSync } from 'node:zlib';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
@@ -153,9 +153,20 @@ export function buildSql(plan) {
 
 async function readExisting(config,token,get=requestJson) {
   const rows=[];
+  const readId=randomUUID();
   for(let offset=0;;offset+=500) {
-    const batch=token?await get(`https://api.supabase.com/v1/projects/${config.ref}/database/query`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({query:`select * from public.enemies order by id limit 500 offset ${offset}`,read_only:true})}):await get(`${config.url}/rest/v1/enemies?select=*&order=id&limit=500&offset=${offset}`,{headers:{apikey:config.key}});
+    const batch=token?await get(`https://api.supabase.com/v1/projects/${config.ref}/database/query`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({query:`select * from public.enemies order by id limit 500 offset ${offset} /* catalog read ${readId} */`,read_only:true})}):await get(`${config.url}/rest/v1/enemies?select=*&order=id&limit=500&offset=${offset}`,{headers:{apikey:config.key}});
     requireValue(Array.isArray(batch),'Invalid existing enemy response');rows.push(...batch);if(batch.length<500) return rows;
+  }
+}
+export async function verifySaved(changes,read,wait=ms=>new Promise(resolve=>setTimeout(resolve,ms))) {
+  for(let attempt=0;attempt<3;attempt++) {
+    const saved=await read();
+    const mismatches=changes.flatMap(({after})=>{const row=saved.find(r=>r.id===after.id);return COLUMNS.filter(key=>!row || !same(row[key],after[key])).map(key=>`${after.id}:${key}`);});
+    if(!mismatches.length) return;
+    if(attempt===2) throw new Error(`Read-back differs after write (${mismatches.slice(0,5).join(', ')}); inspect the database before retrying`);
+    // Only repeat verification reads, never the write transaction.
+    await wait(1000*(attempt+1));
   }
 }
 export async function sync({apply=false,output=path.join(ROOT,'.cache/enemy-import'),env=process.env}={}) {
@@ -175,8 +186,7 @@ export async function sync({apply=false,output=path.join(ROOT,'.cache/enemy-impo
   console.log(`${plan.sourceCount} source templates; ${report.added.length} new, ${report.changed.length} changed, ${report.protected.length} manually maintained profiles protected.`);
   if(apply && plan.changes.length) {
     await requestJson(`https://api.supabase.com/v1/projects/${config.ref}/database/query`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({query,read_only:false})});
-    const saved=await readExisting(config,token);
-    requireValue(plan.changes.every(({after})=>{const row=saved.find(r=>r.id===after.id);return row && COLUMNS.every(key=>same(row[key],after[key]));}),'Read-back differs after write; inspect the database before retrying');
+    await verifySaved(plan.changes,()=>readExisting(config,token));
     console.log('Applied in one transaction and verified every saved row.');
   }
   return report;
