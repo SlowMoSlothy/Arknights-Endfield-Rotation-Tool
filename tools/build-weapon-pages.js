@@ -66,7 +66,7 @@ function head(title, description, url, schema, image = SITE + '/favicon-flat.png
 <meta property="og:type" content="website"><meta property="og:url" content="${escape(url)}"><meta property="og:image" content="${escape(image)}">
 <meta name="twitter:card" content="summary"><meta name="twitter:title" content="${escape(title)}"><meta name="twitter:description" content="${escape(description)}"><meta name="twitter:image" content="${escape(image)}">
 <script type="application/ld+json">${json(schema)}</script>
-${baseStyles()}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6"><link rel="stylesheet" href="/endfield/css/weaponCatalog.css?v=2">`;
+${baseStyles()}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6"><link rel="stylesheet" href="/endfield/css/weaponCatalog.css?v=5">`;
 }
 
 function footer() { return '<footer>RotationForge is an unofficial fan-made tool for Arknights: Endfield. Game content belongs to its respective owners.</footer>'; }
@@ -108,7 +108,7 @@ function progression(row) {
 
 function atkProgression(row) {
   const values = row.raw_data?.catalogImport?.atkStats;
-  const points = Array.isArray(values) ? values.filter(point => numeric(point.level) && numeric(point.atk)).sort((a,b) => a.level-b.level) : [];
+  const points = Array.isArray(values) ? values.filter(point => numeric(point.level) && point.level >= 1 && point.level <= 90 && numeric(point.atk)).sort((a,b) => a.level-b.level) : [];
   if (!points.length) return '<p class="weapon-missing">Additional level values have not been recorded.</p>';
   return `<div class="weapon-atk-levels">${points.map(point => `<div><span>Level ${number(point.level)}</span><strong>${number(point.atk)}</strong><small>Base ATK</small></div>`).join('')}</div>`;
 }
@@ -134,15 +134,16 @@ export function createWeaponPage(row, rows) {
   const source = safeUrl(profile?.source_url || row.raw_data?.catalogImport?.source || row.raw_data?.source);
   return `<!doctype html><html lang="en"><head>${head(`${row.name} – Weapon Stats & Skills | RotationForge`, description, url, schema, absoluteImage(row))}</head>
 <body class="operator-index weapon-index weapon-profile">${siteHeader({ showWeaponLink: false }).replace(/[ \t]+$/gm, '')}<main class="page">${breadcrumbs(row)}
+<nav class="weapon-section-links" aria-label="Weapon sections"><a href="#weapon-atk">ATK by level</a><a href="#weapon-attributes">Attributes</a><a href="#weapon-skill">Weapon skill</a></nav>
 <section class="weapon-hero"><div class="portrait-card weapon-portrait"><div class="weapon-portrait-media"><img src="${escape(weaponImage(row))}" alt="${escape(row.name)}" width="360" height="360" fetchpriority="high"></div><span class="barcode">ROTATIONFORGE DATABASE</span></div>
 <div class="weapon-hero-copy"><div class="eyebrow">Arknights: Endfield Weapon</div>${stars(row)}<h1>${escape(row.name)}</h1><p class="weapon-subtitle">${escape(typeName(row))} <span aria-hidden="true">/</span> ${escape(row.passive_name || 'Weapon skill not recorded')}</p>
 <dl class="weapon-stat-grid"><div><dt>Base ATK · Level ${number(row.base_stats_level)}</dt><dd>${number(row.base_atk)}</dd></div><div><dt>${escape(profile?.primary_label || row.main_attribute || 'Primary attribute')}${primaryRank ? ` · Rank ${primaryRank}` : ''}</dt><dd>${stat(primaryMax, profile?.primary_is_percent)}</dd></div>${profile?.secondary_label ? `<div><dt>${escape(profile.secondary_label)} · Rank ${profile.secondary_values?.length || '—'}</dt><dd>${stat(secondaryMax, profile.secondary_is_percent)}</dd></div>` : ''}</dl>
-<nav class="weapon-section-links" aria-label="Weapon sections"><a href="#weapon-atk">ATK by level</a><a href="#weapon-attributes">Attributes</a><a href="#weapon-skill">Weapon skill</a></nav></div></section>
+</div></section>
 <section class="weapon-section" id="weapon-atk"><div class="section-kicker">Weapon growth</div><h2>Base ATK by level</h2>${atkProgression(row)}</section>
 <div class="weapon-details-grid"><section class="weapon-section" id="weapon-attributes"><div class="section-kicker">Rank progression</div><h2>Attribute values</h2>${progression(row)}</section>
 <section class="weapon-section" id="weapon-skill"><div class="section-kicker">Weapon skill</div><h2>${escape(profile?.skill_name || row.passive_name || 'Skill descriptions')}</h2><p class="weapon-section-intro">Expand a rank to compare its effect.</p>${skills(row)}</section></div>
 <section class="weapon-source"><h2>About these values</h2><p>Base ATK is shown at the listed weapon level. Attribute and skill ranks are shown separately; they do not include operator stats, gear or temporary combat buffs.</p>${profile?.verified !== true ? '<p>Imported community data. These values have not been marked as verified in-game.</p>' : ''}<p>${source ? `<a href="${escape(source)}" target="_blank" rel="noopener noreferrer">View data source ↗</a>` : 'Source not recorded.'}${dateLabel(row) ? ` <span>Database updated: <time datetime="${dateLabel(row)}">${dateLabel(row)}</time></span>` : ''}</p></section>
-${related.length ? `<section class="weapon-related"><h2>More ${escape(typeName(row))} weapons</h2><div class="weapon-grid">${related.map(tile).join('')}</div></section>` : ''}<p class="weapon-back"><a href="${BASE}">← Browse all weapons</a></p>${footer()}</main></body></html>`;
+${related.length ? `<section class="weapon-related"><h2>More ${escape(typeName(row))} weapons</h2><div class="weapon-grid">${related.map(tile).join('')}</div></section>` : ''}<p class="weapon-back"><a href="${BASE}">← Browse all weapons</a></p>${footer()}</main><script src="/endfield/js/ui/weaponProgression.js?v=1" defer></script><script src="/endfield/js/ui/enemySectionNav.js?v=2" defer></script></body></html>`;
 }
 
 export function createWeaponSitemap(rows) {

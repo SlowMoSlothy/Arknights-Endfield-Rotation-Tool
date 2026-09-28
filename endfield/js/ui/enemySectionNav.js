@@ -1,5 +1,5 @@
 (() => {
-    const nav = document.querySelector('.enemy-section-nav');
+    const nav = document.querySelector('.enemy-section-nav, .weapon-section-links');
     if (!nav) return;
     const header = document.querySelector('.top');
     const entries = [...nav.querySelectorAll('a[href^="#"]')]
