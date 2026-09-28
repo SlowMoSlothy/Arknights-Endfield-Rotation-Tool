@@ -2,6 +2,21 @@
 .enemy-index .enemy-category{display:block;margin-top:10px;font-size:.62rem;font-weight:850;text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
 .enemy-index .tile-avatar{object-fit:contain}
 .enemy-index .tile-body h2{overflow-wrap:anywhere}
+.enemy-index .operator-tile{display:flex;flex-direction:column}
+.enemy-index .operator-tile .tile-body{display:flex;flex-direction:column;flex:1}
+.enemy-index .tile-body .tile-engagement{margin-top:auto;padding-top:10px}
+.enemy-index .tile-body>p:last-of-type{margin-bottom:10px}
+.enemy-level-picker[hidden]{display:none}
+.enemy-level-picker label{display:flex;justify-content:space-between;align-items:center;font-weight:800}
+.enemy-level-picker output{color:var(--accent);font-size:1.5rem;font-variant-numeric:tabular-nums}
+.enemy-level-picker input{display:block;width:100%;margin:12px 0;min-height:44px;accent-color:var(--accent);cursor:pointer}
+.enemy-level-picker input:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:5px}
+.enemy-level-picker p{color:var(--muted);font-size:.8rem;margin:0 0 16px}
+.enemy-level-values{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.enemy-level-values .attribute-card{display:flex;flex-direction:column;align-items:flex-start}
+.enemy-all-levels{margin-top:20px}
+.enemy-all-levels summary{cursor:pointer;color:var(--accent);font-weight:750;padding:10px 0}
+.enemy-all-levels summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .enemy-index .enemy-hero{display:grid;grid-template-columns:160px minmax(0,1fr);gap:28px;align-items:center}
 .enemy-hero>img{width:160px;height:160px;border-radius:12px;object-fit:contain;background:var(--charcoal-2);border:1px solid var(--border)}
 .enemy-profile h1{overflow-wrap:anywhere;line-height:1.1;letter-spacing:-.04em}

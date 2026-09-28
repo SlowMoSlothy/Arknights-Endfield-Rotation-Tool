@@ -97,7 +97,7 @@ function head(title, description, url, schema, image = `${SITE}/favicon-flat.png
 <meta property="og:type" content="website"><meta property="og:url" content="${escape(url)}">
 <meta property="og:image" content="${escape(image)}"><meta name="twitter:card" content="summary">
 <script type="application/ld+json">${json(schema)}</script>
-${baseStyles()}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=4"><link rel="stylesheet" href="/endfield/css/enemyCatalog.css?v=21">`;
+${baseStyles()}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=4"><link rel="stylesheet" href="/endfield/css/enemyCatalog.css?v=22">`;
 }
 
 function tile(row) {
@@ -165,6 +165,7 @@ ${renderEnemyDossier(row, { includeResistances: false })}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/endfield/supabaseClient.js?v=14"></script>
 <script src="/endfield/js/ui/profileEngagement.js?v=2"></script>
+<script src="/endfield/js/ui/enemyLevels.js?v=1" defer></script>
 <script src="/endfield/js/ui/enemySectionNav.js?v=1" defer></script></body></html>`;
 }
 
