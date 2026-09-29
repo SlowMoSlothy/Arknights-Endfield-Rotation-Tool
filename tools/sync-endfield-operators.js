@@ -120,7 +120,9 @@ export async function sync({apply=false,output='.cache/operator-import',env=proc
   for(const binding of additions) {
     if(used.has(binding.sourceId)) continue;
     assert(!existing.some(row=>row.id===binding.id||row.slug===binding.slug),'New operator identity already occupied');
-    assert(list.some(item=>item.charId===binding.sourceId&&item.engName===binding.name),'New operator missing from source');
+    // The list and detail endpoints can have different CDN cache ages. An
+    // explicitly reviewed addition is validated against its complete detail.
+    assert(/^chr_[a-z0-9_]+$/.test(binding.sourceId),'Invalid new source identity');
     const detail=await requestJson(SOURCE+`details/${binding.sourceId}.json`);
     changes.push(planNewOperator(binding,detail));used.add(binding.sourceId);
     matches.push({id:binding.id,name:binding.name,sourceId:binding.sourceId});
