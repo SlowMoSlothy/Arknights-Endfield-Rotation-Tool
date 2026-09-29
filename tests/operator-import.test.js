@@ -1,8 +1,20 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mapLevels,planOperator,buildSql,normalizeRows} from '../tools/sync-endfield-operators.js';
+import {mapLevels,planOperator,planNewOperator,buildSql,normalizeRows} from '../tools/sync-endfield-operators.js';
 import {operatorProgression} from '../tools/operator-progression.js';
 const detail=()=>({charId:'chr_test',attributes:Array.from({length:100},(_,index)=>({breakStage:0,Attribute:{attrs:[{attrType:0,attrValue:index+1},...[1,2,39,40,41,42].map(attrType=>({attrType,attrValue:String(index+attrType+0.25)}))]}}))});
+test('approved catalog additions validate identity and insert with collision protection',()=>{
+ const binding={id:32,sourceId:'chr_test',name:'Test',slug:'test',iconPath:'assets/operators/avatars/Test.png'};
+ const source={...detail(),engName:'Test',slug:'test',profession:2,charTypeId:'Physical',weaponType:1,mainAttrType:39,subAttrType:42,rarity:5};
+ const change=planNewOperator(binding,source);
+ assert.equal(change.before,null);assert.equal(change.after.operator_class,'Defender');
+ assert.equal(change.after.raw_data.dataStatus,'catalog_only');assert.equal(change.after.raw_data.operatorCatalogImport.levels.length,90);
+ const saved=change.after,second=planOperator(saved,source);assert.deepEqual(second.before,second.after);
+ const sql=buildSql([change]);assert.match(sql,/where id=32 or slug='test'/);assert.match(sql,/insert into public.operators/);assert.doesNotMatch(sql,/on conflict|delete |operator_skills/i);
+ assert.throws(()=>planNewOperator(binding,{...source,charId:'wrong'}),/identity mismatch/);
+ assert.throws(()=>planNewOperator(binding,{...source,profession:999}),/classification/);
+ assert.throws(()=>buildSql([{...change,id:'32;drop'}]),/Invalid/);
+});
 test('Management numeric strings normalize without changing raw data, names or missing values',()=>{
  assert.deepEqual(normalizeRows([{name:'123',base_strength:'121',base_agility_level_1:'9.6',base_hp:null,raw_data:{id:'123'},_import_version:'abc'}]),[{name:'123',base_strength:121,base_agility_level_1:9.6,base_hp:null,raw_data:{id:'123'},_import_version:'abc'}]);
 });

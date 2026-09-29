@@ -1356,6 +1356,7 @@ export function createOperatorPage(
       <div class="operator-share-list" data-share-results-list></div>
     </section>
 
+    ${operator.raw_data?.dataStatus === 'catalog_only' ? '<p class="operator-level-source">Catalog profile: base attributes are available. Skills and rotation mechanics have not been implemented yet.</p>' : ''}
     <section class="panel profile-section overview-section" id="rotation-profile">
       <div class="profile-heading">
         <h2>${escapeHtml(name)} Rotation Overview</h2>

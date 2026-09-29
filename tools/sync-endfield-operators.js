@@ -11,6 +11,19 @@ const ALIASES = {endministrator:'chr_0002_endminm',zhuang:'chr_0030_zhuangfy',mi
 const assert = (condition,message) => {if(!condition) throw new Error(message);};
 const key = value => String(value).toLowerCase().replace(/[^a-z0-9]/g,'');
 const camel = name => name.replace(/_([a-z0-9])/g,(_,letter)=>letter.toUpperCase());
+export function planNewOperator(binding,detail) {
+  assert(detail.charId===binding.sourceId&&detail.engName===binding.name&&detail.slug===binding.slug,'New operator identity mismatch');
+  const classes={0:'Guard',1:'Striker',2:'Defender',4:'Supporter',5:'Caster',7:'Vanguard',8:'Striker'};
+  const elements={Physical:'physical',Fire:'heat',Ice:'cryo',Pulse:'electric',Natural:'nature'};
+  const weapons={1:'sword',2:'arts_unit',3:'great_sword',4:'polearm',5:'handcannon'};
+  const attributes={39:'Strength',40:'Agility',41:'Intellect',42:'Will'};
+  assert(classes[detail.profession]&&elements[detail.charTypeId]&&weapons[detail.weaponType]&&attributes[detail.mainAttrType]&&attributes[detail.subAttrType],'Unknown operator classification');
+  assert(Number.isInteger(detail.rarity)&&detail.rarity>=1&&detail.rarity<=6,'Invalid rarity');
+  assert(/^[a-z0-9_]+$/.test(binding.slug)&&/^assets\/operators\/avatars\/[A-Za-z0-9_]+\.png$/.test(binding.iconPath),'Invalid catalog path');
+  const row={id:binding.id,game:'arknights_endfield',slug:binding.slug,name:binding.name,star:detail.rarity,operator_class:classes[detail.profession],element_type:elements[detail.charTypeId],weapon_type:weapons[detail.weaponType],main_attribute:attributes[detail.mainAttrType],secondary_attribute:attributes[detail.subAttrType],icon_path:binding.iconPath,can_enter_ultimate_state:false,is_visible:true,sort_order:binding.id,
+    raw_data:{id:binding.id,name:binding.name,icon:binding.iconPath,star:detail.rarity,operatorClass:classes[detail.profession],elementType:elements[detail.charTypeId],weaponType:weapons[detail.weaponType],mainAttribute:attributes[detail.mainAttrType],secondaryAttribute:attributes[detail.subAttrType],dataStatus:'catalog_only',sourceNote:'API catalog and base attributes imported. Skills and rotation mechanics have not been implemented.'}};
+  return {id:row.id,name:row.name,before:null,after:{...row,...planOperator(row,detail).after}};
+}
 export function mapLevels(detail) {
   assert(Array.isArray(detail.attributes),'Missing operator attributes');
   const levels = new Map();
@@ -62,6 +75,13 @@ export function buildSql(changes) {
   return ['begin;','set local standard_conforming_strings=on;','lock table public.operators in share row exclusive mode;',...changes.flatMap(change=>{
     assert(Number.isSafeInteger(change.id)&&change.id>0,'Invalid operator id');
     const fields=Object.keys(change.after);
+    if(change.before===null) {
+      const allowed=new Set(['id','game','slug','name','star','operator_class','element_type','weapon_type','main_attribute','secondary_attribute','icon_path','can_enter_ultimate_state','is_visible','sort_order','raw_data']);
+      assert(fields.every(field=>allowed.has(field)||/^base_(stats_level|(?:hp|atk|strength|agility|intellect|will)(?:_level_1)?)$/.test(field)),'Unexpected insert field');
+      assert(/^[a-z0-9_]+$/.test(change.after.slug),'Invalid insert slug');
+      return [`select 1 / case when not exists(select 1 from public.operators where id=${change.id} or slug='${change.after.slug}') then 1 else 0 end as new_operator_guard;`,
+        `insert into public.operators (${fields.join(',')}) select ${fields.join(',')} from jsonb_populate_record(null::public.operators,${literal(change.after)});`];
+    }
     assert(fields.every(field=>/^base_(stats_level|(?:hp|atk|strength|agility|intellect|will)(?:_level_1)?)$/.test(field)||field==='raw_data'),'Unexpected update field');
     assert(change.version===undefined||/^[a-f0-9]{32}$/.test(change.version),'Invalid row version');
     const guard=change.version?`md5(to_jsonb(o)::text)='${change.version}'`:`to_jsonb(o) @> ${literal(change.before)}`;
@@ -96,11 +116,20 @@ export async function sync({apply=false,output='.cache/operator-import',env=proc
     const change=planOperator(row,detail);if(!isDeepStrictEqual(change.before,change.after)) changes.push(change);
     matches.push({id:row.id,name:row.name,sourceId:item.charId});
   }
-  const query=buildSql(changes),report={source:SOURCE,fetchedAt:new Date().toISOString(),project:config.ref,readScope:token?'all operators including drafts':'public operators',matched:matches,changed:changes.map(c=>({name:c.name,stats:Object.keys(c.after).filter(k=>k!=='raw_data'&&!isDeepStrictEqual(c.before[k],c.after[k])).map(k=>({field:k,before:c.before[k],after:c.after[k]}))})),unmatchedSource:list.filter(item=>!used.has(item.charId)).map(item=>({id:item.charId,name:item.engName}))};
+  const additions=JSON.parse(await fs.readFile(new URL('./data/operator-source-additions.json',import.meta.url),'utf8'));
+  for(const binding of additions) {
+    if(used.has(binding.sourceId)) continue;
+    assert(!existing.some(row=>row.id===binding.id||row.slug===binding.slug),'New operator identity already occupied');
+    assert(list.some(item=>item.charId===binding.sourceId&&item.engName===binding.name),'New operator missing from source');
+    const detail=await requestJson(SOURCE+`details/${binding.sourceId}.json`);
+    changes.push(planNewOperator(binding,detail));used.add(binding.sourceId);
+    matches.push({id:binding.id,name:binding.name,sourceId:binding.sourceId});
+  }
+  const query=buildSql(changes),report={source:SOURCE,fetchedAt:new Date().toISOString(),project:config.ref,readScope:token?'all operators including drafts':'public operators',matched:matches,added:changes.filter(c=>!c.before).map(c=>c.name),changed:changes.map(c=>({name:c.name,stats:Object.keys(c.after).filter(k=>k!=='raw_data'&&!isDeepStrictEqual(c.before?.[k],c.after[k])).map(k=>({field:k,before:c.before?.[k],after:c.after[k]}))})),unmatchedSource:list.filter(item=>!used.has(item.charId)).map(item=>({id:item.charId,name:item.engName}))};
   await fs.mkdir(output,{recursive:true});await fs.writeFile(path.join(output,'catalog.sql'),query);await fs.writeFile(path.join(output,'report.json'),JSON.stringify(report,null,2));
   console.log(`${matches.length} operators matched; ${changes.length} updates. Skills and simulation mechanics are outside this importer.`);
   if(apply&&changes.length) {
-    assert(changes.every(change=>change.version),'Missing database row versions');
+    assert(changes.every(change=>change.before===null||change.version),'Missing database row versions');
     await requestJson(`https://api.supabase.com/v1/projects/${config.ref}/database/query`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({query,read_only:false})});
     for(let attempt=0;attempt<3;attempt++) {
       const saved=await readRows(config,token);
