@@ -54,7 +54,8 @@ export function planOperator(row,detail) {
   raw.baseStatsMissing=false;
   raw.operatorCatalogImport={sourceId:detail.charId,source,levels,stats,rawStats:Object.fromEntries(Object.keys(stats).map(field=>[camel(field),after[field]]))};
   after.raw_data=raw;
-  return {id:row.id,name:row.name,before:Object.fromEntries(Object.keys(after).map(field=>[field,row[field]])),after};
+  const rawPatch=Object.fromEntries(Object.entries(raw).filter(([field,value])=>!isDeepStrictEqual(value,row.raw_data?.[field])));
+  return {id:row.id,name:row.name,version:row._import_version,rawPatch,before:Object.fromEntries(Object.keys(after).map(field=>[field,row[field]])),after};
 }
 const literal=value=>`'${JSON.stringify(value).replaceAll("'","''")}'::jsonb`;
 export function buildSql(changes) {
@@ -62,12 +63,14 @@ export function buildSql(changes) {
     assert(Number.isSafeInteger(change.id)&&change.id>0,'Invalid operator id');
     const fields=Object.keys(change.after);
     assert(fields.every(field=>/^base_(stats_level|(?:hp|atk|strength|agility|intellect|will)(?:_level_1)?)$/.test(field)||field==='raw_data'),'Unexpected update field');
-    return [`select 1 / case when exists(select 1 from public.operators o where id=${change.id} and to_jsonb(o) @> ${literal(change.before)}) then 1 else 0 end as unchanged_operator_guard;`,
-      `update public.operators o set ${fields.map(field=>`${field}=v.${field}`).join(',')} from jsonb_populate_record(null::public.operators,${literal(change.after)}) v where o.id=${change.id};`];
+    assert(change.version===undefined||/^[a-f0-9]{32}$/.test(change.version),'Invalid row version');
+    const guard=change.version?`md5(to_jsonb(o)::text)='${change.version}'`:`to_jsonb(o) @> ${literal(change.before)}`;
+    return [`select 1 / case when exists(select 1 from public.operators o where id=${change.id} and ${guard}) then 1 else 0 end as unchanged_operator_guard;`,
+      `update public.operators o set ${fields.map(field=>field==='raw_data'?`raw_data=coalesce(o.raw_data,'{}'::jsonb) || ${literal(change.rawPatch)}`:`${field}=v.${field}`).join(',')} from jsonb_populate_record(null::public.operators,${literal(change.after)}) v where o.id=${change.id};`];
   }),'commit;'].join('\n');
 }
 async function readRows(config,token) {
-  if(token) return requestJson(`https://api.supabase.com/v1/projects/${config.ref}/database/query`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({query:`select * from public.operators where game='arknights_endfield' order by id /* ${randomUUID()} */`,read_only:true})});
+  if(token) return requestJson(`https://api.supabase.com/v1/projects/${config.ref}/database/query`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({query:`select o.*,md5(to_jsonb(o)::text) as _import_version from public.operators o where game='arknights_endfield' order by id /* ${randomUUID()} */`,read_only:true})});
   return requestJson(`${config.url}/rest/v1/operators?select=*&game=eq.arknights_endfield&order=id`,{headers:{apikey:config.key}});
 }
 export async function sync({apply=false,output='.cache/operator-import',env=process.env}={}) {
@@ -90,6 +93,7 @@ export async function sync({apply=false,output='.cache/operator-import',env=proc
   await fs.mkdir(output,{recursive:true});await fs.writeFile(path.join(output,'catalog.sql'),query);await fs.writeFile(path.join(output,'report.json'),JSON.stringify(report,null,2));
   console.log(`${matches.length} operators matched; ${changes.length} updates. Skills and simulation mechanics are outside this importer.`);
   if(apply&&changes.length) {
+    assert(changes.every(change=>change.version),'Missing database row versions');
     await requestJson(`https://api.supabase.com/v1/projects/${config.ref}/database/query`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({query,read_only:false})});
     for(let attempt=0;attempt<3;attempt++) {
       const saved=await readRows(config,token);

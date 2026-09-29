@@ -19,6 +19,8 @@ test('stat updates preserve mechanics, are idempotent, and respect later manual 
  saved.base_atk=777;saved.raw_data.baseAtk=778;
  assert.equal(planOperator(saved,source).after.base_atk,777);assert.equal(planOperator(saved,source).after.raw_data.baseAtk,778);
  const sql=buildSql([change]);assert.match(sql,/lock table public.operators/);assert.match(sql,/to_jsonb\(o\) @>/);assert.doesNotMatch(sql,/operator_skills|delete |insert /i);
+ assert.equal(change.rawPatch.basicAttack,undefined);assert.equal(change.rawPatch.altSkills,undefined);
+ const versioned=buildSql([{...change,version:'a'.repeat(32)}]);assert.match(versioned,/md5\(to_jsonb\(o\)::text\)/);assert.match(versioned,/raw_data=coalesce\(o.raw_data/);
  assert.throws(()=>buildSql([{...change,id:'1;drop'}]),/Invalid/);
 });
 test('operator slider retains crawlable levels, excludes 91–100, and safely falls back without imported data',()=>{
