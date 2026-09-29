@@ -69,9 +69,16 @@ export function buildSql(changes) {
       `update public.operators o set ${fields.map(field=>field==='raw_data'?`raw_data=coalesce(o.raw_data,'{}'::jsonb) || ${literal(change.rawPatch)}`:`${field}=v.${field}`).join(',')} from jsonb_populate_record(null::public.operators,${literal(change.after)}) v where o.id=${change.id};`];
   }),'commit;'].join('\n');
 }
+export function normalizeRows(rows) {
+  assert(Array.isArray(rows),'Invalid operator response');
+  return rows.map(row=>Object.fromEntries(Object.entries(row).map(([field,value])=>[field,
+    /^base_(stats_level|(?:hp|atk|strength|agility|intellect|will)(?:_level_1)?)$/.test(field)&&typeof value==='string'&&value.trim()!==''&&Number.isFinite(Number(value))?Number(value):value])));
+}
 async function readRows(config,token) {
-  if(token) return requestJson(`https://api.supabase.com/v1/projects/${config.ref}/database/query`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({query:`select o.*,md5(to_jsonb(o)::text) as _import_version from public.operators o where game='arknights_endfield' order by id /* ${randomUUID()} */`,read_only:true})});
-  return requestJson(`${config.url}/rest/v1/operators?select=*&game=eq.arknights_endfield&order=id`,{headers:{apikey:config.key}});
+  const rows=token?await requestJson(`https://api.supabase.com/v1/projects/${config.ref}/database/query`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({query:`select o.*,md5(to_jsonb(o)::text) as _import_version from public.operators o where game='arknights_endfield' order by id /* ${randomUUID()} */`,read_only:true})}):
+    await requestJson(`${config.url}/rest/v1/operators?select=*&game=eq.arknights_endfield&order=id`,{headers:{apikey:config.key}});
+  // Management SQL serializes PostgreSQL numeric columns as strings; REST uses numbers.
+  return normalizeRows(rows);
 }
 export async function sync({apply=false,output='.cache/operator-import',env=process.env}={}) {
   const config=await publicConfiguration(env);config.ref=new URL(config.url).hostname.split('.')[0];

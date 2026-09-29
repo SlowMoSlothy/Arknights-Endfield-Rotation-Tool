@@ -1,8 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mapLevels,planOperator,buildSql} from '../tools/sync-endfield-operators.js';
+import {mapLevels,planOperator,buildSql,normalizeRows} from '../tools/sync-endfield-operators.js';
 import {operatorProgression} from '../tools/operator-progression.js';
 const detail=()=>({charId:'chr_test',attributes:Array.from({length:100},(_,index)=>({breakStage:0,Attribute:{attrs:[{attrType:0,attrValue:index+1},...[1,2,39,40,41,42].map(attrType=>({attrType,attrValue:String(index+attrType+0.25)}))]}}))});
+test('Management numeric strings normalize without changing raw data, names or missing values',()=>{
+ assert.deepEqual(normalizeRows([{name:'123',base_strength:'121',base_agility_level_1:'9.6',base_hp:null,raw_data:{id:'123'},_import_version:'abc'}]),[{name:'123',base_strength:121,base_agility_level_1:9.6,base_hp:null,raw_data:{id:'123'},_import_version:'abc'}]);
+});
 test('imports complete 1–90 levels and rejects missing, invalid or conflicting breakthrough data',()=>{
  const source=detail();source.attributes.push(structuredClone(source.attributes[19]));
  assert.equal(mapLevels(source).length,90);source.attributes.at(-1).Attribute.attrs[1].attrValue=999;
