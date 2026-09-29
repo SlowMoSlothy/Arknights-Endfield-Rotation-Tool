@@ -109,6 +109,8 @@ export async function sync({apply=false,output='.cache/operator-import',env=proc
   const changes=[],matches=[],used=new Set();
   for(const row of existing) {
     const candidates=list.filter(item=>ALIASES[row.slug]?item.charId===ALIASES[row.slug]:key(item.engName)===key(row.name));
+    // Preserve the verified binding when a CDN serves an older summary list.
+    if(!candidates.length&&row.raw_data?.operatorCatalogImport?.sourceId) candidates.push({charId:row.raw_data.operatorCatalogImport.sourceId,engName:row.name});
     assert(candidates.length===1,`Cannot unambiguously match ${row.name}`);
     const item=candidates[0];assert(/^chr_[a-z0-9_]+$/.test(item.charId)&&!used.has(item.charId),'Invalid or duplicate source identity');used.add(item.charId);
     const detail=await requestJson(SOURCE+`details/${item.charId}.json`);
