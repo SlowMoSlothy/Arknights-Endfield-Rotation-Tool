@@ -1,10 +1,11 @@
 (() => {
-    const nav = document.querySelector('.enemy-section-nav, .weapon-section-links');
+    const nav = document.querySelector('.enemy-section-nav, .weapon-section-links, .operator-page .section-nav');
     if (!nav) return;
     const header = document.querySelector('.top');
     const entries = [...nav.querySelectorAll('a[href^="#"]')]
         .map(link => ({ link, section: document.getElementById(link.hash.slice(1)) }))
-        .filter(entry => entry.section);
+        .filter(entry => entry.section)
+        .sort((a,b) => a.section.compareDocumentPosition(b.section) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1);
     let pending = false;
     function update() {
         pending = false;

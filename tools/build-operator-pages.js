@@ -1,3 +1,4 @@
+import { operatorProgression } from './operator-progression.js';
 import { createClient } from "@supabase/supabase-js";
 import { createHash } from "node:crypto";
 import fs from "fs";
@@ -1302,6 +1303,7 @@ export function createOperatorPage(
   ${baseStyles()}
   <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6">
   ${attributeVariantStyles()}
+  <link rel="stylesheet" href="/endfield/css/operatorProgression.css?v=1">
 </head>
 <body class="operator-page">
   ${siteHeader({ showOperatorLink: false, showToolCta: false })}
@@ -1372,7 +1374,7 @@ export function createOperatorPage(
           <h2>${escapeHtml(name)} Attributes</h2>
           <span class="attribute-level">Values shown at Level ${escapeHtml(numberValue(operator.base_stats_level))}</span>
         </div>
-        <div class="stats-grid attribute-stats">${attributeStatsHtml}</div>
+        ${operatorProgression(operator, attributeStatsHtml)}
       </article>
 
       <article class="panel about">
@@ -1405,6 +1407,8 @@ export function createOperatorPage(
   <script src="/endfield/js/ui/operatorBatkExport.js?v=13"></script>
   ${attributeVariantScript(defaultSkillVariant, operator.id)}
   ${operatorHeadingScript()}
+  <script src="/endfield/js/ui/operatorLevels.js?v=1" defer></script>
+  <script src="/endfield/js/ui/enemySectionNav.js?v=3" defer></script>
 </body>
 </html>`;
 }

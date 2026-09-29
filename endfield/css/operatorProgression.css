@@ -1,0 +1,19 @@
+.operator-page .section-nav{position:sticky;top:var(--enemy-header-height,80px);z-index:20;flex-wrap:wrap;gap:8px;margin:18px 0 24px;padding:12px;background:#1d2628;border:1px solid var(--border);border-radius:10px;overflow:visible}
+.operator-page .section-nav a{padding:9px 17px;font-size:.8rem}
+.operator-page .section-nav a[aria-current="location"]{background:#a74700;border-color:var(--accent);color:var(--text)}
+.operator-page #rotation-profile,.operator-page #batk,.operator-page #stats,.operator-page #skills,.operator-page #related{scroll-margin-top:var(--enemy-section-offset,150px)}
+.operator-level-picker[hidden]{display:none}
+.operator-level-picker label{display:flex;align-items:center;justify-content:space-between;font-weight:800}
+.operator-level-picker output{font-size:1.5rem;color:var(--accent);font-variant-numeric:tabular-nums}
+.operator-level-picker input{display:block;width:100%;min-height:44px;margin:12px 0;accent-color:var(--accent);cursor:pointer}
+.operator-level-picker input:focus-visible,.operator-all-levels summary:focus-visible,.operator-level-table-wrap:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.operator-level-picker p,.operator-level-source{font-size:.8rem;line-height:1.6;color:var(--silver)}
+.operator-level-source a{color:var(--accent)}
+.operator-all-levels{margin-top:20px}
+.operator-all-levels summary{padding:10px 0;color:var(--accent);font-weight:750;cursor:pointer}
+.operator-level-table-wrap{overflow-x:auto}
+.operator-level-table{width:100%;border-collapse:collapse;font-size:.8rem;font-variant-numeric:tabular-nums}
+.operator-level-table th,.operator-level-table td{padding:12px 10px;border-bottom:1px solid var(--border);text-align:right;white-space:nowrap}
+.operator-level-table th{color:#ffad65}
+.operator-level-table caption{text-align:left;color:var(--silver);padding:12px 0}
+@media(max-width:520px){.operator-page .section-nav{gap:6px;padding:10px}.operator-page .section-nav a{padding:8px 11px;font-size:.75rem}}

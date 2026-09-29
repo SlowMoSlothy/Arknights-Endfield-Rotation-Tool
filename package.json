@@ -6,7 +6,8 @@
     "build:operators": "node tools/build-operator-pages.js",
     "build:weapons": "node tools/build-weapon-pages.js",
     "test": "node --test tests/*.test.js",
-    "build:enemies": "node tools/build-enemy-pages.js"
+    "build:enemies": "node tools/build-enemy-pages.js",
+    "sync:operators": "node tools/sync-endfield-operators.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0"
