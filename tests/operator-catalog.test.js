@@ -3,8 +3,19 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import {mapOperatorCatalog,formatDescription} from '../tools/operator-catalog-data.js';
-import {catalogSkills,catalogSections} from '../tools/operator-catalog-markup.js';
+import {catalogSkills,catalogSections,catalogSkillHeader} from '../tools/operator-catalog-markup.js';
 const fixture=JSON.parse(fs.readFileSync(new URL('./fixtures/operator-catalog-purrchena.json',import.meta.url)));
+test('catalog cards preserve existing skill icons and provide local source icons for new skills',()=>{
+ const skill={id:'chr_0038_purrche_NormalSkill',name:'Battle skill',type:'Battle Skill'};
+ const original=catalogSkillHeader(skill,{element_type:'nature'},[{skill_type:'Battle Skill',icon_small_path:'assets/operators/skills/arcane/jadecrushing-grid.png',element_type:'nature'}]);
+ assert.match(original,/src="\/endfield\/assets\/operators\/skills\/arcane\/jadecrushing-grid.png"/);
+ assert.match(original,/ef-element-nature ef-fill-half/);
+ const fallback=catalogSkillHeader(skill,{element_type:'physical'});
+ assert.match(fallback,/catalog-skills\/icon_skill_purrche_01.png/);
+ const manifest=JSON.parse(fs.readFileSync('tools/data/operator-skill-icons.json','utf8'));
+ assert.equal(Object.keys(manifest).length,128);
+ for(const icon of Object.values(manifest))assert.ok(fs.existsSync(`endfield/assets/operators/catalog-skills/${icon}.png`));
+});
 test('source ranks, final strike, potential multipliers and named upgrade costs resolve correctly',()=>{
  const c=mapOperatorCatalog(fixture.detail,fixture);
  assert.equal(c.skills.length,4);assert.equal(c.potentials.length,5);

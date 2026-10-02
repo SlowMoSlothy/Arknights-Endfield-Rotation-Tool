@@ -1,9 +1,23 @@
+import fs from 'node:fs';
+const skillIcons=JSON.parse(fs.readFileSync(new URL('./data/operator-skill-icons.json',import.meta.url),'utf8'));
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=value=>Number(value).toLocaleString('en-US',{maximumFractionDigits:3});
 const materials=items=>`<ul class="catalog-materials">${items.map(item=>`<li><span>${escape(item.name)}</span><strong>× ${fmt(item.count)}</strong></li>`).join('')}</ul>`;
-export function catalogSkills(operator) {
+export function catalogSkillHeader(skill,operator,existingSkills=[]) {
+ const key=value=>String(value||'').toLowerCase().replace(/[ _-]/g,'');
+ const existing=existingSkills.find(s=>key(s.skill_type)===key(skill.type));
+ const raw=existing?.icon_small_path||existing?.iconSmall||existing?.icon_path||existing?.icon;
+ const relative=String(raw||'').replace(/^\/?endfield\//,'').replace(/^\//,'');
+ const local=/^assets\/[a-zA-Z0-9_./-]+$/.test(relative)&&!relative.includes('..')&&fs.existsSync(new URL('../endfield/'+relative,import.meta.url));
+ const source=skillIcons[skill.id];
+ const icon=local?'/endfield/'+relative:source?'/endfield/assets/operators/catalog-skills/'+source+'.png':'';
+ const element=existing?.element_type||operator.element_type;
+ const tone=['physical','heat','cryo','electric','nature'].includes(element)?element:'neutral';
+ return `<div class="skill-head"><div class="skill-icon-wrap"><div class="ef-skill-icon ef-element-${tone} ef-fill-${skill.type==='Ultimate'?'full':'half'}"><span class="ef-skill-fill"></span><span class="ef-skill-ring"></span><span class="ef-skill-glyph-wrap">${icon?`<img class="ef-skill-glyph" src="${escape(icon)}" alt="${escape(skill.name)} icon" loading="lazy" width="52" height="52">`:'<span class="skill-placeholder">?</span>'}</span></div></div><div><span class="skill-type">${escape(skill.type)}</span><h3>${escape(skill.name)}</h3></div></div>`;
+}
+export function catalogSkills(operator, existingSkills=[]) {
  const catalog=operator.raw_data?.operatorCatalogDetails;if(!catalog)return '';
- return `<div class="catalog-skills" data-catalog-skills><p class="operator-level-source">Skill values at the selected rank, before potential and combat modifiers.</p><div class="operator-level-picker" data-catalog-rank-picker hidden><label for="catalog-skill-rank">Skill rank <output for="catalog-skill-rank">12</output></label><input id="catalog-skill-rank" type="range" min="1" max="12" step="1" value="12"></div><div class="skills-grid">${catalog.skills.map(skill=>`<article class="skill-card"><span class="skill-type">${escape(skill.type)}</span><h3>${escape(skill.name)}</h3>${Array.from({length:12},(_,i)=>{
+ return `<div class="catalog-skills" data-catalog-skills><p class="operator-level-source">Skill values at the selected rank, before potential and combat modifiers.</p><div class="operator-level-picker" data-catalog-rank-picker hidden><label for="catalog-skill-rank">Skill rank <output for="catalog-skill-rank">12</output></label><input id="catalog-skill-rank" type="range" min="1" max="12" step="1" value="12"></div><div class="skills-grid">${catalog.skills.map(skill=>`<article class="skill-card">${catalogSkillHeader(skill,operator,existingSkills)}${Array.from({length:12},(_,i)=>{
  const rank=i+1,primary=skill.variants[0].ranks[i];
  return `<details class="catalog-rank" data-catalog-rank="${rank}"${rank===12?' open':''}><summary>Rank ${rank}</summary><p class="catalog-description">${escape(skill.descriptions[i])}</p>${skill.variants.map(variant=>{const r=variant.ranks[i];return `<section class="catalog-variant"><h4>${escape(variant.label)}</h4><dl class="catalog-values">${r.cooldown!==null?`<div><dt>Cooldown</dt><dd>${fmt(r.cooldown)} s</dd></div>`:''}${r.cost>0?`<div><dt>${skill.type==='Ultimate'?'Ultimate Energy':'SP'} cost</dt><dd>${fmt(r.cost)}</dd></div>`:''}${r.stats.map(stat=>`<div><dt>${escape(stat.label)}</dt><dd>${escape(stat.value)}</dd></div>`).join('')}</dl>${!r.stats.length?'<p class="operator-level-source">Additional rank values are not provided for this variant.</p>':''}</section>`;}).join('')}</details>`;
  }).join('')}</article>`).join('')}</div></div>`;

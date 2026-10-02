@@ -1394,7 +1394,7 @@ export function createOperatorPage(
         <h2>${escapeHtml(name)} Skills</h2>
         ${!operator.raw_data?.operatorCatalogDetails && skillVariantKeys.length > 1 ? `<div class="attribute-variant-switch" role="group" aria-label="${escapeHtml(name)} attribute stance">${skillVariantButtons}</div>` : ""}
       </div>
-      ${operator.raw_data?.operatorCatalogDetails ? `${catalogSkills(operator)}<details class="catalog-simulation"><summary>Rotation tool skill profiles</summary>${skillVariantKeys.length > 1 ? `<div class="attribute-variant-switch" role="group" aria-label="${escapeHtml(name)} attribute stance">${skillVariantButtons}</div>` : ''}${skillPanelsMarkup}</details>` : skillPanelsMarkup}
+      ${operator.raw_data?.operatorCatalogDetails ? `${catalogSkills(operator, skills)}<details class="catalog-simulation"><summary>Rotation tool skill profiles</summary>${skillVariantKeys.length > 1 ? `<div class="attribute-variant-switch" role="group" aria-label="${escapeHtml(name)} attribute stance">${skillVariantButtons}</div>` : ''}${skillPanelsMarkup}</details>` : skillPanelsMarkup}
     </section>
 
     ${catalogSections(operator)}
