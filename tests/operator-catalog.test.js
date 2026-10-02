@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import {mapOperatorCatalog,formatDescription} from '../tools/operator-catalog-data.js';
-import {catalogSkills,catalogSections,catalogSkillHeader} from '../tools/operator-catalog-markup.js';
+import {catalogSkills,catalogSections,catalogSkillHeader,catalogDisplaySkills} from '../tools/operator-catalog-markup.js';
 const fixture=JSON.parse(fs.readFileSync(new URL('./fixtures/operator-catalog-purrchena.json',import.meta.url)));
 test('catalog cards preserve existing skill icons and provide local source icons for new skills',()=>{
  const skill={id:'chr_0038_purrche_NormalSkill',name:'Battle skill',type:'Battle Skill'};
@@ -39,7 +39,7 @@ test('missing ranks or materials abort the catalog update instead of dropping co
 test('catalog markup keeps all ranks crawlable, escapes source text and includes potentials/materials',()=>{
  const c=mapOperatorCatalog(fixture.detail,fixture);c.skills[0].name='<img onerror=alert(1)>';
  const op={raw_data:{operatorCatalogDetails:c}},h=catalogSkills(op),s=catalogSections(op);
- assert.equal((h.match(/data-catalog-rank="/g)||[]).length,48);
+ assert.equal((h.match(/data-catalog-rank="/g)||[]).length,60);
  assert.match(h,/&lt;img onerror/);assert.doesNotMatch(h,/<img onerror/);
  assert.match(h,/min="1" max="12"/);assert.match(s,/id="potentials"/);assert.match(s,/id="materials"/);assert.match(s,/Rank 11 → 12/);
  assert.equal(catalogSkills({}),'');assert.equal(catalogSections({}),'');
@@ -53,4 +53,15 @@ test('slider selects matching ranks in every card and exposes its accessible val
  assert.equal(picker.hidden,false);assert.equal(panels.filter(p=>!p.hidden).length,2);
  slider.value='1';input();assert.equal(output.textContent,'1');assert.equal(slider['aria-valuetext'],'Skill rank 1');
  assert.ok(panels.filter(p=>!p.hidden).every(p=>p.dataset.catalogRank==='1'&&p.open));
+});
+
+test('Dive Attack is a standalone rank-aware skill without duplicating the basic attack description',()=>{
+ const c=mapOperatorCatalog(fixture.detail,fixture),before=structuredClone(c.skills),cards=catalogDisplaySkills(c.skills);
+ const basic=cards.find(s=>s.type==='Basic Attack'),dive=cards.find(s=>s.type==='Dive Attack');
+ assert.equal(cards.length,5);assert.ok(dive);assert.equal(dive.variants[0].ranks.length,12);
+ assert.ok(basic.variants.every(v=>!v.id.includes('plunging')));assert.doesNotMatch(basic.descriptions[0],/DIVE ATTACK/);
+ assert.match(dive.descriptions[0],/mid-air/);assert.doesNotMatch(dive.descriptions[0],/FINISHER/);
+ assert.deepEqual(c.skills,before);
+ const html=catalogSkills({raw_data:{operatorCatalogDetails:c}});
+ assert.match(html,/<h3>Dive Attack<\/h3>/);assert.equal((html.match(/shared\/dive_attack.png/g)||[]).length,1);
 });
