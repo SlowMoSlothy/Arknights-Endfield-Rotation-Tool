@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: 22
       - name: Test operator importer
-        run: node --test tests/operator-import.test.js
+        run: node --test tests/operator-import.test.js tests/operator-catalog.test.js
       - name: Fetch and validate operators
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

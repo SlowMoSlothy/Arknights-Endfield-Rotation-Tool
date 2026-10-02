@@ -1,0 +1,15 @@
+.catalog-skills,.catalog-section{min-width:0}
+.operator-page #potentials,.operator-page #materials{scroll-margin-top:var(--enemy-section-offset,150px)}
+.catalog-skills .operator-level-picker{margin:20px 0 28px}
+.catalog-rank[hidden]{display:none}
+.catalog-rank summary,.catalog-upgrades summary,.catalog-simulation summary{cursor:pointer;color:var(--accent);font-weight:800;padding:14px 0}
+.catalog-rank summary:focus-visible,.catalog-upgrades summary:focus-visible,.catalog-simulation summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.catalog-enhanced .catalog-rank>summary{display:none}
+.catalog-description{white-space:pre-line;overflow-wrap:anywhere;margin-top:16px!important}
+.catalog-variant{border-top:1px solid var(--border);margin-top:20px;padding-top:6px}
+.catalog-variant h4{margin:12px 0;font-size:.9rem;color:var(--silver)}
+.catalog-values{margin:0;font-size:.85rem}.catalog-values>div{display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid rgba(160,170,169,.12)}
+.catalog-values dt{min-width:0;overflow-wrap:anywhere}.catalog-values dd{margin:0;color:#ffad65;text-align:right;font-weight:800;flex-shrink:0}
+.catalog-materials{list-style:none;padding:0;margin:0}.catalog-materials li{display:flex;justify-content:space-between;gap:14px;padding:8px 0;border-bottom:1px solid rgba(160,170,169,.12);font-size:.85rem}.catalog-materials span{overflow-wrap:anywhere}.catalog-materials strong{color:#ffad65;white-space:nowrap}
+.catalog-section>h3{margin-top:26px}.catalog-section .skill-card h4{margin-top:0}.catalog-upgrades{margin-top:10px}.catalog-simulation{margin-top:24px}
+@media(max-width:760px){.catalog-skills .skills-grid,.catalog-section .skills-grid{grid-template-columns:1fr}.catalog-values>div{gap:10px}}

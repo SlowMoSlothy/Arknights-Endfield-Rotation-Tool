@@ -1,4 +1,5 @@
 import { operatorProgression } from './operator-progression.js';
+import { catalogSkills, catalogSections } from './operator-catalog-markup.js';
 import { createClient } from "@supabase/supabase-js";
 import { createHash } from "node:crypto";
 import fs from "fs";
@@ -1305,6 +1306,7 @@ export function createOperatorPage(
   ${attributeVariantStyles()}
   <link rel="stylesheet" href="/endfield/css/operatorProgression.css?v=1">
 </head>
+  <link rel="stylesheet" href="/endfield/css/operatorCatalog.css?v=1">
 <body class="operator-page">
   ${siteHeader({ showOperatorLink: false, showToolCta: false })}
   <div class="page">
@@ -1315,6 +1317,7 @@ export function createOperatorPage(
       <a href="#stats">Attributes</a>
       <a href="#skills">Skills</a>
       <a href="#related">Related</a>
+      ${operator.raw_data?.operatorCatalogDetails ? '<a href="#potentials">Potentials</a><a href="#materials">Materials</a>' : ''}
     </nav>
 
     <main class="hero">
@@ -1356,7 +1359,7 @@ export function createOperatorPage(
       <div class="operator-share-list" data-share-results-list></div>
     </section>
 
-    ${operator.raw_data?.dataStatus === 'catalog_only' ? '<p class="operator-level-source">Catalog profile: base attributes are available. Skills and rotation mechanics have not been implemented yet.</p>' : ''}
+    ${operator.raw_data?.dataStatus === 'catalog_only' ? '<p class="operator-level-source">Catalog profile: source data is available below. Rotation simulation mechanics have not been implemented yet.</p>' : ''}
     <section class="panel profile-section overview-section" id="rotation-profile">
       <div class="profile-heading">
         <h2>${escapeHtml(name)} Rotation Overview</h2>
@@ -1391,12 +1394,14 @@ export function createOperatorPage(
         <h2>${escapeHtml(name)} Skills</h2>
         ${skillVariantKeys.length > 1 ? `<div class="attribute-variant-switch" role="group" aria-label="${escapeHtml(name)} attribute stance">${skillVariantButtons}</div>` : ""}
       </div>
-      ${skillPanelsMarkup}
+      ${operator.raw_data?.operatorCatalogDetails ? `${catalogSkills(operator)}<details class="catalog-simulation"><summary>Rotation tool skill profiles</summary>${skillPanelsMarkup}</details>` : skillPanelsMarkup}
     </section>
 
     <section class="panel related-section" id="related">
       <h2>Related Operators</h2>
       <div class="related-grid">${relatedOperators.length > 0 ? relatedOperators.map(relatedCard).join("\n") : "<p>No related operators found yet.</p>"}</div>
+    ${catalogSections(operator)}
+
     </section>
 
     <footer>RotationForge is an unofficial fan-made tool for Arknights: Endfield.<span class="database-ref">Database ID: ${escapeHtml(databaseId)}</span></footer>
@@ -1412,6 +1417,7 @@ export function createOperatorPage(
   <script src="/endfield/js/ui/enemySectionNav.js?v=3" defer></script>
 </body>
 </html>`;
+  <script src="/endfield/js/ui/operatorCatalog.js?v=1" defer></script>
 }
 
 export function createIndexPage(operators) {

@@ -11,3 +11,9 @@ For existing operators, only base stat columns, their existing raw-data mirrors,
 Reports and guarded SQL are saved in `.cache/operator-import/`. Updates use one transaction with a table lock and optimistic checks on all affected fields and raw data. Concurrent changes abort the transaction. Writes are never automatically retried; only verification reads retry. Preview reads through Actions include drafts. After applying, every changed field is checked against Supabase.
 
 The SEO generator renders the full level table for search engines and without JavaScript, then enhances it with a keyboard-accessible slider. The public display remains capped at level 90.
+
+## Skill ranks, potentials and materials
+
+The same import also resolves English skill descriptions and rank 1–12 display values, all five potentials, promotion/outfitting costs and per-rank skill upgrade costs. It reads the shared `i18n/I18nTextTable_EN.json` and `items/items-list.json` dictionaries. Named rank values come from the source's `subDescDataList`, retaining its units and labels. Final Strike stagger uses the final normal attack's blackboard; potential placeholders use the recorded effect modifiers. Unsupported or absent values remain explicitly unavailable, never guessed as zero.
+
+This display-only data is stored in `raw_data.operatorCatalogDetails`. It does not modify `operator_skills`, attack timings, simulator mechanics or manually maintained rotation profiles. All twelve ranks are rendered as static, crawlable content and enhanced with a keyboard-accessible range input. Existing rotation skill profiles remain in a separate expandable section. Material quantities represent individual upgrade costs, not cumulative totals. Missing skill ranks, dictionary entries or upgrade data abort before any database write.

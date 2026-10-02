@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto';
 import { isDeepStrictEqual, parseArgs } from 'node:util';
 import { pathToFileURL } from 'node:url';
 import { requestJson, publicConfiguration, checkDatabaseWriteAccess } from './sync-endfield-equipment.js';
+import { mapOperatorCatalog } from './operator-catalog-data.js';
 
 export const SOURCE = 'https://endfieldtools.dev/localdb/optimized/characters/';
 const FIELDS = {hp:1,atk:2,strength:39,agility:40,intellect:41,will:42};
@@ -11,7 +12,7 @@ const ALIASES = {endministrator:'chr_0002_endminm',zhuang:'chr_0030_zhuangfy',mi
 const assert = (condition,message) => {if(!condition) throw new Error(message);};
 const key = value => String(value).toLowerCase().replace(/[^a-z0-9]/g,'');
 const camel = name => name.replace(/_([a-z0-9])/g,(_,letter)=>letter.toUpperCase());
-export function planNewOperator(binding,detail) {
+export function planNewOperator(binding,detail,resources) {
   assert(detail.charId===binding.sourceId&&detail.engName===binding.name&&detail.slug===binding.slug,'New operator identity mismatch');
   const classes={0:'Guard',1:'Striker',2:'Defender',4:'Supporter',5:'Caster',7:'Vanguard',8:'Striker'};
   const elements={Physical:'physical',Fire:'heat',Ice:'cryo',Pulse:'electric',Natural:'nature'};
@@ -22,7 +23,7 @@ export function planNewOperator(binding,detail) {
   assert(/^[a-z0-9_]+$/.test(binding.slug)&&/^assets\/operators\/avatars\/[A-Za-z0-9_]+\.png$/.test(binding.iconPath),'Invalid catalog path');
   const row={id:binding.id,game:'arknights_endfield',slug:binding.slug,name:binding.name,star:detail.rarity,operator_class:classes[detail.profession],element_type:elements[detail.charTypeId],weapon_type:weapons[detail.weaponType],main_attribute:attributes[detail.mainAttrType],secondary_attribute:attributes[detail.subAttrType],icon_path:binding.iconPath,can_enter_ultimate_state:false,is_visible:true,sort_order:binding.id,
     raw_data:{id:binding.id,name:binding.name,icon:binding.iconPath,star:detail.rarity,operatorClass:classes[detail.profession],elementType:elements[detail.charTypeId],weaponType:weapons[detail.weaponType],mainAttribute:attributes[detail.mainAttrType],secondaryAttribute:attributes[detail.subAttrType],dataStatus:'catalog_only',sourceNote:'API catalog and base attributes imported. Skills and rotation mechanics have not been implemented.'}};
-  return {id:row.id,name:row.name,before:null,after:{...row,...planOperator(row,detail).after}};
+  return {id:row.id,name:row.name,before:null,after:{...row,...planOperator(row,detail,resources).after}};
 }
 export function mapLevels(detail) {
   assert(Array.isArray(detail.attributes),'Missing operator attributes');
@@ -48,7 +49,7 @@ export function mapLevels(detail) {
   assert(result.length===90&&result.every((row,index)=>row.level===index+1),'Incomplete levels 1–90');
   return result;
 }
-export function planOperator(row,detail) {
+export function planOperator(row,detail,resources) {
   const levels=mapLevels(detail),source=SOURCE+`details/${detail.charId}.json`;
   const stats={base_stats_level:90};
   for(const field of Object.keys(FIELDS)) {
@@ -65,6 +66,7 @@ export function planOperator(row,detail) {
     if(!prior||isDeepStrictEqual(raw[rawKey],prior.rawStats?.[rawKey])) raw[rawKey]=after[field];
   }
   raw.baseStatsMissing=false;
+  if(resources) raw.operatorCatalogDetails=mapOperatorCatalog(detail,resources);
   raw.operatorCatalogImport={sourceId:detail.charId,source,levels,stats,rawStats:Object.fromEntries(Object.keys(stats).map(field=>[camel(field),after[field]]))};
   after.raw_data=raw;
   const rawPatch=Object.fromEntries(Object.entries(raw).filter(([field,value])=>!isDeepStrictEqual(value,row.raw_data?.[field])));
@@ -86,7 +88,7 @@ export function buildSql(changes) {
     assert(change.version===undefined||/^[a-f0-9]{32}$/.test(change.version),'Invalid row version');
     const guard=change.version?`md5(to_jsonb(o)::text)='${change.version}'`:`to_jsonb(o) @> ${literal(change.before)}`;
     return [`select 1 / case when exists(select 1 from public.operators o where id=${change.id} and ${guard}) then 1 else 0 end as unchanged_operator_guard;`,
-      `update public.operators o set ${fields.map(field=>field==='raw_data'?`raw_data=coalesce(o.raw_data,'{}'::jsonb) || ${literal(change.rawPatch)}`:`${field}=v.${field}`).join(',')} from jsonb_populate_record(null::public.operators,${literal(change.after)}) v where o.id=${change.id};`];
+      `update public.operators o set ${fields.map(field=>field==='raw_data'?`raw_data=coalesce(o.raw_data,'{}'::jsonb) || ${literal(change.rawPatch)}`:`${field}=v.${field}`).join(',')} from jsonb_populate_record(null::public.operators,${literal({...change.after,raw_data:undefined})}) v where o.id=${change.id};`];
   }),'commit;'].join('\n');
 }
 export function normalizeRows(rows) {
@@ -107,6 +109,9 @@ export async function sync({apply=false,output='.cache/operator-import',env=proc
   const existing=await readRows(config,token),list=Object.values(await requestJson(SOURCE+'characters-list.json'));
   assert(Array.isArray(existing)&&existing.length>=25&&list.length>=30,'Incomplete operator catalog');
   const changes=[],matches=[],used=new Set();
+  const [text,items]=await Promise.all(['i18n/I18nTextTable_EN.json','items/items-list.json'].map(p=>requestJson('https://endfieldtools.dev/localdb/optimized/'+p)));
+  assert(Object.keys(text).length>1000&&Object.keys(items).length>100,'Incomplete catalog dictionaries');
+  const resources={text,items};
   for(const row of existing) {
     const candidates=list.filter(item=>ALIASES[row.slug]?item.charId===ALIASES[row.slug]:key(item.engName)===key(row.name));
     // Preserve the verified binding when a CDN serves an older summary list.
@@ -115,7 +120,7 @@ export async function sync({apply=false,output='.cache/operator-import',env=proc
     const item=candidates[0];assert(/^chr_[a-z0-9_]+$/.test(item.charId)&&!used.has(item.charId),'Invalid or duplicate source identity');used.add(item.charId);
     const detail=await requestJson(SOURCE+`details/${item.charId}.json`);
     assert(detail.charId===item.charId&&detail.engName===item.engName,'Source detail identity mismatch');
-    const change=planOperator(row,detail);if(!isDeepStrictEqual(change.before,change.after)) changes.push(change);
+    const change=planOperator(row,detail,resources);if(!isDeepStrictEqual(change.before,change.after)) changes.push(change);
     matches.push({id:row.id,name:row.name,sourceId:item.charId});
   }
   const additions=JSON.parse(await fs.readFile(new URL('./data/operator-source-additions.json',import.meta.url),'utf8'));
@@ -126,12 +131,12 @@ export async function sync({apply=false,output='.cache/operator-import',env=proc
     // explicitly reviewed addition is validated against its complete detail.
     assert(/^chr_[a-z0-9_]+$/.test(binding.sourceId),'Invalid new source identity');
     const detail=await requestJson(SOURCE+`details/${binding.sourceId}.json`);
-    changes.push(planNewOperator(binding,detail));used.add(binding.sourceId);
+    changes.push(planNewOperator(binding,detail,resources));used.add(binding.sourceId);
     matches.push({id:binding.id,name:binding.name,sourceId:binding.sourceId});
   }
   const query=buildSql(changes),report={source:SOURCE,fetchedAt:new Date().toISOString(),project:config.ref,readScope:token?'all operators including drafts':'public operators',matched:matches,added:changes.filter(c=>!c.before).map(c=>c.name),changed:changes.map(c=>({name:c.name,stats:Object.keys(c.after).filter(k=>k!=='raw_data'&&!isDeepStrictEqual(c.before?.[k],c.after[k])).map(k=>({field:k,before:c.before?.[k],after:c.after[k]}))})),unmatchedSource:list.filter(item=>!used.has(item.charId)).map(item=>({id:item.charId,name:item.engName}))};
   await fs.mkdir(output,{recursive:true});await fs.writeFile(path.join(output,'catalog.sql'),query);await fs.writeFile(path.join(output,'report.json'),JSON.stringify(report,null,2));
-  console.log(`${matches.length} operators matched; ${changes.length} updates. Skills and simulation mechanics are outside this importer.`);
+  console.log(`${matches.length} operators matched; ${changes.length} updates. Catalog skill ranks, potentials and materials included; simulator mechanics unchanged.`);
   if(apply&&changes.length) {
     assert(changes.every(change=>change.before===null||change.version),'Missing database row versions');
     await requestJson(`https://api.supabase.com/v1/projects/${config.ref}/database/query`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({query,read_only:false})});
