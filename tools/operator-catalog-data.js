@@ -45,7 +45,7 @@ export function mapOperatorCatalog(detail,{text,items}) {
         const lastAttack=group.skillGroupType===0?group.skillIdList.filter(skill=>/_attack\d+$/.test(skill)).sort((a,b)=>Number(a.match(/\d+$/)[0])-Number(b.match(/\d+$/)[0])).at(-1):null;
         const descriptionValues=Object.fromEntries((detail.skills[lastAttack||group.skillIdList[0]].SkillPatchDataBundle[i].blackboard||[]).map(v=>[v.key,v.value]));
         const stats=(rank.subDescDataList||[]).map(stat=>({label:translated(stat.name),value:formatDescription(stat.desc,values)}));
-        check(stats.every(s=>s.label&&s.value),'Missing skill stat translation');
+        check(stats.every(s=>s.label&&s.value),`Missing skill stat translation: ${id}, rank ${rank.level}`);
         return {level:rank.level,description:formatDescription(translated(group.desc),descriptionValues),cooldown:number(rank.coolDown)??null,cost:number(rank.costValue)??null,stats};
       });
       return {id,label,ranks};

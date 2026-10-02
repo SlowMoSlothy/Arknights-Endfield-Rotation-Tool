@@ -106,10 +106,12 @@ export async function sync({apply=false,output='.cache/operator-import',env=proc
   const config=await publicConfiguration(env);config.ref=new URL(config.url).hostname.split('.')[0];
   const token=env.SUPABASE_ACCESS_TOKEN;
   if(apply){assert(token,'Missing SUPABASE_ACCESS_TOKEN');await checkDatabaseWriteAccess(config.ref,token);}
-  const existing=await readRows(config,token),list=Object.values(await requestJson(SOURCE+'characters-list.json'));
+  // Bypass independently stale CDN entries for this validated import batch.
+  const revision=randomUUID(),sourceJson=url=>requestJson(url+'?v='+revision);
+  const existing=await readRows(config,token),list=Object.values(await sourceJson(SOURCE+'characters-list.json'));
   assert(Array.isArray(existing)&&existing.length>=25&&list.length>=30,'Incomplete operator catalog');
   const changes=[],matches=[],used=new Set();
-  const [text,items]=await Promise.all(['i18n/I18nTextTable_EN.json','items/items-list.json'].map(p=>requestJson('https://endfieldtools.dev/localdb/optimized/'+p)));
+  const [text,items]=await Promise.all(['i18n/I18nTextTable_EN.json','items/items-list.json'].map(p=>sourceJson('https://endfieldtools.dev/localdb/optimized/'+p)));
   assert(Object.keys(text).length>1000&&Object.keys(items).length>100,'Incomplete catalog dictionaries');
   const resources={text,items};
   for(const row of existing) {
@@ -118,7 +120,7 @@ export async function sync({apply=false,output='.cache/operator-import',env=proc
     if(!candidates.length&&row.raw_data?.operatorCatalogImport?.sourceId) candidates.push({charId:row.raw_data.operatorCatalogImport.sourceId,engName:row.name});
     assert(candidates.length===1,`Cannot unambiguously match ${row.name}`);
     const item=candidates[0];assert(/^chr_[a-z0-9_]+$/.test(item.charId)&&!used.has(item.charId),'Invalid or duplicate source identity');used.add(item.charId);
-    const detail=await requestJson(SOURCE+`details/${item.charId}.json`);
+    const detail=await sourceJson(SOURCE+`details/${item.charId}.json`);
     assert(detail.charId===item.charId&&detail.engName===item.engName,'Source detail identity mismatch');
     const change=planOperator(row,detail,resources);if(!isDeepStrictEqual(change.before,change.after)) changes.push(change);
     matches.push({id:row.id,name:row.name,sourceId:item.charId});
@@ -130,7 +132,7 @@ export async function sync({apply=false,output='.cache/operator-import',env=proc
     // The list and detail endpoints can have different CDN cache ages. An
     // explicitly reviewed addition is validated against its complete detail.
     assert(/^chr_[a-z0-9_]+$/.test(binding.sourceId),'Invalid new source identity');
-    const detail=await requestJson(SOURCE+`details/${binding.sourceId}.json`);
+    const detail=await sourceJson(SOURCE+`details/${binding.sourceId}.json`);
     changes.push(planNewOperator(binding,detail,resources));used.add(binding.sourceId);
     matches.push({id:binding.id,name:binding.name,sourceId:binding.sourceId});
   }
