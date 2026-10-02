@@ -1305,8 +1305,8 @@ export function createOperatorPage(
   <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6">
   ${attributeVariantStyles()}
   <link rel="stylesheet" href="/endfield/css/operatorProgression.css?v=1">
-</head>
   <link rel="stylesheet" href="/endfield/css/operatorCatalog.css?v=1">
+</head>
 <body class="operator-page">
   ${siteHeader({ showOperatorLink: false, showToolCta: false })}
   <div class="page">
@@ -1316,8 +1316,8 @@ export function createOperatorPage(
       <a href="#batk">BATK</a>
       <a href="#stats">Attributes</a>
       <a href="#skills">Skills</a>
-      <a href="#related">Related</a>
       ${operator.raw_data?.operatorCatalogDetails ? '<a href="#potentials">Potentials</a><a href="#materials">Materials</a>' : ''}
+      <a href="#related">Related</a>
     </nav>
 
     <main class="hero">
@@ -1397,11 +1397,11 @@ export function createOperatorPage(
       ${operator.raw_data?.operatorCatalogDetails ? `${catalogSkills(operator)}<details class="catalog-simulation"><summary>Rotation tool skill profiles</summary>${skillPanelsMarkup}</details>` : skillPanelsMarkup}
     </section>
 
+    ${catalogSections(operator)}
+
     <section class="panel related-section" id="related">
       <h2>Related Operators</h2>
       <div class="related-grid">${relatedOperators.length > 0 ? relatedOperators.map(relatedCard).join("\n") : "<p>No related operators found yet.</p>"}</div>
-    ${catalogSections(operator)}
-
     </section>
 
     <footer>RotationForge is an unofficial fan-made tool for Arknights: Endfield.<span class="database-ref">Database ID: ${escapeHtml(databaseId)}</span></footer>
@@ -1414,10 +1414,10 @@ export function createOperatorPage(
   ${attributeVariantScript(defaultSkillVariant, operator.id)}
   ${operatorHeadingScript()}
   <script src="/endfield/js/ui/operatorLevels.js?v=1" defer></script>
+  <script src="/endfield/js/ui/operatorCatalog.js?v=1" defer></script>
   <script src="/endfield/js/ui/enemySectionNav.js?v=3" defer></script>
 </body>
 </html>`;
-  <script src="/endfield/js/ui/operatorCatalog.js?v=1" defer></script>
 }
 
 export function createIndexPage(operators) {
