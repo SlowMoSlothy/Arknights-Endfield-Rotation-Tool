@@ -1313,8 +1313,8 @@ export function createOperatorPage(
     <div class="breadcrumbs"><a href="${SITE_URL}/">Home</a><span>›</span><a href="${SITE_URL}${BASE_PATH}/operators/">Operators</a><span>›</span><strong>${escapeHtml(name)}</strong></div>
     <nav class="section-nav" aria-label="On this page">
       <a href="#rotation-profile">Overview</a>
-      <a href="#batk">BATK</a>
       <a href="#stats">Attributes</a>
+      <a href="#batk">BATK</a>
       <a href="#skills">Skills</a>
       ${operator.raw_data?.operatorCatalogDetails ? '<a href="#potentials">Potentials</a><a href="#materials">Materials</a>' : ''}
       <a href="#related">Related</a>
