@@ -25,11 +25,21 @@ export function catalogDisplaySkills(skills) {
      {id:skill.id+'_dive',name:'Dive Attack',type:'Dive Attack',variants:dives,descriptions:skill.descriptions.map(text=>text.match(pattern)?.[1].trim()||'Description unavailable from the source.')}];
  });
 }
-export function catalogSkills(operator, existingSkills=[]) {
+const skillKey=value=>String(value||'').toLowerCase().replace(/[ _-]/g,'');
+function profileContent(skill,operator,sets,rank=null) {
+ return sets.map((set,index)=>{
+  const profile=set.skills.find(s=>skillKey(s.skill_type)===skillKey(skill.type));
+  const content=rank===null?catalogSkillHeader({...skill,name:profile?.name||skill.name},operator,set.skills):`<p class="catalog-description">${escape(profile?.description||skill.descriptions[rank])}</p>`;
+  return set.key?`<div data-attribute-variant-panel="${escape(set.key)}"${index?' hidden':''}>${content}</div>`:content;
+ }).join('');
+}
+export function catalogSkills(operator, existingSkills=[], profileSets=null) {
  const catalog=operator.raw_data?.operatorCatalogDetails;if(!catalog)return '';
- return `<div class="catalog-skills" data-catalog-skills><p class="operator-level-source">Skill values at the selected rank, before potential and combat modifiers.</p><div class="operator-level-picker" data-catalog-rank-picker hidden><label for="catalog-skill-rank">Skill rank <output for="catalog-skill-rank">12</output></label><input id="catalog-skill-rank" type="range" min="1" max="12" step="1" value="12"></div><div class="skills-grid">${catalogDisplaySkills(catalog.skills).map(skill=>`<article class="skill-card">${catalogSkillHeader(skill,operator,existingSkills)}${Array.from({length:12},(_,i)=>{
+ const sets=profileSets||[{key:'',skills:existingSkills}];
+ const cards=catalogDisplaySkills(catalog.skills).map(skill=>skill.type==='Basic Attack'?{...skill,type:'Final Strike',variants:[],descriptions:skill.descriptions.map(text=>text.match(/As the controlled operator,[^.]*\./i)?.[0]||'Final Strike details are shown in BATK.')}:skill);
+ return `<div class="catalog-skills" data-catalog-skills><p class="operator-level-source">Skill values at the selected rank, before potential and combat modifiers.</p><div class="operator-level-picker" data-catalog-rank-picker hidden><label for="catalog-skill-rank">Skill rank <output for="catalog-skill-rank">12</output></label><input id="catalog-skill-rank" type="range" min="1" max="12" step="1" value="12"></div><div class="skills-grid">${cards.map(skill=>`<article class="skill-card">${profileContent(skill,operator,sets)}${Array.from({length:12},(_,i)=>{
  const rank=i+1;
- return `<details class="catalog-rank" data-catalog-rank="${rank}"${rank===12?' open':''}><summary>Rank ${rank}</summary><p class="catalog-description">${escape(skill.descriptions[i])}</p>${skill.variants.filter(variant=>!(skill.type==='Basic Attack'&&/_attack\d+$/.test(variant.id))).map(variant=>{const r=variant.ranks[i];return `<section class="catalog-variant">${skill.type==='Dive Attack'?'':`<h4>${escape(variant.label)}</h4>`}<dl class="catalog-values">${r.cooldown!==null?`<div><dt>Cooldown</dt><dd>${fmt(r.cooldown)} s</dd></div>`:''}${r.cost>0?`<div><dt>${skill.type==='Ultimate'?'Ultimate Energy':'SP'} cost</dt><dd>${fmt(r.cost)}</dd></div>`:''}${r.stats.map(stat=>`<div><dt>${escape(stat.label)}</dt><dd>${escape(stat.value)}</dd></div>`).join('')}</dl>${!r.stats.length?'<p class="operator-level-source">Additional rank values are not provided for this variant.</p>':''}</section>`;}).join('')}</details>`;
+ return `<details class="catalog-rank" data-catalog-rank="${rank}"${rank===12?' open':''}><summary>Rank ${rank}</summary>${profileContent(skill,operator,sets,i)}${skill.variants.filter(variant=>!(skill.type==='Basic Attack'&&/_attack\d+$/.test(variant.id))).map(variant=>{const r=variant.ranks[i];return `<section class="catalog-variant">${skill.type==='Dive Attack'?'':`<h4>${escape(variant.label)}</h4>`}<dl class="catalog-values">${r.cooldown!==null?`<div><dt>Cooldown</dt><dd>${fmt(r.cooldown)} s</dd></div>`:''}${r.cost>0?`<div><dt>${skill.type==='Ultimate'?'Ultimate Energy':'SP'} cost</dt><dd>${fmt(r.cost)}</dd></div>`:''}${r.stats.map(stat=>`<div><dt>${escape(stat.label)}</dt><dd>${escape(stat.value)}</dd></div>`).join('')}</dl>${!r.stats.length?'<p class="operator-level-source">Additional rank values are not provided for this variant.</p>':''}</section>`;}).join('')}</details>`;
  }).join('')}</article>`).join('')}</div></div>`;
 }
 export function catalogSections(operator) {

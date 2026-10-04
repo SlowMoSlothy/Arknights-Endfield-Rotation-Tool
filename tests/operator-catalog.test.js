@@ -65,3 +65,14 @@ test('Dive Attack is a standalone rank-aware skill without duplicating the basic
  const html=catalogSkills({raw_data:{operatorCatalogDetails:c}});
  assert.match(html,/<h3>Dive Attack<\/h3>/);assert.equal((html.match(/shared\/dive_attack.png/g)||[]).length,1);
 });
+test('unified cards use rotation profiles without assigning finisher values to Final Strike',()=>{
+ const c=mapOperatorCatalog(fixture.detail,fixture),op={element_type:'physical',raw_data:{operatorCatalogDetails:c}};
+ const profiles=[{skill_type:'Final Strike',name:'Profile strike',description:'Controlled operator final strike.'},{skill_type:'Battle Skill',name:'Profile battle',description:'Profile mechanics.'}];
+ const html=catalogSkills(op,profiles),first=html.split('</article>')[0];
+ assert.match(first,/Profile strike/);assert.match(first,/Controlled operator final strike/);
+ assert.doesNotMatch(first,/BASIC ATTACK:|FINISHER:|Finisher ATK Multiplier/);
+ assert.match(html,/Profile mechanics/);assert.doesNotMatch(html,/Rotation tool skill profiles/);
+ const variants=catalogSkills(op,profiles,[{key:'intellect',skills:profiles},{key:'will',skills:[{...profiles[1],name:'Will skill',description:'Will mechanics.'}]}]);
+ assert.match(variants,/data-attribute-variant-panel="intellect"/);assert.match(variants,/data-attribute-variant-panel="will" hidden/);assert.match(variants,/Will mechanics/);
+ assert.equal((variants.match(/id="catalog-skill-rank"/g)||[]).length,1);
+});

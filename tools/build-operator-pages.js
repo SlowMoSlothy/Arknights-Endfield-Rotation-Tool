@@ -1392,9 +1392,9 @@ export function createOperatorPage(
     <section class="panel skills-section" id="skills">
       <div class="attribute-variant-heading">
         <h2>${escapeHtml(name)} Skills</h2>
-        ${!operator.raw_data?.operatorCatalogDetails && skillVariantKeys.length > 1 ? `<div class="attribute-variant-switch" role="group" aria-label="${escapeHtml(name)} attribute stance">${skillVariantButtons}</div>` : ""}
+        ${skillVariantKeys.length > 1 ? `<div class="attribute-variant-switch" role="group" aria-label="${escapeHtml(name)} attribute stance">${skillVariantButtons}</div>` : ""}
       </div>
-      ${operator.raw_data?.operatorCatalogDetails ? `${catalogSkills(operator, skills)}<details class="catalog-simulation"><summary>Rotation tool skill profiles</summary>${skillVariantKeys.length > 1 ? `<div class="attribute-variant-switch" role="group" aria-label="${escapeHtml(name)} attribute stance">${skillVariantButtons}</div>` : ''}${skillPanelsMarkup}</details>` : skillPanelsMarkup}
+      ${operator.raw_data?.operatorCatalogDetails ? catalogSkills(operator, skills, skillVariantKeys.length > 1 ? skillVariantKeys.map(key => ({key, skills: skills.map(skill => skillForAttributeVariant(skill, key))})) : null) : skillPanelsMarkup}
     </section>
 
     ${catalogSections(operator)}
