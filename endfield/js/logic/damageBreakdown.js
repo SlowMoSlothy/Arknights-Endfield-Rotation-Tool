@@ -713,6 +713,23 @@ function appendSimulationDamageBreakdown(parent, event) {
     const breakdown = event?.damageBreakdown || getSimulationDamageBreakdown(event);
     if (!breakdown) return;
 
+    const inputIssue = typeof getSimulationDamageInputIssue === "function" ? getSimulationDamageInputIssue(event) : "";
+    if (inputIssue) {
+        appendSimulationInspectorSection(parent, "Damage unavailable", [
+            ["Loadout", inputIssue, "is-warning"],
+            ["Next step", "Open this operator's loadout to review equipment and ATK."]
+        ]);
+        return;
+    }
+    if (typeof getCurrentDamageInputIssues === "function") {
+        const inputs = getCurrentDamageInputIssues();
+        if (inputs.assumptions.length || !inputs.enemyVerified) {
+            appendSimulationInspectorSection(parent, "Enemy data", [
+                [inputs.enemyName, inputs.assumptions.join(" ") || "Recorded values have not been verified.", "is-warning"]
+            ]);
+        }
+    }
+
     if (breakdown.status === "missing-profile") {
         appendSimulationInspectorSection(parent, "Damage Breakdown", [
             ["Current ATK", String(breakdown.attack || 0)],

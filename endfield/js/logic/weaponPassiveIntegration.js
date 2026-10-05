@@ -207,6 +207,7 @@
             originalRenderSimulationRotation();
             if (typeof mountSimulationWeaponAtkChart === "function") mountSimulationWeaponAtkChart();
             if (typeof mountSimulationDamageChart === "function") mountSimulationDamageChart();
+            if (typeof mountSimulationDamageInputs === "function") mountSimulationDamageInputs();
         };
     }
 
@@ -244,7 +245,10 @@
             `Weapon: ${formatPassiveActivationBonuses(activation)}${activation.duration ? ` for ${activation.duration}s` : ""}`
         )).join(" | ");
         const damage = event?.damageBreakdown;
-        const damageSummary = damage && damage.status !== "missing-profile"
+        const inputIssue = typeof getSimulationDamageInputIssue === "function" ? getSimulationDamageInputIssue(event) : "";
+        const damageSummary = damage && inputIssue ? `DMG unavailable: ${inputIssue}`
+            : damage?.status === "missing-profile" ? "DMG unavailable: skill scaling is missing"
+            : damage && damage.status !== "missing-profile"
             ? `Expected DMG: ${damage.expectedFinalDamage ?? damage.finalDamage ?? damage.preMitigationDamage}`
             : "";
         return [baseSummary, passiveSummary, damageSummary].filter(Boolean).join(" | ");

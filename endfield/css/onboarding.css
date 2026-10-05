@@ -1,0 +1,36 @@
+.planner-guide { margin-bottom: 16px; padding: 16px; border: 1px solid #655038; border-radius: 12px; background: #202628; color: #f6f7f0; }
+.planner-guide [hidden], .planner-guide[hidden], .planner-guide-actions[hidden], .planner-guide-actions [hidden] { display: none !important; }
+:root.simulation-timeline-focus .planner-guide { display: none; }
+.planner-guide-intro { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.planner-guide button, .planner-guide select { min-height: 44px; padding: 10px 14px; border: 1px solid #68716e; border-radius: 7px; background: #303839; color: #f6f7f0; font: inherit; font-size: 13px; cursor: pointer; }
+.planner-guide button:hover:not(:disabled) { border-color: #fc8a35; }
+.planner-guide button:disabled, .planner-guide select:disabled { opacity: .55; cursor: default; }
+.planner-guide :focus-visible { outline: 2px solid #ff9d3f; outline-offset: 3px; }
+.planner-guide-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; margin-left: auto; }
+.planner-guide-actions button { min-height: 32px; padding: 6px 10px; border: 1px solid #655038; border-radius: 7px; background: #202628; color: #f6f7f0; font: inherit; font-size: 12px; cursor: pointer; }
+.planner-guide-actions button:hover { border-color: #fc8a35; }
+.planner-guide-actions button:focus-visible { outline: 2px solid #ff9d3f; outline-offset: 3px; }
+#plannerGuideToggle { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; }
+#plannerGuideTitle { font-size: 12px; font-weight: 700; }
+#plannerGuideToggle::after { content: '+'; color: #ff9d3f; font-size: 14px; }
+#plannerGuideToggle[aria-expanded="true"]::after { content: '−'; }
+#plannerGuideProgress { color: #c2ccc7; font-size: 12px; }
+.planner-guide-intro { margin-top: 12px; }
+.planner-guide p { margin: 8px 0 12px; font-size: 13px; line-height: 1.55; color: #c2ccc7; }
+.planner-guide .planner-guide-primary { background: #fc6f02; border-color: #fc6f02; color: #211006; font-weight: 800; flex-shrink: 0; }
+.planner-guide .planner-guide-note { font-size: 12px; }
+.planner-guide-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; list-style: none; padding: 0; margin: 18px 0 10px; }
+.planner-guide-steps li { min-width: 0; padding: 16px; border: 1px solid #485250; border-radius: 8px; background: #181e20; }
+.planner-guide-steps li[aria-current="step"] { border-color: #ff9d3f; }
+.planner-guide-number { color: #ff9d3f; font-size: 12px; font-weight: 800; }
+.planner-guide-steps h2 { font-size: 15px; margin: 8px 0; color: #f6f7f0; }
+.planner-guide-steps label { display: block; font-size: 12px; margin-bottom: 6px; }
+.planner-guide-steps select { width: 100%; margin-bottom: 8px; }
+.planner-guide .planner-guide-status { color: #ffe0bd; }
+.planner-guide-status:empty { display: none; }
+@media (max-width: 760px) {
+  .planner-guide-intro { flex-direction: column; align-items: stretch; gap: 8px; }
+  .planner-guide-actions { margin-left: 0; justify-content: flex-start; }
+  .planner-guide-steps { grid-template-columns: 1fr; }
+  .planner-guide { padding: 12px; }
+}

@@ -6925,6 +6925,7 @@ function renderSimulationRotation() {
 }
 
 function renderRotation() {
+    if (typeof refreshPlannerGuide === "function") refreshPlannerGuide();
     const container = document.getElementById("rotationDropZone");
     if (!container) return;
     if (isSimulationTimelineMode()) {

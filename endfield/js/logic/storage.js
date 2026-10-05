@@ -1,5 +1,6 @@
 function saveTeam() {
     localStorage.setItem("team", JSON.stringify(selectedTeam));
+    if (typeof refreshPlannerGuide === "function") refreshPlannerGuide();
 }
 
 function loadTeam() {

@@ -815,6 +815,7 @@ function loadOperatorLoadouts() {
 function saveOperatorLoadouts() {
     operatorLoadouts = normalizeOperatorLoadouts(operatorLoadouts);
     localStorage.setItem(OPERATOR_LOADOUT_STORAGE_KEY, JSON.stringify(operatorLoadouts));
+    if (typeof refreshPlannerGuide === "function") refreshPlannerGuide();
 }
 
 function getOperatorLoadout(operatorId) {

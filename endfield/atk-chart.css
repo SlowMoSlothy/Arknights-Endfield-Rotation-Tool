@@ -693,3 +693,19 @@
     .rotation-sim-damage-track { min-height: 92px; }
     .rotation-sim-atk-legend { gap: 4px 8px; }
 }
+.rotation-sim-damage-inputs { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; padding: 8px 12px; margin: 12px 0; border: 1px solid #ad783d; border-radius: 8px; background: #29251f; color: #ffe1bb; font-size: 13px; line-height: 1.5; }
+.damage-input-dialog { width: min(620px, calc(100vw - 32px)); max-height: calc(100dvh - 40px); margin: auto; padding: 20px; box-sizing: border-box; overflow-y: auto; border: 1px solid #ad783d; border-radius: 12px; background: #202628; color: #ffe1bb; font-size: 13px; line-height: 1.5; box-shadow: 0 24px 80px #0009; }
+.damage-input-dialog::backdrop { background: #000b; }
+:root:not(.rotation-mode-simulation) .rotation-sim-damage-inputs { display: none; }
+.damage-input-dialog-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.damage-input-dialog-heading h2 { margin: 0; font-size: 18px; color: #f6f7f0; }
+.damage-input-dialog-heading button { flex-shrink: 0; font-size: 22px; }
+.damage-input-details > strong { display: block; font-size: 14px; }
+.damage-input-details p { margin: 10px 0; }
+.damage-input-details ul { padding: 0; margin: 14px 0; list-style: none; }
+.damage-input-details li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; align-items: center; padding: 10px 0; border-bottom: 1px solid #ffffff18; }
+.rotation-sim-damage-inputs button, .damage-input-dialog button { border: 1px solid #aa8455; border-radius: 6px; padding: 8px 12px; min-height: 36px; background: #373029; color: #fff3e4; cursor: pointer; font: inherit; }
+.damage-input-dialog button { min-height: 44px; }
+.damage-input-dialog .damage-input-dialog-heading button { min-width: 44px; font-size: 22px; line-height: 1; }
+.rotation-sim-damage-inputs button:hover, .damage-input-dialog button:hover { border-color: #ffa65e; }
+.rotation-sim-damage-inputs button:focus-visible, .damage-input-dialog button:focus-visible { outline: 2px solid #ffa65e; outline-offset: 3px; }

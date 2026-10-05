@@ -459,6 +459,7 @@ async function initApp() {
 
         // Direkt den Rotation Builder anzeigen
         showBuilderScreen();
+        if (typeof initPlannerGuide === "function") initPlannerGuide();
     } catch (error) {
         console.error("App initialization failed:", error);
     } finally {
