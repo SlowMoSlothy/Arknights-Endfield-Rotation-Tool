@@ -7,7 +7,14 @@
         const query = form.elements.search.value.trim().toLowerCase();
         const category = form.elements.category.value;
         let count = 0;
-        cards.sort((a,b) => a.dataset.name.localeCompare(b.dataset.name, 'en') * (form.elements.sort.value === 'name-desc' ? -1 : 1));
+        cards.sort((a,b) => {
+            const sort = form.elements.sort.value;
+            if (sort === 'newest') {
+                const difference = (Number(b.dataset.added) || 0) - (Number(a.dataset.added) || 0);
+                if (difference) return difference;
+            }
+            return a.dataset.name.localeCompare(b.dataset.name, 'en') * (sort === 'name-desc' ? -1 : 1);
+        });
         for (const card of cards) {
             card.hidden = !card.dataset.search.includes(query) || !!category && card.dataset.category !== category;
             if (!card.hidden) count++;

@@ -102,13 +102,16 @@ ${baseStyles()}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v
 
 function tile(row) {
     const search = [row.name, row.location, row.description, ...row.skills.map(skill => skill.name)].join(' ').toLowerCase();
-    return `<a class="operator-tile" href="${enemyPath(row)}" data-name="${escape(row.name.toLowerCase())}" data-search="${escape(search)}" data-category="${escape(row.category)}">
+    return `<a class="operator-tile" href="${enemyPath(row)}" data-added="${catalogAddedAt(row)}" data-name="${escape(row.name.toLowerCase())}" data-search="${escape(search)}" data-category="${escape(row.category)}">
 <span class="tile-avatar-frame"><img class="tile-avatar" src="${portrait(row)}" alt="" loading="lazy" width="256" height="256"></span>
 <div class="tile-body"><span class="enemy-category">${escape(category(row))}</span><h2>${escape(row.name)}</h2>
 <p>${escape(row.location || 'Location unknown')}</p><p>${row.skills.length} ${row.skills.length === 1 ? 'ability' : 'abilities'}</p>${profileEngagementSummaryMarkup('enemy', row.id)}</div></a>`;
 }
 
+const catalogAddedAt = row => Number.isFinite(Date.parse(row.created_at)) ? Date.parse(row.created_at) : 0;
+
 export function createEnemyIndex(rows, workInProgress = true) {
+    rows = [...rows].sort((a, b) => catalogAddedAt(b) - catalogAddedAt(a) || a.name.localeCompare(b.name, 'en'));
     const url = `${SITE}${BASE}`;
     const schema = { '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'Arknights: Endfield Enemy Database', url,
         mainEntity: { '@type': 'ItemList', itemListElement: rows.map((row, index) => ({ '@type': 'ListItem', position: index + 1, name: row.name, url: SITE + enemyPath(row) })) } };
@@ -122,7 +125,7 @@ ${statusBadge(workInProgress)}<section class="index-hero"><div class="eyebrow">R
 <div class="operator-summary" aria-live="polite"><strong id="enemy-count">${rows.length} ${rows.length === 1 ? 'Enemy' : 'Enemies'}</strong><span>Filter the database</span></div>
 <label class="control search-control"><span>Search</span><input type="search" name="search" placeholder="Enemy, location or ability" autocomplete="off"></label>
 <label class="control"><span>Category</span><select name="category"><option value="">All categories</option>${['normal','elite','boss','test'].map(key => `<option value="${key}">${category({category:key})}</option>`).join('')}</select></label>
-<label class="control"><span>Sort</span><select name="sort"><option value="name">Name A-Z</option><option value="name-desc">Name Z-A</option></select></label>
+<label class="control"><span>Sort</span><select name="sort"><option value="newest">Newest first</option><option value="name">Name A-Z</option><option value="name-desc">Name Z-A</option></select></label>
 <button class="filter-reset" type="reset">Reset</button></form></details>
 <section class="operator-grid" aria-label="Enemy profiles">${rows.map(tile).join('\n')}</section>
 <p class="empty-state"${rows.length ? ' hidden' : ''}>${rows.length ? 'No enemies match the selected filters.' : 'No enemies have been published yet.'}</p>
@@ -131,7 +134,7 @@ ${statusBadge(workInProgress)}<section class="index-hero"><div class="eyebrow">R
 <script src="/endfield/supabaseClient.js?v=14"></script>
 <script src="/endfield/js/ui/profileEngagement.js?v=2"></script>
 <script src="/endfield/js/ui/databaseFilters.js?v=1"></script>
-<script src="/endfield/js/ui/enemyCatalog.js?v=1"></script></body></html>`;
+<script src="/endfield/js/ui/enemyCatalog.js?v=2"></script></body></html>`;
 }
 
 export function createEnemyPage(row, rows, workInProgress = true) {

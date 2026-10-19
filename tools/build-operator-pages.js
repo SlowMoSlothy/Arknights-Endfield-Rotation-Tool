@@ -968,7 +968,7 @@ function indexCard(operator) {
     ? `<img class="tile-avatar" src="${escapeHtml(avatar)}" alt="${escapeHtml(operator.name)}" loading="lazy">`
     : `<img class="tile-avatar avatar-placeholder" src="${BRAND_ICON_PATH}" alt="No image available for ${escapeHtml(operator.name)}" loading="lazy">`;
 
-  return `<a class="operator-tile" href="${localPageUrlFor(operator)}" data-name="${escapeHtml(String(operator.name).toLowerCase())}" data-class="${escapeHtml(operatorClass)}" data-element="${escapeHtml(elementType)}" data-rarity="${rarity}" data-order="${sortOrder}">
+  return `<a class="operator-tile" href="${localPageUrlFor(operator)}" data-added="${catalogAddedAt(operator)}" data-name="${escapeHtml(String(operator.name).toLowerCase())}" data-class="${escapeHtml(operatorClass)}" data-element="${escapeHtml(elementType)}" data-rarity="${rarity}" data-order="${sortOrder}">
     <span class="tile-avatar-frame">${avatarMarkup}</span>
     <div class="tile-body">
       <span class="tile-stars">${stars(operator.star)}</span>
@@ -1093,6 +1093,10 @@ function operatorIndexScript() {
         const sort = controls.sort.value;
 
         const sortedCards = [...cards].sort((left, right) => {
+          if (sort === "newest") {
+            const difference = (Number(right.dataset.added) || 0) - (Number(left.dataset.added) || 0);
+            if (difference) return difference;
+          }
           if (sort === "name-desc") return collator.compare(right.dataset.name, left.dataset.name);
           if (sort === "rarity-desc") {
             return Number(right.dataset.rarity) - Number(left.dataset.rarity)
@@ -1420,7 +1424,10 @@ export function createOperatorPage(
 </html>`;
 }
 
+const catalogAddedAt = row => Number.isFinite(Date.parse(row.created_at)) ? Date.parse(row.created_at) : 0;
+
 export function createIndexPage(operators) {
+  operators = [...operators].sort((a, b) => catalogAddedAt(b) - catalogAddedAt(a) || a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }));
   const pageUrl = `${SITE_URL}${BASE_PATH}/operators/`;
   const title = "Arknights Endfield Operator Database | RotationForge";
   const description = "Browse all Arknights: Endfield operators available in the RotationForge database with classes, elements, attributes and direct rotation tool links.";
@@ -1494,6 +1501,7 @@ export function createIndexPage(operators) {
       <label class="control">
         <span>Sort</span>
         <select name="sort">
+          <option value="newest">Newest first</option>
           <option value="name">Name A-Z</option>
           <option value="name-desc">Name Z-A</option>
           <option value="rarity-desc">Highest rarity</option>
