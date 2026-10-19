@@ -19,7 +19,16 @@ test('write verification tolerates a stale read but rejects persistent missing o
 const fixture=JSON.parse(fs.readFileSync(new URL('./fixtures/enemy-import/ram.json',import.meta.url),'utf8'));
 test('runner access denial uses an explicitly dated, checksum-verified capture, not silent fallback for invalid data',async()=>{
   const loaded=await loadSource(async()=>{const error=new Error('denied');error.status=403;throw error;});
-  assert.equal(loaded.mode,'snapshot-fallback-http-403');assert.ok(Date.parse(loaded.capturedAt));assert.equal(mapSource(loaded.data).length,87);
+  assert.equal(loaded.mode,'snapshot-fallback-http-403');assert.ok(Date.parse(loaded.capturedAt));const rows=mapSource(loaded.data);
+  const manifest=JSON.parse(fs.readFileSync(new URL('../tools/data/enemy-source-snapshot.json',import.meta.url),'utf8'));
+  assert.equal(rows.length,manifest.sourceTemplates);
+  for(const id of ['eny_0130_inkbiter','eny_0131_inkscroll','eny_0132_inkkirin','eny_0133_inklion','eny_0134_jsspsi']) {
+    const item=rows.find(row=>row.sourceId===id);
+    assert.ok(item, 'Missing Sanctuary of Ink enemy: '+id);
+    assert.equal(item.row.combat_details.levels.length,100);
+    assert.ok(item.row.skills.length>0);
+    assert.ok(manifest.images[id]);
+  }
   await assert.rejects(loadSource(async()=>{throw new Error('invalid schema');}),/invalid schema/);
 });
 function sourceData() {

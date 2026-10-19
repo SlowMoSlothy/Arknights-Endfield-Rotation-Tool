@@ -1,9 +1,8 @@
 {
   "source": "https://endfield-assets.fffdan.com",
-  "capturedAt": "2026-09-27T18:10:12.972Z",
-  "sha256": "8d87bdf746d7888663578f5133d0eceed4dfd8131a53bbc84503e92c348882bd",
-  "sourceTemplates": 87,
-  "reason": "Public API returns HTTP 403 from GitHub-hosted runners. This validated capture is an explicit fallback, not a claim of live freshness.",
+  "capturedAt": "2026-10-19T17:12:30.686Z",
+  "sha256": "9418998d5f972904207bdba2f22e3a1d356006d899ce0837c8f11444e50db89f",
+  "sourceTemplates": 92,
   "images": {
     "eny_0007_mimicw": "c13143066c54f4926eed71750434fd1169260529d233684e08f2b1c8ada4031a",
     "eny_0018_lbtough": "1612fe0e320c04aa95e95567556c03ce0c3482a64949e6ea2902a8c97c0be145",
@@ -14,6 +13,7 @@
     "eny_0029_lbmob": "a7b532ad58018b67b021c91ed31b26c24b0ff4687dd3f861165361be185edf62",
     "eny_0033_lbhunt": "d2cfc65e05e1bdc20ea26a7383cdeb72139107e872d4cd3d7dbe086493878b2b",
     "eny_0039_agcanno": "865a6a75ce285f9642dac6ec02c262e2bb1db08ce638d19087bfa95074fcef23",
+    "eny_0045_agtrinit": "594b4ae6f1f333c340821e83991aedb15773846a7a4bd1b996be350450fc8b34",
     "eny_0046_lbshamman": "1d827b1c6eef4b810cdc9d9c6616cab1e3999d9d4e10fa4133bc54ea7b59e27d",
     "eny_0047_firebat": "df7a53769edc8e0b264fa7bbd9f618fb3b6d0c274e6667c32ab27b5c9f2d421a",
     "eny_0048_hvybow": "dbd2dd02e26d85039d100341e743a287fb21d8d0189639c27e436e3df742abe9",
@@ -90,6 +90,10 @@
     "eny_0127_bigents": "5a3c0216a4706649ffbaa591296345f6136c14c0a51cdbd3be604086b74f6c1f",
     "eny_0128_babyents": "99a2d8a954d1383b46ae50c95b7cf6e1a6211e3b35c478876a108c25fe4382b1",
     "eny_0129_slwood": "c673efe303303533bf4f34fb26a2d5110be5f1446d2e655ee79d5682d381a865",
-    "eny_0045_agtrinit": "594b4ae6f1f333c340821e83991aedb15773846a7a4bd1b996be350450fc8b34"
+    "eny_0130_inkbiter": "f4bf3d77f89521a1d8227854dbc650ee81eb5ad89b83ff4d42d58d2d9702391a",
+    "eny_0131_inkscroll": "2b12cb939b9c39939f5c718108e50a33ba353c1568d59566ec361e120e4bfec5",
+    "eny_0132_inkkirin": "99cdce5ead778a7a1491686a210778ac24b821177e530bd5e6eee6656754de13",
+    "eny_0133_inklion": "d9071f2316f58a4d77f018d8ba15930aae6295792954a3c997e6089805916607",
+    "eny_0134_jsspsi": "d70bc6b7b59c803638a32f3d03076350fa3b800346d7a84ccc9cc22b902a7b8a"
   }
 }
