@@ -26,6 +26,22 @@ test('weapon content, links, metadata and all nine ranks are present without Jav
   assert.match(createWeaponPage({...weapon, profile:null, base_atk:null}, [weapon]), /<dd>Unknown<\/dd>/);
 });
 
+test('default static and structured-data order uses creation date, never modification date', () => {
+  const rows = [
+    {...weapon, name:'Old', weapon_key:'old', created_at:'2026-01-01', updated_at:'2026-12-01'},
+    {...weapon, name:'Unknown', weapon_key:'unknown', created_at:'invalid'},
+    {...weapon, name:'New B', weapon_key:'new_b', created_at:'2026-10-19'},
+    {...weapon, name:'New A', weapon_key:'new_a', created_at:'2026-10-19'}
+  ];
+  const html = createWeaponIndex(rows);
+  const keys = [...html.matchAll(/class="weapon-tile" href="\/endfield\/weapons\/([^/]+)\//g)].map(m=>m[1]);
+  assert.deepEqual(keys, ['new_a','new_b','old','unknown']);
+  assert.equal(rows[0].weapon_key, 'old');
+  assert.match(html, /<select name="sort"><option value="newest">Newest first/);
+  const schema = JSON.parse(html.match(/<script type="application\/ld\+json">(.*?)<\/script>/s)[1]);
+  assert.deepEqual(schema.mainEntity.itemListElement.map(item=>item.name), ['New A','New B','Old','Unknown']);
+});
+
 test('stored text and unsafe image/source URLs cannot inject markup', () => {
   const row = {...weapon, name:'</script><img src=x onerror=alert(1)>', icon_path:'javascript:alert(1)', profile:{...weapon.profile, source_url:'javascript:alert(1)', skill_descriptions:['<script>alert(1)</script>']}};
   for (const html of [createWeaponIndex([row]), createWeaponPage(row, [row])]) {
@@ -79,15 +95,17 @@ test('regeneration replaces stale weapon pages and preserves other catalogs and 
 
 test('catalog combines search and filters, sorts numeric ATK and resets its empty state', () => {
   const handlers = {};
-  const elements = Object.fromEntries(['search','sort','type','rarity','attribute'].map(key=>[key,{value:key==='sort'?'name':''}]));
-  const cards = [{name:'alpha',search:'alpha fire',type:'sword',rarity:'6',attribute:'Strength',atk:'90'}, {name:'beta',search:'beta frost',type:'polearm',rarity:'5',attribute:'Agility',atk:'500'}].map(dataset=>({dataset}));
+  const elements = Object.fromEntries(['search','sort','type','rarity','attribute'].map(key=>[key,{value:key==='sort'?'newest':''}]));
+  const cards = [{name:'alpha',added:'100',search:'alpha fire',type:'sword',rarity:'6',attribute:'Strength',atk:'90'}, {name:'beta',added:'200',search:'beta frost',type:'polearm',rarity:'5',attribute:'Agility',atk:'500'}].map(dataset=>({dataset}));
   const grid = {children:cards.slice(),append(card){this.children=this.children.filter(other=>other!==card).concat(card);}};
   const count = {}, empty = {};
   const form = {elements,addEventListener:(event,fn)=>handlers[event]=fn};
   const nodes = {'.weapon-toolbar':form,'.weapon-grid':grid,'#weapon-count':count,'.empty-state':empty};
   vm.runInNewContext(fs.readFileSync('endfield/js/ui/weaponCatalog.js','utf8'),{document:{querySelector:selector=>nodes[selector]},requestAnimationFrame:fn=>fn()});
+  assert.equal(grid.children[0],cards[1]);
+  elements.sort.value='name'; handlers.change(); assert.equal(grid.children[0],cards[0]);
   elements.sort.value='atk'; handlers.change(); assert.equal(grid.children[0],cards[1]);
   elements.search.value='fire'; elements.type.value='polearm'; handlers.input(); assert.equal(count.textContent,'0 Weapons'); assert.equal(empty.hidden,false);
   elements.type.value='sword'; handlers.change(); assert.equal(count.textContent,'1 Weapon'); assert.equal(cards[0].hidden,false);
-  elements.search.value=''; elements.type.value=''; handlers.reset(); assert.equal(count.textContent,'2 Weapons'); assert.equal(empty.hidden,true);
+  elements.search.value=''; elements.type.value=''; elements.sort.value='newest'; handlers.reset(); assert.equal(count.textContent,'2 Weapons'); assert.equal(empty.hidden,true); assert.equal(grid.children[0],cards[1]);
 });

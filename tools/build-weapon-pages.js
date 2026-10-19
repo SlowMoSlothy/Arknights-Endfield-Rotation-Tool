@@ -24,6 +24,8 @@ export function safeUrl(value, localImages = false) {
 }
 export const weaponImage = row => safeUrl(row.icon_path, true) || '/favicon-flat.png';
 const absoluteImage = row => weaponImage(row).startsWith('/') ? SITE + weaponImage(row) : weaponImage(row);
+const addedAt = row => Number.isFinite(Date.parse(row.created_at)) ? Date.parse(row.created_at) : 0;
+const newestFirst = (a, b) => addedAt(b) - addedAt(a) || a.name.localeCompare(b.name, 'en', { sensitivity: 'base' });
 const updatedAt = row => [row.updated_at, row.profile?.updated_at].filter(value => value && Number.isFinite(Date.parse(value))).sort((a, b) => Date.parse(b) - Date.parse(a))[0];
 const dateLabel = row => updatedAt(row) ? new Date(updatedAt(row)).toISOString().slice(0, 10) : null;
 
@@ -74,12 +76,13 @@ function breadcrumbs(row) { return `<nav class="breadcrumbs" aria-label="Breadcr
 function stars(row) { return `<span class="weapon-stars" aria-label="${row.rarity} stars">${'★'.repeat(row.rarity)}</span>`; }
 function tile(row) {
   const search = [row.name, typeName(row), row.main_attribute, row.secondary_attribute, row.passive_name].join(' ').toLowerCase();
-  return `<a class="weapon-tile" href="${weaponPath(row)}" data-name="${escape(row.name.toLowerCase())}" data-search="${escape(search)}" data-type="${escape(row.weapon_type)}" data-rarity="${row.rarity}" data-attribute="${escape(row.main_attribute || '')}" data-atk="${numeric(row.base_atk) ? Number(row.base_atk) : -1}">
+  return `<a class="weapon-tile" href="${weaponPath(row)}" data-added="${addedAt(row)}" data-name="${escape(row.name.toLowerCase())}" data-search="${escape(search)}" data-type="${escape(row.weapon_type)}" data-rarity="${row.rarity}" data-attribute="${escape(row.main_attribute || '')}" data-atk="${numeric(row.base_atk) ? Number(row.base_atk) : -1}">
 <span class="weapon-art"><span class="weapon-type">${escape(typeName(row))}</span><img src="${escape(weaponImage(row))}" alt="" loading="lazy" width="256" height="256"></span>
 <span class="weapon-tile-copy">${stars(row)}<h2>${escape(row.name)}</h2><span class="weapon-tile-stats"><span>ATK <strong>${number(row.base_atk)}</strong><small>Lv. ${number(row.base_stats_level)}</small></span><span>${escape(row.main_attribute || 'Unknown attribute')}</span></span><span class="weapon-passive-name">${escape(row.passive_name || 'Skill not recorded')}</span></span></a>`;
 }
 
 export function createWeaponIndex(rows) {
+  rows = [...rows].sort(newestFirst);
   const url = SITE + BASE;
   const schema = { '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'Arknights: Endfield Weapon Database', url,
     mainEntity: { '@type': 'ItemList', itemListElement: rows.map((row, index) => ({ '@type': 'ListItem', position: index + 1, name: row.name, url: SITE + weaponPath(row) })) } };
@@ -94,9 +97,9 @@ export function createWeaponIndex(rows) {
 <label class="control"><span>Type</span><select name="type"><option value="">All types</option>${Object.entries(TYPES).map(([key, name]) => `<option value="${key}">${name}</option>`).join('')}</select></label>
 <label class="control"><span>Rarity</span><select name="rarity"><option value="">All rarities</option>${[...new Set(rows.map(row => row.rarity))].sort((a,b) => b-a).map(rarity => `<option value="${rarity}">${rarity} stars</option>`).join('')}</select></label>
 <label class="control"><span>Attribute</span><select name="attribute"><option value="">All attributes</option>${attributes.map(name => `<option value="${escape(name)}">${escape(name)}</option>`).join('')}</select></label>
-<label class="control"><span>Sort</span><select name="sort"><option value="name">Name A–Z</option><option value="name-desc">Name Z–A</option><option value="rarity">Rarity ↓</option><option value="atk">Base ATK ↓</option></select></label><button type="reset" class="filter-reset">Reset</button></form></details>
+<label class="control"><span>Sort</span><select name="sort"><option value="newest">Newest first</option><option value="name">Name A–Z</option><option value="name-desc">Name Z–A</option><option value="rarity">Rarity ↓</option><option value="atk">Base ATK ↓</option></select></label><button type="reset" class="filter-reset">Reset</button></form></details>
 <section class="weapon-grid" aria-label="Weapons">${rows.map(tile).join('\n')}</section><p class="empty-state" hidden>No weapons match the selected filters.</p>${footer()}</main>
-<script src="/endfield/js/ui/databaseFilters.js?v=1"></script><script src="/endfield/js/ui/weaponCatalog.js?v=1" defer></script></body></html>`;
+<script src="/endfield/js/ui/databaseFilters.js?v=1"></script><script src="/endfield/js/ui/weaponCatalog.js?v=2" defer></script></body></html>`;
 }
 
 function progression(row) {

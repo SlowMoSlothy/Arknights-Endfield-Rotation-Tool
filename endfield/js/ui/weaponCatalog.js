@@ -9,6 +9,10 @@
         const query = controls.search.value.trim().toLowerCase();
         const sort = controls.sort.value;
         cards.sort((a, b) => {
+            if (sort === 'newest') {
+                const difference = (Number(b.dataset.added) || 0) - (Number(a.dataset.added) || 0);
+                if (difference) return difference;
+            }
             if (sort === 'atk' || sort === 'rarity') {
                 const difference = Number(b.dataset[sort]) - Number(a.dataset[sort]);
                 if (difference) return difference;
