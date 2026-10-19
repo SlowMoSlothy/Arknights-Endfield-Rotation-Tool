@@ -1,10 +1,39 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
+import os from 'node:os';
+import path from 'node:path';
+import { sync } from '../tools/sync-endfield-equipment.js';
 import { buildSql, diffCatalog, fetchWeaponList, formatSetDescription, mapGear, mapGearStat, mapWeapon, readExisting, requestJson, checkDatabaseWriteAccess } from '../tools/sync-endfield-equipment.js';
 
 const weapon = JSON.parse(fs.readFileSync(new URL('./fixtures/equipment-import/weapon.json', import.meta.url)));
 const empty = () => ({ weapons: [], weapon_essence_profiles: [], gear_sets: [], gear_items: [] });
+
+test('weapons-only import skips gear sources and never generates gear writes', async () => {
+  const folder = fs.mkdtempSync(path.join(os.tmpdir(), 'weapon-import-'));
+  try {
+    const result = await sync({
+      weaponsOnly: true, output: folder, keysPath: path.join(folder, 'keys.json'),
+      env: { SUPABASE_URL: 'https://example.supabase.co', SUPABASE_ANON_KEY: 'test' },
+      get: async url => {
+        if (url.includes('/rest/v1/gear_items?')) return [{ gear_key: 'retained_gear' }];
+        if (url.includes('/rest/v1/gear_sets?')) return [{ set_key: 'retained_set' }];
+        if (url.includes('/rest/v1/')) return [];
+        if (url.endsWith('/api/weapons?page=1')) return { page: 1, total: 1, data: [{ slug: weapon.slug }] };
+        if (url.endsWith('/api/weapons/' + weapon.slug)) return { data: weapon };
+        throw new Error('Unexpected source request: ' + url);
+      }
+    });
+    assert.equal(result.catalog.weapons.length, 1);
+    assert.equal(result.catalog.weapon_essence_profiles.length, 1);
+    assert.deepEqual(result.report.gear_items.retained, ['retained_gear']);
+    assert.deepEqual(result.report.gear_sets.retained, ['retained_set']);
+    assert.doesNotMatch(result.query, /insert into public\.gear_/);
+    assert.match(result.query, /insert into public\.weapons/);
+  } finally {
+    fs.rmSync(folder, { recursive: true, force: true });
+  }
+});
 
 test('write preflight only reads settings and stops on a read-only session', async () => {
   await assert.rejects(checkDatabaseWriteAccess('example', 'token', async (url, options) => {

@@ -79,7 +79,10 @@
     "jiminy-12": "jiminy_12",
     "opero-77": "opero_77",
     "peco-5": "peco_5",
-    "tarr-11": "tarr_11"
+    "tarr-11": "tarr_11",
+    "complexed-industry": "complexed_industry",
+    "jade-vessel": "jade_vessel",
+    "long-heritage": "long_heritage"
   },
   "gear_items": {
     "item_equip_t0_parts_tundra01_body_01": "basic_armor",
