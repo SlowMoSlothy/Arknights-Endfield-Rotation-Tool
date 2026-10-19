@@ -142,8 +142,10 @@ const literal = value => "'"+JSON.stringify(value).replaceAll("'","''")+"'::json
 export function buildSql(plan) {
   const statements=['begin;', 'set local standard_conforming_strings = on;', 'lock table public.enemies in share row exclusive mode;'];
   for(const {before,after} of plan.changes) {
-    const expected=before?`exists(select 1 from public.enemies e where e.id='${after.id}'::uuid and to_jsonb(e) @> ${literal(before)})`:`not exists(select 1 from public.enemies where id='${after.id}'::uuid)`;
+    const expected=before?`exists(select 1 from public.enemies e where e.id='${after.id}'::uuid and to_jsonb(e) = to_jsonb(jsonb_populate_record(null::public.enemies,${literal(before)})))`:`not exists(select 1 from public.enemies where id='${after.id}'::uuid)`;
     requireValue(/^[0-9a-f-]{36}$/.test(after.id),'Invalid target UUID');
+    // Decode the read snapshot through PostgreSQL column types so timestamps from
+    // the Management API compare by value despite their different JSON spelling.
     // A failed optimistic guard aborts the transaction before any stale write.
     statements.push(`select 1 / case when (${expected}) then 1 else 0 end as unchanged_enemy_guard;`);
     statements.push(`insert into public.enemies (${COLUMNS.join(',')}) select ${COLUMNS.join(',')} from jsonb_populate_record(null::public.enemies,${literal(after)}) on conflict(id) do update set ${COLUMNS.filter(c=>c!=='id').map(c=>`${c}=excluded.${c}`).join(',')};`);

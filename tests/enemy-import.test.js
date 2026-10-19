@@ -100,5 +100,8 @@ test('SQL uses snapshots, escaping and one transaction without deleting profiles
   assert.match(query,/lock table public.enemies/);assert.match(query,/unchanged_enemy_guard/);assert.match(query,/O''Brien \$guard\$/);
   assert.doesNotMatch(query,/delete from|do \$guard\$/i);
   const saved=plan.changes.map(c=>c.after);source[1].row.location='new';
-  assert.match(buildSql(planImport(source,saved)),/to_jsonb\(e\) @>/);
+  saved[1].created_at='2026-09-28 08:38:01.752475+00';
+  const guarded=buildSql(planImport(source,saved));
+  assert.match(guarded,/to_jsonb\(e\) = to_jsonb\(jsonb_populate_record\(null::public\.enemies,/);
+  assert.match(guarded,/2026-09-28 08:38:01.752475\+00/);
 });
