@@ -13,6 +13,8 @@ test('approved catalog additions validate identity and insert with collision pro
  const sql=buildSql([change]);assert.match(sql,/where id=32 or slug='test'/);assert.match(sql,/insert into public.operators/);assert.doesNotMatch(sql,/on conflict|delete |operator_skills/i);
  assert.throws(()=>planNewOperator(binding,{...source,charId:'wrong'}),/identity mismatch/);
  assert.throws(()=>planNewOperator(binding,{...source,profession:999}),/classification/);
+ assert.equal(planNewOperator(binding,{...source,charTypeId:'Cryst'}).after.element_type,'cryo');
+ assert.throws(()=>planNewOperator(binding,{...source,charTypeId:'Unknown'}),/classification/);
  assert.throws(()=>buildSql([{...change,id:'32;drop'}]),/Invalid/);
 });
 test('Management numeric strings normalize without changing raw data, names or missing values',()=>{

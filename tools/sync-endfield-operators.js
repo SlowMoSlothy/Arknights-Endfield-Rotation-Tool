@@ -15,7 +15,7 @@ const camel = name => name.replace(/_([a-z0-9])/g,(_,letter)=>letter.toUpperCase
 export function planNewOperator(binding,detail,resources) {
   assert(detail.charId===binding.sourceId&&detail.engName===binding.name&&detail.slug===binding.slug,'New operator identity mismatch');
   const classes={0:'Guard',1:'Striker',2:'Defender',4:'Supporter',5:'Caster',7:'Vanguard',8:'Striker'};
-  const elements={Physical:'physical',Fire:'heat',Ice:'cryo',Pulse:'electric',Natural:'nature'};
+  const elements={Physical:'physical',Fire:'heat',Ice:'cryo',Cryst:'cryo',Pulse:'electric',Natural:'nature'};
   const weapons={1:'sword',2:'arts_unit',3:'great_sword',4:'polearm',5:'handcannon'};
   const attributes={39:'Strength',40:'Agility',41:'Intellect',42:'Will'};
   assert(classes[detail.profession]&&elements[detail.charTypeId]&&weapons[detail.weaponType]&&attributes[detail.mainAttrType]&&attributes[detail.subAttrType],'Unknown operator classification');

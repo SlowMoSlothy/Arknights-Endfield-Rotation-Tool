@@ -1,3 +1,4 @@
 [
-  {"id":32,"sourceId":"chr_0038_purrche","slug":"purrchena","name":"Purrchena","iconPath":"assets/operators/avatars/Purrchena.png"}
+  {"id":32,"sourceId":"chr_0038_purrche","slug":"purrchena","name":"Purrchena","iconPath":"assets/operators/avatars/Purrchena.png"},
+  {"id":33,"sourceId":"chr_0036_jsspsi","slug":"si","name":"Si","iconPath":"assets/operators/avatars/Si.png"}
 ]

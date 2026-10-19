@@ -14,6 +14,8 @@ The SEO generator renders the full level table for search engines and without Ja
 
 ## Skill ranks, potentials and materials
 
+Si (`chr_0036_jsspsi`, database ID 33) is also registered as a catalog-only addition. The source's `Cryst` classification maps to Cryo, as confirmed by Si's English skill descriptions. Her original source portrait is stored locally; rotation mechanics still require a separate implementation.
+
 The same import also resolves English skill descriptions and rank 1–12 display values, all five potentials, promotion/outfitting costs and per-rank skill upgrade costs. It reads the shared `i18n/I18nTextTable_EN.json` and `items/items-list.json` dictionaries. Named rank values come from the source's `subDescDataList`, retaining its units and labels. Final Strike stagger uses the final normal attack's blackboard; potential placeholders use the recorded effect modifiers. Unsupported or absent values remain explicitly unavailable, never guessed as zero.
 
 This display-only data is stored in `raw_data.operatorCatalogDetails`. It does not modify `operator_skills`, attack timings, simulator mechanics or manually maintained rotation profiles. All twelve ranks are rendered as static, crawlable content and enhanced with a keyboard-accessible range input. Rotation profile names, icons and descriptions appear directly in the corresponding catalog skill cards, including INT/WILL variants. Final Strike replaces the former Basic Attack description; finisher multipliers are not relabeled as Final Strike values. Dive Attack remains its own ranked card. Material quantities represent individual upgrade costs, not cumulative totals. Missing skill ranks, dictionary entries or upgrade data abort before any database write.
