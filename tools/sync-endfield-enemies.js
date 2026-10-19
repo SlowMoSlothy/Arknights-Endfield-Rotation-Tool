@@ -153,12 +153,21 @@ export function buildSql(plan) {
   statements.push('commit;'); return statements.join('\n');
 }
 
+export function normalizeDatabaseEnemy(row) {
+  const normalized={...row};
+  // Management API exposes PostgreSQL numeric columns as strings; REST uses numbers.
+  for(const field of ['hp','defense']) {
+    if(typeof row[field]==='string' && row[field].trim()!=='' && Number.isFinite(Number(row[field]))) normalized[field]=Number(row[field]);
+  }
+  return normalized;
+}
+
 async function readExisting(config,token,get=requestJson) {
   const rows=[];
   const readId=randomUUID();
   for(let offset=0;;offset+=500) {
     const batch=token?await get(`https://api.supabase.com/v1/projects/${config.ref}/database/query`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({query:`select * from public.enemies order by id limit 500 offset ${offset} /* catalog read ${readId} */`,read_only:true})}):await get(`${config.url}/rest/v1/enemies?select=*&order=id&limit=500&offset=${offset}`,{headers:{apikey:config.key}});
-    requireValue(Array.isArray(batch),'Invalid existing enemy response');rows.push(...batch);if(batch.length<500) return rows;
+    requireValue(Array.isArray(batch),'Invalid existing enemy response');rows.push(...batch.map(normalizeDatabaseEnemy));if(batch.length<500) return rows;
   }
 }
 export async function verifySaved(changes,read,wait=ms=>new Promise(resolve=>setTimeout(resolve,ms))) {

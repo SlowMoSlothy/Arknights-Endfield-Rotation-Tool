@@ -1,3 +1,4 @@
+import { normalizeDatabaseEnemy } from '../tools/sync-endfield-enemies.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -104,4 +105,11 @@ test('SQL uses snapshots, escaping and one transaction without deleting profiles
   const guarded=buildSql(planImport(source,saved));
   assert.match(guarded,/to_jsonb\(e\) = to_jsonb\(jsonb_populate_record\(null::public\.enemies,/);
   assert.match(guarded,/2026-09-28 08:38:01.752475\+00/);
+});
+
+test('numeric database fields compare consistently between Management API and REST',()=>{
+  const row={hp:'100888.000',defense:'100',name:'Enemy'};
+  assert.deepEqual(normalizeDatabaseEnemy(row),{hp:100888,defense:100,name:'Enemy'});
+  assert.equal(row.hp,'100888.000');
+  assert.deepEqual(normalizeDatabaseEnemy({hp:null,defense:0}),{hp:null,defense:0});
 });
