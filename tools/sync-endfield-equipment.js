@@ -76,10 +76,12 @@ export async function fetchWeaponList(get = requestJson) {
 
 function identity(existing, field, mapping, sourceId, name) {
   const mapped = mapping[sourceId];
-  if (mapped) return mapped;
+  // A checked-in mapping may be new to an existing deployment. Reuse its
+  // legacy row before creating a second weapon/profile under the suggested key.
+  if (mapped && existing.some(row => row[field] === mapped)) return mapped;
   const matches = existing.filter(row => normalizeName(row.name) === normalizeName(name));
   requireValue(matches.length <= 1, `Ambiguous existing name: ${name}`);
-  const key = matches[0]?.[field] || (name === 'Industry 0.1' ? 'industry_01' : slug(name));
+  const key = matches[0]?.[field] || mapped || (name === 'Industry 0.1' ? 'industry_01' : slug(name));
   requireValue(!existing.some(row => row[field] === key && normalizeName(row.name) !== normalizeName(name)), `Key collision: ${key}`);
   mapping[sourceId] = key;
   return key;

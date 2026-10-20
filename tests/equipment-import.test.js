@@ -83,6 +83,35 @@ test('weapon import preserves saved loadout keys and imports all nine skill rank
   assert.equal(renamed.weapon.weapon_key, 'legacy_sword');
 });
 
+test('new source mappings reuse an existing legacy weapon and Essence key', () => {
+  for (const name of ['Complexed Industry', 'Jade Vessel', 'Long Heritage']) {
+    const sourceSlug = name.toLowerCase().replaceAll(' ', '-');
+    const existing = empty();
+    existing.weapons.push({ weapon_key: 'legacy_key', name, icon_path: 'legacy.png' });
+    const keys = { [sourceSlug]: sourceSlug.replaceAll('-', '_') };
+    const result = mapWeapon({ ...weapon, slug: sourceSlug, name }, existing, keys);
+    assert.equal(result.weapon.weapon_key, 'legacy_key');
+    assert.equal(result.profile.weapon_key, 'legacy_key');
+    assert.equal(keys[sourceSlug], 'legacy_key');
+  }
+});
+
+test('Essence import leaves every tuning column out of conflict updates', () => {
+  const existing = empty(), catalog = empty();
+  const { weapon: row, profile } = mapWeapon(weapon, existing, {});
+  existing.weapon_essence_profiles.push({ ...profile,
+    primary_base_ranks: [1, 2, 3, 4, 5], secondary_base_ranks: [1, 1, 2, 2, 3],
+    primary_max_essence: 7, secondary_max_essence: 6, skill_max_essence: 8,
+    skill_name: 'Old description', verified: true
+  });
+  catalog.weapons.push(row);
+  catalog.weapon_essence_profiles.push(profile);
+  const query = buildSql(catalog, diffCatalog(catalog, existing));
+  assert.match(query, /insert into public\.weapon_essence_profiles/);
+  assert.doesNotMatch(query, /primary_base_ranks|secondary_base_ranks|primary_max_essence|secondary_max_essence|skill_max_essence/);
+  assert.equal(profile.verified, false);
+});
+
 test('missing weapon ranks fail before generating an incomplete profile', () => {
   assert.throws(() => mapWeapon({ ...weapon, skill: { ...weapon.skill, ranks: weapon.skill.ranks.slice(1) } }, empty(), {}), /Missing skill ranks/);
 });
