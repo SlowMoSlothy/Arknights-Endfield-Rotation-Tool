@@ -13,7 +13,7 @@ test('catalog cards preserve existing skill icons and provide local source icons
  const fallback=catalogSkillHeader(skill,{element_type:'physical'});
  assert.match(fallback,/catalog-skills\/icon_skill_purrche_01.png/);
  const manifest=JSON.parse(fs.readFileSync('tools/data/operator-skill-icons.json','utf8'));
- assert.equal(Object.keys(manifest).length,128);
+ assert.equal(Object.keys(manifest).length,132);
  for(const icon of Object.values(manifest))assert.ok(fs.existsSync(`endfield/assets/operators/catalog-skills/${icon}.png`));
 });
 test('source ranks, final strike, potential multipliers and named upgrade costs resolve correctly',()=>{
