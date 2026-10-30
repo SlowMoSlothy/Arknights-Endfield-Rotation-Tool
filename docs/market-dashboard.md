@@ -63,3 +63,12 @@ Histories are fetched read-only from Supabase when the selection changes; failed
 refreshes retain cached observations with an explicit message. Stale requests are
 cancelled and cannot replace a later selection. Comparison does not change favorites,
 alerts or the single-good detail panel. No selection is sent to a server or saved.
+
+Price / Change % switches the comparison chart and its summary between absolute
+prices and percentage change. Each good's first actual observation in the selected
+period is its 0% baseline; changing the period recalculates that baseline. Baseline
+dates appear in the legend because goods can start on different dates. The formula
+is (price / baseline price - 1) * 100. Percentage extrema and average use these
+normalized daily observations, not day-over-day returns. The daily-values table
+retains raw prices and adds a percentage column. Switching modes makes no requests,
+preserves selection, and does not change card/detail prices or stored data.
