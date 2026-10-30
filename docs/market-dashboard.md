@@ -18,6 +18,9 @@ illustration lives in `assets/market-trading-depot.webp` and is not a game captu
 Daily statistics count the last observation per Europe/Berlin calendar day.
 Historical game arrays with unconfirmed dates are excluded. Every price shows
 its observation date; a connected page does not imply a real-time game feed.
-The goods names currently follow the German game client.
+Goods names use the official English localization, mapped by goods IDs in
+`marketNames.js`; live German source names do not overwrite the display names.
+The compact layout prioritizes visible prices; on mobile the history panel
+starts collapsed and opens when a good is selected.
 
 Tests: `node --test tests/market-dashboard.test.js tests/landing-page.test.js`.

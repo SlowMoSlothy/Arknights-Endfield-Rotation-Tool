@@ -1,0 +1,28 @@
+// Official English item names from the installed game localization, matched by item/reward IDs.
+export const marketNames = {
+  "domainshop_goods_rand_map01_1": "Ankhorilling Kitchenware [pkg]",
+  "domainshop_goods_rand_map01_10": "Originium Saplings [pkg]",
+  "domainshop_goods_rand_map01_11": "Vigilant Pickaxes [pkg]",
+  "domainshop_goods_rand_map01_12": "Hard Noggin Helmets [pkg]",
+  "domainshop_goods_rand_map01_2": "Musbeast Scrimshaw Dangles [pkg]",
+  "domainshop_goods_rand_map01_3": "Witchcraft Mining Drill [pkg]",
+  "domainshop_goods_rand_map01_4": "Aggeloi War Tins [pkg]",
+  "domainshop_goods_rand_map01_5": "Valley Hydroculture Fillets [pkg]",
+  "domainshop_goods_rand_map01_6": "Unity Syrup [pkg]",
+  "domainshop_goods_rand_map01_7": "Seš'qamam Knucklebones [pkg]",
+  "domainshop_goods_rand_map01_8": "Astarron Crystals [pkg]",
+  "domainshop_goods_rand_map01_9": "Scrap Toy Blocks [pkg]",
+  "domainshop_goods_rand_map02_1": "Wuling Frozen Pears [pkg]",
+  "domainshop_goods_rand_map02_10": "Swordmancer Forge [pkg]",
+  "domainshop_goods_rand_map02_11": "Xiranite Bridge [pkg]",
+  "domainshop_goods_rand_map02_12": "Marker Stone Lock [pkg]",
+  "domainshop_goods_rand_map02_13": "Chubby Lung Blimp [pkg]",
+  "domainshop_goods_rand_map02_2": "Eureka Anti-smog Tincture [pkg]",
+  "domainshop_goods_rand_map02_3": "Nymphsprout [pkg]",
+  "domainshop_goods_rand_map02_4": "Wuxia Movies [pkg]",
+  "domainshop_goods_rand_map02_5": "Chubby Lung Tianshi [pkg]",
+  "domainshop_goods_rand_map02_6": "Xiran-Hue Fireworks [pkg]",
+  "domainshop_goods_rand_map02_7": "Xiranite Filter Cores [pkg]",
+  "domainshop_goods_rand_map02_8": "Qingbo Rafts [pkg]",
+  "domainshop_goods_rand_map02_9": "Aerial Receptionists [pkg]"
+};
