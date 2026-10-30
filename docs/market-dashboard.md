@@ -51,3 +51,5 @@ produces no comparison. The compact recorded-range bar positions the latest
 price between the minimum and maximum of the observed daily prices. Equal
 endpoints use a centered marker without dividing by zero. Invalid or inconsistent
 ranges are shown as unavailable rather than silently clamped.
+
+History period controls (7 / 30 / All days) affect the selected history and detail statistics only. Cards retain all-time statistics. The calendar window ends today in Europe/Berlin, is inclusive, and never invents missing observations. Empty periods show an explicit message and no period extrema.
