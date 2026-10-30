@@ -43,3 +43,11 @@ prices and observation dates, not a live game-server feed. They are evaluated
 while the page is open or when reopened; there are no closed-page push, email
 or background notifications. Denied storage falls back to this visit only.
 Automatic refresh does not replace an alert editor while it is focused.
+
+Cards and the detail panel show amount/percentage change against
+previous_observed_day_price, explicitly labelled previous recorded day. This is
+not necessarily yesterday. A missing/zero prior value or one observed day
+produces no comparison. The compact recorded-range bar positions the latest
+price between the minimum and maximum of the observed daily prices. Equal
+endpoints use a centered marker without dividing by zero. Invalid or inconsistent
+ranges are shown as unavailable rather than silently clamped.

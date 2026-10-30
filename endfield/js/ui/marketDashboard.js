@@ -1,6 +1,6 @@
-import { MarketAlerts, alertEditor } from '../data/marketAlerts.js';
+import { MarketAlerts, alertEditor } from '../data/marketAlerts.js?v=5';
 import { MarketFavorites } from '../data/marketFavorites.js';
-import { cardMarkup, detailMarkup, filterStats, identity, createMarketApi, validateStats, validateHistory } from '../data/marketData.js?v=4';
+import { cardMarkup, detailMarkup, filterStats, identity, createMarketApi, validateStats, validateHistory } from '../data/marketData.js?v=5';
 const seed=JSON.parse(document.getElementById('market-seed').textContent), config=JSON.parse(document.getElementById('market-config').textContent);
 const favorites=new MarketFavorites(),alerts=new MarketAlerts();let view='all';
 let rows=validateStats(seed.statistics), selected=rows[0]?identity(rows[0]):null, history=validateHistory(seed.history), request=0;

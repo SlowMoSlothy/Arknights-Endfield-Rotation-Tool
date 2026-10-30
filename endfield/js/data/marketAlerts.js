@@ -1,4 +1,4 @@
-import {identity,displayName,escapeHtml,number} from './marketData.js?v=4';
+import {identity,displayName,escapeHtml,number} from './marketData.js?v=5';
 const KEY='rotationforge.market.alerts.v1';
 const validId=id=>typeof id==='string'&&/^domainshop_page_rand_map0[12]:domainshop_goods_rand_map0[12]_\d+$/.test(id);
 export const validTarget=value=>Number.isSafeInteger(value)&&value>0&&value<=2147483647;
