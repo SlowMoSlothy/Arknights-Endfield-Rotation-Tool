@@ -62,7 +62,15 @@ Dates are spaced by calendar distance; missing observations are never generated.
 Histories are fetched read-only from Supabase when the selection changes; failed
 refreshes retain cached observations with an explicit message. Stale requests are
 cancelled and cannot replace a later selection. Comparison does not change favorites,
-alerts or the single-good detail panel. No selection is sent to a server or saved.
+alerts or the single-good detail panel. No selection is sent to a server.
+
+Comparison selections are stored locally under
+`rotationforge.market.comparison.selection.v1` and restored on the next visit.
+Only up to four distinct goods currently in the catalog are accepted. Restored
+selections open the comparison panel and refresh the selected histories; Price
+and All days remain the default display settings. Clear comparison also clears
+the saved selection. Storage failures keep an in-memory selection with an explicit
+visit-only message. This is specific to this browser, with no account/device sync.
 
 Price / Change % switches the comparison chart and its summary between absolute
 prices and percentage change. Each good's first actual observation in the selected
