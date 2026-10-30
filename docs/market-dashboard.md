@@ -53,3 +53,13 @@ endpoints use a centered marker without dividing by zero. Invalid or inconsisten
 ranges are shown as unavailable rather than silently clamped.
 
 History period controls (7 / 30 / All days) affect the selected history and detail statistics only. Cards retain all-time statistics. The calendar window ends today in Europe/Berlin, is inclusive, and never invents missing observations. Empty periods show an explicit message and no period extrema.
+
+The collapsed Compare goods panel supports up to four independently selected goods,
+with searchable English names and regions. A shared absolute-price/date chart uses
+distinct colors, line patterns and observation dots. Its separate 7 / 30 / All days
+control also scopes the summary statistics and accessible daily-values table.
+Dates are spaced by calendar distance; missing observations are never generated.
+Histories are fetched read-only from Supabase when the selection changes; failed
+refreshes retain cached observations with an explicit message. Stale requests are
+cancelled and cannot replace a later selection. Comparison does not change favorites,
+alerts or the single-good detail panel. No selection is sent to a server or saved.
