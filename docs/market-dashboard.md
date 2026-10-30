@@ -24,3 +24,11 @@ The compact layout prioritizes visible prices; on mobile the history panel
 starts collapsed and opens when a good is selected.
 
 Tests: `node --test tests/market-dashboard.test.js tests/landing-page.test.js`.
+
+Favorites are saved under `rotationforge.market.favorites.v1` in browser localStorage.
+They pin to the top of the normal list and can be filtered with Favorites. Storage
+failures fall back to this visit only, with an explanatory message. Resetting
+filters does not delete favorites. No account or server storage is involved.
+Best deals includes only observations below their base price and sorts by the
+price/base-price ratio, greatest discount first. Region and search still apply.
+Each card includes its latest observation date in Europe/Berlin.

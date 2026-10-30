@@ -12,13 +12,18 @@ export function validateStats(rows) {
   }
   return rows;
 }
-export function filterStats(rows, { search = '', region = '', sort = 'name' } = {}) {
+export function filterStats(rows, { search = '', region = '', sort = 'name', view = 'all' } = {}, favorites = new Set()) {
   const q = search.trim().toLocaleLowerCase();
-  return rows.filter(r => (!region || r.region === region) && (!q || displayName(r).toLocaleLowerCase().includes(q) || r.goods_id.includes(q))).sort((a,b) => sort === 'price-low' ? a.latest_price-b.latest_price : sort === 'price-high' ? b.latest_price-a.latest_price : sort === 'deviation' ? (a.latest_price/a.base_price)-(b.latest_price/b.base_price) : displayName(a).localeCompare(displayName(b),'en'));
+  return rows.filter(r => (!region || r.region === region) && (!q || displayName(r).toLocaleLowerCase().includes(q) || r.goods_id.includes(q)) && (view !== 'favorites' || favorites.has(identity(r))) && (view !== 'deals' || r.latest_price < r.base_price)).sort((a,b) => {
+    const byName=()=>displayName(a).localeCompare(displayName(b),'en');
+    if(view==='deals')return a.latest_price/a.base_price-b.latest_price/b.base_price||byName();
+    const pinned=Number(favorites.has(identity(b)))-Number(favorites.has(identity(a)));if(pinned)return pinned;
+    return (sort==='price-low'?a.latest_price-b.latest_price:sort==='price-high'?b.latest_price-a.latest_price:sort==='deviation'?a.latest_price/a.base_price-b.latest_price/b.base_price:0)||byName();
+  });
 }
-export function cardMarkup(r, selected = false) {
+export function cardMarkup(r, selected = false, favorite = false) {
   const pct = (r.latest_price / r.base_price - 1) * 100;
-  return `<button type="button" class="market-item${selected?' selected':''}" data-market-id="${escapeHtml(identity(r))}" aria-pressed="${selected}"><span class="market-item-top"><span>${escapeHtml(r.region)}</span><span class="${pct<0?'below':'above'}">${pct>0?'+':''}${number(pct)}%</span></span><strong class="market-name">${escapeHtml(displayName(r))}</strong><span class="market-price">${number(r.latest_price)} <small>per package</small></span><span class="market-mini">Min ${number(r.min_price)} <span>Avg ${number(r.average_price)}</span> Max ${number(r.max_price)}</span><span class="market-item-bottom">${r.observed_days} recorded days <span>View history ↗</span></span></button>`;
+  return `<div class="market-item-wrap"><button type="button" class="market-favorite" data-favorite-id="${escapeHtml(identity(r))}" aria-pressed="${favorite}" aria-label="${favorite?'Remove':'Add'} ${escapeHtml(displayName(r))} ${favorite?'from':'to'} favorites" title="${favorite?'Remove favorite':'Add favorite'}">${favorite?'★':'☆'}</button><button type="button" class="market-item${selected?' selected':''}" data-market-id="${escapeHtml(identity(r))}" aria-pressed="${selected}"><span class="market-item-top"><span>${escapeHtml(r.region)}</span><span class="${pct<0?'below':'above'}">${pct>0?'+':''}${number(pct)}%</span></span><strong class="market-name">${escapeHtml(displayName(r))}</strong><span class="market-price">${number(r.latest_price)} <small>per package</small></span><span class="market-mini">Min ${number(r.min_price)} <span>Avg ${number(r.average_price)}</span> Max ${number(r.max_price)}</span><span class="market-item-bottom">${escapeHtml(new Date(r.latest_observed_at).toLocaleDateString('en-GB',{timeZone:'Europe/Berlin'}))} · ${r.observed_days} days <span>History ↗</span></span></button></div>`;
 }
 export function validateHistory(rows) {
   if (!Array.isArray(rows) || rows.some(r => !/^\d{4}-\d{2}-\d{2}$/.test(r.observation_day) || !Number.isFinite(Date.parse(r.observation_day)) || !Number.isInteger(r.price) || r.price <= 0 || !Number.isFinite(Date.parse(r.observed_at)))) throw new Error('Invalid market history');
