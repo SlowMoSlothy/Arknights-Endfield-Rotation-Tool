@@ -30,7 +30,7 @@ test("landing page uses concise non-repetitive header copy", () => {
 });
 
 test("tool cards use a shared text-only Endfield game identity", () => {
-  assert.equal((landingHtml.match(/class="game-name">Arknights: Endfield/g) || []).length, 4);
+  assert.equal((landingHtml.match(/class="game-name">Arknights: Endfield/g) || []).length, 5);
   assert.match(landingHtml, /class="game-tool-name">Rotation Planner/);
   assert.match(landingHtml, /class="game-tool-name">Operator Database/);
   assert.match(landingHtml, /class="game-tool-name">Weapon Database/);
@@ -39,4 +39,10 @@ test("tool cards use a shared text-only Endfield game identity", () => {
   assert.doesNotMatch(landingHtml, /class="game-icon"/);
   assert.doesNotMatch(landingHtml, /background-image:\s*url\("\/endfield\/assets\/header\.png"\)/);
   assert.doesNotMatch(landingHtml, /<h3>Endfield Operator Database<\/h3>/);
+});
+
+test("landing page links the market dashboard with its own artwork", () => {
+  assert.match(landingHtml, /href="endfield\/market\/"/);
+  assert.match(landingHtml, /Market Prices &amp; Statistics/);
+  assert.match(landingHtml, /assets\/market-trading-depot\.webp/);
 });

@@ -5,3 +5,4 @@ Sitemap: https://rotationforge.gg/sitemap.xml
 
 Sitemap: https://rotationforge.gg/sitemap-enemies.xml
 Sitemap: https://rotationforge.gg/sitemap-weapons.xml
+Sitemap: https://rotationforge.gg/sitemap-market.xml
