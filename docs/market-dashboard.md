@@ -32,3 +32,14 @@ filters does not delete favorites. No account or server storage is involved.
 Best deals includes only observations below their base price and sorts by the
 price/base-price ratio, greatest discount first. Region and search still apply.
 Each card includes its latest observation date in Europe/Berlin.
+
+Price alerts are local target prices for favorites, stored separately under
+`rotationforge.market.alerts.v1`. An alert is reached when the last recorded
+price is less than or equal to its positive integer target. Unstarring pauses
+the alert but retains the target. Removing an alert deletes its target.
+The Alerts view lists configured targets for current favorites; a banner marks
+reached targets even when another list/filter is open. Alerts use recorded
+prices and observation dates, not a live game-server feed. They are evaluated
+while the page is open or when reopened; there are no closed-page push, email
+or background notifications. Denied storage falls back to this visit only.
+Automatic refresh does not replace an alert editor while it is focused.
