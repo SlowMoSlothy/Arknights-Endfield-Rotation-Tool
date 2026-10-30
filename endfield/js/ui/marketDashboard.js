@@ -1,4 +1,4 @@
-import { cardMarkup, detailMarkup, filterStats, identity, createMarketApi, validateStats, validateHistory } from '../data/marketData.js';
+import { cardMarkup, detailMarkup, filterStats, identity, createMarketApi, validateStats, validateHistory } from '../data/marketData.js?v=2';
 const seed=JSON.parse(document.getElementById('market-seed').textContent), config=JSON.parse(document.getElementById('market-config').textContent);
 let rows=validateStats(seed.statistics), selected=rows[0]?identity(rows[0]):null, history=validateHistory(seed.history), request=0;
 const api=createMarketApi(config), grid=document.getElementById('market-grid'), detail=document.getElementById('market-detail'), status=document.getElementById('market-status'), form=document.getElementById('market-filters'), refresh=document.getElementById('market-refresh');
