@@ -284,8 +284,13 @@ function canDropOnSimulationTrack(track, item = null) {
 }
 
 function placeSkillOnSimulationTrack(skillId, simulationTrack, event) {
+    if (!simulationTrack) return false;
+    return placeSkillAtSimulationTime(skillId, getSimulationDropTime(simulationTrack, event));
+}
+
+function placeSkillAtSimulationTime(skillId, time) {
     const draggedId = parseInt(skillId, 10);
-    if (!draggedId || !simulationTrack) return false;
+    if (!draggedId || !Number.isFinite(time) || time < 0) return false;
 
     const originalSkill = getSkillById(draggedId);
     if (!originalSkill) return false;
@@ -294,7 +299,7 @@ function placeSkillOnSimulationTrack(skillId, simulationTrack, event) {
         finalSkillId = getMappedSkillIdForOperatorState(draggedId);
     }
 
-    const time = getSimulationDropTime(simulationTrack, event);
+    if (typeof beginMobileRotationEdit === "function") beginMobileRotationEdit();
     rotation.push({
         uid: crypto.randomUUID(),
         id: finalSkillId,
@@ -342,6 +347,8 @@ function createSourceSortable(target) {
             put: false
         },
         sort: false,
+        filter: () => window.innerWidth <= 700,
+        preventOnFilter: false,
         draggable: ".skill-small:not(.basic-attack-small)",
         forceFallback: true,
         fallbackOnBody: true,

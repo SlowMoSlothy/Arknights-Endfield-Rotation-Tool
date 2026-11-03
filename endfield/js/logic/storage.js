@@ -37,6 +37,7 @@ function loadOperatorUltimateStates() {
     }
 }
 function saveRotation() {
+    if (typeof commitMobileRotationEdit === "function") commitMobileRotationEdit();
     localStorage.setItem("rotation", JSON.stringify(rotation));
     localStorage.setItem("operatorUltimateStates", JSON.stringify(operatorUltimateStates));
     renderRotation();
@@ -110,10 +111,12 @@ function loadRotation() {
 }
 
 function clearRotation() {
+    if (typeof beginMobileRotationEdit === "function") beginMobileRotationEdit();
     operatorUltimateStates = {};
     localStorage.removeItem("operatorUltimateStates");
     rotation = [null];
     localStorage.removeItem("rotation");
+    if (typeof commitMobileRotationEdit === "function") commitMobileRotationEdit();
     renderRotation();
     if (typeof refreshSkillsAfterRotationChange === "function") {
         refreshSkillsAfterRotationChange();

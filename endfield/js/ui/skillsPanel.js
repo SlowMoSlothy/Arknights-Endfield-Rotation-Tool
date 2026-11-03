@@ -432,6 +432,10 @@ function positionSkillTooltip(targetEl) {
     if (left < 8) left = 8;
     if (left + tooltipRect.width > window.innerWidth - 8) left = window.innerWidth - tooltipRect.width - 8;
     if (top < 8) top = rect.bottom + margin;
+    if (window.innerWidth <= 700) {
+        left = Math.max(8, Math.min(left, window.innerWidth - tooltipRect.width - 8));
+        top = Math.max(8, Math.min(rect.bottom + margin, window.innerHeight - tooltipRect.height - 8));
+    }
     tooltip.style.left = `${left}px`;
     tooltip.style.top = `${top}px`;
 }
@@ -457,6 +461,23 @@ function toggleSkillTooltip(targetEl, skillData) {
 }
 
 function attachSkillTooltipEvents(skillEl, skillData) {
+    let holdTimer = null;
+    let start = null;
+    const cancelHold = () => { clearTimeout(holdTimer); holdTimer = null; };
+    skillEl.addEventListener("pointerdown", event => {
+        if (window.innerWidth > 700 || event.button > 0) return;
+        delete skillEl.dataset.longPressConsumed;
+        start = {x: event.clientX, y: event.clientY};
+        holdTimer = setTimeout(() => {
+            skillEl.dataset.longPressConsumed = "true";
+            showSkillTooltip(skillEl, skillData);
+        }, 500);
+    });
+    skillEl.addEventListener("pointermove", event => {
+        if (start && Math.hypot(event.clientX - start.x, event.clientY - start.y) > 8) cancelHold();
+    });
+    ["pointerup", "pointercancel", "pointerleave"].forEach(type => skillEl.addEventListener(type, cancelHold));
+    skillEl.addEventListener("contextmenu", event => { if (window.innerWidth <= 700) event.preventDefault(); });
     skillEl.addEventListener("mouseenter", () => { if (window.innerWidth > 900) showSkillTooltip(skillEl, skillData); });
     skillEl.addEventListener("mouseleave", () => { if (window.innerWidth > 900) hideSkillTooltip(); });
     skillEl.addEventListener("mousemove", () => {
@@ -468,6 +489,7 @@ function attachSkillTooltipEvents(skillEl, skillData) {
         if (window.innerWidth > 900) return;
         e.preventDefault();
         e.stopPropagation();
+        if (window.innerWidth <= 700) return;
         toggleSkillTooltip(skillEl, skillData);
     });
 }
@@ -693,6 +715,47 @@ function getOperatorSkillCardBackground(op) {
     return op?.background || op?.icon;
 }
 
+function createMobileOperatorSummary(op, index) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "mobile-operator-summary";
+    button.setAttribute("aria-label", `${op.name}: operator actions`);
+    button.title = op.name;
+    button.setAttribute("aria-haspopup", "dialog");
+    const image = document.createElement("img");
+    image.src = op.icon || op.background;
+    image.alt = "";
+    const name = document.createElement("span");
+    name.textContent = op.name;
+    button.append(image, name);
+    if (index === 0) button.dataset.leader = "true";
+    button.addEventListener("click", () => {
+        const dialog = document.createElement("dialog");
+        dialog.className = "mobile-operator-actions";
+        dialog.setAttribute("aria-label", `${op.name} actions`);
+        const title = document.createElement("strong");
+        title.textContent = `${index === 0 ? "Leader · " : ""}${op.name}`;
+        dialog.appendChild(title);
+        const actions = [
+            ["Change operator", () => openTeamSelectionModal(index)],
+            ["Operator details", () => window.open(createOperatorLandingPageUrl(op), "_blank", "noopener")]
+        ];
+        if (typeof openOperatorLoadoutModal === "function") actions.push(["Equipment", () => openOperatorLoadoutModal(op.id)]);
+        actions.push(["Close", () => {}]);
+        actions.forEach(([label, action]) => {
+            const control = document.createElement("button");
+            control.type = "button";
+            control.textContent = label;
+            control.addEventListener("click", () => { dialog.close(); action(); });
+            dialog.appendChild(control);
+        });
+        dialog.addEventListener("close", () => { dialog.remove(); button.focus(); });
+        document.body.appendChild(dialog);
+        dialog.showModal();
+    });
+    return button;
+}
+
 function renderSkills() {
     const list = document.getElementById("skillList");
     if (!list) return;
@@ -719,6 +782,7 @@ function renderSkills() {
             : String(op.elementType || "neutral").trim().toLowerCase();
         operatorWrapper.classList.add(`operator-element-${operatorElement || "neutral"}`);
 
+        operatorWrapper.appendChild(createMobileOperatorSummary(op, index));
         const card = document.createElement("div");
         card.className = "operator-skill-card";
         const bgPath = getOperatorSkillCardBackground(op);
@@ -789,6 +853,7 @@ function renderSkills() {
     });
     list.appendChild(wrapper);
     renderRotationQuickSkills();
+    if (typeof updateMobileUndoButton === "function") updateMobileUndoButton();
 }
 
 function createQuickSkillSource(skill, operator) {
@@ -907,7 +972,7 @@ function renderRotationQuickSkills() {
         const row = document.createElement("div");
         row.className = "skill-row rotation-quick-skill-row";
         skills.forEach(skill => row.appendChild(createQuickSkillSource(skill, operator)));
-        group.append(name, row);
+        group.append(createMobileOperatorSummary(operator, selectedTeam.indexOf(operatorId)), name, row);
         groups.appendChild(group);
     });
 

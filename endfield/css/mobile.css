@@ -1161,3 +1161,105 @@
         backdrop-filter: blur(6px);
     }
 }
+
+.mobile-operator-summary, .mobile-rotation-tools { display: none; }
+.mobile-operator-actions {
+    width: min(340px, calc(100vw - 32px)); box-sizing: border-box;
+    padding: 20px; border: 1px solid #737a48; border-radius: 16px;
+    background: #20282a; color: #f3f4ec;
+}
+.mobile-operator-actions::backdrop { background: #080c10bb; }
+.mobile-operator-actions strong { display: block; margin-bottom: 12px; }
+.mobile-operator-actions button {
+    display: block; width: 100%; min-height: 44px; margin-top: 8px;
+    border: 1px solid #5d6866; border-radius: 8px; background: #303a3c; color: inherit;
+}
+@media (max-width: 700px) {
+    #builderScreen .app-brand { padding: 8px 10px; gap: 6px; margin-bottom: 8px; }
+    #builderScreen .app-brand-copy { gap: 6px; }
+    #builderScreen .app-brand-title strong { font-size: 20px; line-height: 1.1; letter-spacing: .03em; }
+    #builderScreen .app-brand-kicker, #builderScreen .app-beta-chip { display: none; }
+    #builderScreen .planner-guide-actions { margin: 0; gap: 4px; }
+    #builderScreen .planner-guide-actions button { min-height: 32px; padding: 6px 8px; }
+    #builderScreen .builder-shell { padding: 8px; }
+    #builderScreen .builder-main { gap: 8px; }
+    #builderScreen #rotationBuilderPanel { padding: 8px; }
+    #builderScreen .builder-divider { margin: 6px 0; }
+    #builderScreen .skills-panel { width: 100%; padding: 4px; overflow: visible; }
+    #builderScreen .operators-skills-grid { display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; gap: 6px; }
+    #builderScreen .operator-skill-wrapper {
+        display: grid; grid-template-columns: 70px minmax(0, 1fr); align-items: center;
+        width: 100%; min-width: 0; gap: 4px; padding: 3px; box-sizing: border-box;
+        border: 1px solid color-mix(in srgb, var(--element-color, #858a77) 55%, #303936);
+        border-radius: 10px; background: #0b1113bb;
+    }
+    #builderScreen .operator-skill-wrapper.leader { border-left: 3px solid #f3ef43; }
+    #builderScreen .operator-skill-wrapper > .operator-skill-card,
+    #builderScreen .operator-skill-wrapper > .operator-weapon-loadout { display: none; }
+    #builderScreen .mobile-operator-summary {
+        display: flex; align-items: center; flex-direction: column; justify-content: center; gap: 1px;
+        min-width: 0; width: 70px; min-height: 60px; padding: 2px;
+        border: 0; border-radius: 8px; background: transparent; color: #f4f5ed; cursor: pointer;
+    }
+    #builderScreen .mobile-operator-summary img { width: 36px; height: 36px; border-radius: 7px; object-fit: cover; }
+    #builderScreen .mobile-operator-summary span { display: block; max-width: 66px; font-size: 10px; line-height: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #builderScreen .operator-owned-skill-row,
+    #builderScreen .operator-skill-wrapper.leader .operator-owned-skill-row {
+        width: 100%; min-width: 0; height: auto; min-height: 48px; margin: 0;
+        padding: 0; gap: 0; border: 0; background: transparent; box-shadow: none;
+        transform: none; border-radius: 0; justify-content: space-evenly; flex-wrap: wrap;
+    }
+    #builderScreen .operator-owned-skill-row > .operator-skill-owner { display: none; }
+    /* Keep Arcane's stance switch usable without a wide ownership pill. */
+    #builderScreen .operator-owned-skill-row > .operator-skill-owner:has(.operator-attribute-variant) {
+        display: flex; position: static; transform: none; width: 100%; max-width: none;
+        order: 2; border: 0; background: transparent; overflow: visible; padding: 0;
+    }
+    #builderScreen .operator-skill-owner:has(.operator-attribute-variant) > :not(.operator-attribute-variant) { display: none; }
+    #builderScreen .operator-attribute-variant-btn { min-height: 28px; min-width: 44px; }
+    #builderScreen .operator-owned-skill-row > .skill-small {
+        flex: 0 0 44px; width: 44px; height: 44px; min-width: 44px; min-height: 44px;
+        box-sizing: border-box; padding: 2px; touch-action: pan-y; cursor: pointer;
+    }
+    #builderScreen .operator-owned-skill-row .ef-size-small { --ef-size: 40px; }
+    #builderScreen .operator-skill-wrapper.empty { display: block; min-height: 58px; }
+    #builderScreen .operator-skill-add-card { min-width: 0; width: 100%; min-height: 58px; height: 58px; }
+    #builderScreen .rotation-skills-dock { margin-bottom: 6px; }
+    #builderScreen .rotation-skills-dock > h3, #builderScreen .rotation-panel-title { margin: 6px 0; font-size: 18px; }
+    #builderScreen .mobile-rotation-tools { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
+    #mobilePlacementHint { flex: 1; min-width: 0; margin: 0; color: #c5d0ca; font-size: 11px; line-height: 1.4; }
+    #mobileUndoBtn { flex: 0 0 auto; min-height: 44px; padding: 8px 10px; border: 1px solid #757d55; border-radius: 9px; background: #293235; color: #f1f3d4; }
+    #mobileUndoBtn:disabled { opacity: .4; }
+    #builderScreen .rotation-panel { padding: 10px; min-height: 140px; }
+    #builderScreen .rotation-quick-skills { margin-top: 8px; }
+}
+@media (max-width: 700px) {
+    #builderScreen #rotationBuilderPanel .operator-owned-skill-row > .skill-small {
+        width: 44px; height: 44px; min-width: 44px; min-height: 44px;
+    }
+    #builderScreen #rotationBuilderPanel .operator-owned-skill-row > .skill-small .ef-skill-icon {
+        --ef-size: 40px; width: 40px; height: 40px; min-width: 40px; min-height: 40px;
+    }
+    #globalSkillTooltip { width: calc(100vw - 24px); max-width: 360px; min-width: 0; max-height: 60vh; max-height: 60dvh; overflow: auto; pointer-events: auto; }
+    #globalSkillTooltip .tooltip-card { padding: 12px; }
+    #globalSkillTooltip .tooltip-description { font-size: 12px; line-height: 1.5; }
+}
+@media (max-width: 360px) {
+    #builderScreen .operator-skill-wrapper { grid-template-columns: 50px minmax(0, 1fr); gap: 2px; }
+    #builderScreen .mobile-operator-summary { width: 50px; }
+    #builderScreen .mobile-operator-summary span { max-width: 46px; }
+}
+@media (max-width: 700px) {
+    #builderScreen .rotation-quick-skills-groups { display: grid; grid-template-columns: minmax(0, 1fr); overflow: visible; width: 100%; }
+    #builderScreen .rotation-quick-skill-group:not(.is-combat-events) { grid-template-columns: 70px minmax(0, 1fr); grid-template-rows: auto; align-items: center; min-width: 0; }
+    #builderScreen .rotation-quick-skill-group:not(.is-combat-events) > .rotation-quick-skill-name { display: none; }
+    #builderScreen .rotation-quick-skill-row { width: 100%; height: auto; min-height: 44px; flex-wrap: wrap; gap: 0; padding: 0; justify-content: space-evenly; }
+    #builderScreen #rotationBuilderPanel .rotation-quick-skill-row > .skill-small { width: 44px; height: 44px; min-width: 44px; min-height: 44px; box-sizing: border-box; padding: 2px; touch-action: pan-y; }
+    #builderScreen #rotationBuilderPanel .rotation-quick-skill-row .ef-skill-icon { --ef-size: 40px; width: 40px; height: 40px; min-width: 40px; min-height: 40px; }
+    :root:not(.simulation-timeline-focus) #builderScreen .rotation-quick-skills-groups,
+    :root:not(.simulation-timeline-focus) #builderScreen .rotation-quick-skills-heading { display: none; }
+    :root:not(.simulation-timeline-focus) #builderScreen .rotation-quick-skills:not(:has(.is-combat-events)) { display: none; }
+}
+@media (max-width: 360px) {
+    #builderScreen .rotation-quick-skill-group:not(.is-combat-events) { grid-template-columns: 50px minmax(0, 1fr); }
+}
