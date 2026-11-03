@@ -61,3 +61,30 @@ test('database mapping retains Aether multiplier without treating it as neutral 
  assert.equal(profile.resistanceMultipliers.aether,0.8);
  assert.equal(profile.resistanceMultipliers.neutral,undefined);
 });
+
+test('imported enemy portraits use the same local copies as the generated database', async()=>{
+ const {portrait}=await import('../tools/build-enemy-pages.js');
+ const ctx=context();
+ const imported={...row,name:'Acid Originium Slug',avatar_url:null,combat_details:{catalog_import:{slug:'acid-originium-slug',portrait_url:'https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/monstericonbig/eny_0001_example.png'}}};
+ const mapped=ctx.mapDatabaseEnemy(imported);
+ assert.equal(mapped.icon,portrait(imported));
+ assert.equal(mapped.icon,'/endfield/enemies/acid-originium-slug/avatar.webp');
+ assert.ok(fs.existsSync('endfield'+mapped.icon.slice('/endfield'.length)));
+ assert.equal(mapped.skills[0].icon,mapped.icon);
+ assert.equal(mapped.skills[0].iconSmall,mapped.icon);
+});
+test('uploaded portraits retain precedence and use the matching generated PNG and cache version',async()=>{
+ const {portrait}=await import('../tools/build-enemy-pages.js');
+ const ctx=context();const uploaded={...row,avatar_url:`https://ftssllxdkqvmlxhfeqmy.supabase.co/storage/v1/object/public/enemy-avatars/${row.id}/${'a'.repeat(64)}.png`};
+ assert.equal(ctx.getEnemyPortrait(uploaded),portrait(uploaded));
+ assert.match(ctx.getEnemyPortrait(uploaded),/^\/endfield\/enemies\/heat-attacker\/avatar\.png\?v=a{64}$/);
+});
+test('invalid portrait provenance and unsafe slugs cannot escape local generated enemy paths',()=>{
+ const ctx=context();
+ for(const slug of ['../other','foo/bar','x" onerror="alert(1)']){
+  assert.equal(ctx.getEnemyPortrait({...row,avatar_url:null,combat_details:{catalog_import:{slug,portrait_url:'https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/monstericonbig/eny_test.png'}}}),'/favicon-flat.png');
+ }
+ assert.equal(ctx.getEnemyPortrait({...row,avatar_url:null,combat_details:{catalog_import:{slug:'valid',portrait_url:'https://attacker.example/eny_test.png'}}}),'/favicon-flat.png');
+ const result=ctx.mapDatabaseEnemy({...row,skills:[{id:1,name:'Attack',icon:'/endfield/assets/enemies/skills/basic_attack.svg'}]});
+ assert.match(result.skills[0].icon,/basic_attack\.svg$/);
+});

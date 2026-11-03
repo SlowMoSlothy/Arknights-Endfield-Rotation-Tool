@@ -16,18 +16,44 @@ function safeEnemyImage(value) {
         return url.protocol === "https:" && ["rotationforge.gg", "ftssllxdkqvmlxhfeqmy.supabase.co"].includes(url.hostname) ? url.href : fallback;
     } catch { return fallback; }
 }
+function getEnemyPortrait(row) {
+    // Imported portraits are copied into the generated Enemy Database pages.
+    // avatar_url is only populated for manually uploaded images.
+    const imported = row.combat_details?.catalog_import;
+    const importedUrl = imported?.portrait_url || "";
+    const slug = String(row.slug || imported?.slug || "").trim()
+        || String(row.name || "").trim().toLowerCase().normalize("NFKD")
+            .replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")
+        || String(row.id || "");
+    const validSlug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
+    if (validSlug && /^https:\/\/ftssllxdkqvmlxhfeqmy\.supabase\.co\/storage\/v1\/object\/public\/enemy-avatars\/[0-9a-f-]{36}\/[0-9a-f]{64}\.png$/.test(row.avatar_url || "")) {
+        return `/endfield/enemies/${slug}/avatar.png?v=${row.avatar_url.split("/").at(-1).slice(0, 64)}`;
+    }
+    const uploaded = safeEnemyImage(row.avatar_url);
+    if (uploaded !== "/favicon-flat.png") return uploaded;
+    if (validSlug && /^https:\/\/endfield-assets\.fffdan\.com\/vfs\/Bundle\/file\/assets\/beyond\/dynamicassets\/gameplay\/ui\/sprites\/monstericonbig\/eny_[a-z0-9_]+\.png$/.test(importedUrl)) {
+        return `/endfield/enemies/${slug}/avatar.webp`;
+    }
+    return "/favicon-flat.png";
+}
+
 function mapDatabaseEnemy(row) {
+    const portrait = getEnemyPortrait(row);
+    const skillImage = value => {
+        const image = safeEnemyImage(value);
+        return image === "/favicon-flat.png" ? portrait : image;
+    };
     const skills = (Array.isArray(row.skills) ? row.skills : []).map(skill => ({
         ...skill, name: String(skill.name || "Ability"),
-        icon: safeEnemyImage(skill.icon || row.avatar_url),
-        iconSmall: safeEnemyImage(skill.iconSmall || skill.icon || row.avatar_url),
+        icon: skillImage(skill.icon),
+        iconSmall: skillImage(skill.iconSmall || skill.icon),
         type: "Enemy Skill", shortType: "Enemy", isEnemySkill: true
     }));
     const multipliers = Object.fromEntries(Object.entries(row.resistances || {}).filter(([key, value]) =>
         ['physical','heat','cryo','electric','nature','aether','neutral'].includes(key) && typeof value === "number" && Number.isFinite(value) && value >= 0));
     return {
         id: row.id, name: String(row.name), description: String(row.description || ""),
-        icon: safeEnemyImage(row.avatar_url),
+        icon: portrait,
         enemyRank: ['normal','elite','boss','test'].includes(row.category) ? row.category : 'normal',
         enemyType: 'neutral', skills,
         combatProfile: { defense: typeof row.defense === 'number' && Number.isFinite(row.defense) && row.defense >= 0 ? row.defense : null,
