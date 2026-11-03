@@ -821,9 +821,11 @@ function renderSkills() {
         const attributeVariantControl = createOperatorAttributeVariantControl(op);
         if (attributeVariantControl) skillOwner.appendChild(attributeVariantControl);
         skillRow.appendChild(skillOwner);
-        getDisplaySkillsForOperator(op).forEach(({ skill, switchGroup }) => {
+        const visibleSkills = getDisplaySkillsForOperator(op)
+            .filter(({skill}) => uiSettings?.timelineMode !== "simulation" || !isFinalStrikeSkillForPanel(skill));
+        skillRow.style.setProperty("--mobile-skill-count", String(Math.max(1, visibleSkills.length)));
+        visibleSkills.forEach(({ skill, switchGroup }) => {
             skill = resolveSkillForAttributeSelection(skill, op);
-            if (uiSettings?.timelineMode === "simulation" && isFinalStrikeSkillForPanel(skill)) return;
             const div = document.createElement("div");
             div.className = "skill skill-small";
             div.dataset.id = String(skill.id);
@@ -971,6 +973,7 @@ function renderRotationQuickSkills() {
         name.textContent = operator.name;
         const row = document.createElement("div");
         row.className = "skill-row rotation-quick-skill-row";
+        row.style.setProperty("--mobile-skill-count", String(Math.max(1, skills.length)));
         skills.forEach(skill => row.appendChild(createQuickSkillSource(skill, operator)));
         group.append(createMobileOperatorSummary(operator, selectedTeam.indexOf(operatorId)), name, row);
         groups.appendChild(group);

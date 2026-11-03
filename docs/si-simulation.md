@@ -5,6 +5,7 @@ Rank: 12. Original skill icons are already included in the repository.
 
 Si's catalog record currently has no simulator rows. The loader provides default actions only when operator 33 (`si`) has no database skills. Database skills continue to take precedence.
 
+- Dive Attack is a separate source action with the shared Dive icon and 180% ATK Cryo damage at rank 12. It counts as normal-attack damage and emits the Dive Attack trigger.
 - Final Strike uses the fifth sequence's 144% multiplier, not the separate 900% finisher.
 - Brushwork Realm costs 100 SP and deals 100% Cryo damage. It applies Cryo Infliction, or Heat Infliction when team position 01 is Heat, and one second of Immobilization.
 - Artful Intent records 13% of subsequent team damage, including basic attacks, for 20 seconds. The application hit is excluded. Reapplication replaces the previous mark without a burst.
@@ -16,7 +17,7 @@ The recorded burst has its own log entry and chart contribution. Damage modes ke
 
 ## Automatic Battle Skill stages
 
-Si's skill source row and simulation quick skills show one Battle Skill alongside Final Strike, Combo and Ultimate. The Battle Skill changes automatically: Brushwork Realm (1) → Initial Stroke (2) → Final Stroke (3) → Brushwork Realm (1). A small numbered badge distinguishes the stages sharing the same original icon. The picker cannot manually skip a stage.
+Si's skill source row and simulation quick skills show one Battle Skill alongside Final Strike, Dive Attack, Combo and Ultimate. The Battle Skill changes automatically: Brushwork Realm (1) → Initial Stroke (2) → Final Stroke (3) → Brushwork Realm (1). A small numbered badge distinguishes the stages sharing the same original icon. The picker cannot manually skip a stage.
 
 Existing edit/load hooks replay and normalize the stages when inserting, deleting, reordering, changing timestamps, clearing or importing a rotation. Simulation uses timestamp order and returns to Brushwork at Artful Intent's original 20-second expiry. Slot mode uses action order without inventing elapsed seconds. A drawn host transfer preserves Final Stroke; an undrawn drop returns to Brushwork. Placed actions still undergo the simulation's existing SP checks.
 

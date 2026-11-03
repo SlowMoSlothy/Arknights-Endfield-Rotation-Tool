@@ -1125,6 +1125,47 @@ const SI_DEFAULT_SKILL_ROWS = [
             "sp_cost": 0,
             "siAction": "final_stroke"
         }
+    },
+    {
+        "id": 3307,
+        "operator_id": 33,
+        "slot_index": 7,
+        "name": "Dive Attack",
+        "skill_type": "Dive Attack",
+        "short_type": "Dive",
+        "cooldown": 0,
+        "energy": 0,
+        "element_type": "cryo",
+        "icon_path": "assets/operators/avatars/Si.png",
+        "icon_small_path": "assets/operators/skills/shared/dive_attack.png",
+        "description": "A mid-air basic attack becomes a dive attack, dealing 180% ATK as Cryo DMG to nearby enemies (Rank 12).",
+        "atk_multiplier": 1.8,
+        "damage_element": "cryo",
+        "damage_verified": false,
+        "raw_data": {
+            "skillRank": 12,
+            "siAction": "dive_attack",
+            "damageType": "basic_attack",
+            "sourceUrl": "https://endfieldtools.dev/localdb/optimized/characters/details/chr_0036_jsspsi.json",
+            "stagger": 0,
+            "normalAttackDamage": true,
+            "formActionKey": "dive_attack",
+            "emits": [
+                "dive_attack"
+            ],
+            "sp_cost": 0,
+            "damageMultiplier": 180,
+            "skillLevel": 12,
+            "debuffs": [
+                {
+                    "id": "dive_attack",
+                    "name": "Dive Attack",
+                    "visible": false,
+                    "appliesEffect": "dive_attack",
+                    "persistsForCombo": false
+                }
+            ]
+        }
     }
 ];
 

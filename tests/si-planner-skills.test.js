@@ -7,7 +7,7 @@ vm.runInContext(fs.readFileSync('endfield/supabaseClient.js', 'utf8'), context);
 const resolve = (op, rows = []) => context.getPlannerSkillRows(op, rows);
 test('catalog-only Si has usable source-backed skills and existing icons', () => {
     const rows = resolve({id: 33, slug: 'si'});
-    assert.equal(rows.length, 6);
+    assert.equal(rows.length, 7);
     assert.deepEqual(Array.from(rows.slice(0, 4), row => row.short_type), ['FS', 'BS', 'CS', 'Ult']);
     for (const row of rows) {
         assert.ok(fs.existsSync(`endfield/${row.icon_small_path}`));
@@ -30,4 +30,15 @@ test('database skills take precedence and fallback remains isolated to Si', () =
     const rows = resolve({id: 33, slug: 'si'});
     rows[0].raw_data.skillRank = 1;
     assert.equal(resolve({id: 33, slug: 'si'})[0].raw_data.skillRank, 12);
+});
+
+test('Si Dive Attack has the rank-12 Cryo multiplier and shared Dive icon', () => {
+    const dive = resolve({id:33,slug:'si'}).map(context.mapDatabaseSkill).find(skill => skill.siAction === 'dive_attack');
+    assert.equal(dive.type, 'Dive Attack');
+    assert.equal(dive.normalAttackDamage, true);
+    assert.equal(dive.emits[0], 'dive_attack');
+    assert.equal(dive.damageProfile.atkMultiplier, 1.8);
+    assert.equal(dive.damageProfile.element, 'cryo');
+    assert.equal(dive.iconSmall, 'assets/operators/skills/shared/dive_attack.png');
+    assert.ok(fs.existsSync('endfield/' + dive.iconSmall));
 });
