@@ -1,3 +1,75 @@
+let mobilePlacementSlotIndex = null;
+let mobilePointerGesture = null;
+let mobileUndoPending = null;
+const mobileRotationUndo = [];
+function isCompactMobilePlanner() { return typeof window !== "undefined" && window.innerWidth <= 700; }
+function mobileRotationSnapshot() {
+    return JSON.stringify({rotation, operatorUltimateStates});
+}
+function beginMobileRotationEdit() {
+    if (isCompactMobilePlanner() && mobileUndoPending === null) mobileUndoPending = mobileRotationSnapshot();
+}
+function commitMobileRotationEdit() {
+    if (mobileUndoPending !== null) {
+        const after = mobileRotationSnapshot();
+        if (after !== mobileUndoPending) {
+            mobileRotationUndo.push({before: mobileUndoPending, after});
+            if (mobileRotationUndo.length > 20) mobileRotationUndo.shift();
+        }
+        mobileUndoPending = null;
+    }
+    updateMobileUndoButton();
+}
+function updateMobileUndoButton() {
+    const button = document.getElementById("mobileUndoBtn");
+    if (button) button.disabled = !mobileRotationUndo.length
+        || mobileRotationUndo.at(-1).after !== mobileRotationSnapshot();
+}
+function undoMobileRotationEdit() {
+    const last = mobileRotationUndo.at(-1);
+    if (!last || last.after !== mobileRotationSnapshot()) return;
+    mobileRotationUndo.pop();
+    const previous = JSON.parse(last.before);
+    rotation = previous.rotation;
+    operatorUltimateStates = previous.operatorUltimateStates;
+    selectedSkill = null;
+    mobilePlacementSlotIndex = null;
+    localStorage.setItem("rotation", JSON.stringify(rotation));
+    localStorage.setItem("operatorUltimateStates", JSON.stringify(operatorUltimateStates));
+    renderRotation();
+    refreshSkillsAfterRotationChange();
+    updateMobileUndoButton();
+    setMobilePlacementHint("Last change undone");
+}
+function setMobilePlacementHint(message) {
+    const hint = document.getElementById("mobilePlacementHint");
+    if (hint) hint.textContent = message;
+}
+function placeMobileTapSkill(action) {
+    if (!getSkillById(action.id)) return;
+    if (typeof isSimulationTimelineMode === "function" && isSimulationTimelineMode()) {
+        const time = rotation.reduce((end, entry, index) => {
+            if (!entry) return end;
+            const skill = getSkillById(entry.id);
+            const start = Number.isFinite(Number(entry.time)) ? Number(entry.time) : index;
+            return Math.max(end, start + (Number(skill?.durationSeconds) || 1));
+        }, 0);
+        placeSkillAtSimulationTime(action.id, time);
+    } else {
+        const target = mobilePlacementSlotIndex;
+        const index = target !== null && target >= 0 && target < rotation.length
+            ? target : rotation.reduce((last, entry, i) => entry ? i + 1 : last, 0);
+        placeSkillInSlot(index, action.id, target !== null || !rotation[index]);
+    }
+    mobilePlacementSlotIndex = null;
+    selectedSkill = null;
+    closeSlotMenu();
+    updateSelectedUI();
+    updateSelectedSlotsUI();
+    const skill = getSkillById(action.id);
+    setMobilePlacementHint(`${skill?.name || "Skill"} placed · Undo available`);
+}
+
 let selectedSkill = null;
 let activeSlotMenuIndex = null;
 let tapInputInitialized = false;
@@ -88,10 +160,21 @@ function initTapInput() {
     if (tapInputInitialized) return;
     tapInputInitialized = true;
 
+    document.addEventListener("pointerdown", event => {
+        mobilePointerGesture = {id: event.pointerId, x: event.clientX, y: event.clientY, moved: false};
+    }, {passive: true});
+    document.addEventListener("pointermove", event => {
+        if (mobilePointerGesture?.id === event.pointerId
+            && Math.hypot(event.clientX - mobilePointerGesture.x, event.clientY - mobilePointerGesture.y) > 8) mobilePointerGesture.moved = true;
+    }, {passive: true});
+    document.addEventListener("pointercancel", () => { mobilePointerGesture = {moved: true}; });
     document.addEventListener("pointerup", handleTapInput, { passive: false });
 }
 
 function handleTapInput(e) {
+    const moved = mobilePointerGesture?.moved;
+    mobilePointerGesture = null;
+    if (isCompactMobilePlanner() && (moved || (typeof isDraggingSkill !== "undefined" && isDraggingSkill))) return;
     const basicPoint = e.target.closest(".rotation-basic-point");
     if (basicPoint) {
         e.preventDefault();
@@ -134,6 +217,8 @@ function handleTapInput(e) {
         if (Number.isNaN(index)) return;
 
         if (action === "remove") {
+            beginMobileRotationEdit();
+            mobilePlacementSlotIndex = null;
             rotation[index] = null;
             compactRotation();
             if (typeof normalizeQingboMovesInRotation === "function") {
@@ -169,6 +254,19 @@ function handleTapInput(e) {
         return;
     }
 
+    const mobileSlot = isCompactMobilePlanner() && e.target.closest(".rotation-slot");
+    if (mobileSlot) {
+        e.preventDefault();
+        e.stopPropagation();
+        mobilePlacementSlotIndex = Number(mobileSlot.dataset.index);
+        selectedSkill = null;
+        if (rotation[mobilePlacementSlotIndex]) openSlotMenu(mobilePlacementSlotIndex);
+        else closeSlotMenu();
+        updateSelectedSlotsUI();
+        setMobilePlacementHint(`Slot ${mobilePlacementSlotIndex + 1}: tap a skill to ${rotation[mobilePlacementSlotIndex] ? "replace" : "insert"}`);
+        return;
+    }
+
     const rotationSkillEl = e.target.closest(".rotation-skill");
     if (rotationSkillEl && window.innerWidth <= 900) {
         e.preventDefault();
@@ -184,8 +282,17 @@ function handleTapInput(e) {
         e.preventDefault();
         e.stopPropagation();
 
+        if (skillEl.dataset.longPressConsumed === "true") {
+            delete skillEl.dataset.longPressConsumed;
+            return;
+        }
+        if (e.target.closest(".qingbo-switch-btn, .operator-attribute-variant-btn")) return;
         const action = getTapActionFromSkillElement(skillEl);
         if (!action) return;
+        if (isCompactMobilePlanner() && action.actionType !== BASIC_ATTACK_ACTION_TYPE) {
+            placeMobileTapSkill(action);
+            return;
+        }
         if (action.actionType === BASIC_ATTACK_ACTION_TYPE) {
             selectedSkill = null;
             closeSlotMenu();
@@ -270,6 +377,8 @@ function handleTapInput(e) {
 
 function placeSkillInSlot(index, skillId, replaceExisting = false) {
     const originalSkill = getSkillById(skillId);
+    if (!originalSkill) return;
+    beginMobileRotationEdit();
 
     let finalSkillId = skillId;
     if (!originalSkill?.togglesUltimateState) {
@@ -335,7 +444,7 @@ function updateSelectedUI() {
 function updateSelectedSlotsUI() {
     document.querySelectorAll(".rotation-slot").forEach(slot => {
         const canPlace = !!selectedSkill && canPlaceTapActionInSlot(selectedSkill, slot);
-        slot.classList.toggle("tap-target", canPlace);
+        slot.classList.toggle("tap-target", canPlace || (isCompactMobilePlanner() && Number(slot.dataset.index) === mobilePlacementSlotIndex));
         slot.classList.toggle("tap-target-blocked", !!selectedSkill && !canPlace);
     });
     const simulationSelected = !!selectedSkill && uiSettings?.timelineMode === "simulation";
