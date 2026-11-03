@@ -160,3 +160,35 @@ function createSiRecordedDamageEvents(events, duration) {
     if (mark && mark.expiresAt <= duration) burst(mark.expiresAt);
     return bursts;
 }
+
+function getSiBattleSkillAction(skill) {
+    if (['brushwork', 'initial_stroke', 'final_stroke'].includes(skill?.siAction)) return skill.siAction;
+    if (Number(skill?.operatorId) !== 33) return null;
+    return {3302: 'brushwork', 3305: 'initial_stroke', 3306: 'final_stroke'}[Number(skill.id)] || null;
+}
+
+function expireSiBattleSkillStage(state, time) {
+    return time !== null && state.expiresAt !== null && time >= state.expiresAt
+        ? {...state, nextAction: 'brushwork', expiresAt: null, drawn: false}
+        : state;
+}
+
+// Slot mode has ordered actions, not elapsed time. Simulation supplies seconds.
+function advanceSiBattleSkillStage(state, skill, time = null) {
+    state = expireSiBattleSkillStage(state, time);
+    const hostEvent = skill?.siHostEvent;
+    if (hostEvent === 'defeat_next' || hostEvent === 'defeat_last') {
+        if (!state.hostAlive) return state;
+        const hostAlive = hostEvent === 'defeat_next';
+        return state.drawn ? {...state, hostAlive}
+            : {...state, hostAlive, nextAction: 'brushwork', expiresAt: null};
+    }
+    if (hostEvent === 'enemy_enters') return {...state, hostAlive: true};
+    if (!state.hostAlive) return state;
+    const action = getSiBattleSkillAction(skill);
+    if (action !== state.nextAction) return state;
+    if (action === 'brushwork') return {...state, nextAction: 'initial_stroke', expiresAt: time === null ? null : time + 20};
+    if (action === 'initial_stroke') return {...state, nextAction: 'final_stroke', drawn: true};
+    if (action === 'final_stroke') return {...state, nextAction: 'brushwork', expiresAt: null, drawn: false};
+    return state;
+}

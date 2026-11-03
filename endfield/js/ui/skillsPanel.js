@@ -74,7 +74,72 @@ function getQingboMovesForOperator(op) {
         .sort((a, b) => Number(a.qingboMove) - Number(b.qingboMove));
 }
 
+function resolveSiRotationBattleSkillState(op, normalizeEntries = false) {
+    if (Number(op?.id) !== 33 || typeof getSiBattleSkillAction !== "function") return null;
+    const stages = {};
+    (op.skills || []).forEach(skill => {
+        const action = getSiBattleSkillAction(skill);
+        if (action) stages[action] = skill;
+    });
+    if (!stages.brushwork || !stages.initial_stroke || !stages.final_stroke) return null;
+    const simulation = typeof isSimulationTimelineMode === "function" && isSimulationTimelineMode();
+    const secondsPerSlot = simulation && typeof getTimelineSecondsPerSlot === "function"
+        ? getTimelineSecondsPerSlot(typeof getTimelineBasicAttackData === "function" ? getTimelineBasicAttackData() : null)
+        : 1;
+    const entries = (typeof rotation !== "undefined" && Array.isArray(rotation) ? rotation : [])
+        .map((entry, index) => ({entry, index, time: simulation
+            ? (typeof getRotationEntryTime === "function" ? getRotationEntryTime(entry, index, secondsPerSlot)
+                : (Number.isFinite(Number(entry?.time)) ? Number(entry.time) : index * secondsPerSlot))
+            : null}))
+        .filter(item => item.entry);
+    if (simulation) entries.sort((a, b) => (a.time - b.time) || (a.index - b.index));
+    let state = {nextAction: "brushwork", expiresAt: null, drawn: false, hostAlive: true};
+    let changed = false;
+    entries.forEach(({entry, time}) => {
+        state = expireSiBattleSkillStage(state, time);
+        let skill = (op.skills || []).find(candidate => candidate.id === entry.id)
+            || (typeof getSkillById === "function" ? getSkillById(entry.id) : null);
+        const isOwnStage = (op.skills || []).some(candidate => candidate.id === entry.id)
+            && getSiBattleSkillAction(skill);
+        if (isOwnStage) {
+            const expected = stages[state.nextAction];
+            if (normalizeEntries && entry.id !== expected.id) {
+                entry.id = expected.id;
+                changed = true;
+            }
+            // Replay the legal stage even when previewing an old imported rotation.
+            skill = expected;
+        }
+        state = advanceSiBattleSkillStage(state, skill, time);
+    });
+    return {skill: stages[state.nextAction], stages, state, changed};
+}
+
+function getSiDisplaySkillsForOperator(op) {
+    const resolved = resolveSiRotationBattleSkillState(op);
+    if (!resolved) return null;
+    const stageIds = Object.values(resolved.stages).map(skill => skill.id);
+    if (typeof selectedSkill !== "undefined" && stageIds.includes(selectedSkill?.id)) {
+        selectedSkill = { ...selectedSkill, id: resolved.skill.id };
+    }
+    let inserted = false;
+    return (op.skills || []).flatMap(skill => {
+        if (!stageIds.includes(skill.id)) return [{skill}];
+        if (inserted) return [];
+        inserted = true;
+        return [{skill: resolved.skill}];
+    });
+}
+
+function normalizeSiBattleSkillStagesInRotation() {
+    if (typeof operators === "undefined" || !Array.isArray(operators)) return false;
+    const si = operators.find(op => Number(op.id) === 33);
+    return resolveSiRotationBattleSkillState(si, true)?.changed || false;
+}
+
 function getDisplaySkillsForOperator(op) {
+    const siSkills = getSiDisplaySkillsForOperator(op);
+    if (siSkills) return siSkills;
     const qingboMoves = getQingboMovesForOperator(op);
     if (qingboMoves.length <= 1) {
         return (op.skills || []).map(skill => ({ skill }));
@@ -202,7 +267,9 @@ function resolveQingboRotationMoveState(normalizeEntries = false) {
 }
 
 function normalizeQingboMovesInRotation() {
-    return resolveQingboRotationMoveState(true).changed;
+    // Keep the existing edit/load hooks shared by both conditional skill chains.
+    const siChanged = normalizeSiBattleSkillStagesInRotation();
+    return resolveQingboRotationMoveState(true).changed || siChanged;
 }
 
 function syncQingboMoveStateFromRotation() {

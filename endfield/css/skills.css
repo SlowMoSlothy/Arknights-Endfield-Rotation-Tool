@@ -1173,3 +1173,20 @@
         transform: scale(0.86);
     }
 }
+
+.si-skill-stage-badge {
+    position: absolute;
+    bottom: 2px;
+    right: calc(50% - 8px);
+    min-width: 16px;
+    height: 16px;
+    padding: 0 2px;
+    border: 1px solid #cce7ed;
+    border-radius: 8px;
+    background: #16272d;
+    color: #fff;
+    font: 700 11px/14px sans-serif;
+    text-align: center;
+    z-index: 3;
+    pointer-events: none;
+}
