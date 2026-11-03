@@ -14,6 +14,18 @@ Si's catalog record currently has no simulator rows. The loader provides default
 
 The recorded burst has its own log entry and chart contribution. Damage modes keep separate sums; already mitigated damage receives no second mitigation, bonus or crit roll. Unknown mitigation remains unknown. A burst beyond the simulated duration is omitted. Events exactly at expiry occur after the expired mark's burst.
 
+## Host transfer
+
+With Si on the team, Simulation → Combat Events offers three labeled events. Place them at the intended time using the existing combat-event lane:
+
+- **NEXT — Host defeated → next enemy**: a drawn Inksoul links to the next host. Original expiry and all recorded damage remain unchanged. It can transfer repeatedly.
+- **END — Last enemy defeated**: the Inksoul has no living host. Recording and damage bursts stop until another enemy is available.
+- **NEW — New enemy enters combat**: a drawn Inksoul waiting for a host links to this enemy if its original duration has not expired. Adding an enemy while the current host is alive does not switch the host.
+
+An undrawn Inksoul is logged as dropped when its host dies; it is not silently treated as a drawn Inksoul or transferred. Picking up a dropped Inksoul is not simulated. Transfers and drops appear in the log, including previous/new host, remaining time, expiry and stored damage. The selected enemy profile is reused for sequential hosts. These are manually placed scenarios, not deaths inferred from HP or damage.
+
+Optional engine event fields `targetId` / `targetIds` restrict which hits are recorded. `inksoul:33` identifies the drawn Inksoul. Hits carrying the same `damageInstanceId` count once if they overlap host and Inksoul. Without explicit target fields, subsequent hits follow the current living host. Host events may provide `defeatedTargetId` and `nextTargetId`; a death of an unrelated target does not move the mark.
+
 ## Limits
 
-This is a single-target model. Host and Inksoul use the same damage stream, so drawing an Inksoul does not duplicate damage. Enemy defeat and transfer to another host are not simulated. Recording follows the planner's existing event/hit timing. Reapplication and expiration ordering are explicit simulation assumptions, not frame-verified game behavior. Passive talents, potentials, exact attack animations and multi-target overlap still need separate verification; default damage profiles remain marked unverified.
+Hosts and Inksoul share one damage stream, so drawing an Inksoul does not duplicate damage. Different simultaneous enemy profiles, automatic HP-based defeat, and pickup of undrawn ground Inksouls are not modeled. Recording follows the planner's existing event/hit timing. Reapplication and expiration ordering are explicit simulation assumptions, not frame-verified game behavior. Passive talents, potentials, exact attack animations and multi-target overlap still need separate verification; default damage profiles remain marked unverified.

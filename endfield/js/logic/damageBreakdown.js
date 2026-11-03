@@ -106,7 +106,7 @@ function getSimulationDisplayedDamage(breakdown, mode = getSimulationDamageMode(
     if (!breakdown || breakdown.status === "missing-profile") return null;
     if (mode === "normal") return breakdown.finalDamage ?? breakdown.preMitigationDamage ?? null;
     if (mode === "critical") {
-        return breakdown.canCrit
+        return (breakdown.canCrit || breakdown.recordedDamageModes === true)
             ? (breakdown.criticalHitDamage ?? breakdown.finalDamage ?? breakdown.preMitigationDamage ?? null)
             : (breakdown.finalDamage ?? breakdown.preMitigationDamage ?? null);
     }
@@ -720,7 +720,7 @@ function appendSimulationDamageBreakdown(parent, event) {
             ["Final DMG (non-crit)", breakdown.finalDamage === null ? "Unavailable" : String(breakdown.finalDamage)],
             ["Expected DMG", breakdown.expectedFinalDamage === null ? "Unavailable" : String(breakdown.expectedFinalDamage)],
             ["Calculation", "Recorded damage is already mitigated; no additional bonuses, resistance or critical hit roll."],
-            ["Model", "Single target; Inksoul and host share one damage stream."]
+            ["Model", "Sequential hosts; Inksoul and host share one damage stream."]
         ]);
         return;
     }

@@ -752,13 +752,13 @@ async function hydrateSimulationTriggerEventsFromSupabase() {
         databaseEvents = await loadSimulationTriggerEventsFromSupabase();
     } catch (error) {
         console.info("Simulation trigger events are not available in Supabase yet.", error?.message || error);
-        return false;
     }
 
-    simulationTriggerEvents = databaseEvents;
+    simulationTriggerEvents = typeof getSiCombatEvents === "function"
+        ? getSiCombatEvents(databaseEvents) : databaseEvents;
     window.simulationTriggerEvents = simulationTriggerEvents;
     console.info(`Simulation trigger events loaded from Supabase: ${databaseEvents.length}`);
-    return databaseEvents.length > 0;
+    return simulationTriggerEvents.length > 0;
 }
 
 async function loadSimulationActionRulesFromSupabase() {
@@ -936,15 +936,15 @@ const SI_DEFAULT_SKILL_ROWS = [
         "element_type": "cryo",
         "icon_path": "assets/operators/avatars/Si.png",
         "icon_small_path": "assets/operators/catalog-skills/icon_attack_claym.png",
-        "description": "BASIC ATTACK: \nAn attack with up to 5 sequences that deals Cryo DMG. As the controlled operator, Final Strike also deals 18 Stagger. \n\nDIVE ATTACK: \nBasic attack performed in mid-air becomes a dive attack that deals Cryo DMG to nearby enemies. \n\nFINISHER: \nBasic attack performed near a Staggered enemy becomes a finisher that deals massive Cryo DMG and recovers some SP.\n\nPlanner: Single-target simulation. Inksoul and host share one damage stream; multi-enemy transfer on defeat is not modeled.",
+        "description": "BASIC ATTACK: \nAn attack with up to 5 sequences that deals Cryo DMG. As the controlled operator, Final Strike also deals 18 Stagger. \n\nDIVE ATTACK: \nBasic attack performed in mid-air becomes a dive attack that deals Cryo DMG to nearby enemies. \n\nFINISHER: \nBasic attack performed near a Staggered enemy becomes a finisher that deals massive Cryo DMG and recovers some SP.\n\nPlanner: Host transfers use manual Combat Events. Hosts share the selected enemy profile; remaining duration and recorded damage are preserved.",
         "atk_multiplier": 1.44,
         "damage_element": "cryo",
         "damage_verified": false,
         "raw_data": {
             "skillRank": 12,
             "sourceUrl": "https://endfieldtools.dev/localdb/optimized/characters/details/chr_0036_jsspsi.json",
-            "mechanicsStatus": "single_target",
-            "sourceNote": "Single-target simulation. Inksoul and host share one damage stream; multi-enemy transfer on defeat is not modeled.",
+            "mechanicsStatus": "sequential_hosts",
+            "sourceNote": "Host transfers use manual Combat Events. Hosts share the selected enemy profile; remaining duration and recorded damage are preserved.",
             "stagger": 18,
             "debuffs": [
                 {
@@ -969,15 +969,15 @@ const SI_DEFAULT_SKILL_ROWS = [
         "element_type": "cryo",
         "icon_path": "assets/operators/avatars/Si.png",
         "icon_small_path": "assets/operators/catalog-skills/icon_skill_jsspsi_01.png",
-        "description": "Si deals Cryo DMG and applies Artful Intent, Immobilization, and Cryo Infliction (or Heat Infliction if a Heat element operator is in Team Position 01) on the target. After a target with Artful Intent takes DMG, part of the DMG taken is recorded. When the duration of Artful Intent ends, it bursts and deals Fixed DMG equal to the DMG recorded. After casting the skill, Si's battle skill is temporarily changed to Initial Stroke.\nInitial Stroke: Costs 15 SP. Si pulls an Inksoul from a target with Artful Intent. All DMG dealt and effects applied to the Inksoul will also be dealt to its host (the said target). The Inksoul lasts as long as the remaining duration of Artful Intent. After casting the skill, Si's battle skill is temporarily changed to Final Stroke.\nFinal Stroke: Costs no SP. Makes the Inksoul disappear early. When disappearing, the Inksoul will move to its host and trigger a burst like the ending burst of Artful Intent.\nWhen dealing DMG or applying effects to both the Inksoul and the host, only 1 instance of the DMG or effect is dealt/applied. If the host is defeated during the Inksoul's duration, it will link to another enemy in combat and apply Artful Intent to it. This does not reset the duration of Artful Intent. If a target with Artful Intent is defeated without having its Inksoul drawn out of it, the defeated target will drop an Inksoul at its location.\n\nPlanner: Single-target simulation. Inksoul and host share one damage stream; multi-enemy transfer on defeat is not modeled.",
+        "description": "Si deals Cryo DMG and applies Artful Intent, Immobilization, and Cryo Infliction (or Heat Infliction if a Heat element operator is in Team Position 01) on the target. After a target with Artful Intent takes DMG, part of the DMG taken is recorded. When the duration of Artful Intent ends, it bursts and deals Fixed DMG equal to the DMG recorded. After casting the skill, Si's battle skill is temporarily changed to Initial Stroke.\nInitial Stroke: Costs 15 SP. Si pulls an Inksoul from a target with Artful Intent. All DMG dealt and effects applied to the Inksoul will also be dealt to its host (the said target). The Inksoul lasts as long as the remaining duration of Artful Intent. After casting the skill, Si's battle skill is temporarily changed to Final Stroke.\nFinal Stroke: Costs no SP. Makes the Inksoul disappear early. When disappearing, the Inksoul will move to its host and trigger a burst like the ending burst of Artful Intent.\nWhen dealing DMG or applying effects to both the Inksoul and the host, only 1 instance of the DMG or effect is dealt/applied. If the host is defeated during the Inksoul's duration, it will link to another enemy in combat and apply Artful Intent to it. This does not reset the duration of Artful Intent. If a target with Artful Intent is defeated without having its Inksoul drawn out of it, the defeated target will drop an Inksoul at its location.\n\nPlanner: Host transfers use manual Combat Events. Hosts share the selected enemy profile; remaining duration and recorded damage are preserved.",
         "atk_multiplier": 1,
         "damage_element": "cryo",
         "damage_verified": false,
         "raw_data": {
             "skillRank": 12,
             "sourceUrl": "https://endfieldtools.dev/localdb/optimized/characters/details/chr_0036_jsspsi.json",
-            "mechanicsStatus": "single_target",
-            "sourceNote": "Single-target simulation. Inksoul and host share one damage stream; multi-enemy transfer on defeat is not modeled.",
+            "mechanicsStatus": "sequential_hosts",
+            "sourceNote": "Host transfers use manual Combat Events. Hosts share the selected enemy profile; remaining duration and recorded damage are preserved.",
             "sp_cost": 100,
             "siAction": "brushwork"
         }
@@ -994,15 +994,15 @@ const SI_DEFAULT_SKILL_ROWS = [
         "element_type": "cryo",
         "icon_path": "assets/operators/avatars/Si.png",
         "icon_small_path": "assets/operators/catalog-skills/icon_combo_skill_jsspsi_01.png",
-        "description": "COMBO TRIGGER: When an enemy's Cryo Infliction or Heat Infliction is consumed or absorbed.\nSi summons an Ink Lung that deals Cryo DMG. This DMG is based on the highest stacks of Arts Infliction consumed or absorbed from a single target.\n\nPlanner: Single-target simulation. Inksoul and host share one damage stream; multi-enemy transfer on defeat is not modeled.",
+        "description": "COMBO TRIGGER: When an enemy's Cryo Infliction or Heat Infliction is consumed or absorbed.\nSi summons an Ink Lung that deals Cryo DMG. This DMG is based on the highest stacks of Arts Infliction consumed or absorbed from a single target.\n\nPlanner: Host transfers use manual Combat Events. Hosts share the selected enemy profile; remaining duration and recorded damage are preserved.",
         "atk_multiplier": 7.5,
         "damage_element": "cryo",
         "damage_verified": false,
         "raw_data": {
             "skillRank": 12,
             "sourceUrl": "https://endfieldtools.dev/localdb/optimized/characters/details/chr_0036_jsspsi.json",
-            "mechanicsStatus": "single_target",
-            "sourceNote": "Single-target simulation. Inksoul and host share one damage stream; multi-enemy transfer on defeat is not modeled.",
+            "mechanicsStatus": "sequential_hosts",
+            "sourceNote": "Host transfers use manual Combat Events. Hosts share the selected enemy profile; remaining duration and recorded damage are preserved.",
             "ultimateEnergyGain": 10,
             "siAction": "combo",
             "comboTriggers": [
@@ -1038,15 +1038,15 @@ const SI_DEFAULT_SKILL_ROWS = [
         "element_type": "cryo",
         "icon_path": "assets/operators/avatars/Si.png",
         "icon_small_path": "assets/operators/catalog-skills/icon_ultimate_skill_jsspsi_01.png",
-        "description": "Si summons a Giant Ink Lung from her painting that deals Cryo DMG and grants temporary Cryo Amp and Heat Amp to the entire team.\n\nPlanner: Single-target simulation. Inksoul and host share one damage stream; multi-enemy transfer on defeat is not modeled.",
+        "description": "Si summons a Giant Ink Lung from her painting that deals Cryo DMG and grants temporary Cryo Amp and Heat Amp to the entire team.\n\nPlanner: Host transfers use manual Combat Events. Hosts share the selected enemy profile; remaining duration and recorded damage are preserved.",
         "atk_multiplier": 5,
         "damage_element": "cryo",
         "damage_verified": false,
         "raw_data": {
             "skillRank": 12,
             "sourceUrl": "https://endfieldtools.dev/localdb/optimized/characters/details/chr_0036_jsspsi.json",
-            "mechanicsStatus": "single_target",
-            "sourceNote": "Single-target simulation. Inksoul and host share one damage stream; multi-enemy transfer on defeat is not modeled.",
+            "mechanicsStatus": "sequential_hosts",
+            "sourceNote": "Host transfers use manual Combat Events. Hosts share the selected enemy profile; remaining duration and recorded damage are preserved.",
             "siAction": "ultimate",
             "buffs": [
                 {
@@ -1088,15 +1088,15 @@ const SI_DEFAULT_SKILL_ROWS = [
         "element_type": "cryo",
         "icon_path": "assets/operators/avatars/Si.png",
         "icon_small_path": "assets/operators/catalog-skills/icon_skill_jsspsi_01.png",
-        "description": "Si deals Cryo DMG and applies Artful Intent, Immobilization, and Cryo Infliction (or Heat Infliction if a Heat element operator is in Team Position 01) on the target. After a target with Artful Intent takes DMG, part of the DMG taken is recorded. When the duration of Artful Intent ends, it bursts and deals Fixed DMG equal to the DMG recorded. After casting the skill, Si's battle skill is temporarily changed to Initial Stroke.\nInitial Stroke: Costs 15 SP. Si pulls an Inksoul from a target with Artful Intent. All DMG dealt and effects applied to the Inksoul will also be dealt to its host (the said target). The Inksoul lasts as long as the remaining duration of Artful Intent. After casting the skill, Si's battle skill is temporarily changed to Final Stroke.\nFinal Stroke: Costs no SP. Makes the Inksoul disappear early. When disappearing, the Inksoul will move to its host and trigger a burst like the ending burst of Artful Intent.\nWhen dealing DMG or applying effects to both the Inksoul and the host, only 1 instance of the DMG or effect is dealt/applied. If the host is defeated during the Inksoul's duration, it will link to another enemy in combat and apply Artful Intent to it. This does not reset the duration of Artful Intent. If a target with Artful Intent is defeated without having its Inksoul drawn out of it, the defeated target will drop an Inksoul at its location.\n\nPlanner: Single-target simulation. Inksoul and host share one damage stream; multi-enemy transfer on defeat is not modeled.",
+        "description": "Si deals Cryo DMG and applies Artful Intent, Immobilization, and Cryo Infliction (or Heat Infliction if a Heat element operator is in Team Position 01) on the target. After a target with Artful Intent takes DMG, part of the DMG taken is recorded. When the duration of Artful Intent ends, it bursts and deals Fixed DMG equal to the DMG recorded. After casting the skill, Si's battle skill is temporarily changed to Initial Stroke.\nInitial Stroke: Costs 15 SP. Si pulls an Inksoul from a target with Artful Intent. All DMG dealt and effects applied to the Inksoul will also be dealt to its host (the said target). The Inksoul lasts as long as the remaining duration of Artful Intent. After casting the skill, Si's battle skill is temporarily changed to Final Stroke.\nFinal Stroke: Costs no SP. Makes the Inksoul disappear early. When disappearing, the Inksoul will move to its host and trigger a burst like the ending burst of Artful Intent.\nWhen dealing DMG or applying effects to both the Inksoul and the host, only 1 instance of the DMG or effect is dealt/applied. If the host is defeated during the Inksoul's duration, it will link to another enemy in combat and apply Artful Intent to it. This does not reset the duration of Artful Intent. If a target with Artful Intent is defeated without having its Inksoul drawn out of it, the defeated target will drop an Inksoul at its location.\n\nPlanner: Host transfers use manual Combat Events. Hosts share the selected enemy profile; remaining duration and recorded damage are preserved.",
         "atk_multiplier": 0,
         "damage_element": "cryo",
         "damage_verified": false,
         "raw_data": {
             "skillRank": 12,
             "sourceUrl": "https://endfieldtools.dev/localdb/optimized/characters/details/chr_0036_jsspsi.json",
-            "mechanicsStatus": "single_target",
-            "sourceNote": "Single-target simulation. Inksoul and host share one damage stream; multi-enemy transfer on defeat is not modeled.",
+            "mechanicsStatus": "sequential_hosts",
+            "sourceNote": "Host transfers use manual Combat Events. Hosts share the selected enemy profile; remaining duration and recorded damage are preserved.",
             "sp_cost": 15,
             "siAction": "initial_stroke"
         }
@@ -1113,15 +1113,15 @@ const SI_DEFAULT_SKILL_ROWS = [
         "element_type": "cryo",
         "icon_path": "assets/operators/avatars/Si.png",
         "icon_small_path": "assets/operators/catalog-skills/icon_skill_jsspsi_01.png",
-        "description": "Si deals Cryo DMG and applies Artful Intent, Immobilization, and Cryo Infliction (or Heat Infliction if a Heat element operator is in Team Position 01) on the target. After a target with Artful Intent takes DMG, part of the DMG taken is recorded. When the duration of Artful Intent ends, it bursts and deals Fixed DMG equal to the DMG recorded. After casting the skill, Si's battle skill is temporarily changed to Initial Stroke.\nInitial Stroke: Costs 15 SP. Si pulls an Inksoul from a target with Artful Intent. All DMG dealt and effects applied to the Inksoul will also be dealt to its host (the said target). The Inksoul lasts as long as the remaining duration of Artful Intent. After casting the skill, Si's battle skill is temporarily changed to Final Stroke.\nFinal Stroke: Costs no SP. Makes the Inksoul disappear early. When disappearing, the Inksoul will move to its host and trigger a burst like the ending burst of Artful Intent.\nWhen dealing DMG or applying effects to both the Inksoul and the host, only 1 instance of the DMG or effect is dealt/applied. If the host is defeated during the Inksoul's duration, it will link to another enemy in combat and apply Artful Intent to it. This does not reset the duration of Artful Intent. If a target with Artful Intent is defeated without having its Inksoul drawn out of it, the defeated target will drop an Inksoul at its location.\n\nPlanner: Single-target simulation. Inksoul and host share one damage stream; multi-enemy transfer on defeat is not modeled.",
+        "description": "Si deals Cryo DMG and applies Artful Intent, Immobilization, and Cryo Infliction (or Heat Infliction if a Heat element operator is in Team Position 01) on the target. After a target with Artful Intent takes DMG, part of the DMG taken is recorded. When the duration of Artful Intent ends, it bursts and deals Fixed DMG equal to the DMG recorded. After casting the skill, Si's battle skill is temporarily changed to Initial Stroke.\nInitial Stroke: Costs 15 SP. Si pulls an Inksoul from a target with Artful Intent. All DMG dealt and effects applied to the Inksoul will also be dealt to its host (the said target). The Inksoul lasts as long as the remaining duration of Artful Intent. After casting the skill, Si's battle skill is temporarily changed to Final Stroke.\nFinal Stroke: Costs no SP. Makes the Inksoul disappear early. When disappearing, the Inksoul will move to its host and trigger a burst like the ending burst of Artful Intent.\nWhen dealing DMG or applying effects to both the Inksoul and the host, only 1 instance of the DMG or effect is dealt/applied. If the host is defeated during the Inksoul's duration, it will link to another enemy in combat and apply Artful Intent to it. This does not reset the duration of Artful Intent. If a target with Artful Intent is defeated without having its Inksoul drawn out of it, the defeated target will drop an Inksoul at its location.\n\nPlanner: Host transfers use manual Combat Events. Hosts share the selected enemy profile; remaining duration and recorded damage are preserved.",
         "atk_multiplier": 0,
         "damage_element": "cryo",
         "damage_verified": false,
         "raw_data": {
             "skillRank": 12,
             "sourceUrl": "https://endfieldtools.dev/localdb/optimized/characters/details/chr_0036_jsspsi.json",
-            "mechanicsStatus": "single_target",
-            "sourceNote": "Single-target simulation. Inksoul and host share one damage stream; multi-enemy transfer on defeat is not modeled.",
+            "mechanicsStatus": "sequential_hosts",
+            "sourceNote": "Host transfers use manual Combat Events. Hosts share the selected enemy profile; remaining duration and recorded damage are preserved.",
             "sp_cost": 0,
             "siAction": "final_stroke"
         }
