@@ -98,5 +98,13 @@ function createSkillIcon(skillData, options = {}) {
     root.appendChild(ring);
     root.appendChild(glyphWrap);
 
+    const action = typeof getSiBattleSkillAction === "function" ? getSiBattleSkillAction(skillData) : null;
+    if (action) {
+        const badge = document.createElement("span");
+        badge.className = "si-skill-stage-badge";
+        badge.textContent = String({brushwork: 1, initial_stroke: 2, final_stroke: 3}[action]);
+        badge.setAttribute("aria-label", `Si Battle Skill stage ${badge.textContent} of 3`);
+        root.appendChild(badge);
+    }
     return root;
 }

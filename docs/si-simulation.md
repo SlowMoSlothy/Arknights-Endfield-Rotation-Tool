@@ -14,6 +14,12 @@ Si's catalog record currently has no simulator rows. The loader provides default
 
 The recorded burst has its own log entry and chart contribution. Damage modes keep separate sums; already mitigated damage receives no second mitigation, bonus or crit roll. Unknown mitigation remains unknown. A burst beyond the simulated duration is omitted. Events exactly at expiry occur after the expired mark's burst.
 
+## Automatic Battle Skill stages
+
+Si's skill source row and simulation quick skills show one Battle Skill alongside Final Strike, Combo and Ultimate. The Battle Skill changes automatically: Brushwork Realm (1) → Initial Stroke (2) → Final Stroke (3) → Brushwork Realm (1). A small numbered badge distinguishes the stages sharing the same original icon. The picker cannot manually skip a stage.
+
+Existing edit/load hooks replay and normalize the stages when inserting, deleting, reordering, changing timestamps, clearing or importing a rotation. Simulation uses timestamp order and returns to Brushwork at Artful Intent's original 20-second expiry. Slot mode uses action order without inventing elapsed seconds. A drawn host transfer preserves Final Stroke; an undrawn drop returns to Brushwork. Placed actions still undergo the simulation's existing SP checks.
+
 ## Host transfer
 
 With Si on the team, Simulation → Combat Events offers three labeled events. Place them at the intended time using the existing combat-event lane:
