@@ -574,6 +574,7 @@ function createEffectTray(items, type) {
     const tray = document.createElement("div");
     tray.className = `rotation-${type}-tray`;
     if (items.length > 5) tray.classList.add("is-multi-row");
+    tray.title = items.map(effect => type === "buff" ? getBuffDisplayName(effect) : getDebuffDisplayName(effect)).join(", ");
     items.forEach(effect => {
         const item = document.createElement("div");
         item.className = `rotation-${type}-item`;
@@ -582,22 +583,18 @@ function createEffectTray(items, type) {
         item.dataset.tooltip = displayName;
         item.setAttribute("aria-label", displayName);
         const iconPath = type === "buff" ? resolveBuffIcon(effect) : resolveDebuffIcon(effect);
+        if (!iconPath) return;
         if (iconPath) {
             const img = document.createElement("img");
             img.className = `rotation-${type}-icon`;
+            if (typeof guardPlannerEffectImage === "function") guardPlannerEffectImage(img, item);
             img.src = iconPath;
             img.alt = displayName;
             img.title = displayName;
             img.dataset.tooltip = displayName;
             img.setAttribute("aria-label", displayName);
             item.appendChild(img);
-        } else {
-            const fallback = document.createElement("span");
-            fallback.className = `rotation-${type}-fallback`;
-            fallback.textContent = displayName.slice(0, 2).toUpperCase();
-            fallback.title = displayName;
-            fallback.dataset.tooltip = displayName;
-            item.appendChild(fallback);
+            if (typeof appendPlannerEffectStackBadge === "function") appendPlannerEffectStackBadge(item, effect, type);
         }
         attachEffectTooltipEvents(item, displayName, type);
         tray.appendChild(item);
@@ -2233,15 +2230,16 @@ function createSimulationCursorEffectList(items, type) {
         item.className = "rotation-sim-cursor-effect";
         const displayName = type === "buff" ? getBuffDisplayName(effect) : getDebuffDisplayName(effect);
         const iconPath = type === "buff" ? resolveBuffIcon(effect) : resolveDebuffIcon(effect);
+        if (!iconPath) return;
         item.title = displayName;
 
         if (iconPath) {
             const img = document.createElement("img");
+            if (typeof guardPlannerEffectImage === "function") guardPlannerEffectImage(img, item);
             img.src = iconPath;
             img.alt = displayName;
             item.appendChild(img);
-        } else {
-            item.textContent = displayName.slice(0, 2).toUpperCase();
+            if (typeof appendPlannerEffectStackBadge === "function") appendPlannerEffectStackBadge(item, effect, type);
         }
 
         list.appendChild(item);
@@ -3130,20 +3128,22 @@ function createSimulationStackEffects(items, type) {
     const row = document.createElement("div");
     row.className = `rotation-sim-stack-effects is-${type}`;
 
+    row.title = items.map(effect => type === "buff" ? getBuffDisplayName(effect) : getDebuffDisplayName(effect)).join(", ");
     items.forEach(effect => {
         const item = document.createElement("span");
         item.className = "rotation-sim-stack-effect";
         const displayName = type === "buff" ? getBuffDisplayName(effect) : getDebuffDisplayName(effect);
         const iconPath = type === "buff" ? resolveBuffIcon(effect) : resolveDebuffIcon(effect);
+        if (!iconPath) return;
         item.title = displayName;
 
         if (iconPath) {
             const img = document.createElement("img");
+            if (typeof guardPlannerEffectImage === "function") guardPlannerEffectImage(img, item);
             img.src = iconPath;
             img.alt = displayName;
             item.appendChild(img);
-        } else {
-            item.textContent = displayName.slice(0, 2).toUpperCase();
+            if (typeof appendPlannerEffectStackBadge === "function") appendPlannerEffectStackBadge(item, effect, type);
         }
 
         row.appendChild(item);
@@ -6501,6 +6501,7 @@ function createSimulationEffectTimelineTrack(type, events, durationSeconds, pixe
             ));
         } else if (iconUrl) {
             const icon = document.createElement("img");
+            if (typeof guardPlannerEffectImage === "function") guardPlannerEffectImage(icon);
             icon.src = iconUrl;
             icon.alt = "";
             icon.loading = "lazy";
