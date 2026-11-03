@@ -734,6 +734,14 @@ function createQuickSkillSource(skill, operator) {
         item.dataset.skillLane = getSimulationSkillLane(skillData);
     }
     item.appendChild(createSkillIcon(skillData, { size: "small", useSmallIcon: true }));
+    if (skill.siHostEvent) {
+        item.setAttribute("aria-label", skill.name);
+        item.title = skill.name;
+        const label = document.createElement("span");
+        label.className = "si-host-event-label";
+        label.textContent = skill.quickLabel;
+        item.appendChild(label);
+    }
     attachSkillTooltipEvents(item, skillData);
     return item;
 }
@@ -798,7 +806,9 @@ function renderRotationQuickSkills() {
     const groups = document.createElement("div");
     groups.className = "rotation-quick-skills-groups";
 
-    if (Array.isArray(simulationTriggerEvents) && simulationTriggerEvents.length > 0) {
+    const availableCombatEvents = (Array.isArray(simulationTriggerEvents) ? simulationTriggerEvents : [])
+        .filter(event => !event.siHostEvent || selectedTeam.some(id => Number(id) === 33));
+    if (availableCombatEvents.length > 0) {
         const eventGroup = document.createElement("div");
         eventGroup.className = "rotation-quick-skill-group is-combat-events";
         const eventName = document.createElement("span");
@@ -807,7 +817,7 @@ function renderRotationQuickSkills() {
         const eventRow = document.createElement("div");
         eventRow.className = "skill-row rotation-quick-skill-row";
         const eventSource = { name: "Combat Event" };
-        simulationTriggerEvents.forEach(eventData => {
+        availableCombatEvents.forEach(eventData => {
             eventRow.appendChild(createQuickSkillSource(eventData, eventSource));
         });
         eventGroup.append(eventName, eventRow);

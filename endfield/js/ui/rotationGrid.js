@@ -3330,6 +3330,18 @@ function createSimulationSkillInspector(event) {
         ["Cooldown", Number(skillData.cooldown || 0) > 0 ? formatSimulationInspectorSeconds(skillData.cooldown) : "None"]
     ]);
 
+    if (primaryEvent.siHostState) {
+        const state = primaryEvent.siHostState;
+        appendSimulationInspectorSection(panel, "Inksoul host", [
+            ["Previous host", state.previousTargetId],
+            ["Current host", state.targetId || "No living host"],
+            ["Remaining", formatSimulationInspectorSeconds(state.remainingSeconds)],
+            ["Original expiry", formatSimulationInspectorSeconds(state.expiresAt)],
+            ["Recorded DMG (non-crit)", state.recordedDamage.finalDamage === null ? "Unavailable" : String(state.recordedDamage.finalDamage)],
+            ["Inksoul", state.drawn ? "Drawn" : "Dropped undrawn"]
+        ]);
+    }
+
     if (primaryEvent.loadoutState) {
         const loadout = primaryEvent.loadoutState;
         appendSimulationInspectorSection(panel, "Simulation Loadout", [
@@ -3654,6 +3666,11 @@ function getSimulationLogTypeKey(event) {
 }
 
 function getSimulationLogReason(event) {
+    if (event?.siHostState) {
+        const state = event.siHostState;
+        const destination = state.targetId ? ` → ${state.targetId}` : " → no living host";
+        return `${state.previousTargetId}${destination}; ${formatSimulationInspectorSeconds(state.remainingSeconds)} remaining`;
+    }
     if (event?.problemType === "cooldown") {
         const source = event.triggerSourceName || "Trigger";
         return `${source} met the trigger, but this Combo Skill is still on cooldown`;
@@ -4985,6 +5002,11 @@ function enrichSimulationSkillEventsWithEffects(events) {
     };
 
     const processEvent = event => {
+            if (typeof resolveSiTeamSkill === "function") {
+                event = { ...event, skillData: resolveSiTeamSkill(event.skillData,
+                    typeof selectedTeam !== "undefined" ? selectedTeam : [],
+                    typeof operators !== "undefined" ? operators : []) };
+            }
             const expireTimedEffects = (stackState, metaState, registry) => {
                 Object.entries(metaState).forEach(([effectId, effect]) => {
                     const registryEntry = registry?.[effectId] || null;

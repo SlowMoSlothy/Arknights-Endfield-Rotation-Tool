@@ -1,0 +1,33 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+const context = vm.createContext({ window: {}, structuredClone });
+vm.runInContext(fs.readFileSync('endfield/supabaseClient.js', 'utf8'), context);
+const resolve = (op, rows = []) => context.getPlannerSkillRows(op, rows);
+test('catalog-only Si has usable source-backed skills and existing icons', () => {
+    const rows = resolve({id: 33, slug: 'si'});
+    assert.equal(rows.length, 6);
+    assert.deepEqual(Array.from(rows.slice(0, 4), row => row.short_type), ['FS', 'BS', 'CS', 'Ult']);
+    for (const row of rows) {
+        assert.ok(fs.existsSync(`endfield/${row.icon_small_path}`));
+        const skill = context.mapDatabaseSkill(row);
+        assert.equal(skill.operatorId, 33);
+        assert.equal(skill.elementType, 'cryo');
+        assert.ok(skill.name && skill.description);
+    }
+    assert.equal(rows[1].energy, 100);
+    assert.equal(rows[2].cooldown, 15);
+    assert.equal(rows[3].energy, 80);
+    assert.equal(rows[4].raw_data.sp_cost, 15);
+    assert.equal(rows[5].raw_data.sp_cost, 0);
+});
+test('database skills take precedence and fallback remains isolated to Si', () => {
+    const authored = [{id: 3302, name: 'Admin edit'}];
+    assert.equal(resolve({id: 33, slug: 'si'}, authored), authored);
+    assert.equal(resolve({id: 32, slug: 'purrchena'}).length, 0);
+    assert.equal(resolve({id: 33, slug: 'other'}).length, 0);
+    const rows = resolve({id: 33, slug: 'si'});
+    rows[0].raw_data.skillRank = 1;
+    assert.equal(resolve({id: 33, slug: 'si'})[0].raw_data.skillRank, 12);
+});

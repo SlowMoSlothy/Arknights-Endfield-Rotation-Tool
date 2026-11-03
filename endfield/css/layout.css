@@ -1003,3 +1003,18 @@ body.mobile-nav-open .builder-sidebar {
         margin: 14px 0;
     }
 }
+
+/* Distinguish Si's manual host events on touchscreens. */
+.rotation-quick-skill:has(.si-host-event-label) { position: relative; }
+.si-host-event-label {
+    position: absolute;
+    inset: auto 0 0;
+    border-radius: 0 0 4px 4px;
+    background: #151b1eee;
+    color: #eeef7a;
+    font-size: 9px;
+    line-height: 13px;
+    font-weight: 700;
+    text-align: center;
+    pointer-events: none;
+}
