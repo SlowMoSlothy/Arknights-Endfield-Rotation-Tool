@@ -921,6 +921,169 @@ async function hydrateOperatorFormsFromSupabase() {
     return operatorForms.length > 0;
 }
 
+// Si was imported as a catalog-only operator. Use source-backed base actions
+// until simulator rows are installed; never replace administrator-authored rows.
+const SI_DEFAULT_SKILL_ROWS = [
+    {
+        "id": 900033,
+        "operator_id": 33,
+        "slot_index": 1,
+        "name": "Artistic Urge",
+        "skill_type": "Final Strike",
+        "short_type": "FS",
+        "cooldown": null,
+        "energy": null,
+        "element_type": "cryo",
+        "icon_path": "assets/operators/avatars/Si.png",
+        "icon_small_path": "assets/operators/catalog-skills/icon_attack_claym.png",
+        "description": "BASIC ATTACK: \nAn attack with up to 5 sequences that deals Cryo DMG. As the controlled operator, Final Strike also deals 18 Stagger. \n\nDIVE ATTACK: \nBasic attack performed in mid-air becomes a dive attack that deals Cryo DMG to nearby enemies. \n\nFINISHER: \nBasic attack performed near a Staggered enemy becomes a finisher that deals massive Cryo DMG and recovers some SP.\n\nPlanner: Base skill values only. Artful Intent damage recording, Inksoul linking, team-position infliction and consumed-stack combo scaling are not simulated.",
+        "atk_multiplier": 9,
+        "damage_element": "cryo",
+        "damage_verified": false,
+        "raw_data": {
+            "skillRank": 12,
+            "sourceUrl": "https://endfieldtools.dev/localdb/optimized/characters/details/chr_0036_jsspsi.json",
+            "mechanicsStatus": "partial",
+            "sourceNote": "Base skill values only. Artful Intent damage recording, Inksoul linking, team-position infliction and consumed-stack combo scaling are not simulated.",
+            "stagger": 18,
+            "debuffs": [
+                {
+                    "id": "final_strike",
+                    "appliesEffect": "final_strike",
+                    "transientTrigger": true,
+                    "visible": false
+                }
+            ]
+        }
+    },
+    {
+        "id": 3302,
+        "operator_id": 33,
+        "slot_index": 2,
+        "name": "Brushwork Realm",
+        "skill_type": "Battle Skill",
+        "short_type": "BS",
+        "cooldown": null,
+        "energy": 100,
+        "element_type": "cryo",
+        "icon_path": "assets/operators/avatars/Si.png",
+        "icon_small_path": "assets/operators/catalog-skills/icon_skill_jsspsi_01.png",
+        "description": "Si deals Cryo DMG and applies Artful Intent, Immobilization, and Cryo Infliction (or Heat Infliction if a Heat element operator is in Team Position 01) on the target. After a target with Artful Intent takes DMG, part of the DMG taken is recorded. When the duration of Artful Intent ends, it bursts and deals Fixed DMG equal to the DMG recorded. After casting the skill, Si's battle skill is temporarily changed to Initial Stroke.\nInitial Stroke: Costs 15 SP. Si pulls an Inksoul from a target with Artful Intent. All DMG dealt and effects applied to the Inksoul will also be dealt to its host (the said target). The Inksoul lasts as long as the remaining duration of Artful Intent. After casting the skill, Si's battle skill is temporarily changed to Final Stroke.\nFinal Stroke: Costs no SP. Makes the Inksoul disappear early. When disappearing, the Inksoul will move to its host and trigger a burst like the ending burst of Artful Intent.\nWhen dealing DMG or applying effects to both the Inksoul and the host, only 1 instance of the DMG or effect is dealt/applied. If the host is defeated during the Inksoul's duration, it will link to another enemy in combat and apply Artful Intent to it. This does not reset the duration of Artful Intent. If a target with Artful Intent is defeated without having its Inksoul drawn out of it, the defeated target will drop an Inksoul at its location.\n\nPlanner: Base skill values only. Artful Intent damage recording, Inksoul linking, team-position infliction and consumed-stack combo scaling are not simulated.",
+        "atk_multiplier": 1,
+        "damage_element": "cryo",
+        "damage_verified": false,
+        "raw_data": {
+            "skillRank": 12,
+            "sourceUrl": "https://endfieldtools.dev/localdb/optimized/characters/details/chr_0036_jsspsi.json",
+            "mechanicsStatus": "partial",
+            "sourceNote": "Base skill values only. Artful Intent damage recording, Inksoul linking, team-position infliction and consumed-stack combo scaling are not simulated.",
+            "sp_cost": 100
+        }
+    },
+    {
+        "id": 3303,
+        "operator_id": 33,
+        "slot_index": 3,
+        "name": "Fully Envisioned",
+        "skill_type": "Combo Skill",
+        "short_type": "CS",
+        "cooldown": 15,
+        "energy": null,
+        "element_type": "cryo",
+        "icon_path": "assets/operators/avatars/Si.png",
+        "icon_small_path": "assets/operators/catalog-skills/icon_combo_skill_jsspsi_01.png",
+        "description": "COMBO TRIGGER: When an enemy's Cryo Infliction or Heat Infliction is consumed or absorbed.\nSi summons an Ink Lung that deals Cryo DMG. This DMG is based on the highest stacks of Arts Infliction consumed or absorbed from a single target.\n\nPlanner: Base skill values only. Artful Intent damage recording, Inksoul linking, team-position infliction and consumed-stack combo scaling are not simulated.",
+        "atk_multiplier": 7.5,
+        "damage_element": "cryo",
+        "damage_verified": false,
+        "raw_data": {
+            "skillRank": 12,
+            "sourceUrl": "https://endfieldtools.dev/localdb/optimized/characters/details/chr_0036_jsspsi.json",
+            "mechanicsStatus": "partial",
+            "sourceNote": "Base skill values only. Artful Intent damage recording, Inksoul linking, team-position infliction and consumed-stack combo scaling are not simulated.",
+            "ultimateEnergyGain": 10
+        }
+    },
+    {
+        "id": 3304,
+        "operator_id": 33,
+        "slot_index": 4,
+        "name": "No One Spoils the Fun",
+        "skill_type": "Ultimate",
+        "short_type": "Ult",
+        "cooldown": 30,
+        "energy": 80,
+        "element_type": "cryo",
+        "icon_path": "assets/operators/avatars/Si.png",
+        "icon_small_path": "assets/operators/catalog-skills/icon_ultimate_skill_jsspsi_01.png",
+        "description": "Si summons a Giant Ink Lung from her painting that deals Cryo DMG and grants temporary Cryo Amp and Heat Amp to the entire team.\n\nPlanner: Base skill values only. Artful Intent damage recording, Inksoul linking, team-position infliction and consumed-stack combo scaling are not simulated.",
+        "atk_multiplier": 5,
+        "damage_element": "cryo",
+        "damage_verified": false,
+        "raw_data": {
+            "skillRank": 12,
+            "sourceUrl": "https://endfieldtools.dev/localdb/optimized/characters/details/chr_0036_jsspsi.json",
+            "mechanicsStatus": "partial",
+            "sourceNote": "Base skill values only. Artful Intent damage recording, Inksoul linking, team-position infliction and consumed-stack combo scaling are not simulated."
+        }
+    },
+    {
+        "id": 3305,
+        "operator_id": 33,
+        "slot_index": 5,
+        "name": "Initial Stroke",
+        "skill_type": "Battle Skill",
+        "short_type": "BS",
+        "cooldown": null,
+        "energy": 15,
+        "element_type": "cryo",
+        "icon_path": "assets/operators/avatars/Si.png",
+        "icon_small_path": "assets/operators/catalog-skills/icon_skill_jsspsi_01.png",
+        "description": "Si deals Cryo DMG and applies Artful Intent, Immobilization, and Cryo Infliction (or Heat Infliction if a Heat element operator is in Team Position 01) on the target. After a target with Artful Intent takes DMG, part of the DMG taken is recorded. When the duration of Artful Intent ends, it bursts and deals Fixed DMG equal to the DMG recorded. After casting the skill, Si's battle skill is temporarily changed to Initial Stroke.\nInitial Stroke: Costs 15 SP. Si pulls an Inksoul from a target with Artful Intent. All DMG dealt and effects applied to the Inksoul will also be dealt to its host (the said target). The Inksoul lasts as long as the remaining duration of Artful Intent. After casting the skill, Si's battle skill is temporarily changed to Final Stroke.\nFinal Stroke: Costs no SP. Makes the Inksoul disappear early. When disappearing, the Inksoul will move to its host and trigger a burst like the ending burst of Artful Intent.\nWhen dealing DMG or applying effects to both the Inksoul and the host, only 1 instance of the DMG or effect is dealt/applied. If the host is defeated during the Inksoul's duration, it will link to another enemy in combat and apply Artful Intent to it. This does not reset the duration of Artful Intent. If a target with Artful Intent is defeated without having its Inksoul drawn out of it, the defeated target will drop an Inksoul at its location.\n\nPlanner: Base skill values only. Artful Intent damage recording, Inksoul linking, team-position infliction and consumed-stack combo scaling are not simulated.",
+        "atk_multiplier": 0,
+        "damage_element": "cryo",
+        "damage_verified": false,
+        "raw_data": {
+            "skillRank": 12,
+            "sourceUrl": "https://endfieldtools.dev/localdb/optimized/characters/details/chr_0036_jsspsi.json",
+            "mechanicsStatus": "partial",
+            "sourceNote": "Base skill values only. Artful Intent damage recording, Inksoul linking, team-position infliction and consumed-stack combo scaling are not simulated.",
+            "sp_cost": 15
+        }
+    },
+    {
+        "id": 3306,
+        "operator_id": 33,
+        "slot_index": 6,
+        "name": "Final Stroke",
+        "skill_type": "Battle Skill",
+        "short_type": "BS",
+        "cooldown": null,
+        "energy": 0,
+        "element_type": "cryo",
+        "icon_path": "assets/operators/avatars/Si.png",
+        "icon_small_path": "assets/operators/catalog-skills/icon_skill_jsspsi_01.png",
+        "description": "Si deals Cryo DMG and applies Artful Intent, Immobilization, and Cryo Infliction (or Heat Infliction if a Heat element operator is in Team Position 01) on the target. After a target with Artful Intent takes DMG, part of the DMG taken is recorded. When the duration of Artful Intent ends, it bursts and deals Fixed DMG equal to the DMG recorded. After casting the skill, Si's battle skill is temporarily changed to Initial Stroke.\nInitial Stroke: Costs 15 SP. Si pulls an Inksoul from a target with Artful Intent. All DMG dealt and effects applied to the Inksoul will also be dealt to its host (the said target). The Inksoul lasts as long as the remaining duration of Artful Intent. After casting the skill, Si's battle skill is temporarily changed to Final Stroke.\nFinal Stroke: Costs no SP. Makes the Inksoul disappear early. When disappearing, the Inksoul will move to its host and trigger a burst like the ending burst of Artful Intent.\nWhen dealing DMG or applying effects to both the Inksoul and the host, only 1 instance of the DMG or effect is dealt/applied. If the host is defeated during the Inksoul's duration, it will link to another enemy in combat and apply Artful Intent to it. This does not reset the duration of Artful Intent. If a target with Artful Intent is defeated without having its Inksoul drawn out of it, the defeated target will drop an Inksoul at its location.\n\nPlanner: Base skill values only. Artful Intent damage recording, Inksoul linking, team-position infliction and consumed-stack combo scaling are not simulated.",
+        "atk_multiplier": 0,
+        "damage_element": "cryo",
+        "damage_verified": false,
+        "raw_data": {
+            "skillRank": 12,
+            "sourceUrl": "https://endfieldtools.dev/localdb/optimized/characters/details/chr_0036_jsspsi.json",
+            "mechanicsStatus": "partial",
+            "sourceNote": "Base skill values only. Artful Intent damage recording, Inksoul linking, team-position infliction and consumed-stack combo scaling are not simulated.",
+            "sp_cost": 0
+        }
+    }
+];
+
+function getPlannerSkillRows(operatorRow, skillRows) {
+    const isSi = Number(operatorRow.id) === 33 && operatorRow.slug === "si";
+    return isSi && skillRows.length === 0
+        ? SI_DEFAULT_SKILL_ROWS.map(row => structuredClone(row))
+        : skillRows;
+}
+
 async function loadOperatorsFromSupabase() {
     if (!supabaseClient) {
         throw new Error("Supabase client is not available. Cannot load operator data.");
@@ -976,7 +1139,7 @@ async function loadOperatorsFromSupabase() {
     const basicAttackConfigs = buildBasicAttackConfigs(basicAttackRows);
     const operators = visibleOperatorRows.map(row => mapDatabaseOperator(
         row,
-        skillsByOperatorId.get(row.id) || [],
+        getPlannerSkillRows(row, skillsByOperatorId.get(row.id) || []),
         basicAttackConfigs.get(getBasicAttackConfigKey(row.id, "base")) || null
     ));
 
