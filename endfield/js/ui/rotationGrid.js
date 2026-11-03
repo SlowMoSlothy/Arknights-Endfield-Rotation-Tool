@@ -4985,6 +4985,11 @@ function enrichSimulationSkillEventsWithEffects(events) {
     };
 
     const processEvent = event => {
+            if (typeof resolveSiTeamSkill === "function") {
+                event = { ...event, skillData: resolveSiTeamSkill(event.skillData,
+                    typeof selectedTeam !== "undefined" ? selectedTeam : [],
+                    typeof operators !== "undefined" ? operators : []) };
+            }
             const expireTimedEffects = (stackState, metaState, registry) => {
                 Object.entries(metaState).forEach(([effectId, effect]) => {
                     const registryEntry = registry?.[effectId] || null;

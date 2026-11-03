@@ -355,6 +355,7 @@ function getSimulationOutgoingDamageBonuses(event, element) {
     registries.forEach(({ effect, registry }) => {
         const { key, merged } = getSimulationDamageEffectData(effect, registry);
         if (!isSimulationDamageEffectForSource(merged, sourceOperatorId)) return;
+        if (merged.damageElementFilter && merged.damageElementFilter !== normalizedElement) return;
         const stacks = merged.resolvedSkillValueStacks ? 1 : getSimulationDamageEffectStacks(merged);
         const options = {
             stacks,
@@ -632,6 +633,7 @@ function getSimulationDamageEffectContext(event, outgoing, mitigation, crit) {
 }
 
 function getSimulationDamageBreakdown(event) {
+    if (event?.fixedDamageBreakdown) return event.fixedDamageBreakdown;
     const skillData = event?.skillData;
     if (!skillData || event?.kind === "weapon-passive" || skillData.isEnemySkill) return null;
 
@@ -712,6 +714,16 @@ function appendSimulationDamageBreakdown(parent, event) {
     if (!parent || typeof appendSimulationInspectorSection !== "function") return;
     const breakdown = event?.damageBreakdown || getSimulationDamageBreakdown(event);
     if (!breakdown) return;
+    if (event.fixedDamageBreakdown) {
+        appendSimulationInspectorSection(parent, "Artful Intent · Fixed Damage", [
+            ["Recorded share", "13% of damage dealt during the mark"],
+            ["Final DMG (non-crit)", breakdown.finalDamage === null ? "Unavailable" : String(breakdown.finalDamage)],
+            ["Expected DMG", breakdown.expectedFinalDamage === null ? "Unavailable" : String(breakdown.expectedFinalDamage)],
+            ["Calculation", "Recorded damage is already mitigated; no additional bonuses, resistance or critical hit roll."],
+            ["Model", "Single target; Inksoul and host share one damage stream."]
+        ]);
+        return;
+    }
 
     const inputIssue = typeof getSimulationDamageInputIssue === "function" ? getSimulationDamageInputIssue(event) : "";
     if (inputIssue) {

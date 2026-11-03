@@ -195,6 +195,11 @@
         if (typeof enrichSimulationSkillEventsWithDamageBreakdown === "function") {
             enrichSimulationSkillEventsWithDamageBreakdown(basicAttackDamageEvents);
         }
+        const siBursts = typeof createSiRecordedDamageEvents === "function"
+            ? createSiRecordedDamageEvents([...damageEvents, ...basicAttackDamageEvents], duration)
+            : [];
+        damageEvents.push(...siBursts);
+        damageEvents.sort((a, b) => (a.time - b.time) || ((a.order || 0) - (b.order || 0)));
         window.__simulationDamageTimeline = typeof buildSimulationDamageTimeline === "function"
             ? buildSimulationDamageTimeline([...damageEvents, ...basicAttackDamageEvents])
             : [];
