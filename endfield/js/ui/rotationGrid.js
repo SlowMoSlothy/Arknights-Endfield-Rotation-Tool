@@ -354,14 +354,19 @@ function resolveSlotModeSkillData(skillData, debuffStackState) {
 }
 
 function consumeSlotModeSkillDebuffs(skillData, stackState, metaState) {
+    const consumedEffects = {};
     (Array.isArray(skillData?.consumeDebuffs) ? skillData.consumeDebuffs : [])
         .forEach(effect => {
             if (
                 typeof shouldConsumeDebuffFromEffectMap === "function" &&
                 !shouldConsumeDebuffFromEffectMap(skillData, effect, stackState)
             ) return;
+            const key = typeof getConsumedDebuffEffectName === "function"
+                ? getConsumedDebuffEffectName(effect) : (typeof effect === "string" ? effect : effect.effect);
+            if (Number(stackState[key]) > 0) consumedEffects[`${key}_consumed`] = Number(stackState[key]);
             consumeAllDebuffStacks(effect, stackState, metaState);
         });
+    return consumedEffects;
 }
 
 const ROTATION_ELEMENTAL_INFLICTION_EFFECTS = [
@@ -468,7 +473,49 @@ function getActiveDebuffsFromRotationState(stackState, metaState) {
     }));
 }
 
-function applySkillDebuffsAndGetActiveState(skillData, activeBuffMetaState, activeBuffStackState, debuffStackState, debuffMetaState, buffStackState, buffMetaState) {
+// Steel Oath responds to newly applied Physical Status, not Physical damage or Vulnerable.
+// Called by both slot rendering and simulation after physical-status resolution.
+function consumeSteelOathForSkill(skillData, stackState, metaState, appliedDebuffs = [], triggerEffectMap = {}) {
+    const before = Math.max(0, Number(stackState.steel_oath) || 0);
+    if (!before) return 0;
+    const statuses = new Set(appliedDebuffs.map(effect => normalizeRotationConsumeKey(
+        effect?.appliesEffect || effect?.id
+    )).filter(key => ["lift", "knock_down", "crush", "breach"].includes(key)));
+    let amount = statuses.size;
+    if (Number(skillData?.id) === 2203) {
+        const config = skillData.triggerEffectScaling;
+        const triggerStacks = Number(triggerEffectMap.vulnerable_consumed || 0);
+        const variant = triggerStacks > 0 && config
+            ? getSimulationScalingVariant(config, triggerStacks) : null;
+        const sequences = variant?.damageSequences || skillData.damageSequences;
+        // Full Moon Slash has 1–3 sequences; four consumed Vulnerable enhances sequence 3.
+        amount += Math.max(1, Math.min(3, Array.isArray(sequences) && sequences.length
+            ? sequences.length : Number(variant?.damageProfile?.hitCount || skillData.damageProfile?.hitCount || 1)));
+    }
+    const consumed = Math.min(before, amount);
+    if (!consumed) return 0;
+    const remaining = before - consumed;
+    if (remaining > 0) {
+        stackState.steel_oath = remaining;
+        if (Array.isArray(metaState.steel_oath?.appliedStackTimes)) {
+            metaState.steel_oath = {...metaState.steel_oath,
+                appliedStackTimes: metaState.steel_oath.appliedStackTimes.slice(-remaining)};
+        }
+    } else {
+        delete stackState.steel_oath;
+        delete metaState.steel_oath;
+    }
+    return consumed;
+}
+
+function applySkillDebuffsAndGetActiveState(skillData, activeBuffMetaState, activeBuffStackState, debuffStackState, debuffMetaState, buffStackState, buffMetaState, triggerEffectMap = {}) {
+    const appliedDebuffs = shouldSkipNormalDebuffs(skillData, activeBuffMetaState, activeBuffStackState)
+        ? [] : (skillData.debuffs || []);
+    const conditionalDebuffs = getMatchedConditionalRules(skillData, activeBuffMetaState, activeBuffStackState,
+        debuffMetaState, debuffStackState).flatMap(rule => rule.debuffs || []);
+    consumeSteelOathForSkill(skillData, debuffStackState, debuffMetaState,
+        [...appliedDebuffs, ...conditionalDebuffs], triggerEffectMap);
+
     const debuffStackStateBeforeSkill = { ...debuffStackState };
     const debuffMetaStateBeforeSkill = { ...debuffMetaState };
 
@@ -5087,7 +5134,8 @@ function enrichSimulationSkillEventsWithEffects(events) {
                 rotationDebuffStackState,
                 rotationDebuffMetaState,
                 rotationBuffStackState,
-                rotationBuffMetaState
+                rotationBuffMetaState,
+                event.triggerEffectMap || {}
             );
             const enrichedEvent = {
                 ...event,
@@ -6973,6 +7021,7 @@ function renderRotation() {
     const timelineBasicAttackData = getTimelineBasicAttackData();
     const timelineSecondsPerSlot = getTimelineSecondsPerSlot(timelineBasicAttackData);
 
+    let slotConsumedEffectMap = {};
     rotation.forEach((entry, index) => {
         const { step, skillSlot } = createRotationTimelineStep(index, timelineSecondsPerSlot, {
             showSeconds: false,
@@ -6994,7 +7043,9 @@ function renderRotation() {
                 const activeBuffStacksBeforeSkill = {
                     ...rotationBuffStackState
                 };
-                consumeSlotModeSkillDebuffs(skillData, rotationDebuffStackState, rotationDebuffMetaState);
+                const consumedEffects = consumeSlotModeSkillDebuffs(skillData, rotationDebuffStackState, rotationDebuffMetaState);
+                if (Object.keys(consumedEffects).length) slotConsumedEffectMap = consumedEffects;
+                else if (!entry.autoInserted && Number(skillData.id) !== 2203) slotConsumedEffectMap = {};
                 applySkillBuffsAndGetActiveState(skillData, rotationBuffStackState, rotationBuffMetaState, activeBuffsBeforeSkill, activeBuffStacksBeforeSkill);
                 const inner = document.createElement("div");
                 inner.className = "rotation-skill-composite";
@@ -7017,7 +7068,8 @@ function renderRotation() {
                 inner.appendChild(typeBadge);
                 inner.appendChild(glyphBadge);
                 skillDiv.appendChild(inner);
-                const activeDebuffs = applySkillDebuffsAndGetActiveState(skillData, activeBuffsBeforeSkill, activeBuffStacksBeforeSkill, rotationDebuffStackState, rotationDebuffMetaState, rotationBuffStackState, rotationBuffMetaState);
+                const activeDebuffs = applySkillDebuffsAndGetActiveState(skillData, activeBuffsBeforeSkill, activeBuffStacksBeforeSkill, rotationDebuffStackState, rotationDebuffMetaState, rotationBuffStackState, rotationBuffMetaState, slotConsumedEffectMap);
+                if (Number(skillData.id) === 2203) slotConsumedEffectMap = {};
                 const activeBuffsAfterEffects = getActiveBuffsFromRotationState(rotationBuffStackState, rotationBuffMetaState);
                 const buffTray = createEffectTray(activeBuffsAfterEffects, "buff");
                 if (buffTray) skillDiv.appendChild(buffTray);
