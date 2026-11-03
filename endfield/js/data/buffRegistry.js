@@ -167,6 +167,7 @@ function getBuffStackCount(buffData, registryEntry) {
 }
 
 function resolveBuffIcon(buffData) {
+    if (typeof resolvePlannerEffectIcon === "function") return resolvePlannerEffectIcon(buffData);
     if (!buffData) return null;
 
     if (buffData.icon) {

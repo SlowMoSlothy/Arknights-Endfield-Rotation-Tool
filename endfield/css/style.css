@@ -961,3 +961,19 @@
         height: 88px;
     }
 }
+
+/* Status icons keep stack counts when the original sprite has no numbered variant. */
+.planner-effect-stack-count {
+    position: absolute;
+    right: -4px;
+    bottom: -5px;
+    min-width: 13px;
+    padding: 0 2px;
+    border: 1px solid #d9df8c;
+    border-radius: 7px;
+    background: #152022;
+    color: #fff;
+    font: 700 10px/13px sans-serif;
+    text-align: center;
+    pointer-events: none;
+}

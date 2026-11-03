@@ -119,6 +119,7 @@ function renderOperatorBuffs() {
             if (iconPath) {
                 const icon = document.createElement("img");
                 icon.className = "operator-buff-icon";
+                if (typeof guardPlannerEffectImage === "function") guardPlannerEffectImage(icon);
                 icon.src = iconPath;
                 icon.alt = displayName;
                 icon.title = displayName;

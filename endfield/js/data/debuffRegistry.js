@@ -352,6 +352,7 @@ function getDebuffStackCount(debuffData, registryEntry) {
 }
 
 function resolveDebuffIcon(debuffData) {
+    if (typeof resolvePlannerEffectIcon === "function") return resolvePlannerEffectIcon(debuffData);
     if (!debuffData) return null;
 
     if (debuffData.icon) {
