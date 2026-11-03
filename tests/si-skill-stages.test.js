@@ -16,9 +16,9 @@ function planner(simulation=false) {
     const active=()=>context.resolveSiRotationBattleSkillState(si()).skill.id;
     return {context,set,si,active};
 }
-test('Si shows four icons and one Battle Skill automatically advances through all three stages',()=>{
+test('Si shows five icons and one Battle Skill automatically advances through all three stages',()=>{
     const p=planner();
-    assert.equal(p.context.getDisplaySkillsForOperator(p.si()).length,4);
+    assert.equal(p.context.getDisplaySkillsForOperator(p.si()).length,5);
     assert.equal(p.active(),3302);
     p.set([{id:3302}]);assert.equal(p.active(),3305);
     p.set([{id:3302},{id:3305}]);assert.equal(p.active(),3306);
@@ -58,4 +58,11 @@ test('selection follows the staged source without changing unrelated operators o
     const mifu={id:27,skills:[{id:2702},{id:2705},{id:2706},{id:2704}]};
     const result=p.context.getDisplaySkillsForOperator(mifu);
     assert.equal(result.length,2);assert.equal(result[0].switchGroup.length,3);
+});
+
+test('Dive Attack remains available in every Battle Skill stage and does not advance it',()=>{
+    const p=planner();
+    p.set([{id:3302},{id:3307}]);assert.equal(p.active(),3305);
+    assert.ok(p.context.getDisplaySkillsForOperator(p.si()).some(entry=>entry.skill.id===3307));
+    p.set([{id:3302},{id:3305},{id:3307}]);assert.equal(p.active(),3306);
 });
