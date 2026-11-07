@@ -105,6 +105,7 @@ function buildOperatorFormIntervals(events, durationSeconds = Infinity) {
                 icon: form.icon || event?.skillData?.iconSmall || event?.skillData?.icon || "",
                 visible: form.visible !== false,
                 activationSkillId: skillId,
+                activationOrder: Number(event.order || 0),
                 sourceUrl: form.sourceUrl || "",
                 sourceNote: form.sourceNote || ""
             });
@@ -114,10 +115,12 @@ function buildOperatorFormIntervals(events, durationSeconds = Infinity) {
     return intervals.sort((left, right) => left.start - right.start || right.priority - left.priority);
 }
 
-function getActiveOperatorForm(operatorId, time, intervals = []) {
+function getActiveOperatorForm(operatorId, time, intervals = [], eventOrder = Infinity) {
     return [...(Array.isArray(intervals) ? intervals : [])]
         .filter(interval => Number(interval.operatorId) === Number(operatorId)
             && Number(interval.start) <= Number(time) + 0.0001
+            && (Math.abs(Number(interval.start) - Number(time)) > 0.0001
+                || Number(interval.activationOrder || 0) <= Number(eventOrder))
             && Number(interval.end) > Number(time) + 0.0001)
         .sort((left, right) => Number(right.priority || 0) - Number(left.priority || 0) || Number(right.start) - Number(left.start))[0]
         || null;
@@ -125,7 +128,7 @@ function getActiveOperatorForm(operatorId, time, intervals = []) {
 
 function resolveOperatorFormAction(actionData, operatorId, time, intervals = [], context = {}) {
     if (!actionData) return actionData;
-    const form = getActiveOperatorForm(operatorId, time, intervals);
+    const form = getActiveOperatorForm(operatorId, time, intervals, context.eventOrder ?? Infinity);
     if (!form) return actionData;
 
     const actionKey = getOperatorFormActionKey(actionData);

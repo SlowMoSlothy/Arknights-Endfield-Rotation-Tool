@@ -1,4 +1,5 @@
 [
   {"id":32,"sourceId":"chr_0038_purrche","slug":"purrchena","name":"Purrchena","iconPath":"assets/operators/avatars/Purrchena.png"},
-  {"id":33,"sourceId":"chr_0036_jsspsi","slug":"si","name":"Si","iconPath":"assets/operators/avatars/Si.png"}
+  {"id":33,"sourceId":"chr_0036_jsspsi","slug":"si","name":"Si","iconPath":"assets/operators/avatars/Si.png"},
+  {"id":34,"sourceId":"chr_0037_minghe","sourceSlug":"argent-flow","slug":"argent_flow","name":"Argent Flow","iconPath":"assets/operators/avatars/Argent_Flow.png"}
 ]

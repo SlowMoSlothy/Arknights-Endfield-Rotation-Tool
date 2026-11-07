@@ -4470,6 +4470,8 @@ function collectSimulationFinalStrikeComboSkills(sourceOperatorId, finalStrikeTi
     const blockedSeen = new Set();
     const cooldownState = {};
     const persistentEffectMap = {};
+    const formActivationEvents = [...manualEvents];
+    const formUseCounts = new Map();
     const manualComboTimeKeys = new Set(
         manualEvents
             .filter(event => isComboSkillData(event.skillData))
@@ -4494,6 +4496,16 @@ function collectSimulationFinalStrikeComboSkills(sourceOperatorId, finalStrikeTi
     ].sort((left, right) => (left.time - right.time) || (left.order - right.order));
 
     timelineEvents.forEach(event => {
+        if (event.skillData && typeof resolveOperatorFormAction === "function") {
+            const intervals = window.__simulationOperatorFormIntervals || [];
+            const form = getActiveOperatorForm(event.sourceOperatorId, event.time, intervals, event.order);
+            const baseSkill = event.skillData.baseActionData || event.skillData;
+            const actionKey = getOperatorFormActionKey(baseSkill);
+            const useKey = form ? `${form.operatorId}:${form.formKey}:${form.start}:${actionKey}` : "";
+            const activationUseIndex = useKey ? (formUseCounts.get(useKey) || 0) + 1 : 0;
+            if (useKey) formUseCounts.set(useKey, activationUseIndex);
+            event.skillData = resolveOperatorFormAction(baseSkill, event.sourceOperatorId, event.time, intervals, { activationUseIndex, eventOrder: event.order });
+        }
         if (event.skillData && isComboSkillData(event.skillData)) {
             markSimulationComboCooldown(event.skillData, event.time, cooldownState);
         }
@@ -4601,6 +4613,12 @@ function collectSimulationFinalStrikeComboSkills(sourceOperatorId, finalStrikeTi
                     triggerContextEffects: Object.keys(triggerContext.resolvedEffectMap || {}),
                     triggerEffectMap: { ...(triggerContext.currentTriggerMap || {}) }
                 });
+                // A Combo can activate a form too. Subsequent actions in this
+                // chronological trigger pass must see its temporary replacement.
+                if (typeof buildOperatorFormIntervals === "function") {
+                    formActivationEvents.push(result[result.length - 1]);
+                    window.__simulationOperatorFormIntervals = buildOperatorFormIntervals(formActivationEvents);
+                }
             });
         };
 
@@ -4715,22 +4733,27 @@ function getSimulationManualSkillEvents(entries, secondsPerSlot) {
 
     const formIntervals = buildOperatorFormIntervals(rawEvents);
     window.__simulationOperatorFormIntervals = formIntervals;
+    return resolveSimulationEventsWithOperatorForms(rawEvents, formIntervals);
+}
+
+function resolveSimulationEventsWithOperatorForms(events, formIntervals = []) {
     const activationUseCounts = new Map();
-    const resolvedEvents = rawEvents
+    const resolvedEvents = [...events]
         .sort((left, right) => left.time - right.time || left.order - right.order)
         .map(event => {
             const form = typeof getActiveOperatorForm === "function"
-                ? getActiveOperatorForm(event.sourceOperatorId, event.time, formIntervals)
+                ? getActiveOperatorForm(event.sourceOperatorId, event.time, formIntervals, event.order)
                 : null;
+            const baseSkill = event.skillData.baseActionData || event.skillData;
             const actionKey = typeof getOperatorFormActionKey === "function"
-                ? getOperatorFormActionKey(event.skillData)
+                ? getOperatorFormActionKey(baseSkill)
                 : "";
             const useKey = form && actionKey ? `${form.operatorId}:${form.formKey}:${form.start}:${actionKey}` : "";
             const activationUseIndex = useKey ? (activationUseCounts.get(useKey) || 0) + 1 : 0;
             if (useKey) activationUseCounts.set(useKey, activationUseIndex);
             const skillData = typeof resolveOperatorFormAction === "function"
-                ? resolveOperatorFormAction(event.skillData, event.sourceOperatorId, event.time, formIntervals, { activationUseIndex })
-                : event.skillData;
+                ? resolveOperatorFormAction(baseSkill, event.sourceOperatorId, event.time, formIntervals, { activationUseIndex, eventOrder: event.order })
+                : baseSkill;
             return { ...event, skillData, activeForm: form };
         });
     return typeof attachOperatorFormEffectsToActivationEvents === "function"
@@ -6661,7 +6684,7 @@ function renderSimulationRotation() {
     const timelineBasicAttackData = getTimelineBasicAttackData();
     const secondsPerSlot = getTimelineSecondsPerSlot(timelineBasicAttackData);
     const entries = rotation.map((entry, index) => ({ entry, index })).filter(item => item.entry);
-    const manualSkillEvents = getSimulationManualSkillEvents(entries, secondsPerSlot);
+    let manualSkillEvents = getSimulationManualSkillEvents(entries, secondsPerSlot);
     const maxEntryTime = manualSkillEvents.reduce((max, event) => Math.max(max, event.time), 0);
     const maxManualFollowUpTime = manualSkillEvents.reduce((max, event) => {
         const delayedSeconds = Math.max(0, Number(event.skillData?.delayedFollowUp?.delaySeconds) || 0);
@@ -6676,7 +6699,7 @@ function renderSimulationRotation() {
         ? configuredDurationSeconds
         : 0;
     const naturalDurationSeconds = Math.max(4, Math.ceil(maxEntryTime + 2), Math.ceil(maxManualFollowUpTime + 1), Math.ceil(firstBasicAttackCycle + 1));
-    const formIntervals = window.__simulationOperatorFormIntervals || [];
+    let formIntervals = window.__simulationOperatorFormIntervals || [];
     const maxFormEnd = formIntervals.reduce((max, interval) => Math.max(max, Number(interval.end) || 0), 0);
     const initialDurationSeconds = Math.max(
         naturalDurationSeconds,
@@ -6717,19 +6740,22 @@ function renderSimulationRotation() {
         basicAttackActionEvents
     );
     const autoSkillEvents = autoComboEvents.filter(event => !isSimulationProblemEvent(event));
+    formIntervals = window.__simulationOperatorFormIntervals || formIntervals;
+    manualSkillEvents = resolveSimulationEventsWithOperatorForms(manualSkillEvents, formIntervals);
     const simulationProblemEvents = autoComboEvents.filter(event => isSimulationProblemEvent(event));
     const cooldownEndTime = getSimulationCooldownEndTime(entries, secondsPerSlot, autoSkillEvents);
-    const durationSeconds = Math.max(initialDurationSeconds, Math.ceil(cooldownEndTime + 1));
+    const durationSeconds = Math.max(initialDurationSeconds, Math.ceil(cooldownEndTime + 1),
+        ...formIntervals.map(interval => Math.ceil(Number(interval.end) || 0)));
     const basicAttackSegments = typeof getBasicAttackFormSegments === "function"
         ? getBasicAttackFormSegments(leaderId, durationSeconds, formIntervals)
         : initialBasicAttackSegments;
     const pixelsPerSecond = getSimulationPixelsPerSecond();
     const trackWidth = durationSeconds * pixelsPerSecond;
-    const mechanicEvents = [
+    const mechanicEvents = resolveSimulationEventsWithOperatorForms([
         ...manualSkillEvents,
         ...autoSkillEvents,
         ...finalStrikeStateEvents
-    ];
+    ], formIntervals);
     const resolvedMechanicEvents = typeof resolveSimulationFollowUpEvents === "function"
         ? resolveSimulationFollowUpEvents(mechanicEvents)
         : mechanicEvents;

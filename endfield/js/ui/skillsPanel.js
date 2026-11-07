@@ -394,6 +394,10 @@ function buildSkillTooltipHtml(skillData) {
         `
         : "";
 
+    const limitations = [skillData.simulationLimitations].flat().filter(Boolean)
+        .map(value => String(value).replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char])))
+        .map(value => `<div class="tooltip-description"><strong>Simulation:</strong> ${value}</div>`).join("");
+
     return `
         <div class="tooltip-card tooltip-element-${elementType}">
             <div class="tooltip-header">
@@ -418,6 +422,7 @@ function buildSkillTooltipHtml(skillData) {
 
             <div class="tooltip-description">${formatTooltipDescription(skillData.description)}</div>
             ${basicAttackDetails}
+            ${limitations}
         </div>
     `;
 }

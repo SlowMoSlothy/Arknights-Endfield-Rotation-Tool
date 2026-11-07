@@ -136,4 +136,8 @@
     <loc>https://rotationforge.gg/endfield/operators/si/</loc>
     <image:image><image:loc>https://rotationforge.gg/endfield/assets/operators/avatars/Si.png?v=2510e7e9b520</image:loc></image:image>
   </url>
+  <url>
+    <loc>https://rotationforge.gg/endfield/operators/argent_flow/</loc>
+    <image:image><image:loc>https://rotationforge.gg/endfield/assets/operators/avatars/Argent_Flow.png?v=0635cebed969</image:loc></image:image>
+  </url>
 </urlset>

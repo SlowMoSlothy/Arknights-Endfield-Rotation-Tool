@@ -62,6 +62,7 @@ function getPhysicalStatusStackCount(effectState, effectName) {
 }
 
 function resolveSimulationPhysicalStatusSkill(skillData, effectState = {}) {
+    skillData = resolveSimulationForcedArtsStatusSkill(skillData, effectState);
     const config = skillData?.physicalStatusResolution;
     if (!config || typeof config !== "object" || Array.isArray(config)) return skillData;
 
@@ -134,6 +135,35 @@ function resolveSimulationPhysicalStatusSkill(skillData, effectState = {}) {
             consumedStacks: config.consumeAllVulnerable === false ? 1 : vulnerableStacksBefore,
             convertedToVulnerable: false
         }
+    };
+}
+
+function resolveSimulationForcedArtsStatusSkill(skillData, effectState = {}) {
+    const config = skillData?.forcedArtsStatus;
+    if (!config || typeof config !== "object" || Array.isArray(config)) return skillData;
+    const infliction = normalizeComboEffectKey(config.consumeInfliction);
+    const status = normalizeComboEffectKey(config.statusEffect);
+    if (!infliction || !status) return skillData;
+    const consumedStacks = getPhysicalStatusStackCount(effectState, infliction);
+    const statusLevel = Math.max(1, Number(config.baseStatusLevel) || 1) + consumedStacks;
+    const statusDefinition = config.statusApplication || {};
+    const conditionalEffect = getPhysicalStatusEffectKey(config.onConsumedInfliction);
+    const debuffs = (Array.isArray(skillData.debuffs) ? skillData.debuffs : [])
+        .filter(effect => ![status, conditionalEffect].filter(Boolean).includes(getPhysicalStatusEffectKey(effect)));
+    debuffs.push({
+        ...statusDefinition, id: status, appliesEffect: status,
+        name: `${statusDefinition.name || status} Lv. ${statusLevel}`,
+        statusLevel, visible: statusDefinition.visible !== false,
+        stackable: false, persistsForCombo: true
+    });
+    if (consumedStacks > 0 && config.onConsumedInfliction) {
+        debuffs.push(config.onConsumedInfliction);
+    }
+    return {
+        ...skillData, debuffs,
+        consumeDebuffs: [...(skillData.consumeDebuffs || []).filter(value =>
+            normalizeComboEffectKey(getConsumedDebuffEffectName(value)) !== infliction), infliction],
+        forcedArtsStatusState: { statusEffect: status, statusLevel, consumedStacks }
     };
 }
 
