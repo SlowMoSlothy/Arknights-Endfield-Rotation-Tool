@@ -13,6 +13,9 @@ Requires Node.js 22 or newer; the importer has no additional dependencies.
 node tools/sync-endfield-equipment.js
 # Equivalent when npm is installed:
 npm run sync:equipment
+
+# Update only weapons and their Essence profiles (skip gear sources/writes):
+npm run sync:equipment -- --weapons-only
 ```
 
 By default this only prepares files in `.cache/equipment-import/`:
@@ -37,6 +40,8 @@ Set `SUPABASE_ACCESS_TOKEN` in the local environment, then run:
 
 ```sh
 node tools/sync-endfield-equipment.js --apply
+# Weapons only:
+node tools/sync-endfield-equipment.js --weapons-only --apply
 ```
 
 This is a Supabase Management API personal access token with permission to write
@@ -57,6 +62,9 @@ The default run prepares downloadable SQL and a report. Select **Apply the
 validated catalog to Supabase** to write automatically, with the
 `SUPABASE_ACCESS_TOKEN` repository secret configured. Existing `SUPABASE_URL`
 and `SUPABASE_ANON_KEY` secrets are reused. No recurring schedule is enabled.
+
+Select **Import only weapons and their Essence profiles** to exclude gear from
+the import. Existing gear rows and weapon Essence tuning limits are retained.
 
 The workflow artifact also contains `equipment-source-keys.json`. Commit updated
 source keys after importing new items so future source renames retain their IDs.
