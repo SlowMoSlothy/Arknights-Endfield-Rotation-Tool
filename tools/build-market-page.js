@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { baseStyles, siteHeader } from './build-operator-pages.js';
-import { safeUrl as safeWeaponImageUrl, typeName } from './build-weapon-pages.js';
+import { isWeaponKey, safeUrl as safeWeaponImageUrl, typeName, weaponPath } from './build-weapon-pages.js';
 import { cardMarkup, detailMarkup, escapeHtml, identity, validateStats, validateHistory, createMarketApi } from '../endfield/js/data/marketData.js';
 const SITE='https://rotationforge.gg', ROUTE='/endfield/market/';
 const ARSENAL_ROUTE = '/endfield/arsenal/';
@@ -38,7 +38,8 @@ export function renderArsenalPage(config, weapons = []) {
   const portraits = weapons.map(row => ({
     name: row.name, image: safeWeaponImageUrl(row.icon_path, true), rarity: row.rarity,
     type: row.weapon_type ? typeName(row) : undefined,
-  })).filter(({ name, image }) => typeof name === 'string' && name.trim() && image);
+    href: isWeaponKey(row.weapon_key) ? weaponPath(row) : undefined,
+  })).filter(({ name, image, href }) => typeof name === 'string' && name.trim() && (image || href));
   const title = 'Arsenal Exchange | RotationForge';
   const description = 'Track recorded daily weapon offers and upcoming Arsenal Exchange rotations in Arknights: Endfield.';
   return `<!doctype html>
@@ -59,7 +60,7 @@ export function renderArsenalPage(config, weapons = []) {
   <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6">
   <link rel="stylesheet" href="/endfield/css/weaponCatalog.css?v=7">
   <link rel="stylesheet" href="/endfield/css/shopHeader.css?v=1">
-  <link rel="stylesheet" href="/endfield/css/marketArsenal.css?v=5">
+  <link rel="stylesheet" href="/endfield/css/marketArsenal.css?v=6">
 </head>
 <body class="operator-index shop-page">
   ${siteHeader()}
@@ -82,7 +83,7 @@ export function renderArsenalPage(config, weapons = []) {
   </main>
   <script id="arsenal-config" type="application/json">${json(config)}</script>
   <script id="arsenal-portraits" type="application/json">${json(portraits)}</script>
-  <script type="module" src="/endfield/js/ui/marketArsenal.js?v=5"></script>
+  <script type="module" src="/endfield/js/ui/marketArsenal.js?v=6"></script>
 </body>
 </html>
 `;

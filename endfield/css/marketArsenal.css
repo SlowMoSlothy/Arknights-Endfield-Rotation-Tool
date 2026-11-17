@@ -71,6 +71,10 @@
   list-style: none;
 }
 
+.arsenal-offers > li { display: flex; min-width: 0; }
+.arsenal-offer { width: 100%; }
+.arsenal-offer:not([href]):hover { transform: none; border-color: var(--border); }
+
 .arsenal-offer h3 {
   margin: 0;
   font-size: 1.05rem;

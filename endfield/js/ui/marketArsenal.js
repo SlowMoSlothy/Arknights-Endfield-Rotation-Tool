@@ -31,9 +31,12 @@ function offerList(offers, portraits, { starts = false, dailyEnd } = {}) {
     const portrait = portraits.get(nameKey(offer.name));
     const rarity = Number.isInteger(portrait?.rarity) && portrait.rarity >= 1 && portrait.rarity <= 6 ? portrait.rarity : 0;
     const deadline = starts ? offer.opens_at : (dailyEnd ?? offer.closes_at);
-    return `<li class="weapon-tile arsenal-offer" data-rarity="${rarity || ''}">
+    const name = escapeHtml(offer.name);
+    const cardTag = portrait?.href ? 'a' : 'div';
+    const linkAttributes = portrait?.href ? ` href="${escapeHtml(portrait.href)}" aria-label="${name}"` : '';
+    return `<li><${cardTag} class="weapon-tile arsenal-offer" data-rarity="${rarity || ''}"${linkAttributes}>
       <div class="portrait-card weapon-art" aria-hidden="true">
-        <div class="weapon-portrait-media">${portrait
+        <div class="weapon-portrait-media">${portrait?.image
           ? `<img src="${escapeHtml(portrait.image)}" alt="" width="256" height="256" loading="lazy" decoding="async">`
           : ''}</div>
         <span class="barcode">ROTATIONFORGE DATABASE</span>
@@ -41,7 +44,7 @@ function offerList(offers, portraits, { starts = false, dailyEnd } = {}) {
       <div class="weapon-tile-copy">
         ${portrait?.type ? `<span class="weapon-type">${escapeHtml(portrait.type)}</span>` : ''}
         ${rarity ? `<span class="weapon-stars" aria-label="${rarity} stars">${'★'.repeat(rarity)}</span>` : ''}
-        <h3 class="arsenal-weapon-name">${escapeHtml(offer.name)}</h3>
+        <h3 class="arsenal-weapon-name">${name}</h3>
         <div class="arsenal-offer-details">
           <span class="arsenal-price"><strong>${number(offer.price)}</strong> Tickets</span>
           <span class="arsenal-countdown" role="timer">
@@ -51,7 +54,7 @@ function offerList(offers, portraits, { starts = false, dailyEnd } = {}) {
           ${starts ? '' : `<span class="arsenal-offer-end">Until ${time(deadline)}</span>`}
         </div>
       </div>
-    </li>`;
+    </${cardTag}></li>`;
   }).join('')}</ul>`;
 }
 

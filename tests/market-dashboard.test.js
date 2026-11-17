@@ -21,17 +21,21 @@ test('Market and Arsenal Exchange each render their own dashboard and scripts', 
   assert.doesNotMatch(market, /arsenal-content|marketArsenal\.(js|css)|View Arsenal Exchange/);
 
   const arsenal = renderArsenalPage(config, [
-    { name:'Long Road', icon_path:'assets/weapons/long_road.png', rarity:4, weapon_type:'handcannon' },
+    { name:'Long Road', icon_path:'assets/weapons/long_road.png', rarity:4, weapon_type:'handcannon', weapon_key:'long_road' },
     { name:'Unsafe portrait', icon_path:'javascript:fake()', rarity:5 },
+    { name:'Unsafe route', weapon_key:'../market', rarity:5 },
   ]);
   assert.match(arsenal, /<h1>Arsenal Exchange<\/h1>/);
   assert.match(arsenal, /rel="canonical" href="https:\/\/rotationforge\.gg\/endfield\/arsenal\/"/);
   assert.match(arsenal, /id="arsenal-config"/);
   assert.match(arsenal, /id="arsenal-refresh"/);
-  assert.match(arsenal, /id="arsenal-portraits"[^>]*>\[\{"name":"Long Road","image":"\/endfield\/assets\/weapons\/long_road\.png","rarity":4,"type":"Handcannon"\}\]/);
+  const portraits = JSON.parse(arsenal.match(/id="arsenal-portraits"[^>]*>([^<]+)/)[1]);
+  assert.deepEqual(portraits, [{
+    name:'Long Road', image:'/endfield/assets/weapons/long_road.png', rarity:4,
+    type:'Handcannon', href:'/endfield/weapons/long_road/',
+  }]);
   assert.match(arsenal, /class="shop-hero arsenal-hero"/);
   assert.match(arsenal, /weaponCatalog\.css/);
-  assert.doesNotMatch(arsenal, /Unsafe portrait/);
   assert.match(arsenal, /marketArsenal\.js/);
   assert.doesNotMatch(arsenal, /marketDashboard\.js|marketComparison\.js|market-grid|market-seed/);
 });
