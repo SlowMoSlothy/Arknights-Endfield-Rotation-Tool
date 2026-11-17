@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createMarketApi, validateArsenalRotations } from '../endfield/js/data/marketData.js';
-import { arsenalMarkup, weeklyRotations, mountArsenal } from '../endfield/js/ui/marketArsenal.js';
+import { arsenalMarkup, weeklyRotations, mountArsenal, restoreArsenalDeepLink } from '../endfield/js/ui/marketArsenal.js';
 
 const prior = {
   offer_id:'offer-old', name:'Old Weapon', price:400,
@@ -65,4 +65,44 @@ test('a new daily list replaces the old one and survives a failed refresh', asyn
   await refresh();
   assert.match(nodes.get('arsenal-content').innerHTML,/New Weapon/);
   assert.match(nodes.get('arsenal-status').textContent,/Connection unavailable/);
+});
+
+test('direct Arsenal links scroll after page restoration without overriding a normal market visit', ()=>{
+  const listeners = new Map();
+  const header = {offsetHeight:59};
+  const frames = [];
+  const scrolls = [];
+  const browser = {
+    location:{hash:'#arsenal-exchange'},
+    addEventListener(type, callback) { listeners.set(type, callback); },
+    requestAnimationFrame(callback) { frames.push(callback); },
+  };
+  const section = {
+    ownerDocument:{querySelector() { return header; }},
+    style:{},
+    scrollIntoView(options) { scrolls.push(options); },
+  };
+  restoreArsenalDeepLink(section, browser);
+  assert.equal(section.style.scrollMarginBlockStart, '71px');
+  header.offsetHeight = 176;
+  listeners.get('resize')();
+  assert.equal(section.style.scrollMarginBlockStart, '188px');
+  const pageshow = listeners.get('pageshow');
+
+  pageshow({persisted:false});
+  assert.equal(scrolls.length, 0);
+  frames.shift()();
+  assert.deepEqual(scrolls,[{block:'start',behavior:'instant'}]);
+
+  pageshow({persisted:true});
+  assert.equal(frames.length, 0);
+  browser.location.hash = '';
+  pageshow({persisted:false});
+  assert.equal(frames.length, 0);
+
+  browser.location.hash = '#arsenal-exchange';
+  pageshow({persisted:false});
+  browser.location.hash = '#market-filters';
+  frames.shift()();
+  assert.equal(scrolls.length, 1);
 });
