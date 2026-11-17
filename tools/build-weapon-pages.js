@@ -13,6 +13,7 @@ const number = value => numeric(value) ? new Intl.NumberFormat('en', { maximumFr
 const stat = (value, percent) => numeric(value) ? `${number(value)}${percent ? '%' : ''}` : 'Unknown';
 export const typeName = row => TYPES[row.weapon_type] || row.weapon_type || 'Unknown';
 export const weaponPath = row => `${BASE}${row.weapon_key}/`;
+export const isWeaponKey = value => typeof value === 'string' && /^[a-z0-9]+(?:[_-][a-z0-9]+)*$/.test(value);
 
 export function safeUrl(value, localImages = false) {
   const input = String(value || '');
@@ -33,7 +34,7 @@ export function validateWeapons(rows) {
   if (!Array.isArray(rows)) throw new Error('Weapon response must be an array');
   const keys = new Set();
   for (const row of rows) {
-    if (!/^[a-z0-9]+(?:[_-][a-z0-9]+)*$/.test(row.weapon_key || '') || keys.has(row.weapon_key) || !String(row.name || '').trim()) throw new Error('Invalid or duplicate weapon identity');
+    if (!isWeaponKey(row.weapon_key) || keys.has(row.weapon_key) || !String(row.name || '').trim()) throw new Error('Invalid or duplicate weapon identity');
     if (!Number.isInteger(row.rarity) || row.rarity < 1 || row.rarity > 6) throw new Error(`Invalid weapon rarity: ${row.name}`);
     keys.add(row.weapon_key);
   }

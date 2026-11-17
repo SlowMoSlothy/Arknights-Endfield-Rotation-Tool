@@ -50,15 +50,18 @@ test('weekly schedule moves at the exact server boundary and lists future dates 
   assert.doesNotMatch(html,/Old Weapon/);
 });
 
-test('original weapon portraits appear across rotations and unlisted weapons keep their text', () => {
+test('weapon cards link to their catalog pages across rotations and unlisted weapons stay readable', () => {
   const portraits = [
-    { name:'Long Road', image:'/endfield/assets/weapons/long_road.png', rarity:4 },
-    { name:'Clannibal', image:'/endfield/assets/weapons/clannibal.png', rarity:6 },
-    { name:'Sundered Prince', image:'/endfield/assets/weapons/sundered_prince.png', rarity:6 },
+    { name:'Long Road', image:'/endfield/assets/weapons/long_road.png', rarity:4, href:'/endfield/weapons/long_road/' },
+    { name:'Clannibal', image:'/endfield/assets/weapons/clannibal.png', rarity:6, href:'/endfield/weapons/clannibal/' },
+    { name:'Sundered Prince', image:'/endfield/assets/weapons/sundered_prince.png', rarity:6, href:'/endfield/weapons/sundered_prince/' },
   ];
   const html = arsenalMarkup([daily, weekly], Date.parse(at), portraits);
   assert.deepEqual([...html.matchAll(/<img src="([^"]+)"/g)].map(match => match[1]),
     portraits.map(portrait => portrait.image));
+  assert.deepEqual([...html.matchAll(/<a class="weapon-tile arsenal-offer"[^>]+href="([^"]+)"/g)].map(match => match[1]),
+    portraits.map(portrait => portrait.href));
+  assert.match(html, /aria-label="&lt;Sundered Prince&gt;"/);
   assert.match(html, /data-rarity="4"/);
   assert.match(html, /class="portrait-card weapon-art"/);
   assert.match(html, /aria-label="4 stars">★★★★/);
