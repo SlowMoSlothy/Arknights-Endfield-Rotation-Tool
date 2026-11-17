@@ -59,9 +59,9 @@ test('weapon cards link to their catalog pages across rotations and unlisted wea
   const html = arsenalMarkup([daily, weekly], Date.parse(at), portraits);
   assert.deepEqual([...html.matchAll(/<img src="([^"]+)"/g)].map(match => match[1]),
     portraits.map(portrait => portrait.image));
-  assert.deepEqual([...html.matchAll(/<a class="weapon-tile arsenal-offer"[^>]+href="([^"]+)"/g)].map(match => match[1]),
+  assert.deepEqual([...html.matchAll(/<a class="weapon-tile arsenal-offer"[^>]+href="([^"]+)" target="_blank" rel="noopener"/g)].map(match => match[1]),
     portraits.map(portrait => portrait.href));
-  assert.match(html, /aria-label="&lt;Sundered Prince&gt;"/);
+  assert.match(html, /aria-label="&lt;Sundered Prince&gt; \(opens in a new tab\)"/);
   assert.match(html, /data-rarity="4"/);
   assert.match(html, /class="portrait-card weapon-art"/);
   assert.match(html, /aria-label="4 stars">★★★★/);
