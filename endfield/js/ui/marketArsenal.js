@@ -33,7 +33,9 @@ function offerList(offers, portraits, { starts = false, dailyEnd } = {}) {
     const deadline = starts ? offer.opens_at : (dailyEnd ?? offer.closes_at);
     const name = escapeHtml(offer.name);
     const cardTag = portrait?.href ? 'a' : 'div';
-    const linkAttributes = portrait?.href ? ` href="${escapeHtml(portrait.href)}" aria-label="${name}"` : '';
+    const linkAttributes = portrait?.href
+      ? ` href="${escapeHtml(portrait.href)}" target="_blank" rel="noopener" aria-label="${name} (opens in a new tab)"`
+      : '';
     return `<li><${cardTag} class="weapon-tile arsenal-offer" data-rarity="${rarity || ''}"${linkAttributes}>
       <div class="portrait-card weapon-art" aria-hidden="true">
         <div class="weapon-portrait-media">${portrait?.image
