@@ -11,7 +11,7 @@ const json = value => JSON.stringify(value).replaceAll('<', '\\u003c');
 const numeric = value => value !== null && value !== undefined && value !== '' && Number.isFinite(Number(value));
 const number = value => numeric(value) ? new Intl.NumberFormat('en', { maximumFractionDigits: 2 }).format(Number(value)) : 'Unknown';
 const stat = (value, percent) => numeric(value) ? `${number(value)}${percent ? '%' : ''}` : 'Unknown';
-const typeName = row => TYPES[row.weapon_type] || row.weapon_type || 'Unknown';
+export const typeName = row => TYPES[row.weapon_type] || row.weapon_type || 'Unknown';
 export const weaponPath = row => `${BASE}${row.weapon_key}/`;
 
 export function safeUrl(value, localImages = false) {
