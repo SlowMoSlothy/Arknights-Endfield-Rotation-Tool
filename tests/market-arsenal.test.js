@@ -49,6 +49,19 @@ test('weekly schedule moves at the exact server boundary and lists future dates 
   assert.doesNotMatch(html,/Old Weapon/);
 });
 
+test('original weapon portraits appear across rotations and unlisted weapons keep their text', () => {
+  const portraits = [
+    { name:'Long Road', image:'/endfield/assets/weapons/long_road.png', rarity:4 },
+    { name:'Clannibal', image:'/endfield/assets/weapons/clannibal.png', rarity:6 },
+    { name:'Sundered Prince', image:'/endfield/assets/weapons/sundered_prince.png', rarity:6 },
+  ];
+  const html = arsenalMarkup([daily, weekly], Date.parse(at), portraits);
+  assert.deepEqual([...html.matchAll(/<img src="([^"]+)"/g)].map(match => match[1]),
+    portraits.map(portrait => portrait.image));
+  assert.match(html, /data-rarity="4"/);
+  assert.match(html, /<strong class="arsenal-weapon-name">Later Weapon<\/strong>/);
+});
+
 test('a new daily list replaces the old one and survives a failed refresh', async ()=>{
   const nodes=new Map();
   const doc={ getElementById(id){ if(!nodes.has(id))nodes.set(id,{addEventListener(){}});return nodes.get(id); },addEventListener(){} };

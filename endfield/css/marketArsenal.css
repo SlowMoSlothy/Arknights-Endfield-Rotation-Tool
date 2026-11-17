@@ -76,23 +76,63 @@
 .arsenal-upcoming { border-top: 2px solid #dfa455; }
 .arsenal-note { margin: 0 0 10px; color: var(--muted, #bfc8cc); }
 .arsenal-window { margin: 0 0 10px; color: #ffd287; font-weight: 650; }
-.arsenal-current + .arsenal-current { margin-top: 8px; }
-.arsenal-current .arsenal-note { margin: 2px 0 0; font-size: .85rem; }
 
 .arsenal-offers {
+  display: grid;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.arsenal-offers li {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 6px 12px;
-  padding: 6px 0;
+.arsenal-upcoming .arsenal-offers {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+}
+
+.arsenal-offer {
+  --rarity-color: 160, 170, 169;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px 7px 7px;
+  border: 1px solid #353d40;
+  border-radius: 9px;
+  background: linear-gradient(100deg, rgba(var(--rarity-color), .09), #21282a 65%);
+}
+
+.arsenal-offer[data-rarity="2"] { --rarity-color: 126, 181, 141; }
+.arsenal-offer[data-rarity="3"] { --rarity-color: 95, 166, 230; }
+.arsenal-offer[data-rarity="4"] { --rarity-color: 174, 126, 232; }
+.arsenal-offer[data-rarity="5"] { --rarity-color: 235, 193, 86; }
+.arsenal-offer[data-rarity="6"] { --rarity-color: 252, 111, 2; }
+
+.arsenal-portrait {
+  display: grid;
+  place-items: center;
+  width: clamp(52px, 13vw, 72px);
+  aspect-ratio: 9 / 7;
+  border: 1px solid rgba(var(--rarity-color), .48);
+  border-bottom: 2px solid rgb(var(--rarity-color));
+  border-radius: 6px;
+  background: radial-gradient(ellipse, rgba(var(--rarity-color), .26), transparent 80%), #151c20;
+}
+
+.arsenal-portrait:empty { visibility: hidden; }
+.arsenal-portrait img { width: 100%; height: 100%; padding: 3px; object-fit: contain; }
+
+.arsenal-offer-copy {
+  display: grid;
+  gap: 3px;
   overflow-wrap: anywhere;
 }
 
-.arsenal-offers li + li { border-top: 1px solid var(--border); }
-.arsenal-price { flex: 0 0 auto; font-variant-numeric: tabular-nums; }
+.arsenal-offer-copy .arsenal-note { margin: 0; font-size: .8rem; }
+.arsenal-price {
+  display: grid;
+  gap: 2px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.arsenal-price small { color: var(--muted, #bfc8cc); }

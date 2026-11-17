@@ -6,13 +6,24 @@ const berlin = new Intl.DateTimeFormat('en-GB', {
 });
 const date = value => berlin.format(new Date(value));
 const time = value => `<time datetime="${escapeHtml(value)}">${date(value)}</time>`;
+const nameKey = name => name.normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
 
-function offerList(offers) {
+function offerList(offers, portraits, showEnd = false) {
   if (!offers.length) return '<p class="arsenal-note">No offers in the recorded schedule.</p>';
-  return `<ul class="arsenal-offers">${offers.map(offer=>`<li>
-      <span>${escapeHtml(offer.name)}</span>
-      <span class="arsenal-price"><strong>${number(offer.price)}</strong> Tickets</span>
-    </li>`).join('')}</ul>`;
+  return `<ul class="arsenal-offers">${offers.map(offer => {
+    const portrait = portraits.get(nameKey(offer.name));
+    const rarity = Number.isInteger(portrait?.rarity) ? portrait.rarity : '';
+    return `<li class="arsenal-offer" data-rarity="${rarity}">
+      <span class="arsenal-portrait" aria-hidden="true">${portrait
+        ? `<img src="${escapeHtml(portrait.image)}" alt="" width="72" height="56" decoding="async">`
+        : ''}</span>
+      <span class="arsenal-offer-copy">
+        <strong class="arsenal-weapon-name">${escapeHtml(offer.name)}</strong>
+        ${showEnd ? `<span class="arsenal-note">Until ${time(offer.closes_at)}</span>` : ''}
+      </span>
+      <span class="arsenal-price"><strong>${number(offer.price)}</strong><small>Tickets</small></span>
+    </li>`;
+  }).join('')}</ul>`;
 }
 
 export function weeklyRotations(offers, now = Date.now()) {
@@ -31,23 +42,23 @@ export function weeklyRotations(offers, now = Date.now()) {
   return { active, upcoming:[...upcoming.values()].sort((a,b)=>Date.parse(a.opens_at)-Date.parse(b.opens_at)) };
 }
 
-export function arsenalMarkup(rows, now = Date.now()) {
+export function arsenalMarkup(rows, now = Date.now(), weapons = []) {
   const daily = rows.find(row=>row.period==='daily');
   const weekly = rows.find(row=>row.period==='weekly');
+  const portraits = new Map(weapons.map(weapon => [nameKey(weapon.name), weapon]));
   const {active, upcoming} = weeklyRotations(weekly?.offers??[],now);
   const schedule = upcoming.map(group=>`<article class="arsenal-panel arsenal-upcoming">
       <p class="arsenal-window">${time(group.opens_at)} – ${time(group.closes_at)}</p>
-      ${offerList(group.offers)}
+      ${offerList(group.offers, portraits)}
     </article>`).join('');
-  const current = active.map(offer=>`<div class="arsenal-current">${offerList([offer])}
-    <p class="arsenal-note">Until ${time(offer.closes_at)}</p></div>`).join('');
   return `<div class="arsenal-grid">
     <section class="arsenal-panel"><h2>Daily offers</h2>
-      ${daily ? `<p class="arsenal-note">Recorded ${time(daily.observed_at)}</p>${offerList(daily.offers)}`
+      ${daily ? `<p class="arsenal-note">Recorded ${time(daily.observed_at)}</p>${offerList(daily.offers, portraits)}`
               : '<p class="arsenal-note">Waiting for the first daily rotation.</p>'}
     </section>
     <section class="arsenal-panel"><h2>Current weekly offers</h2>
-      ${current || '<p class="arsenal-note">No active weekly offers in the recorded schedule.</p>'}
+      ${active.length ? offerList(active, portraits, true)
+        : '<p class="arsenal-note">No active weekly offers in the recorded schedule.</p>'}
     </section>
     <section class="arsenal-schedule"><h2>Upcoming weekly rotations</h2>
       ${schedule ? `<div class="arsenal-grid">${schedule}</div>`
@@ -60,8 +71,10 @@ export function mountArsenal(doc = document, api = createMarketApi(JSON.parse(do
   const status = doc.getElementById('arsenal-status');
   const content = doc.getElementById('arsenal-content');
   const refresh = doc.getElementById('arsenal-refresh');
+  const weapons = JSON.parse(doc.getElementById('arsenal-portraits')?.textContent || '[]');
   const latest = new Map();
   let pending = false;
+  let rendered = '';
 
   async function update() {
     if (pending) return;
@@ -78,12 +91,21 @@ export function mountArsenal(doc = document, api = createMarketApi(JSON.parse(do
         ? 'Connection unavailable. Showing recorded offers in Arsenal Tickets and Berlin time.'
         : 'Arsenal Exchange data is temporarily unavailable.';
     } finally {
-      if (latest.size) content.innerHTML = arsenalMarkup([...latest.values()]);
+      if (latest.size) {
+        const markup = arsenalMarkup([...latest.values()], Date.now(), weapons);
+        if (markup !== rendered) {
+          content.innerHTML = markup;
+          rendered = markup;
+        }
+      }
       refresh.disabled = false;
       pending = false;
     }
   }
 
+  content.addEventListener('error', event => {
+    if (event.target.tagName === 'IMG') event.target.hidden = true;
+  }, true);
   refresh.addEventListener('click',update);
   doc.addEventListener('visibilitychange',()=>{if(!doc.hidden)update();});
   update();
