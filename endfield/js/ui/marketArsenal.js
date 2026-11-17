@@ -87,7 +87,27 @@ export function mountArsenal(doc = document, api = createMarketApi(JSON.parse(do
   return update;
 }
 
-if (typeof document !== 'undefined' && document.getElementById('arsenal-content')) {
+export function restoreArsenalDeepLink(section, browser = window) {
+  const hash = '#arsenal-exchange';
+  const header = section.ownerDocument.querySelector('.top');
+  const updateOffset = () => {
+    if (header) section.style.scrollMarginBlockStart = `${header.offsetHeight + 12}px`;
+  };
+  updateOffset();
+  browser.addEventListener('resize', updateOffset);
+  browser.addEventListener('pageshow', event => {
+    updateOffset();
+    if (event.persisted || browser.location.hash !== hash) return;
+    // Run after browser scroll restoration on a reload of the deep link.
+    browser.requestAnimationFrame(() => {
+      if (browser.location.hash === hash) section.scrollIntoView({ block:'start', behavior:'instant' });
+    });
+  });
+}
+
+const arsenalSection = typeof document !== 'undefined' && document.getElementById('arsenal-exchange');
+if (arsenalSection) {
+  restoreArsenalDeepLink(arsenalSection);
   const update = mountArsenal();
   setInterval(()=>{if(!document.hidden)update();},15000);
 }
