@@ -52,8 +52,8 @@ test('weekly schedule moves at the exact server boundary and lists future dates 
 
 test('weapon cards link to their catalog pages across rotations and unlisted weapons stay readable', () => {
   const portraits = [
-    { name:'Long Road', image:'/endfield/assets/weapons/long_road.png', rarity:4, href:'/endfield/weapons/long_road/' },
     { name:'Clannibal', image:'/endfield/assets/weapons/clannibal.png', rarity:6, href:'/endfield/weapons/clannibal/' },
+    { name:'Long Road', image:'/endfield/assets/weapons/long_road.png', rarity:4, href:'/endfield/weapons/long_road/' },
     { name:'Sundered Prince', image:'/endfield/assets/weapons/sundered_prince.png', rarity:6, href:'/endfield/weapons/sundered_prince/' },
   ];
   const html = arsenalMarkup([daily, weekly], Date.parse(at), portraits);
@@ -66,6 +66,28 @@ test('weapon cards link to their catalog pages across rotations and unlisted wea
   assert.match(html, /class="portrait-card weapon-art"/);
   assert.match(html, /aria-label="4 stars">★★★★/);
   assert.match(html, /<h3 class="arsenal-weapon-name">Later Weapon<\/h3>/);
+});
+
+test('weekly, daily and upcoming offers stack in order, with daily offers sorted by rarity', () => {
+  const offers = [
+    { offer_id:'unknown', name:'Unlisted Weapon', price:900 },
+    daily.offers[0],
+    { offer_id:'five-first', name:'Twelve Questions', price:200 },
+    { offer_id:'five-second', name:'Chimeric Justice', price:400 },
+  ];
+  const weapons = [
+    { name:'Long Road', rarity:4 },
+    { name:'Twelve Questions', rarity:5 },
+    { name:'Chimeric Justice', rarity:5 },
+  ];
+  const html = arsenalMarkup([{ ...daily, offers }, weekly], Date.parse(at), weapons);
+  const headings = [...html.matchAll(/<h[23](?: [^>]*)?>([^<]+)<\/h[23]>/g)].map(([, heading]) => heading);
+  assert.deepEqual(headings, [
+    'Current weekly offers', 'Clannibal',
+    'Daily offers', 'Twelve Questions', 'Chimeric Justice', 'Long Road', 'Unlisted Weapon',
+    'Upcoming weekly rotations', '&lt;Sundered Prince&gt;', 'Later Weapon',
+  ]);
+  assert.equal(offers[0].name, 'Unlisted Weapon');
 });
 
 test('daily offers end at the server reset, including on a Berlin daylight saving change', () => {
@@ -109,11 +131,12 @@ test('the live countdown advances and past daily offers expire while offline', a
   const refresh=mountArsenal(doc,{async arsenal(){if(!result)throw Error('offline');return result;}});
   await Promise.resolve();
   const content = nodes.get('arsenal-content');
+  const dailyTimer = () => content.timers.find(timer => timer.dataset.countdownUntil === dailyOfferEnd(at));
   assert.match(content.innerHTML,/Long Road/);
-  assert.equal(content.timers[0].textContent, '22h 07m 55s');
+  assert.equal(dailyTimer().textContent, '22h 07m 55s');
   clock += 1000;
   secondTick();
-  assert.equal(content.timers[0].textContent, '22h 07m 54s');
+  assert.equal(dailyTimer().textContent, '22h 07m 54s');
   clock = Date.parse(dailyOfferEnd(at));
   secondTick();
   assert.doesNotMatch(content.innerHTML, /Long Road/);
