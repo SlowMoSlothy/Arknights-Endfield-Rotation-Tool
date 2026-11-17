@@ -180,6 +180,18 @@ export function mountArsenal(doc = document, api = createMarketApi(JSON.parse(do
 }
 
 if (typeof document !== 'undefined' && document.getElementById('arsenal-content')) {
+  const header = document.querySelector('.top');
+  const jumpLinks = document.querySelector('.arsenal-jump-links');
+  const page = jumpLinks.closest('main');
+  const applyOffsets = () => {
+    page.style.setProperty('--arsenal-header-height', `${header.offsetHeight}px`);
+    page.style.setProperty('--arsenal-jump-height', `${jumpLinks.offsetHeight}px`);
+  };
+  applyOffsets();
+  const observer = new ResizeObserver(applyOffsets);
+  observer.observe(header);
+  observer.observe(jumpLinks);
+
   const update = mountArsenal();
   setInterval(()=>{if(!document.hidden)update();},15000);
 }

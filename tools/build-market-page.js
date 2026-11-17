@@ -60,7 +60,7 @@ export function renderArsenalPage(config, weapons = []) {
   <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6">
   <link rel="stylesheet" href="/endfield/css/weaponCatalog.css?v=7">
   <link rel="stylesheet" href="/endfield/css/shopHeader.css?v=1">
-  <link rel="stylesheet" href="/endfield/css/marketArsenal.css?v=8">
+  <link rel="stylesheet" href="/endfield/css/marketArsenal.css?v=9">
 </head>
 <body class="operator-index shop-page">
   ${siteHeader()}
@@ -71,12 +71,12 @@ export function renderArsenalPage(config, weapons = []) {
       <h1>Arsenal Exchange</h1>
       <p>Daily weapon offers and the upcoming weekly rotations.</p>
     </section>
+    <nav class="arsenal-jump-links" aria-label="Arsenal sections">
+      <a href="#current-weekly">Current weekly</a>
+      <a href="#daily">Daily offers</a>
+      <a href="#next-weekly">Next weekly</a>
+    </nav>
     <section class="arsenal-shop" aria-label="Weapon offers">
-      <nav class="arsenal-jump-links" aria-label="Arsenal sections">
-        <a href="#current-weekly">Current weekly</a>
-        <a href="#daily">Daily offers</a>
-        <a href="#next-weekly">Next weekly</a>
-      </nav>
       <div class="arsenal-toolbar">
         <p class="arsenal-note" id="arsenal-status" role="status">Loading recorded Arsenal Exchange offers…</p>
         <button id="arsenal-refresh" type="button" disabled>Refresh offers</button>
@@ -104,7 +104,7 @@ export function renderArsenalPage(config, weapons = []) {
   </main>
   <script id="arsenal-config" type="application/json">${json(config)}</script>
   <script id="arsenal-portraits" type="application/json">${json(portraits)}</script>
-  <script type="module" src="/endfield/js/ui/marketArsenal.js?v=9"></script>
+  <script type="module" src="/endfield/js/ui/marketArsenal.js?v=10"></script>
 </body>
 </html>
 `;
