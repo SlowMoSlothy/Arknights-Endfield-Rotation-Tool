@@ -1,0 +1,52 @@
+.arsenal-shop {
+  margin-block: 24px;
+  padding: clamp(16px, 3vw, 28px);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: #202628;
+}
+
+.arsenal-shop h2,
+.arsenal-shop h3 {
+  margin: 0 0 8px;
+}
+
+.arsenal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr));
+  gap: 12px;
+}
+
+.arsenal-schedule { grid-column: 1 / -1; }
+
+.arsenal-panel {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #171c1e;
+}
+
+.arsenal-upcoming { border-top: 2px solid #dfa455; }
+.arsenal-note { margin: 0 0 10px; color: var(--muted, #bfc8cc); }
+.arsenal-window { margin: 0 0 10px; color: #ffd287; font-weight: 650; }
+.arsenal-current + .arsenal-current { margin-top: 8px; }
+.arsenal-current .arsenal-note { margin: 2px 0 0; font-size: .85rem; }
+
+.arsenal-offers {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.arsenal-offers li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px 12px;
+  padding: 6px 0;
+  overflow-wrap: anywhere;
+}
+
+.arsenal-offers li + li { border-top: 1px solid var(--border); }
+.arsenal-price { flex: 0 0 auto; font-variant-numeric: tabular-nums; }

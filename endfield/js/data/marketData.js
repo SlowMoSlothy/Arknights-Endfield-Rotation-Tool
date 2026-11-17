@@ -64,6 +64,32 @@ export function chartMarkup(rows) {
 export function detailMarkup(r, history) {
   return `<div class="market-detail-heading"><span class="eyebrow">${escapeHtml(r.region)} / Price history</span><h2>${escapeHtml(displayName(r))}</h2><p>Last observed ${escapeHtml(new Date(r.latest_observed_at).toLocaleString('en-GB',{timeZone:'Europe/Berlin'}))} · Europe/Berlin</p></div><div class="market-detail-stats"><div><span>Last price</span><strong>${number(r.latest_price)}</strong></div><div><span>Recorded minimum</span><strong>${number(r.min_price)}</strong></div><div><span>Daily average</span><strong>${number(r.average_price)}</strong></div><div><span>Recorded maximum</span><strong>${number(r.max_price)}</strong></div></div><div class="market-detail-comparison">${changeMarkup(r)}${rangeMarkup(r)}</div><div id="market-chart">${chartMarkup(history)}</div><details class="market-history-table"><summary>Recorded daily prices (${history.length})</summary><div class="market-table-scroll"><table><thead><tr><th>Date (Berlin)</th><th>Price</th></tr></thead><tbody>${[...history].sort((a,b)=>b.observation_day.localeCompare(a.observation_day)).map(d=>`<tr><td>${d.observation_day}</td><td>${number(d.price)}</td></tr>`).join('')}</tbody></table></div></details><p class="market-explainer">Statistics use the last observed price per day. Missing days are left empty. Chart points are recorded observations; connecting lines do not imply prices for unobserved days.</p>`;
 }
+export function validateArsenalRotations(rows) {
+  if (!Array.isArray(rows) || rows.length > 2) throw new Error('Invalid Arsenal Exchange response');
+  const periods = new Set();
+  for (const row of rows) {
+    if (!['daily', 'weekly'].includes(row?.period) || periods.has(row.period) ||
+        !/^[0-9a-f]{64}$/.test(row.source_id) || !Number.isFinite(Date.parse(row.observed_at)) ||
+        !Array.isArray(row.offers) || row.offers.length > 500) {
+      throw new Error('Invalid Arsenal Exchange rotation');
+    }
+    periods.add(row.period);
+    const ids = new Set();
+    for (const offer of row.offers) {
+      if (!offer || typeof offer.offer_id !== 'string' || !offer.offer_id || ids.has(offer.offer_id) ||
+          typeof offer.name !== 'string' || !offer.name.trim() || !Number.isSafeInteger(offer.price) || offer.price < 1) {
+        throw new Error('Invalid Arsenal Exchange offer');
+      }
+      if (row.period === 'weekly') {
+        const start = Date.parse(offer.opens_at), end = Date.parse(offer.closes_at);
+        if (!Number.isFinite(start) || !Number.isFinite(end) || start >= end) throw new Error('Invalid Arsenal Exchange offer dates');
+      }
+      ids.add(offer.offer_id);
+    }
+  }
+  return rows;
+}
+
 export function createMarketApi({ url, key }, fetchImpl = globalThis.fetch) {
   if (!/^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(url) || !/^sb_publishable_[A-Za-z0-9_-]+$/.test(key)) throw new Error('Public market configuration required');
   async function read(view, query, signal) {
@@ -71,5 +97,11 @@ export function createMarketApi({ url, key }, fetchImpl = globalThis.fetch) {
     for(let offset=0;offset<100000;offset+=500){const params=new URLSearchParams({...query,limit:'500',offset:String(offset)});const response=await fetchImpl(`${url}/rest/v1/${view}?${params}`,{headers:{apikey:key},signal,cache:'no-store',redirect:'error'});if(!response.ok)throw new Error('Market data unavailable (HTTP '+response.status+')');const data=await response.json();if(!Array.isArray(data))throw new Error('Invalid market response');rows.push(...data);if(data.length<500)return rows;}
     throw new Error('Market response exceeds supported range');
   }
-  return { statistics:async signal=>validateStats(await read('ef_market_statistics',{select:'*',order:'shop_id.asc,goods_id.asc'},signal)), history:async(row,signal)=>{validateStats([row]);return validateHistory(await read('ef_market_daily_prices',{select:'observation_day,observed_at,price',shop_id:'eq.'+row.shop_id,goods_id:'eq.'+row.goods_id,order:'observation_day.asc'},signal));} };
+  return {
+    statistics:async signal=>validateStats(await read('ef_market_statistics',{select:'*',order:'shop_id.asc,goods_id.asc'},signal)),
+    history:async(row,signal)=>{validateStats([row]);return validateHistory(await read('ef_market_daily_prices',{select:'observation_day,observed_at,price',shop_id:'eq.'+row.shop_id,goods_id:'eq.'+row.goods_id,order:'observation_day.asc'},signal));},
+    arsenal:async signal=>validateArsenalRotations(await read('ef_arsenal_rotations',{
+      select:'period,source_id,observed_at,offers',order:'period.asc',
+    },signal)),
+  };
 }

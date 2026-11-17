@@ -11,6 +11,13 @@ publishing. Failed or empty source reads retain the existing page. The browser
 refreshes the statistics every minute while visible and when returning to the
 tab. Read failures preserve the last successful values and show a status notice.
 
+The Arsenal Exchange reads `ef_arsenal_rotations` through the same public
+configuration. The PC Analyzer records the daily list at login and when the
+server sends the new rotation. Weekly offers include the server's start and end
+times, converted to Europe/Berlin in the browser. The page keeps active and
+announced future weekly windows visible and checks for new data every 15 seconds
+while visible. The daily list carries its observation timestamp.
+
 The page shares `baseStyles()` and `siteHeader()` with the existing catalogs.
 The homepage links it through an illustrated card. The generated trading-depot
 illustration lives in `assets/market-trading-depot.webp` and is not a game capture.
