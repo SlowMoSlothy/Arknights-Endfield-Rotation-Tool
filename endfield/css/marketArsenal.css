@@ -41,6 +41,13 @@
   color: var(--accent);
 }
 
+.arsenal-jump-links a[aria-current="location"] {
+  border-color: var(--accent);
+  background: #fc6f0233;
+  color: #ffe0c2;
+  box-shadow: inset 0 -2px var(--accent);
+}
+
 .arsenal-toolbar {
   display: flex;
   flex-wrap: wrap;

@@ -60,7 +60,7 @@ export function renderArsenalPage(config, weapons = []) {
   <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6">
   <link rel="stylesheet" href="/endfield/css/weaponCatalog.css?v=7">
   <link rel="stylesheet" href="/endfield/css/shopHeader.css?v=1">
-  <link rel="stylesheet" href="/endfield/css/marketArsenal.css?v=9">
+  <link rel="stylesheet" href="/endfield/css/marketArsenal.css?v=10">
 </head>
 <body class="operator-index shop-page">
   ${siteHeader()}
@@ -104,7 +104,7 @@ export function renderArsenalPage(config, weapons = []) {
   </main>
   <script id="arsenal-config" type="application/json">${json(config)}</script>
   <script id="arsenal-portraits" type="application/json">${json(portraits)}</script>
-  <script type="module" src="/endfield/js/ui/marketArsenal.js?v=10"></script>
+  <script type="module" src="/endfield/js/ui/marketArsenal.js?v=11"></script>
 </body>
 </html>
 `;
