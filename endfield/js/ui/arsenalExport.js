@@ -17,7 +17,9 @@ export async function downloadArsenalImage(page) {
     useCORS: true,
     imageTimeout: 8000,
     logging: false,
-    ignoreElements: element => element.matches('.top, .breadcrumbs, .arsenal-jump-links, .arsenal-toolbar, noscript, .barcode'),
+    ignoreElements: element => element.matches(
+      '.top, .breadcrumbs, .arsenal-jump-links, .arsenal-toolbar, .arsenal-countdown, noscript, .barcode',
+    ),
     onclone: (_doc, clone) => {
       Object.assign(clone.style, {
         width: `${width}px`, maxWidth: 'none', margin: '0', padding: '24px', background: '#1b2123',
