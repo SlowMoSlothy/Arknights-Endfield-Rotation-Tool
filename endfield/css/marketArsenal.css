@@ -6,6 +6,31 @@
 
 .arsenal-shop { margin-bottom: 24px; }
 .arsenal-shop h2 { margin: 0; font-size: 1.2rem; }
+.arsenal-sections h2[id] { scroll-margin-top: 76px; }
+
+.arsenal-jump-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.arsenal-jump-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #242b2d;
+  font-size: .75rem;
+  font-weight: 750;
+}
+
+.arsenal-jump-links a:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
 
 .arsenal-toolbar {
   display: flex;
@@ -101,6 +126,10 @@
 }
 
 .arsenal-countdown strong { font-size: .84rem; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 760px) {
+  .arsenal-sections h2[id] { scroll-margin-top: 132px; }
+}
 
 @media (max-width: 520px) {
   .arsenal-offers {

@@ -77,7 +77,7 @@ export function weeklyRotations(offers, now = Date.now()) {
   return { active, upcoming:[...upcoming.values()].sort((a,b)=>Date.parse(a.opens_at)-Date.parse(b.opens_at)) };
 }
 
-export function arsenalMarkup(rows, now = Date.now(), weapons = []) {
+export function arsenalSectionMarkup(rows, now = Date.now(), weapons = []) {
   const daily = rows.find(row=>row.period==='daily');
   const weekly = rows.find(row=>row.period==='weekly');
   const portraits = new Map(weapons.map(weapon => [nameKey(weapon.name), weapon]));
@@ -94,23 +94,14 @@ export function arsenalMarkup(rows, now = Date.now(), weapons = []) {
       ? offerList(daily.offers.toSorted((a, b) => rarity(b) - rarity(a)), portraits, { dailyEnd })
       : '<p class="arsenal-note">Daily rotation ended. Waiting for new offers.</p>';
   }
-  return `<div class="arsenal-sections">
-    <section class="arsenal-panel">
-      <div class="arsenal-section-heading"><h2>Current weekly offers</h2></div>
-      ${active.length ? offerList(active, portraits)
-        : '<p class="arsenal-note">No active weekly offers in the recorded schedule.</p>'}
-    </section>
-    <section class="arsenal-panel">
-      <div class="arsenal-section-heading"><h2>Daily offers</h2>
-        ${daily ? `<p class="arsenal-note">Recorded ${time(daily.observed_at)}</p>` : ''}
-      </div>
-      ${dailyOffers}
-    </section>
-    <section class="arsenal-schedule"><h2>Upcoming weekly rotations</h2>
-      ${schedule ? `<div class="arsenal-windows">${schedule}</div>`
-                 : '<p class="arsenal-note">No upcoming weekly rotation has been recorded yet.</p>'}
-    </section>
-  </div>`;
+  return {
+    'arsenal-weekly-offers': active.length ? offerList(active, portraits)
+      : '<p class="arsenal-note">No active weekly offers in the recorded schedule.</p>',
+    'arsenal-daily-recorded': daily ? `Recorded ${time(daily.observed_at)}` : '',
+    'arsenal-daily-offers': dailyOffers,
+    'arsenal-upcoming-offers': schedule ? `<div class="arsenal-windows">${schedule}</div>`
+      : '<p class="arsenal-note">No upcoming weekly rotation has been recorded yet.</p>',
+  };
 }
 
 export function mountArsenal(doc = document, api = createMarketApi(JSON.parse(doc.getElementById('arsenal-config').textContent))) {
@@ -120,19 +111,26 @@ export function mountArsenal(doc = document, api = createMarketApi(JSON.parse(do
   const weapons = JSON.parse(doc.getElementById('arsenal-portraits')?.textContent || '[]');
   const latest = new Map();
   let pending = false;
-  let rendered = '';
+  const rendered = new Map();
   let countdowns = [];
   let nextTransition = Infinity;
 
   function render(now) {
-    const markup = arsenalMarkup([...latest.values()], now, weapons);
-    if (markup === rendered) return;
-    content.innerHTML = markup;
-    rendered = markup;
+    const firstHash = rendered.size ? '' : doc.defaultView?.location?.hash;
+    const sections = arsenalSectionMarkup([...latest.values()], now, weapons);
+    for (const [id, markup] of Object.entries(sections)) {
+      if (rendered.get(id) === markup) continue;
+      doc.getElementById(id).innerHTML = markup;
+      rendered.set(id, markup);
+    }
     countdowns = Array.from(content.querySelectorAll('[data-countdown-until]'), element => ({
       element, deadline: Date.parse(element.dataset.countdownUntil),
     }));
     nextTransition = Math.min(...countdowns.map(({ deadline }) => deadline));
+    if (firstHash) {
+      const heading = doc.getElementById(firstHash.slice(1));
+      if (heading?.matches('.arsenal-sections h2[id]')) heading.scrollIntoView({ behavior: 'instant' });
+    }
   }
 
   function tick(now = Date.now()) {
