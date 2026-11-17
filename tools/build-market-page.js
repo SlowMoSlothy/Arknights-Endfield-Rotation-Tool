@@ -60,7 +60,7 @@ export function renderArsenalPage(config, weapons = []) {
   <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6">
   <link rel="stylesheet" href="/endfield/css/weaponCatalog.css?v=7">
   <link rel="stylesheet" href="/endfield/css/shopHeader.css?v=1">
-  <link rel="stylesheet" href="/endfield/css/marketArsenal.css?v=7">
+  <link rel="stylesheet" href="/endfield/css/marketArsenal.css?v=8">
 </head>
 <body class="operator-index shop-page">
   ${siteHeader()}
@@ -72,18 +72,39 @@ export function renderArsenalPage(config, weapons = []) {
       <p>Daily weapon offers and the upcoming weekly rotations.</p>
     </section>
     <section class="arsenal-shop" aria-label="Weapon offers">
+      <nav class="arsenal-jump-links" aria-label="Arsenal sections">
+        <a href="#current-weekly">Current weekly</a>
+        <a href="#daily">Daily offers</a>
+        <a href="#next-weekly">Next weekly</a>
+      </nav>
       <div class="arsenal-toolbar">
         <p class="arsenal-note" id="arsenal-status" role="status">Loading recorded Arsenal Exchange offers…</p>
         <button id="arsenal-refresh" type="button" disabled>Refresh offers</button>
       </div>
-      <div id="arsenal-content"></div>
+      <div id="arsenal-content" class="arsenal-sections">
+        <section class="arsenal-panel" aria-labelledby="current-weekly">
+          <div class="arsenal-section-heading"><h2 id="current-weekly" tabindex="-1">Current weekly offers</h2></div>
+          <div id="arsenal-weekly-offers"></div>
+        </section>
+        <section class="arsenal-panel" aria-labelledby="daily">
+          <div class="arsenal-section-heading">
+            <h2 id="daily" tabindex="-1">Daily offers</h2>
+            <p class="arsenal-note" id="arsenal-daily-recorded"></p>
+          </div>
+          <div id="arsenal-daily-offers"></div>
+        </section>
+        <section class="arsenal-schedule" aria-labelledby="next-weekly">
+          <h2 id="next-weekly" tabindex="-1">Upcoming weekly rotations</h2>
+          <div id="arsenal-upcoming-offers"></div>
+        </section>
+      </div>
       <noscript><p>Enable JavaScript to load daily offers and the weekly schedule.</p></noscript>
     </section>
     <footer>RotationForge · Unofficial Arknights: Endfield tool · <a href="/">Back to all tools ↗</a></footer>
   </main>
   <script id="arsenal-config" type="application/json">${json(config)}</script>
   <script id="arsenal-portraits" type="application/json">${json(portraits)}</script>
-  <script type="module" src="/endfield/js/ui/marketArsenal.js?v=8"></script>
+  <script type="module" src="/endfield/js/ui/marketArsenal.js?v=9"></script>
 </body>
 </html>
 `;

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createMarketApi, validateArsenalRotations } from '../endfield/js/data/marketData.js';
-import { arsenalMarkup, dailyOfferEnd, formatCountdown, weeklyRotations, mountArsenal } from '../endfield/js/ui/marketArsenal.js';
+import { arsenalSectionMarkup, dailyOfferEnd, formatCountdown, weeklyRotations, mountArsenal } from '../endfield/js/ui/marketArsenal.js';
 
 const prior = {
   offer_id:'offer-old', name:'Old Weapon', price:400,
@@ -42,7 +42,7 @@ test('weekly schedule moves at the exact server boundary and lists future dates 
   const change = weeklyRotations(weekly.offers,Date.parse(next.opens_at));
   assert.deepEqual(change.active,[next]);
   assert.deepEqual(change.upcoming.flatMap(group=>group.offers),[later]);
-  const html=arsenalMarkup([daily,weekly],Date.parse(at));
+  const html = arsenalSectionMarkup([daily,weekly], Date.parse(at))['arsenal-upcoming-offers'];
   assert.match(html,/19 Nov 2026(?:,| at)? 18:00/);
   assert.match(html,/24 Nov 2026(?:,| at)? 23:00/);
   assert.match(html,/Starts in<\/span>\s*<strong data-countdown-until="2026-11-19T17:00:00Z"/);
@@ -56,7 +56,7 @@ test('weapon cards link to their catalog pages across rotations and unlisted wea
     { name:'Long Road', image:'/endfield/assets/weapons/long_road.png', rarity:4, href:'/endfield/weapons/long_road/' },
     { name:'Sundered Prince', image:'/endfield/assets/weapons/sundered_prince.png', rarity:6, href:'/endfield/weapons/sundered_prince/' },
   ];
-  const html = arsenalMarkup([daily, weekly], Date.parse(at), portraits);
+  const html = Object.values(arsenalSectionMarkup([daily, weekly], Date.parse(at), portraits)).join('');
   assert.deepEqual([...html.matchAll(/<img src="([^"]+)"/g)].map(match => match[1]),
     portraits.map(portrait => portrait.image));
   assert.deepEqual([...html.matchAll(/<a class="weapon-tile arsenal-offer"[^>]+href="([^"]+)" target="_blank" rel="noopener"/g)].map(match => match[1]),
@@ -68,7 +68,7 @@ test('weapon cards link to their catalog pages across rotations and unlisted wea
   assert.match(html, /<h3 class="arsenal-weapon-name">Later Weapon<\/h3>/);
 });
 
-test('weekly, daily and upcoming offers stack in order, with daily offers sorted by rarity', () => {
+test('daily offers are sorted by rarity', () => {
   const offers = [
     { offer_id:'unknown', name:'Unlisted Weapon', price:900 },
     daily.offers[0],
@@ -80,13 +80,9 @@ test('weekly, daily and upcoming offers stack in order, with daily offers sorted
     { name:'Twelve Questions', rarity:5 },
     { name:'Chimeric Justice', rarity:5 },
   ];
-  const html = arsenalMarkup([{ ...daily, offers }, weekly], Date.parse(at), weapons);
-  const headings = [...html.matchAll(/<h[23](?: [^>]*)?>([^<]+)<\/h[23]>/g)].map(([, heading]) => heading);
-  assert.deepEqual(headings, [
-    'Current weekly offers', 'Clannibal',
-    'Daily offers', 'Twelve Questions', 'Chimeric Justice', 'Long Road', 'Unlisted Weapon',
-    'Upcoming weekly rotations', '&lt;Sundered Prince&gt;', 'Later Weapon',
-  ]);
+  const html = arsenalSectionMarkup([{ ...daily, offers }, weekly], Date.parse(at), weapons)['arsenal-daily-offers'];
+  const headings = [...html.matchAll(/<h3[^>]*>([^<]+)<\/h3>/g)].map(([, heading]) => heading);
+  assert.deepEqual(headings, ['Twelve Questions', 'Chimeric Justice', 'Long Road', 'Unlisted Weapon']);
   assert.equal(offers[0].name, 'Unlisted Weapon');
 });
 
@@ -94,8 +90,8 @@ test('daily offers end at the server reset, including on a Berlin daylight savin
   assert.equal(dailyOfferEnd('2026-03-29T08:59:59.999Z'), '2026-03-29T09:00:00.000Z');
   assert.equal(dailyOfferEnd('2026-03-29T09:00:00.000Z'), '2026-03-30T09:00:00.000Z');
   const cutoff = Date.parse(dailyOfferEnd(at));
-  assert.match(arsenalMarkup([daily], cutoff - 1), /Long Road/);
-  const expired = arsenalMarkup([daily], cutoff);
+  assert.match(arsenalSectionMarkup([daily], cutoff - 1)['arsenal-daily-offers'], /Long Road/);
+  const expired = arsenalSectionMarkup([daily], cutoff)['arsenal-daily-offers'];
   assert.match(expired, /Daily rotation ended/);
   assert.doesNotMatch(expired, /Long Road/);
   assert.equal(formatCountdown(1), '00m 01s');
@@ -119,7 +115,7 @@ test('the live countdown advances and past daily offers expire while offline', a
           }));
         },
         get innerHTML() { return this.html; },
-        querySelectorAll() { return this.timers; },
+        querySelectorAll() { return [...nodes.values()].flatMap(node => node.timers ?? []); },
       });
       return nodes.get(id);
     },
@@ -130,27 +126,29 @@ test('the live countdown advances and past daily offers expire while offline', a
   let result=[daily,weekly];
   const refresh=mountArsenal(doc,{async arsenal(){if(!result)throw Error('offline');return result;}});
   await Promise.resolve();
-  const content = nodes.get('arsenal-content');
-  const dailyTimer = () => content.timers.find(timer => timer.dataset.countdownUntil === dailyOfferEnd(at));
-  assert.match(content.innerHTML,/Long Road/);
+  const dailyContent = nodes.get('arsenal-daily-offers');
+  const weeklyContent = nodes.get('arsenal-weekly-offers');
+  const dailyTimer = () => dailyContent.timers.find(timer => timer.dataset.countdownUntil === dailyOfferEnd(at));
+  assert.match(dailyContent.innerHTML,/Long Road/);
   assert.equal(dailyTimer().textContent, '22h 07m 55s');
   clock += 1000;
   secondTick();
   assert.equal(dailyTimer().textContent, '22h 07m 54s');
   clock = Date.parse(dailyOfferEnd(at));
   secondTick();
-  assert.doesNotMatch(content.innerHTML, /Long Road/);
+  assert.doesNotMatch(dailyContent.innerHTML, /Long Road/);
 
   result=[newDaily];
   await refresh();
-  assert.match(content.innerHTML,/New Weapon/);
-  assert.doesNotMatch(content.innerHTML,/Long Road/);
+  assert.match(dailyContent.innerHTML,/New Weapon/);
+  assert.doesNotMatch(dailyContent.innerHTML,/Long Road/);
   result=null;
   await refresh();
-  assert.match(content.innerHTML,/New Weapon/);
+  assert.match(dailyContent.innerHTML,/New Weapon/);
   assert.match(nodes.get('arsenal-status').textContent,/Connection unavailable/);
   clock = Date.parse(next.opens_at);
   secondTick();
-  assert.doesNotMatch(content.innerHTML, /Clannibal|New Weapon/);
-  assert.match(content.innerHTML, /&lt;Sundered Prince&gt;<\/h3>[\s\S]*?Available for<\/span>\s*<strong data-countdown-until="2026-11-24T22:00:00Z"/);
+  assert.doesNotMatch(dailyContent.innerHTML, /New Weapon/);
+  assert.doesNotMatch(weeklyContent.innerHTML, /Clannibal/);
+  assert.match(weeklyContent.innerHTML, /&lt;Sundered Prince&gt;<\/h3>[\s\S]*?Available for<\/span>\s*<strong data-countdown-until="2026-11-24T22:00:00Z"/);
 });
