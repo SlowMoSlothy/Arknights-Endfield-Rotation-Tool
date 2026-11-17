@@ -29,6 +29,7 @@ test('Market and Arsenal Exchange each render their own dashboard and scripts', 
   assert.match(arsenal, /rel="canonical" href="https:\/\/rotationforge\.gg\/endfield\/arsenal\/"/);
   assert.match(arsenal, /id="arsenal-config"/);
   assert.match(arsenal, /id="arsenal-refresh"/);
+  assert.match(arsenal, /<button id="arsenal-export" type="button" disabled>Download PNG<\/button>/);
   const jumpNav = arsenal.match(/<nav class="arsenal-jump-links"[^>]*>([\s\S]*?)<\/nav>/)[1];
   const jumpLinks = [...jumpNav.matchAll(/href="#([^"]+)"/g)].map(([, id]) => id);
   const jumpTargets = [...arsenal.matchAll(/<h2 id="([^"]+)" tabindex="-1">/g)].map(([, id]) => id);

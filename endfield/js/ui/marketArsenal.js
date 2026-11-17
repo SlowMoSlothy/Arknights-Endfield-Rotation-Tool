@@ -108,9 +108,12 @@ export function mountArsenal(doc = document, api = createMarketApi(JSON.parse(do
   const status = doc.getElementById('arsenal-status');
   const content = doc.getElementById('arsenal-content');
   const refresh = doc.getElementById('arsenal-refresh');
+  const exportButton = doc.getElementById('arsenal-export');
+  const exportStatus = doc.getElementById('arsenal-export-status');
   const weapons = JSON.parse(doc.getElementById('arsenal-portraits')?.textContent || '[]');
   const latest = new Map();
   let pending = false;
+  let exporting = false;
   const rendered = new Map();
   let countdowns = [];
   let nextTransition = Infinity;
@@ -127,6 +130,7 @@ export function mountArsenal(doc = document, api = createMarketApi(JSON.parse(do
       element, deadline: Date.parse(element.dataset.countdownUntil),
     }));
     nextTransition = Math.min(...countdowns.map(({ deadline }) => deadline));
+    exportButton.disabled = exporting || !countdowns.length;
     if (firstHash) {
       const heading = doc.getElementById(firstHash.slice(1));
       if (heading?.matches('.arsenal-sections h2[id]')) heading.scrollIntoView({ behavior: 'instant' });
@@ -168,6 +172,22 @@ export function mountArsenal(doc = document, api = createMarketApi(JSON.parse(do
   content.addEventListener('error', event => {
     if (event.target.tagName === 'IMG') event.target.hidden = true;
   }, true);
+  exportButton.addEventListener('click', async () => {
+    exporting = true;
+    exportButton.disabled = true;
+    exportButton.textContent = 'Preparing PNG…';
+    exportStatus.textContent = '';
+    try {
+      const { downloadArsenalImage } = await import('./arsenalExport.js?v=2');
+      await downloadArsenalImage(content.closest('main'));
+    } catch {
+      exportStatus.textContent = 'Could not download the Arsenal image. Try again.';
+    } finally {
+      exporting = false;
+      exportButton.disabled = !countdowns.length;
+      exportButton.textContent = 'Download PNG';
+    }
+  });
   refresh.addEventListener('click',update);
   doc.addEventListener('visibilitychange', () => {
     if (doc.hidden) return;

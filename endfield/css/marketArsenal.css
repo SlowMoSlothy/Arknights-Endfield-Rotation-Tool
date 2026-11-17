@@ -59,6 +59,17 @@
 
 .arsenal-toolbar .arsenal-note { margin: 0; }
 
+.arsenal-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+#arsenal-export-status {
+  flex-basis: 100%;
+  margin: 0;
+  color: #ffbd85;
+  font-size: .75rem;
+}
+
+#arsenal-export-status:empty { display: none; }
+
 .arsenal-toolbar button {
   min-height: 34px;
   padding: 6px 12px;
