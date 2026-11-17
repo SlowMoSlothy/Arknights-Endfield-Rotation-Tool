@@ -179,19 +179,57 @@ export function mountArsenal(doc = document, api = createMarketApi(JSON.parse(do
   return update;
 }
 
-if (typeof document !== 'undefined' && document.getElementById('arsenal-content')) {
-  const header = document.querySelector('.top');
-  const jumpLinks = document.querySelector('.arsenal-jump-links');
+function mountArsenalJumpLinks(doc, content) {
+  const view = doc.defaultView;
+  const viewport = doc.documentElement;
+  const header = doc.querySelector('.top');
+  const jumpLinks = doc.querySelector('.arsenal-jump-links');
   const page = jumpLinks.closest('main');
+  const destinations = Array.from(jumpLinks.querySelectorAll('a'), link => ({
+    link, section: doc.getElementById(link.hash.slice(1)).closest('section'),
+  }));
+  let activeLink;
+  let framePending = false;
+
+  function updateActiveLink() {
+    framePending = false;
+    const readingLine = jumpLinks.getBoundingClientRect().bottom + 18;
+    const atBottom = view.scrollY > 0 && viewport.scrollHeight - viewport.clientHeight - view.scrollY <= 2;
+    let current = destinations[0];
+    for (const destination of destinations) {
+      const { top, bottom } = destination.section.getBoundingClientRect();
+      if (top >= viewport.clientHeight) break;
+      current = destination;
+      if (!atBottom && bottom > readingLine) break;
+    }
+    if (activeLink === current.link) return;
+    activeLink?.removeAttribute('aria-current');
+    activeLink = current.link;
+    activeLink.setAttribute('aria-current', 'location');
+  }
+
+  function scheduleActiveLink() {
+    if (framePending) return;
+    framePending = true;
+    view.requestAnimationFrame(updateActiveLink);
+  }
+
   const applyOffsets = () => {
     page.style.setProperty('--arsenal-header-height', `${header.offsetHeight}px`);
     page.style.setProperty('--arsenal-jump-height', `${jumpLinks.offsetHeight}px`);
+    scheduleActiveLink();
   };
   applyOffsets();
   const observer = new ResizeObserver(applyOffsets);
   observer.observe(header);
   observer.observe(jumpLinks);
+  observer.observe(content);
+  view.addEventListener('scroll', scheduleActiveLink, { passive: true });
+  view.addEventListener('resize', scheduleActiveLink);
+}
 
+if (typeof document !== 'undefined' && document.getElementById('arsenal-content')) {
+  mountArsenalJumpLinks(document, document.getElementById('arsenal-content'));
   const update = mountArsenal();
   setInterval(()=>{if(!document.hidden)update();},15000);
 }
