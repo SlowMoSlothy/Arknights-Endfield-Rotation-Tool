@@ -30,7 +30,7 @@ test("landing page uses concise non-repetitive header copy", () => {
 });
 
 test("tool cards use a shared text-only Endfield game identity", () => {
-  assert.equal((landingHtml.match(/class="game-name">Arknights: Endfield/g) || []).length, 5);
+  assert.equal((landingHtml.match(/class="game-name">Arknights: Endfield/g) || []).length, 6);
   assert.match(landingHtml, /class="game-tool-name">Rotation Planner/);
   assert.match(landingHtml, /class="game-tool-name">Operator Database/);
   assert.match(landingHtml, /class="game-tool-name">Weapon Database/);
@@ -45,4 +45,11 @@ test("landing page links the market dashboard with its own artwork", () => {
   assert.match(landingHtml, /href="endfield\/market\/"/);
   assert.match(landingHtml, /Market Prices &amp; Statistics/);
   assert.match(landingHtml, /assets\/market-trading-depot\.webp/);
+});
+
+test("landing page links directly to the Arsenal Exchange with original artwork", () => {
+  assert.match(landingHtml, /class="[^"]*arsenal-card" href="endfield\/market\/#arsenal-exchange"/);
+  assert.match(landingHtml, /class="game-tool-name">Arsenal Exchange<\/h3>/);
+  assert.match(landingHtml, /assets\/arsenal-exchange\.webp/);
+  assert.equal(fs.readFileSync("assets/arsenal-exchange.webp").toString("ascii", 8, 12), "WEBP");
 });
