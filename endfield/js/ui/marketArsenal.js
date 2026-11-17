@@ -42,29 +42,31 @@ export function arsenalMarkup(rows, now = Date.now()) {
   const current = active.map(offer=>`<div class="arsenal-current">${offerList([offer])}
     <p class="arsenal-note">Until ${time(offer.closes_at)}</p></div>`).join('');
   return `<div class="arsenal-grid">
-    <section class="arsenal-panel"><h3>Daily offers</h3>
+    <section class="arsenal-panel"><h2>Daily offers</h2>
       ${daily ? `<p class="arsenal-note">Recorded ${time(daily.observed_at)}</p>${offerList(daily.offers)}`
               : '<p class="arsenal-note">Waiting for the first daily rotation.</p>'}
     </section>
-    <section class="arsenal-panel"><h3>Current weekly offers</h3>
+    <section class="arsenal-panel"><h2>Current weekly offers</h2>
       ${current || '<p class="arsenal-note">No active weekly offers in the recorded schedule.</p>'}
     </section>
-    <section class="arsenal-schedule"><h3>Upcoming weekly rotations</h3>
+    <section class="arsenal-schedule"><h2>Upcoming weekly rotations</h2>
       ${schedule ? `<div class="arsenal-grid">${schedule}</div>`
                  : '<p class="arsenal-note">No upcoming weekly rotation has been recorded yet.</p>'}
     </section>
   </div>`;
 }
 
-export function mountArsenal(doc = document, api = createMarketApi(JSON.parse(doc.getElementById('market-config').textContent))) {
+export function mountArsenal(doc = document, api = createMarketApi(JSON.parse(doc.getElementById('arsenal-config').textContent))) {
   const status = doc.getElementById('arsenal-status');
   const content = doc.getElementById('arsenal-content');
+  const refresh = doc.getElementById('arsenal-refresh');
   const latest = new Map();
   let pending = false;
 
   async function update() {
     if (pending) return;
     pending = true;
+    refresh.disabled = true;
     try {
       for (const snapshot of await api.arsenal(AbortSignal.timeout(12000))) {
         const previous = latest.get(snapshot.period);
@@ -77,37 +79,18 @@ export function mountArsenal(doc = document, api = createMarketApi(JSON.parse(do
         : 'Arsenal Exchange data is temporarily unavailable.';
     } finally {
       if (latest.size) content.innerHTML = arsenalMarkup([...latest.values()]);
+      refresh.disabled = false;
       pending = false;
     }
   }
 
-  doc.getElementById('market-refresh').addEventListener('click',update);
+  refresh.addEventListener('click',update);
   doc.addEventListener('visibilitychange',()=>{if(!doc.hidden)update();});
   update();
   return update;
 }
 
-export function restoreArsenalDeepLink(section, browser = window) {
-  const hash = '#arsenal-exchange';
-  const header = section.ownerDocument.querySelector('.top');
-  const updateOffset = () => {
-    if (header) section.style.scrollMarginBlockStart = `${header.offsetHeight + 12}px`;
-  };
-  updateOffset();
-  browser.addEventListener('resize', updateOffset);
-  browser.addEventListener('pageshow', event => {
-    updateOffset();
-    if (event.persisted || browser.location.hash !== hash) return;
-    // Run after browser scroll restoration on a reload of the deep link.
-    browser.requestAnimationFrame(() => {
-      if (browser.location.hash === hash) section.scrollIntoView({ block:'start', behavior:'instant' });
-    });
-  });
-}
-
-const arsenalSection = typeof document !== 'undefined' && document.getElementById('arsenal-exchange');
-if (arsenalSection) {
-  restoreArsenalDeepLink(arsenalSection);
+if (typeof document !== 'undefined' && document.getElementById('arsenal-content')) {
   const update = mountArsenal();
   setInterval(()=>{if(!document.hidden)update();},15000);
 }

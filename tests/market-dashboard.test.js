@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { runInNewContext } from 'node:vm';
 import {filterStats,cardMarkup,chartMarkup,createMarketApi,validateStats} from '../endfield/js/data/marketData.js';
-import {renderMarketPage} from '../tools/build-market-page.js';
+import {renderMarketPage,renderArsenalPage} from '../tools/build-market-page.js';
 const row={shop_id:'domainshop_page_rand_map02',goods_id:'domainshop_goods_rand_map02_99',name:'Package <unsafe>',region:'Wuling',item_id:'item',latest_price:3400,base_price:2000,min_price:3390,max_price:3768,average_price:3519.33,observed_days:3,latest_observed_at:'2026-10-30T15:12:05Z'};
 const days=[{shop_id:row.shop_id,goods_id:row.goods_id,observation_day:'2026-10-28',observed_at:'2026-10-28T12:00:00Z',price:3390},{shop_id:row.shop_id,goods_id:row.goods_id,observation_day:'2026-10-30',observed_at:'2026-10-30T12:00:00Z',price:3400}];
 const config={url:'https://test.supabase.co',key:'sb_publishable_fixture'};
@@ -12,3 +13,33 @@ test('rejects failures and invalid statistics rather than returning empty succes
 test('static snapshot has genuine prices, crawlable metadata and no private key',()=>{const html=renderMarketPage({statistics:[row],history:days},config);assert(html.includes('3,400'));assert(html.includes('&lt;unsafe&gt;'));assert(html.includes('https://rotationforge.gg/endfield/market/'));assert(html.includes('application/ld+json'));assert(html.includes('marketDashboard.js'));assert(!html.includes('sb_secret_'));assert(!html.includes('<unsafe>'));assert.throws(()=>renderMarketPage({statistics:[],history:[]},config));});
 
 test('official English names survive live German source updates', async()=>{const {displayName}=await import('../endfield/js/data/marketData.js');const r={...row,goods_id:'domainshop_goods_rand_map02_11',name:'Xiranit-Brücke [Paket]'};assert.equal(displayName(r),'Xiranite Bridge');assert.equal(filterStats([r],{search:'bridge'}).length,1);assert(cardMarkup(r).includes('Xiranite Bridge'));assert(!cardMarkup(r).includes('Xiranit-Brücke'));const html=renderMarketPage({statistics:[r],history:[]},config);assert(html.includes('marketCompact.css'));assert(html.includes('market-detail-shell'));assert(!html.includes('Know the market.'));});
+
+test('Market and Arsenal Exchange each render their own dashboard and scripts', () => {
+  const market = renderMarketPage({statistics:[row],history:days}, config);
+  assert.match(market, /<h1>Market prices<\/h1>/);
+  assert.doesNotMatch(market, /arsenal-content|marketArsenal\.(js|css)|View Arsenal Exchange/);
+
+  const arsenal = renderArsenalPage(config);
+  assert.match(arsenal, /<h1>Arsenal Exchange<\/h1>/);
+  assert.match(arsenal, /rel="canonical" href="https:\/\/rotationforge\.gg\/endfield\/arsenal\/"/);
+  assert.match(arsenal, /id="arsenal-config"/);
+  assert.match(arsenal, /id="arsenal-refresh"/);
+  assert.match(arsenal, /marketArsenal\.js/);
+  assert.doesNotMatch(arsenal, /marketDashboard\.js|marketComparison\.js|market-grid|market-seed/);
+});
+
+test('only the old Arsenal fragment redirects from the Market dashboard', () => {
+  const market = renderMarketPage({statistics:[row],history:days}, config);
+  const redirect = market.match(/<script>([\s\S]*?)<\/script>/)[1];
+  const visits = [];
+  const location = {hash:'#market-filters', replace: url => visits.push(url)};
+  const listeners = new Map();
+  const addEventListener = (name, handler) => listeners.set(name, handler);
+  runInNewContext(redirect, {location, addEventListener});
+  assert.deepEqual(visits, []);
+
+  location.hash = '#arsenal-exchange';
+  listeners.get('hashchange')();
+  runInNewContext(redirect, {location, addEventListener});
+  assert.deepEqual(visits, ['/endfield/arsenal/', '/endfield/arsenal/']);
+});

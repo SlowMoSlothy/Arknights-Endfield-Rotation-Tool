@@ -48,7 +48,7 @@ test("landing page links the market dashboard with its own artwork", () => {
 });
 
 test("landing page links directly to the Arsenal Exchange with original artwork", () => {
-  assert.match(landingHtml, /class="[^"]*arsenal-card" href="endfield\/market\/#arsenal-exchange"/);
+  assert.match(landingHtml, /class="[^"]*arsenal-card" href="endfield\/arsenal\/"/);
   assert.match(landingHtml, /class="game-tool-name">Arsenal Exchange<\/h3>/);
   assert.match(landingHtml, /assets\/arsenal-exchange\.webp/);
   assert.equal(fs.readFileSync("assets/arsenal-exchange.webp").toString("ascii", 8, 12), "WEBP");
