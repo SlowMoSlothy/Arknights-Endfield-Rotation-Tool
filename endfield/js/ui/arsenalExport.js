@@ -20,11 +20,29 @@ export async function downloadArsenalImage(page) {
     ignoreElements: element => element.matches(
       '.top, .breadcrumbs, .arsenal-jump-links, .arsenal-toolbar, .arsenal-countdown, noscript, .barcode',
     ),
-    onclone: (_doc, clone) => {
+    onclone: async (doc, clone) => {
       Object.assign(clone.style, {
         width: `${width}px`, maxWidth: 'none', margin: '0', padding: '24px', background: '#1b2123',
       });
-      clone.querySelector('footer').textContent = `RotationForge.gg · Exported ${capturedAt} (Berlin time)`;
+      const footer = clone.querySelector('footer');
+      const details = doc.createElement('div');
+      const address = doc.createElement('strong');
+      address.textContent = 'rotationforge.gg/endfield/arsenal/';
+      const timestamp = doc.createElement('div');
+      timestamp.textContent = `Exported ${capturedAt} (Berlin time)`;
+      details.append(address, timestamp);
+
+      const qr = doc.createElement('img');
+      qr.src = new URL('/assets/arsenal-exchange-qr.png', page.ownerDocument.baseURI).href;
+      qr.alt = 'Scan to open Arsenal Exchange';
+      qr.width = 111;
+      qr.height = 111;
+      Object.assign(footer.style, {
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        textAlign: 'left', gap: '20px', borderTop: '1px solid #3c4547', padding: '16px 0 0',
+      });
+      footer.replaceChildren(details, qr);
+      await qr.decode();
     },
   });
   const png = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
