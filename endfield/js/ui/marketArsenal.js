@@ -178,7 +178,7 @@ export function mountArsenal(doc = document, api = createMarketApi(JSON.parse(do
     exportButton.textContent = 'Preparing PNG…';
     exportStatus.textContent = '';
     try {
-      const { downloadArsenalImage } = await import('./arsenalExport.js?v=3');
+      const { downloadArsenalImage } = await import('./arsenalExport.js?v=4');
       await downloadArsenalImage(content.closest('main'));
     } catch {
       exportStatus.textContent = 'Could not download the Arsenal image. Try again.';
