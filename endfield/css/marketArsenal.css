@@ -36,12 +36,6 @@
 .arsenal-sections,
 .arsenal-windows { display: grid; gap: 22px; }
 
-.arsenal-active {
-  display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-  gap: 16px;
-}
-
 .arsenal-panel { min-width: 0; }
 
 .arsenal-section-heading {
@@ -65,7 +59,6 @@
 }
 
 .arsenal-offers {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 165px), 1fr));
   margin: 0;
   padding: 0;
   list-style: none;
@@ -108,10 +101,6 @@
 }
 
 .arsenal-countdown strong { font-size: .84rem; font-variant-numeric: tabular-nums; }
-
-@media (max-width: 940px) {
-  .arsenal-active { grid-template-columns: 1fr; gap: 22px; }
-}
 
 @media (max-width: 520px) {
   .arsenal-offers {

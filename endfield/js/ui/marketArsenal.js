@@ -7,6 +7,7 @@ const berlin = new Intl.DateTimeFormat('en-GB', {
 const date = value => berlin.format(new Date(value));
 const time = value => `<time datetime="${escapeHtml(value)}">${date(value)}</time>`;
 const nameKey = name => name.normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+const weaponRarity = ({ rarity } = {}) => Number.isInteger(rarity) && rarity >= 1 && rarity <= 6 ? rarity : 0;
 
 export function dailyOfferEnd(observedAt) {
   const reset = new Date(observedAt);
@@ -29,7 +30,7 @@ function offerList(offers, portraits, { starts = false, dailyEnd } = {}) {
   if (!offers.length) return '<p class="arsenal-note">No offers in the recorded schedule.</p>';
   return `<ul class="weapon-grid arsenal-offers">${offers.map(offer => {
     const portrait = portraits.get(nameKey(offer.name));
-    const rarity = Number.isInteger(portrait?.rarity) && portrait.rarity >= 1 && portrait.rarity <= 6 ? portrait.rarity : 0;
+    const rarity = weaponRarity(portrait);
     const deadline = starts ? offer.opens_at : (dailyEnd ?? offer.closes_at);
     const name = escapeHtml(offer.name);
     const cardTag = portrait?.href ? 'a' : 'div';
@@ -88,24 +89,23 @@ export function arsenalMarkup(rows, now = Date.now(), weapons = []) {
     </article>`).join('');
   let dailyOffers = '<p class="arsenal-note">Waiting for the first daily rotation.</p>';
   if (daily) {
+    const rarity = offer => weaponRarity(portraits.get(nameKey(offer.name)));
     dailyOffers = now < Date.parse(dailyEnd)
-      ? offerList(daily.offers, portraits, { dailyEnd })
+      ? offerList(daily.offers.toSorted((a, b) => rarity(b) - rarity(a)), portraits, { dailyEnd })
       : '<p class="arsenal-note">Daily rotation ended. Waiting for new offers.</p>';
   }
   return `<div class="arsenal-sections">
-    <div class="arsenal-active">
-      <section class="arsenal-panel">
-        <div class="arsenal-section-heading"><h2>Daily offers</h2>
-          ${daily ? `<p class="arsenal-note">Recorded ${time(daily.observed_at)}</p>` : ''}
-        </div>
-        ${dailyOffers}
-      </section>
-      <section class="arsenal-panel">
-        <div class="arsenal-section-heading"><h2>Current weekly offers</h2></div>
-        ${active.length ? offerList(active, portraits)
-          : '<p class="arsenal-note">No active weekly offers in the recorded schedule.</p>'}
-      </section>
-    </div>
+    <section class="arsenal-panel">
+      <div class="arsenal-section-heading"><h2>Current weekly offers</h2></div>
+      ${active.length ? offerList(active, portraits)
+        : '<p class="arsenal-note">No active weekly offers in the recorded schedule.</p>'}
+    </section>
+    <section class="arsenal-panel">
+      <div class="arsenal-section-heading"><h2>Daily offers</h2>
+        ${daily ? `<p class="arsenal-note">Recorded ${time(daily.observed_at)}</p>` : ''}
+      </div>
+      ${dailyOffers}
+    </section>
     <section class="arsenal-schedule"><h2>Upcoming weekly rotations</h2>
       ${schedule ? `<div class="arsenal-windows">${schedule}</div>`
                  : '<p class="arsenal-note">No upcoming weekly rotation has been recorded yet.</p>'}
