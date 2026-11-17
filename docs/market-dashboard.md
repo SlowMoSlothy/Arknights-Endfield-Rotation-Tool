@@ -5,15 +5,18 @@
 Supabase configuration in `endfield/supabaseClient.js`. No secret key belongs in
 this repository. The PC uploader remains a separate application.
 
-Run `npm run build:market` to generate the initial crawlable snapshot and
-`sitemap-market.xml`. The existing database workflow runs this command before
-publishing. Failed or empty source reads retain the existing page. The browser
+Run `npm run build:market` to generate the initial crawlable market snapshot,
+the Arsenal Exchange page, and `sitemap-market.xml`. The existing database
+workflow runs this command before publishing. Failed or empty source reads
+retain the existing page. The browser
 refreshes the statistics every minute while visible and when returning to the
 tab. Read failures preserve the last successful values and show a status notice.
 
-The Arsenal Exchange reads `ef_arsenal_rotations` through the same public
-configuration. The PC Analyzer records the daily list at login and when the
-server sends the new rotation. Weekly offers include the server's start and end
+The Arsenal Exchange has its own dashboard at `/endfield/arsenal/`. The old
+`/endfield/market/#arsenal-exchange` link redirects there. The dashboard reads
+`ef_arsenal_rotations` through the same public configuration. The PC Analyzer
+records the daily list at login and when the server sends the new rotation.
+Weekly offers include the server's start and end
 times, converted to Europe/Berlin in the browser. The page keeps active and
 announced future weekly windows visible and checks for new data every 15 seconds
 while visible. The daily list carries its observation timestamp.
