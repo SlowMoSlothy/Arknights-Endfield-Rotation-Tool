@@ -1,0 +1,57 @@
+.credit-shop {
+  margin-block: 24px;
+  padding: clamp(16px, 3vw, 28px);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: #202628;
+}
+
+.credit-shop-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 24px;
+}
+
+.credit-shop-header h2 { margin: 0; }
+
+.credit-shop time,
+.credit-shop-status,
+.credit-shop-quantity,
+.credit-shop-price del { color: var(--muted, #bfc8cc); }
+
+.credit-shop-status { margin: 8px 0 0; }
+.credit-shop-offers:empty { display: none; }
+
+.credit-shop-offers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.credit-shop-offer {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #171c1e;
+}
+
+.credit-shop-name { font-weight: 650; }
+.credit-shop-quantity { font-variant-numeric: tabular-nums; }
+
+.credit-shop-price {
+  grid-column: 1 / -1;
+  font-variant-numeric: tabular-nums;
+}
+
+.credit-shop-price del,
+.credit-shop-discount { margin-left: 8px; }
+
+.credit-shop-discount { color: #ffd287; }

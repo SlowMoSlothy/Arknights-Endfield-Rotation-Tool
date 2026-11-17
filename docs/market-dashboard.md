@@ -15,6 +15,12 @@ The page shares `baseStyles()` and `siteHeader()` with the existing catalogs.
 The homepage links it through an illustrated card. The generated trading-depot
 illustration lives in `assets/market-trading-depot.webp` and is not a game capture.
 
+The Credit Shop section reads the latest complete list from
+`ef_credit_shop_latest`. The PC Analyzer publishes that list when it observes a
+login sync or a shop refresh. Distinct offer IDs preserve multiple copies of the
+same good. The page checks for updates every 15 seconds while visible and when
+the reader returns to the tab. It shows the observation time in Europe/Berlin.
+
 Daily statistics count the last observation per Europe/Berlin calendar day.
 Historical game arrays with unconfirmed dates are excluded. Every price shows
 its observation date; a connected page does not imply a real-time game feed.
