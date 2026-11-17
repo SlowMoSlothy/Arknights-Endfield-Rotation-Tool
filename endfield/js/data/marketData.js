@@ -104,7 +104,7 @@ export function createMarketApi({ url, key }, fetchImpl = globalThis.fetch) {
       select:'period,source_id,observed_at,offers',order:'period.asc',
     },signal)),
     arsenalWeapons:signal=>read('weapons',{
-      select:'name,icon_path,rarity',game:'eq.arknights_endfield',order:'weapon_key.asc',
+      select:'name,icon_path,rarity,weapon_type',game:'eq.arknights_endfield',order:'weapon_key.asc',
     },signal),
   };
 }
