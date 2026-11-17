@@ -103,5 +103,8 @@ export function createMarketApi({ url, key }, fetchImpl = globalThis.fetch) {
     arsenal:async signal=>validateArsenalRotations(await read('ef_arsenal_rotations',{
       select:'period,source_id,observed_at,offers',order:'period.asc',
     },signal)),
+    arsenalWeapons:signal=>read('weapons',{
+      select:'name,icon_path,rarity',game:'eq.arknights_endfield',order:'weapon_key.asc',
+    },signal),
   };
 }
