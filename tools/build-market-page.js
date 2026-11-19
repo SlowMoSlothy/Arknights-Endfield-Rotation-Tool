@@ -1,3 +1,4 @@
+import { withMobileLandingNav } from './mobile-landing-nav.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -118,7 +119,7 @@ function writePage(root, route, html) {
   const dir = path.join(root, route.slice(1));
   fs.mkdirSync(dir, { recursive: true });
   const temporary = path.join(dir, 'index.html.tmp');
-  fs.writeFileSync(temporary, html);
+  fs.writeFileSync(temporary, withMobileLandingNav(html));
   fs.renameSync(temporary, path.join(dir, 'index.html'));
 }
 
