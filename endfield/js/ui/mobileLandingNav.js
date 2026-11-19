@@ -1,8 +1,8 @@
-// Compact, accessible mobile menu. The desktop links remain in their original location.
+// Shared right-side mobile drawer for pages linked from the landing page.
 (() => {
   const nav = document.querySelector('header.top nav.nav');
   const links = nav?.querySelector(':scope > .nav-links');
-  if (!nav || !links) return;
+  if (!nav || !links || document.getElementById('rf-mobile-menu')) return;
   const toggle = document.createElement('button');
   toggle.type = 'button';
   toggle.className = 'rf-mobile-menu-toggle';
@@ -10,29 +10,70 @@
   toggle.setAttribute('aria-expanded', 'false');
   toggle.setAttribute('aria-controls', 'rf-mobile-menu');
   toggle.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
-  const menu = document.createElement('div');
+  const backdrop = document.createElement('div');
+  backdrop.className = 'rf-mobile-menu-backdrop';
+  backdrop.hidden = true;
+  const menu = document.createElement('aside');
   menu.id = 'rf-mobile-menu';
   menu.className = 'rf-mobile-menu';
+  menu.setAttribute('aria-label', 'Navigation menu');
+  menu.setAttribute('role', 'navigation');
   menu.hidden = true;
+  const heading = document.createElement('div');
+  heading.className = 'rf-mobile-menu-heading';
+  const title = document.createElement('span');
+  title.className = 'rf-mobile-menu-title';
+  const logo = document.createElement('img');
+  logo.src = '/favicon-flat.png';
+  logo.alt = '';
+  title.append(logo, document.createTextNode('RotationForge'));
+  const closeButton = document.createElement('button');
+  closeButton.type = 'button';
+  closeButton.className = 'rf-mobile-menu-close';
+  closeButton.setAttribute('aria-label', 'Close navigation menu');
+  closeButton.textContent = '×';
+  heading.append(title, closeButton);
+  menu.append(heading);
   for (const link of links.querySelectorAll('a')) {
     const clone = link.cloneNode(true);
     if (new URL(clone.href, location.href).pathname === location.pathname) clone.setAttribute('aria-current', 'page');
-    clone.addEventListener('click', () => close());
-    menu.appendChild(clone);
+    clone.addEventListener('click', close);
+    menu.append(clone);
   }
-  if (!menu.children.length) return;
+  if (menu.children.length < 2) return;
+  let returnFocus = false;
   function close() {
+    if (menu.hidden) return;
     menu.hidden = true;
+    backdrop.hidden = true;
+    document.body.classList.remove('rf-mobile-menu-open');
     toggle.setAttribute('aria-expanded', 'false');
     toggle.setAttribute('aria-label', 'Open navigation menu');
+    if (returnFocus) toggle.focus();
+    returnFocus = false;
   }
-  toggle.addEventListener('click', () => {
-    menu.hidden = !menu.hidden;
-    toggle.setAttribute('aria-expanded', String(!menu.hidden));
-    toggle.setAttribute('aria-label', menu.hidden ? 'Open navigation menu' : 'Close navigation menu');
+  function open() {
+    menu.hidden = false;
+    backdrop.hidden = false;
+    document.body.classList.add('rf-mobile-menu-open');
+    toggle.setAttribute('aria-expanded', 'true');
+    toggle.setAttribute('aria-label', 'Close navigation menu');
+    closeButton.focus();
+  }
+  toggle.addEventListener('click', () => menu.hidden ? open() : close());
+  closeButton.addEventListener('click', () => { returnFocus = true; close(); });
+  backdrop.addEventListener('click', close);
+  document.addEventListener('keydown', event => {
+    if (menu.hidden) return;
+    if (event.key === 'Escape') { returnFocus = true; close(); }
+    if (event.key === 'Tab') {
+      const focusable = [...menu.querySelectorAll('button,a[href]')];
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    }
   });
-  document.addEventListener('keydown', event => { if (event.key === 'Escape') close(); });
-  document.addEventListener('pointerdown', event => { if (!nav.contains(event.target)) close(); });
   matchMedia('(min-width: 768px)').addEventListener('change', event => { if (event.matches) close(); });
-  nav.append(toggle, menu);
+  nav.append(toggle);
+  document.body.append(backdrop, menu);
 })();
