@@ -45,7 +45,7 @@
     { label: 'Arsenal Exchange', href: '/endfield/arsenal/' },
     { label: 'Community', href: '/endfield/community/' },
   ];
-  const currentPath = location.pathname.replace(/\\/index\\.html$/, '/');
+  const currentPath = location.pathname.endsWith('/index.html') ? location.pathname.slice(0, -10) : location.pathname;
   for (const destination of destinations) {
     if (currentPath === destination.href) continue;
     const link = document.createElement('a');
