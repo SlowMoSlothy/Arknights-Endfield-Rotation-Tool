@@ -1,3 +1,4 @@
+import { withMobileLandingNav } from './mobile-landing-nav.js';
 import { operatorProgression } from './operator-progression.js';
 import { catalogSkills, catalogSections } from './operator-catalog-markup.js';
 import { createClient } from "@supabase/supabase-js";
@@ -1822,7 +1823,7 @@ export function writeGeneratedOutput({
 
   try {
     fs.mkdirSync(tempOutputDir, { recursive: true });
-    fs.writeFileSync(path.join(tempOutputDir, "index.html"), createIndexPage(operators), "utf8");
+    fs.writeFileSync(path.join(tempOutputDir, "index.html"), withMobileLandingNav(createIndexPage(operators)), "utf8");
 
     for (const operator of operators) {
       const folder = path.join(tempOutputDir, operator.slug);
