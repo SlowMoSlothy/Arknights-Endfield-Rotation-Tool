@@ -20,9 +20,9 @@ for (const row of rows) {
   for (const offer of row.offers) if (typeof offer.name !== 'string' || !Number.isSafeInteger(offer.price) || offer.price < 1) throw new Error('Invalid offer');
 }
 const portraits = JSON.parse(html.match(/<script id="arsenal-portraits" type="application\/json">([^<]+)<\/script>/)?.[1] ?? '[]');
-const links = new Map(portraits.map(p => [p.name.toLowerCase().replace(/[^\\p{L}\\p{N}]/gu,''),p.href]));
+const links = new Map(portraits.map(p => [p.name.toLowerCase().replace(/[^\p{L}\p{N}]/gu,''),p.href]));
 const cards = offers => offers.length ? '<ul class="arsenal-static-list">' + offers.map(o => {
-  const href = links.get(o.name.toLowerCase().replace(/[^\\p{L}\\p{N}]/gu,''));
+  const href = links.get(o.name.toLowerCase().replace(/[^\p{L}\p{N}]/gu,''));
   const name = href ? '<a href="' + escape(href) + '">' + escape(o.name) + '</a>' : escape(o.name);
   return '<li>' + name + ' — ' + escape(o.price) + ' Arsenal Tickets</li>';
 }).join('') + '</ul>' : '<p>No offers recorded for this rotation.</p>';
