@@ -32,7 +32,7 @@ const dailyReset = daily ? (() => { const d = new Date(daily.observed_at); d.set
 const activeDaily = daily && now < dailyReset ? daily.offers : [];
 const stamp = Math.max(0,...rows.map(r=>Date.parse(r.observed_at)));
 const snapshot = '<!-- arsenal-static:start -->\n<section class="arsenal-panel" id="arsenal-static-snapshot" aria-label="Recorded Arsenal Exchange offers"><h2>Recorded Arsenal Exchange weapon offers</h2><p>Snapshot of recorded offers. Live availability and countdowns update when JavaScript loads. Last observation: <time datetime="' + escape(new Date(stamp).toISOString()) + '">' + escape(new Date(stamp).toISOString().slice(0,16).replace('T',' ') + ' UTC') + '</time>.</p><h3>Current weekly weapons</h3>' + cards(activeWeekly) + '<h3>Daily weapons</h3>' + cards(activeDaily) + '<h3>Upcoming weekly weapons</h3>' + cards(upcoming) + '</section>\n<!-- arsenal-static:end -->';
-const pattern = /<!-- arsenal-static:start -->[\\s\\S]*?<!-- arsenal-static:end -->/;
+const pattern = /<!-- arsenal-static:start -->[\s\S]*?<!-- arsenal-static:end -->/;
 const next = pattern.test(html) ? html.replace(pattern,snapshot) : html.replace('<div id="arsenal-content" class="arsenal-sections">',snapshot + '\n      <div id="arsenal-content" class="arsenal-sections">');
 if (next === html) throw new Error('Could not insert snapshot');
 if (next !== html) await writeFile(file,next);
