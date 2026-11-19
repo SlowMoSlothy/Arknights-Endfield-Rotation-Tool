@@ -36,6 +36,9 @@
   menu.append(heading);
   for (const link of links.querySelectorAll('a')) {
     const clone = link.cloneNode(true);
+    // Do not inherit absolute positioning from page-specific desktop nav classes.
+    const isCta = link.classList.contains('nav-cta');
+    clone.className = isCta ? 'rf-drawer-link rf-drawer-cta' : 'rf-drawer-link';
     if (new URL(clone.href, location.href).pathname === location.pathname) clone.setAttribute('aria-current', 'page');
     clone.addEventListener('click', close);
     menu.append(clone);
