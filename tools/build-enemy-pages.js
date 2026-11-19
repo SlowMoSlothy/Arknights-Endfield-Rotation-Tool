@@ -1,3 +1,4 @@
+import { withMobileLandingNav } from './mobile-landing-nav.js';
 import { renderEnemyDossier, renderEnemyResistances } from './enemy-dossier.js';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -208,7 +209,7 @@ export function writeEnemyOutput(rows, { outputDir = path.resolve('endfield/enem
     }
     try {
         fs.mkdirSync(temp, { recursive: true });
-        fs.writeFileSync(path.join(temp, 'index.html'), createEnemyIndex(rows, workInProgress));
+        fs.writeFileSync(path.join(temp, 'index.html'), withMobileLandingNav(createEnemyIndex(rows, workInProgress)));
         for (const row of rows) {
             const slug = enemySlug(row);
             fs.mkdirSync(path.join(temp, slug));
