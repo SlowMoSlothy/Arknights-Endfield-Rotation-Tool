@@ -1,15 +1,21 @@
-/* Shared compact navigation for landing-linked pages; desktop stays unchanged. */
-.rf-mobile-menu-toggle,.rf-mobile-menu{display:none}
+/* RotationForge mobile drawer. Desktop navigation is untouched. */
+.rf-mobile-menu-toggle,.rf-mobile-menu,.rf-mobile-menu-backdrop{display:none}
 @media(max-width:767px){
-  header.top nav.nav{position:relative;display:flex!important;align-items:center!important;flex-wrap:nowrap!important;min-height:64px!important;height:auto!important;gap:12px!important;padding-top:8px!important;padding-bottom:8px!important}
-  header.top nav.nav>.brand{min-width:0!important;max-width:calc(100% - 65px);margin-right:auto!important}
-  header.top nav.nav>.nav-links{display:none!important}
-  .rf-mobile-menu-toggle{display:flex;align-items:center;justify-content:center;flex:0 0 44px;width:44px;height:44px;border:1px solid rgba(252,111,2,.6);border-radius:10px;background:#252c2e;color:#fc6f02;cursor:pointer}
+  body header.top nav.nav{box-sizing:border-box!important;display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:space-between!important;width:100%!important;max-width:100%!important;height:64px!important;min-height:64px!important;margin:0!important;padding:8px 16px!important;gap:10px!important}
+  body header.top nav.nav>.brand{display:inline-flex!important;flex:0 1 auto!important;min-width:0!important;max-width:calc(100% - 60px)!important;margin:0 auto 0 0!important;align-items:center!important}
+  body header.top nav.nav>.nav-links{display:none!important}
+  body header.top nav.nav>.rf-mobile-menu-toggle{display:flex!important;position:static!important;flex:0 0 44px!important;align-items:center;justify-content:center;width:44px!important;height:44px!important;min-width:44px!important;margin:0!important;padding:0!important;border:1px solid rgba(252,111,2,.65);border-radius:10px;background:#252c2e;color:#fc6f02;cursor:pointer}
   .rf-mobile-menu-toggle svg{width:24px;height:24px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round}
-  .rf-mobile-menu{position:absolute;display:flex;flex-direction:column;gap:10px;top:calc(100% + 2px);right:0;width:min(340px,calc(100vw - 32px));padding:14px;border:1px solid rgba(160,170,169,.28);border-radius:12px;background:#252c2e;box-shadow:0 18px 40px rgba(0,0,0,.55);z-index:100}
-  .rf-mobile-menu[hidden]{display:none!important}
-  .rf-mobile-menu a{display:flex!important;align-items:center;justify-content:space-between;min-height:49px;padding:12px 15px!important;border:1px solid rgba(160,170,169,.28)!important;border-left:3px solid #fc6f02!important;border-radius:10px!important;background:linear-gradient(120deg,#313739,#252c2e)!important;color:#f6f7f0!important;font-size:15px!important;font-weight:800!important;text-decoration:none!important;white-space:normal!important;box-shadow:none!important}
-  .rf-mobile-menu a::after{content:"›";color:#fc6f02;font-size:23px;line-height:1}
-  .rf-mobile-menu a.nav-cta{border:1px solid rgba(252,111,2,.65)!important;background:rgba(252,111,2,.14)!important;color:#fc6f02!important}
-  .rf-mobile-menu a:hover,.rf-mobile-menu a:focus-visible,.rf-mobile-menu a[aria-current="page"]{background:rgba(252,111,2,.22)!important;outline-color:#fc6f02}
+  body>.rf-mobile-menu-backdrop:not([hidden]){display:block!important;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.55)}
+  body>.rf-mobile-menu:not([hidden]){display:flex!important;flex-direction:column;gap:12px;position:fixed!important;top:0!important;right:0!important;bottom:0!important;left:auto!important;width:min(320px,88vw)!important;max-width:88vw!important;height:100dvh!important;max-height:none!important;overflow-y:auto!important;box-sizing:border-box!important;padding:18px 16px 28px!important;border:0!important;border-left:1px solid rgba(160,170,169,.3)!important;border-radius:0!important;background:#1d2325!important;box-shadow:-18px 0 45px rgba(0,0,0,.45)!important;z-index:9999!important}
+  .rf-mobile-menu[hidden],.rf-mobile-menu-backdrop[hidden]{display:none!important}
+  .rf-mobile-menu-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;color:#f6f7f0;font-weight:900;font-size:17px}
+  .rf-mobile-menu-heading img{width:32px;height:32px;object-fit:contain}
+  .rf-mobile-menu-title{display:flex;align-items:center;gap:9px}
+  .rf-mobile-menu-close{display:grid;place-items:center;width:42px;height:42px;flex:none;border:1px solid rgba(160,170,169,.35);border-radius:10px;background:#252c2e;color:#f6f7f0;font-size:26px;cursor:pointer}
+  body>.rf-mobile-menu a{display:flex!important;align-items:center!important;justify-content:space-between!important;min-height:50px!important;padding:12px 15px!important;margin:0!important;border:1px solid rgba(160,170,169,.28)!important;border-left:4px solid #fc6f02!important;border-radius:10px!important;background:linear-gradient(120deg,#313739,#252c2e)!important;color:#f6f7f0!important;font-size:15px!important;font-weight:800!important;text-decoration:none!important;white-space:normal!important;box-shadow:none!important}
+  body>.rf-mobile-menu a::after{content:"›";color:#fc6f02;font-size:23px;line-height:1}
+  body>.rf-mobile-menu a.nav-cta{border-color:rgba(252,111,2,.65)!important;background:rgba(252,111,2,.14)!important;color:#fc6f02!important}
+  body>.rf-mobile-menu a:focus-visible,body>.rf-mobile-menu a[aria-current="page"]{outline:2px solid #fc6f02;outline-offset:2px}
+  body.rf-mobile-menu-open{overflow:hidden!important}
 }
