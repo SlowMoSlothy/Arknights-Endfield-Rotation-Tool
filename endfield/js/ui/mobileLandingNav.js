@@ -34,14 +34,26 @@
   closeButton.textContent = '×';
   heading.append(title, closeButton);
   menu.append(heading);
-  for (const link of links.querySelectorAll('a')) {
-    const clone = link.cloneNode(true);
-    // Do not inherit absolute positioning from page-specific desktop nav classes.
-    const isCta = link.classList.contains('nav-cta');
-    clone.className = isCta ? 'rf-drawer-link rf-drawer-cta' : 'rf-drawer-link';
-    if (new URL(clone.href, location.href).pathname === location.pathname) clone.setAttribute('aria-current', 'page');
-    clone.addEventListener('click', close);
-    menu.append(clone);
+  // One consistent navigation for every landing-linked page.
+  // Omit the current page rather than showing a link to itself.
+  const destinations = [
+    { label: 'Open Rotation Tool ↗', href: '/endfield/', cta: true },
+    { label: 'Operator Database', href: '/endfield/operators/' },
+    { label: 'Enemy Database', href: '/endfield/enemies/' },
+    { label: 'Weapon Database', href: '/endfield/weapons/' },
+    { label: 'Market Prices', href: '/endfield/market/' },
+    { label: 'Arsenal Exchange', href: '/endfield/arsenal/' },
+    { label: 'Community', href: '/endfield/community/' },
+  ];
+  const currentPath = location.pathname.endsWith('/index.html') ? location.pathname.slice(0, -10) : location.pathname;
+  for (const destination of destinations) {
+    if (currentPath === destination.href) continue;
+    const link = document.createElement('a');
+    link.href = destination.href;
+    link.textContent = destination.label;
+    link.className = destination.cta ? 'rf-drawer-link rf-drawer-cta' : 'rf-drawer-link';
+    link.addEventListener('click', close);
+    menu.append(link);
   }
   if (menu.children.length < 2) return;
   let returnFocus = false;
