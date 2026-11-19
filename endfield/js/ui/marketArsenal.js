@@ -160,6 +160,7 @@ export function mountArsenal(doc = document, api = createMarketApi(JSON.parse(do
         : 'Arsenal Exchange data is temporarily unavailable.';
     } finally {
       if (latest.size) {
+        doc.getElementById('arsenal-static-snapshot')?.remove();
         const now = Date.now();
         render(now);
         tick(now);
