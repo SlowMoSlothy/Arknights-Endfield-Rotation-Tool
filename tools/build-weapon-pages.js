@@ -1,3 +1,4 @@
+import { withMobileLandingNav } from './mobile-landing-nav.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -167,7 +168,7 @@ export function writeWeaponOutput(rows, { outputDir = path.resolve('endfield/wea
   };
   try {
     fs.mkdirSync(temp, { recursive: true });
-    fs.writeFileSync(path.join(temp, 'index.html'), createWeaponIndex(rows));
+    fs.writeFileSync(path.join(temp, 'index.html'), withMobileLandingNav(createWeaponIndex(rows)));
     for (const row of rows) {
       const folder = path.join(temp, row.weapon_key);
       fs.mkdirSync(folder);
