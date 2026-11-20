@@ -3,14 +3,14 @@
   "app": "endfield-indigo",
   "platform": "win-x64",
   "edition": "local",
-  "version": "0.306.18",
-  "url": "https://github.com/SlowMoSlothy/Arknights-Endfield-Rotation-Tool/releases/download/indigo-v0.306.18/Endfield-Indigo-0.306.18-lokal-win-x64.exe",
-  "sha256": "8150601394cfc3c35e2bba06772fb8fd648e45e71ab242d4860a49ffe64ceffe",
-  "bytes": 135226229,
-  "notes": "Die Zeitachsenansicht merkt sich Anordnung, Icongröße und beide Trennlinien. Die gekoppelte Auswahl macht passende Ereignisse auch in vertikal gescrollten Spuren sichtbar.",
+  "version": "0.306.19",
+  "url": "https://github.com/SlowMoSlothy/Arknights-Endfield-Rotation-Tool/releases/download/indigo-v0.306.19/Endfield-Indigo-0.306.19-lokal-win-x64.exe",
+  "sha256": "aacc0bf7cd25332d90c76d5443b55f8e4cac4e0af8792077384f99aaa6b41d18",
+  "bytes": 135181173,
+  "notes": "Dichte Ereignisse werden nach verfügbarem Platz gruppiert und beim Zoomen aufgelöst. Skill-Einsätze und Treffer liegen in getrennten Markerzeilen; Gruppen lassen sich in der Liste öffnen.",
   "artwork": {
     "file": "Indigo-Artwork-6038c6d6d4632728f3e9868b.zip",
-    "url": "https://github.com/SlowMoSlothy/Arknights-Endfield-Rotation-Tool/releases/download/indigo-v0.306.18/Indigo-Artwork-6038c6d6d4632728f3e9868b.zip",
+    "url": "https://github.com/SlowMoSlothy/Arknights-Endfield-Rotation-Tool/releases/download/indigo-v0.306.19/Indigo-Artwork-6038c6d6d4632728f3e9868b.zip",
     "sha256": "6038c6d6d4632728f3e9868b56c26bffe362bcd171ddec180131336672a615a1",
     "bytes": 27822492
   }
