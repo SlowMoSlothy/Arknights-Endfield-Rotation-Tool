@@ -384,56 +384,14 @@ window.applySkillDebuffsAndGetActiveState = function patchedApplySkillDebuffsAnd
 };
 
 async function initApp() {
+    startBuilderStartupMeasurement();
+    let builderReady = false;
     setAppLoading(true);
 
     try {
-        if (typeof hydrateDebuffRegistryFromSupabase === "function") {
-            await hydrateDebuffRegistryFromSupabase();
-        }
-
-        if (typeof hydrateInflictionMechanicsFromSupabase === "function") {
-            await hydrateInflictionMechanicsFromSupabase();
-        }
-
-        if (typeof hydrateBuffRegistryFromSupabase === "function") {
-            await hydrateBuffRegistryFromSupabase();
-        }
-
-        if (typeof hydrateReactionRulesFromSupabase === "function") {
-            await hydrateReactionRulesFromSupabase();
-        }
-
-        if (typeof hydrateEffectGroupsFromSupabase === "function") {
-            await hydrateEffectGroupsFromSupabase();
-        }
-
-        if (typeof hydrateSimulationTriggerEventsFromSupabase === "function") {
-            await hydrateSimulationTriggerEventsFromSupabase();
-        }
-
-        if (typeof hydrateSimulationActionRulesFromSupabase === "function") {
-            await hydrateSimulationActionRulesFromSupabase();
-        }
-
-        if (typeof hydrateOperatorPassiveRulesFromSupabase === "function") {
-            await hydrateOperatorPassiveRulesFromSupabase();
-        }
-
-        if (typeof hydrateOperatorFormsFromSupabase === "function") {
-            await hydrateOperatorFormsFromSupabase();
-        }
-
-        if (typeof hydrateGearFromSupabase === "function") {
-            await hydrateGearFromSupabase();
-        }
-
-        if (typeof hydrateOperatorsFromSupabase === "function") {
-            await hydrateOperatorsFromSupabase();
-        }
-
-        if (typeof hydrateEnemyDatabaseFromSupabase === "function") {
-            await hydrateEnemyDatabaseFromSupabase();
-        }
+        await hydratePlannerCoreData();
+        loadUiSettings();
+        if (uiSettings.timelineMode === "simulation") await ensureSimulationDataLoaded();
 
         loadOperatorUltimateStates();
         loadTeam();
@@ -461,15 +419,17 @@ async function initApp() {
         // Direkt den Rotation Builder anzeigen
         showBuilderScreen();
         if (typeof initPlannerGuide === "function") initPlannerGuide();
+        builderReady = operators.some(operator => operator.isVisible !== false);
         if (typeof markPlannerReady === "function") {
             markPlannerReady(loadedSharedBuild ? "shared"
-                : hasLocalSetup ? "restored" : "new", operators.some(operator => operator.isVisible !== false));
+                : hasLocalSetup ? "restored" : "new", builderReady);
         }
     } catch (error) {
         if (typeof trackPlannerEvent === "function") trackPlannerEvent("builder_failed");
         console.error("App initialization failed:", error);
     } finally {
         setAppLoading(false);
+        finishBuilderStartupMeasurement(builderReady);
     }
 }
 

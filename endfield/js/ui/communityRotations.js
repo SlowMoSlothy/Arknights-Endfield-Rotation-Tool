@@ -1429,7 +1429,7 @@ async function likeCommunityRotation(row) {
     }
 }
 
-function loadCommunityRotation(rotationId) {
+async function loadCommunityRotation(rotationId) {
     const row = communityRotationState.rotations.find(item => item.id === rotationId);
     if (!row || !row.share_code) {
         alert("This community rotation has no valid share code.");
@@ -1442,7 +1442,7 @@ function loadCommunityRotation(rotationId) {
     }
 
     try {
-        applyBuildShareCode(row.share_code);
+        await applyBuildShareCode(row.share_code);
         markCommunityRotationViewed(row);
         closeCommunityRotationsModal();
         alert("Community rotation loaded.");

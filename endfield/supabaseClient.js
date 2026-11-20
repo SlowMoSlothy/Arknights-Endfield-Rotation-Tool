@@ -1204,7 +1204,8 @@ async function loadOperatorsFromSupabase() {
     const operatorIds = visibleOperatorRows.map(row => row.id);
     const [
         { data: skillRows, error: skillError },
-        basicAttackRows
+        basicAttackRows,
+        effectDurationOverrides
     ] = await Promise.all([
         supabaseClient
             .from("operator_skills")
@@ -1212,7 +1213,11 @@ async function loadOperatorsFromSupabase() {
             .in("operator_id", operatorIds)
             .order("operator_id", { ascending: true })
             .order("slot_index", { ascending: true }),
-        loadBasicAttackSequencesFromSupabase(operatorIds)
+        loadBasicAttackSequencesFromSupabase(operatorIds),
+        loadEffectDurationOverridesFromSupabase().catch(error => {
+            console.info("Effect duration overrides are not available in Supabase yet. Using operator skill raw data durations.", error?.message || error);
+            return [];
+        })
     ]);
 
     if (skillError) {
@@ -1234,16 +1239,6 @@ async function loadOperatorsFromSupabase() {
         getPlannerSkillRows(row, skillsByOperatorId.get(row.id) || []),
         basicAttackConfigs.get(getBasicAttackConfigKey(row.id, "base")) || null
     ));
-
-    let effectDurationOverrides = [];
-    try {
-        effectDurationOverrides = await loadEffectDurationOverridesFromSupabase();
-    } catch (error) {
-        console.info(
-            "Effect duration overrides are not available in Supabase yet. Using operator skill raw data durations.",
-            error?.message || error
-        );
-    }
 
     return applyEffectDurationOverridesToOperators(operators, effectDurationOverrides);
 }
@@ -1287,30 +1282,22 @@ async function hydrateOperatorsFromSupabase() {
         return false;
     }
 
-    let databaseOperators = [];
-    try {
-        databaseOperators = await loadOperatorsFromSupabase();
-        if (!databaseOperators.length) {
-            return false;
-        }
-    } catch (error) {
-        console.error("Supabase operator loading failed.", error);
+    const [operatorResult, weaponResult, essenceResult] = await Promise.allSettled([
+        loadOperatorsFromSupabase(),
+        loadWeaponsFromSupabase(),
+        loadWeaponEssenceProfilesFromSupabase()
+    ]);
+    if (weaponResult.status === "rejected") console.error("Supabase weapon loading failed. Weapon loadouts are unavailable.", weaponResult.reason);
+    if (essenceResult.status === "rejected") console.error("Supabase weapon Essence profile loading failed.", essenceResult.reason);
+    if (operatorResult.status === "rejected") {
+        console.error("Supabase operator loading failed.", operatorResult.reason);
         return false;
     }
+    const databaseOperators = operatorResult.value;
+    if (!databaseOperators.length) return false;
 
-    let databaseWeapons = [];
-    try {
-        databaseWeapons = await loadWeaponsFromSupabase();
-    } catch (error) {
-        console.error("Supabase weapon loading failed. Weapon loadouts are unavailable.", error);
-    }
-
-    let databaseWeaponEssenceProfiles = [];
-    try {
-        databaseWeaponEssenceProfiles = await loadWeaponEssenceProfilesFromSupabase();
-    } catch (error) {
-        console.error("Supabase weapon Essence profile loading failed.", error);
-    }
+    let databaseWeapons = weaponResult.status === "fulfilled" ? weaponResult.value : [];
+    const databaseWeaponEssenceProfiles = essenceResult.status === "fulfilled" ? essenceResult.value : [];
 
     const profilesByWeaponKey = new Map(
         databaseWeaponEssenceProfiles.map(profile => [String(profile.weaponKey), profile])
@@ -1372,8 +1359,7 @@ async function hydrateGearFromSupabase() {
     let setsData = [];
     let itemsData = [];
     try {
-        setsData = await loadGearSetsFromSupabase();
-        itemsData = await loadGearItemsFromSupabase();
+        [setsData, itemsData] = await Promise.all([loadGearSetsFromSupabase(), loadGearItemsFromSupabase()]);
     } catch (error) {
         console.info("Supabase gear data is not available yet; using local defaults.", error?.message || error);
         return false;

@@ -183,12 +183,15 @@ function loadPlannerGuideExample() {
     refreshPlannerGuide();
 }
 
-function restorePlannerGuideSetup() {
+async function restorePlannerGuideSetup() {
     try {
         const setup = JSON.parse(localStorage.getItem(PLANNER_GUIDE_BACKUP_KEY));
         if (setup?.version !== 1 || !Array.isArray(setup.team) || !Array.isArray(setup.rotation)
             || !setup.loadouts || !setup.settings || !setup.ultimateStates || typeof setup.enemyId !== "string") {
             throw new Error("Invalid backup");
+        }
+        if (setup.settings.timelineMode === "simulation" && typeof ensureSimulationDataLoaded === "function") {
+            await ensureSimulationDataLoaded();
         }
         applyPlannerGuideSetup(setup);
         localStorage.removeItem(PLANNER_GUIDE_BACKUP_KEY);

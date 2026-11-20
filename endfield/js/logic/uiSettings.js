@@ -133,9 +133,21 @@ function setRotationSkillSize(size) {
     }
 }
 
-function setTimelineMode(mode) {
+let timelineModeRequestId = 0;
+
+async function setTimelineMode(mode) {
     if (!Object.values(TIMELINE_MODE_OPTIONS).includes(mode)) return;
     if (mode === TIMELINE_MODE_OPTIONS.simulation && !uiSettings.experimentalSimulationEnabled) return;
+    const requestId = ++timelineModeRequestId;
+    if (mode === TIMELINE_MODE_OPTIONS.simulation && typeof ensureSimulationDataLoaded === "function") {
+        try {
+            await ensureSimulationDataLoaded();
+        } catch (error) {
+            console.error("Simulation data could not be loaded:", error);
+            return false;
+        }
+        if (requestId !== timelineModeRequestId || !uiSettings.experimentalSimulationEnabled) return false;
+    }
 
     uiSettings.timelineMode = mode;
     saveUiSettings();
@@ -222,6 +234,14 @@ function closeSettingsModal() {
 }
 
 function updateSettingsUi() {
+    const simulationDataStatus = typeof getSimulationDataLoadStatus === "function" ? getSimulationDataLoadStatus() : "ready";
+    const loadingSimulation = simulationDataStatus === "loading";
+    const status = document.getElementById("simulationDataStatus");
+    if (status) {
+        status.hidden = !["loading", "error"].includes(simulationDataStatus);
+        status.textContent = loadingSimulation ? "Loading simulation data…"
+            : simulationDataStatus === "error" ? "Simulation data could not be loaded. Select Simulation to try again." : "";
+    }
     document.querySelectorAll("[data-experimental-simulation]").forEach(element => {
         element.hidden = !uiSettings.experimentalSimulationEnabled;
     });
@@ -232,7 +252,7 @@ function updateSettingsUi() {
     const experimentalToggle = document.getElementById("experimentalSimulationToggle");
     if (experimentalToggle) {
         experimentalToggle.checked = uiSettings.experimentalSimulationEnabled;
-        experimentalToggle.disabled = inSimulation;
+        experimentalToggle.disabled = inSimulation || loadingSimulation;
     }
     const experimentalHint = document.getElementById("experimentalSimulationHint");
     if (experimentalHint) experimentalHint.hidden = !inSimulation;
@@ -247,6 +267,7 @@ function updateSettingsUi() {
         const isActive = value === uiSettings.timelineMode;
         btn.classList.toggle("active", isActive);
         btn.setAttribute("aria-pressed", String(isActive));
+        btn.disabled = value === TIMELINE_MODE_OPTIONS.simulation && loadingSimulation;
     });
 
     document.querySelectorAll("[data-setting='simulationTimelineDensity']").forEach(btn => {

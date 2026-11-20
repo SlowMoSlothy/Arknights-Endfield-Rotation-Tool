@@ -2099,7 +2099,7 @@ async function signOutAdmin() {
     updateAdminEntryVisibility();
 }
 
-function loadAdminRotationPreview(row) {
+async function loadAdminRotationPreview(row) {
     if (!row?.share_code || typeof applyBuildShareCode !== "function") {
         setAdminReviewStatus("This submitted rotation cannot be loaded.", "is-error");
         return;
@@ -2109,7 +2109,7 @@ function loadAdminRotationPreview(row) {
     if (!shouldLoad) return;
 
     try {
-        applyBuildShareCode(row.share_code);
+        await applyBuildShareCode(row.share_code);
         setAdminReviewStatus("Rotation loaded into the builder preview.", "is-success");
     } catch (error) {
         console.error("Admin preview load failed:", error);

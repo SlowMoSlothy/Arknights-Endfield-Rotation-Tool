@@ -2152,7 +2152,7 @@ async function loadBuildShareCodeFromUrl() {
 
     try {
         const resolvedShare = await resolveBuildShareInput(decodeURIComponent(code));
-        applyBuildShareCode(resolvedShare.sharePayload);
+        await applyBuildShareCode(resolvedShare.sharePayload);
         if (resolvedShare.shortCode) showBuildShareMetadata(resolvedShare);
         return true;
     } catch (error) {
@@ -2263,8 +2263,13 @@ function applyImportedUiSettings(payload) {
     if (typeof applyUiSettings === "function") applyUiSettings();
 }
 
-function applyBuildShareCode(code) {
+async function applyBuildShareCode(code) {
     const payload = parseBuildShareCode(code);
+    if ((payload.uiSettings?.timelineMode === "simulation" || rotationHasShareTimes(payload.rotation))
+        && typeof ensureSimulationDataLoaded === "function") {
+        // Combat-event IDs must exist before normalizing or replacing the current draft.
+        await ensureSimulationDataLoaded();
+    }
 
     selectedTeam = normalizeImportedTeam(payload.team);
     rotation = normalizeImportedRotation(payload.rotation);
@@ -2311,7 +2316,7 @@ async function loadBuildShareCode() {
 
     try {
         const resolvedShare = await resolveBuildShareInput(code);
-        applyBuildShareCode(resolvedShare.sharePayload);
+        await applyBuildShareCode(resolvedShare.sharePayload);
         if (resolvedShare.shortCode) showBuildShareMetadata(resolvedShare);
         const modeLabel = resolvedShare.shareType
             ? `${getBuildShareTypeLabel(resolvedShare.shareType)} `

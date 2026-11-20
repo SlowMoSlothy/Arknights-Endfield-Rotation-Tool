@@ -74,7 +74,7 @@ test("Infliction mechanics migration contains all four types and no client fallb
   const migration = fs.readFileSync("supabase/infliction_mechanics.sql", "utf8");
   const clientEngine = fs.readFileSync("endfield/js/logic/inflictionEngine.js", "utf8");
   const supabaseClient = fs.readFileSync("endfield/supabaseClient.js", "utf8");
-  const appMain = fs.readFileSync("endfield/js/main.js", "utf8");
+  const startupScript = fs.readFileSync("endfield/js/logic/builderStartup.js", "utf8");
 
   for (const key of ["electric_infliction", "heat_infliction", "cryo_infliction", "nature_infliction"]) {
     assert.match(migration, new RegExp(`'${key}'`));
@@ -85,7 +85,7 @@ test("Infliction mechanics migration contains all four types and no client fallb
   assert.doesNotMatch(clientEngine, /durationSeconds:\s*20/);
   assert.match(supabaseClient, /from\(tableName\)[\s\S]*infliction_mechanics/);
   assert.match(supabaseClient, /replaceRegistryObject\(INFLICTION_MECHANICS, databaseMechanics\)/);
-  assert.match(appMain, /await hydrateInflictionMechanicsFromSupabase\(\)/);
+  assert.match(startupScript, /hydrateInflictionMechanicsFromSupabase\(\)/);
 });
 
 test("Last Rite migration keeps stack-dependent Combo values in Supabase", () => {

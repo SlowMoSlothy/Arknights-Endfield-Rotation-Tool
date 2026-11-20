@@ -1360,7 +1360,7 @@ async function saveCurrentRotationToMyRotations(values) {
     }
 }
 
-function loadMyRotation(row) {
+async function loadMyRotation(row) {
     if (!row?.share_code || typeof applyBuildShareCode !== "function") {
         setMyListStatus("This saved rotation cannot be loaded.", "is-error");
         return;
@@ -1372,7 +1372,7 @@ function loadMyRotation(row) {
     }
 
     try {
-        applyBuildShareCode(row.share_code);
+        await applyBuildShareCode(row.share_code);
         setMyListStatus("Rotation loaded.", "is-success");
         closeMyRotationsModal();
     } catch (error) {

@@ -188,6 +188,14 @@ supabase/community_rotations_review.sql
 
 Run the first query to list pending rotations. Then copy one of the commented blocks, replace the example UUID with the real `id`, and run it to approve, hide, or edit the submission.
 
+### Builder startup
+
+Independent core catalogs load concurrently. Operator skills still wait for visible operator IDs; duration overrides load alongside skills and basic attacks. Weapons, Essence profiles and gear are ready before saved loadouts are normalized, so restoration retains their existing validation behavior.
+
+Infliction mechanics, simulation events, action rules and operator passive rules load on demand before entering Simulation, restoring a saved Simulation, or applying a Simulation share. Concurrent requests share one loading operation. Unexpected loading failures allow a retry; existing individual catalog fallbacks still apply.
+
+Startup diagnostics stay in the browser: `window.rotationForgeStartupMetrics` and the `RF_STARTUP` console entry report initialization, core-data and navigation-to-ready times in milliseconds. The Performance panel includes `rotationforge.builder.initialization`. `RF_SIMULATION_DATA` reports the first on-demand load. These timings are not sent to analytics and require no SQL migration. Compare repeated runs with the same saved setup; network and cache conditions affect results.
+
 ### Publishing rotations
 
 After placing an action, use **Publish rotation** beside the timeline. Publishing is public in Discover and works without an account. The form suggests an editable title from the selected operators; the description is optional. A failed publication keeps the submitted title and description for retry.
