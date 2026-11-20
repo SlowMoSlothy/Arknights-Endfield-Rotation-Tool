@@ -11,7 +11,8 @@ const discoverState = {
   sort: "newest",
   rotationCount: 0,
   simulationCount: 0,
-  loading: false
+  loading: false,
+  error: ""
 };
 
 let toastTimeout = 0;
@@ -416,8 +417,9 @@ function updateUrl() {
 }
 
 function renderTabs() {
-  document.getElementById("rotationTabCount").textContent = discoverState.rotationCount;
-  document.getElementById("simulationTabCount").textContent = discoverState.simulationCount;
+  const countsUnavailable = discoverState.loading || Boolean(discoverState.error);
+  document.getElementById("rotationTabCount").textContent = countsUnavailable ? "—" : discoverState.rotationCount;
+  document.getElementById("simulationTabCount").textContent = countsUnavailable ? "—" : discoverState.simulationCount;
   document.querySelectorAll("[data-share-type]").forEach(button => {
     const active = button.dataset.shareType === discoverState.type;
     button.classList.toggle("is-active", active);
@@ -434,11 +436,36 @@ function render() {
 
   renderTabs();
   grid.replaceChildren();
+  grid.setAttribute("aria-busy", String(discoverState.loading));
+  const refresh = document.getElementById("refreshRotations");
+  if (refresh) refresh.disabled = discoverState.loading;
   if (discoverState.loading) {
     grid.appendChild(create("div", "state-card", "Loading public shares..."));
     count.textContent = "Public shares";
     status.textContent = "Loading rotations and simulations";
     empty.hidden = true;
+    return;
+  }
+
+  if (discoverState.error) {
+    count.textContent = "Public shares";
+    status.textContent = "Could not load public shares";
+    empty.hidden = true;
+    const errorCard = create("div", "state-card state-card-error");
+    errorCard.setAttribute("role", "alert");
+    errorCard.appendChild(create("h2", "", "Discover is temporarily unavailable"));
+    errorCard.appendChild(create("p", "", discoverState.error));
+    const retry = create("button", "filter-reset", "Try again");
+    retry.type = "button";
+    retry.addEventListener("click", () => {
+      if (typeof supabaseClient === "undefined" || !supabaseClient) {
+        window.location.reload();
+        return;
+      }
+      loadData();
+    });
+    errorCard.appendChild(retry);
+    grid.appendChild(errorCard);
     return;
   }
 
@@ -467,16 +494,13 @@ function fillFilters() {
 }
 
 async function loadData() {
+  if (discoverState.loading) return;
   discoverState.loading = true;
+  discoverState.error = "";
   render();
-  if (!supabaseClient) {
-    discoverState.loading = false;
-    document.getElementById("rotationGrid").replaceChildren(create("div", "state-card", "The share directory is unavailable."));
-    document.getElementById("rotationStatus").textContent = "Database unavailable";
-    return;
-  }
 
   try {
+    if (typeof supabaseClient === "undefined" || !supabaseClient) throw new Error("Share client unavailable");
     const [operatorResult, skillResult, shareResult] = await Promise.all([
       supabaseClient.from("operators").select("id,name,operator_class,element_type,icon_path,is_visible").eq("game", "arknights_endfield"),
       supabaseClient.from("operator_skills").select("id,name,operator_id,skill_type,short_type,element_type,icon_path,icon_small_path"),
@@ -485,6 +509,11 @@ async function loadData() {
     if (operatorResult.error) throw operatorResult.error;
     if (skillResult.error) throw skillResult.error;
     if (shareResult.error) throw shareResult.error;
+    if (!Array.isArray(shareResult.data?.items)
+      || ![shareResult.data.rotation_count, shareResult.data.simulation_count].every(value =>
+        typeof value === "number" && Number.isSafeInteger(value) && value >= 0)) {
+      throw new Error("Invalid share directory response");
+    }
 
     list(operatorResult.data).filter(row => row.is_visible !== false).forEach(row => {
       discoverState.operators.set(Number(row.id), {
@@ -516,7 +545,7 @@ async function loadData() {
     discoverState.shares = [];
     discoverState.rotationCount = 0;
     discoverState.simulationCount = 0;
-    document.getElementById("rotationStatus").textContent = "Database migration required";
+    discoverState.error = "Public rotations and simulations could not be loaded. Please try again.";
   } finally {
     discoverState.loading = false;
     render();
