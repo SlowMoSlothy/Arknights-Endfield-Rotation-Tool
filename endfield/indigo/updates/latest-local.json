@@ -3,9 +3,9 @@
   "app": "endfield-indigo",
   "platform": "win-x64",
   "edition": "local",
-  "version": "0.306.13",
-  "url": "https://github.com/SlowMoSlothy/Arknights-Endfield-Rotation-Tool/releases/download/indigo-v0.306.13/Endfield-Indigo-0.306.13-lokal-win-x64.exe",
-  "sha256": "045a4c38e1760b3aa254a0179f1c6654c8b42cd1995cbe73171ac98e35aecfc4",
+  "version": "0.306.14",
+  "url": "https://github.com/SlowMoSlothy/Arknights-Endfield-Rotation-Tool/releases/download/indigo-v0.306.14/Endfield-Indigo-0.306.14-lokal-win-x64.exe",
+  "sha256": "cf4285b0bab0aaf9aa1731bddf5d3b9e407114f7ccd81192c41d88aaad0991ce",
   "bytes": 163085685,
-  "notes": "Feste RotationForge-Updatequelle. Das Adressfeld und die Schaltfläche zum Ändern der Adresse wurden entfernt."
+  "notes": "Die Schaltfläche Update installieren erscheint nur, wenn eine neue Version verfügbar ist."
 }
