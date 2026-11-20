@@ -143,8 +143,7 @@
     gap: 6px;
 }
 
-.rotation-action-label,
-.rotation-actions-host {
+.rotation-action-label {
     display: none;
 }
 
@@ -160,126 +159,125 @@
     margin: 0;
 }
 
+#rotationBuilderPanel > .rotation-footer {
+    position: relative;
+    z-index: 70;
+}
+
+#rotationBuilderPanel > .rotation-actions:has(.rotation-mode-switch[hidden]):has(#simulationDataStatus[hidden]) {
+    display: none;
+}
+
+.rotation-actions-host {
+    display: block;
+    position: relative;
+    z-index: 70;
+    flex: 0 0 auto;
+}
+
+#rotationActionsToggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid #697170;
+    border-radius: 10px;
+    background: #252f30;
+    color: #f4f5f2;
+    font: inherit;
+    font-size: .875rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#rotationActionsToggle > span {
+    font-size: 1.4rem;
+    line-height: 1;
+}
+
+#rotationActionsToggle[aria-expanded="true"] {
+    border-color: #fc8a35;
+}
+
+.rotation-actions-menu {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    right: 0;
+    width: min(280px, calc(100vw - 48px));
+    box-sizing: border-box;
+    padding: 8px;
+    border: 1px solid #697170;
+    border-radius: 12px;
+    background: #172022;
+    box-shadow: 0 14px 30px #0009;
+}
+
+.rotation-actions-menu[hidden] {
+    display: none;
+}
+
+.rotation-actions-menu .rotation-action-controls {
+    display: grid;
+    gap: 4px;
+}
+
+.rotation-actions-menu .rotation-action-tooltip-host {
+    display: flex;
+}
+
+.rotation-actions-menu .rotation-action-tooltip-host::before,
+.rotation-actions-menu .rotation-action-tooltip-host::after {
+    display: none;
+}
+
+.rotation-actions-menu .rotation-action-btn {
+    justify-content: flex-start;
+    gap: 12px;
+    width: 100%;
+    min-height: 44px;
+    height: auto;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    color: #f4f5f2;
+    font-size: .875rem;
+    line-height: 1.4;
+    white-space: normal;
+    text-align: left;
+}
+
+.rotation-actions-menu .rotation-action-icon {
+    flex: 0 0 18px;
+}
+
+.rotation-actions-menu .rotation-action-label {
+    display: inline;
+}
+
+.rotation-actions-menu .rotation-action-btn:disabled {
+    opacity: .45;
+}
+
+.rotation-actions-menu .rotation-action-btn:not(:disabled):hover {
+    background: #303a3c;
+}
+
+.rotation-actions-host :focus-visible {
+    outline: 2px solid #fc8a35;
+    outline-offset: 2px;
+}
+
+.rotation-actions-menu .rotation-action-tooltip-host:has(.rotation-action-danger) {
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px solid #465150;
+}
 @media (max-width: 900px) {
     #rotationBuilderPanel .rotation-skills-dock > h3 {
         text-align: center;
-    }
-
-    #rotationBuilderPanel > .rotation-heading {
-        position: relative;
-        z-index: 70;
-    }
-
-    #rotationBuilderPanel > .rotation-actions:has(.rotation-mode-switch[hidden]):has(#simulationDataStatus[hidden]) {
-        display: none;
-    }
-
-    .rotation-actions-host {
-        display: block;
-        position: relative;
-        z-index: 70;
-        flex: 0 0 auto;
-    }
-
-    #rotationActionsToggle {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        min-height: 44px;
-        padding: 8px 12px;
-        border: 1px solid #697170;
-        border-radius: 10px;
-        background: #252f30;
-        color: #f4f5f2;
-        font: inherit;
-        font-size: .875rem;
-        font-weight: 700;
-        cursor: pointer;
-    }
-
-    #rotationActionsToggle > span {
-        font-size: 1.4rem;
-        line-height: 1;
-    }
-
-    #rotationActionsToggle[aria-expanded="true"] {
-        border-color: #fc8a35;
-    }
-
-    .rotation-actions-menu {
-        position: absolute;
-        top: calc(100% + 6px);
-        right: 0;
-        width: min(280px, calc(100vw - 48px));
-        box-sizing: border-box;
-        padding: 8px;
-        border: 1px solid #697170;
-        border-radius: 12px;
-        background: #172022;
-        box-shadow: 0 14px 30px #0009;
-    }
-
-    .rotation-actions-menu[hidden] {
-        display: none;
-    }
-
-    .rotation-actions-menu .rotation-action-controls {
-        display: grid;
-        gap: 4px;
-    }
-
-    .rotation-actions-menu .rotation-action-tooltip-host {
-        display: flex;
-    }
-
-    .rotation-actions-menu .rotation-action-tooltip-host::before,
-    .rotation-actions-menu .rotation-action-tooltip-host::after {
-        display: none;
-    }
-
-    .rotation-actions-menu .rotation-action-btn {
-        justify-content: flex-start;
-        gap: 12px;
-        width: 100%;
-        min-height: 44px;
-        height: auto;
-        padding: 10px 12px;
-        border-radius: 8px;
-        background: transparent;
-        border-color: transparent;
-        box-shadow: none;
-        color: #f4f5f2;
-        font-size: .875rem;
-        line-height: 1.4;
-        white-space: normal;
-        text-align: left;
-    }
-
-    .rotation-actions-menu .rotation-action-icon {
-        flex: 0 0 18px;
-    }
-
-    .rotation-actions-menu .rotation-action-label {
-        display: inline;
-    }
-
-    .rotation-actions-menu .rotation-action-btn:disabled {
-        opacity: .45;
-    }
-
-    .rotation-actions-menu .rotation-action-btn:not(:disabled):hover {
-        background: #303a3c;
-    }
-
-    .rotation-actions-host :focus-visible {
-        outline: 2px solid #fc8a35;
-        outline-offset: 2px;
-    }
-
-    .rotation-actions-menu .rotation-action-tooltip-host:has(.rotation-action-danger) {
-        margin-top: 4px;
-        padding-top: 4px;
-        border-top: 1px solid #465150;
     }
 }
 

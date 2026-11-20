@@ -41,11 +41,11 @@
       "isAccessibleForFree": true
     }
   </script>
-  <link rel="stylesheet" href="css/style.css?v=109">
+  <link rel="stylesheet" href="css/style.css?v=110">
   <link rel="stylesheet" href="css/mobile.css?v=26">
   <link rel="stylesheet" href="css/onboarding.css?v=4">
   <link rel="stylesheet" href="css/plannerUsage.css?v=1">
-  <link rel="stylesheet" href="css/publishing.css?v=1">
+  <link rel="stylesheet" href="css/publishing.css?v=2">
     <link rel="stylesheet" href="atk-chart.css?v=19">
 </head>
 
@@ -343,81 +343,6 @@
                   <button type="button" data-setting="simulationDamageMode" data-value="critical"
                     aria-pressed="false" title="Show damage when the hit is critical">Crit</button>
                 </div>
-                <div id="rotationActionControls" class="rotation-action-controls">
-                <span class="rotation-action-tooltip-host" data-action-tooltip="Export rotation as PNG image">
-                  <button id="exportRotationBtn" class="rotation-action-btn rotation-action-primary" type="button"
-                    onclick="exportImage()" aria-label="Export rotation as PNG image" disabled>
-                    <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <rect x="4" y="5" width="16" height="14" rx="2"></rect>
-                      <circle cx="9" cy="10" r="1.5"></circle>
-                      <path d="M6.5 17l4.2-4.2 2.8 2.8 1.7-1.7 2.3 3.1"></path>
-                    </svg>
-                    <span class="rotation-action-label" aria-hidden="true">Export as PNG</span>
-                  </button>
-                </span>
-                <span class="rotation-action-tooltip-host" data-action-tooltip="Create 6-character share code">
-                  <button id="copyShareCodeBtn" class="rotation-action-btn" type="button" onclick="copyBuildShareCode()"
-                    aria-label="Create and copy 6-character share code" disabled>
-                    <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <rect x="8" y="8" width="11" height="11" rx="2"></rect>
-                      <path d="M5 15V7a2 2 0 0 1 2-2h8"></path>
-                    </svg>
-                    <span class="rotation-action-label" aria-hidden="true">Share code</span>
-                  </button>
-                </span>
-                <span class="rotation-action-tooltip-host" data-action-tooltip="Create short share link">
-                  <button id="copyShareLinkBtn" class="rotation-action-btn" type="button" onclick="copyBuildShareLink()"
-                    aria-label="Create and copy short share link" disabled>
-                    <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <circle class="rotation-action-icon-dot" cx="18" cy="5" r="2.5"></circle>
-                      <circle class="rotation-action-icon-dot" cx="6" cy="12" r="2.5"></circle>
-                      <circle class="rotation-action-icon-dot" cx="18" cy="19" r="2.5"></circle>
-                      <path d="M8.3 10.8l7.4-4.4"></path>
-                      <path d="M8.3 13.2l7.4 4.4"></path>
-                    </svg>
-                    <span class="rotation-action-label" aria-hidden="true">Share link</span>
-                  </button>
-                </span>
-                <span id="saveRotationMenuHost" class="rotation-action-tooltip-host rotation-save-menu-host"
-                  data-action-tooltip="Save Rotation in...">
-                  <button id="saveRotationMenuBtn" class="rotation-action-btn" type="button"
-                    onclick="toggleRotationSaveMenu(event)" aria-label="Save Rotation in..." aria-haspopup="menu"
-                    aria-expanded="false" disabled>
-                    <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M5 4h12l2 2v14H5z"></path>
-                      <path d="M8 4v6h8V4"></path>
-                      <path d="M8 17h8"></path>
-                      <path d="M9 10h6"></path>
-                    </svg>
-                    <span class="rotation-action-label" aria-hidden="true">Save to My Rotations</span>
-                  </button>
-                  <div id="rotationSaveMenu" class="rotation-save-menu" role="menu" hidden>
-                    <button type="button" role="menuitem" onclick="saveRotationInMyRotations()">My rotations</button>
-                  </div>
-                </span>
-                <span class="rotation-action-tooltip-host" data-action-tooltip="Import short or legacy share code">
-                  <button class="rotation-action-btn" type="button" onclick="loadBuildShareCode()"
-                    aria-label="Import short or legacy share code or link">
-                    <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M3.5 8.5h6l2 2h9v7a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"></path>
-                      <path d="M3.5 8.5V6a2 2 0 0 1 2-2h4l2 2h4"></path>
-                      <path d="M12 13v5"></path>
-                      <path d="M9.8 15.8 12 18l2.2-2.2"></path>
-                    </svg>
-                    <span class="rotation-action-label" aria-hidden="true">Import rotation</span>
-                  </button>
-                </span>
-                <span class="rotation-action-tooltip-host" data-action-tooltip="Create new rotation">
-                  <button class="rotation-action-btn rotation-action-danger" type="button" onclick="createNewRotation()"
-                    aria-label="Create new rotation">
-                    <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M12 5v14"></path>
-                      <path d="M5 12h14"></path>
-                    </svg>
-                    <span class="rotation-action-label" aria-hidden="true">New rotation</span>
-                  </button>
-                </span>
-                </div>
               </div>
               <div class="rotation-skills-dock">
                 <h3>Skills</h3>
@@ -429,21 +354,95 @@
               </div>
               <div class="rotation-heading">
                 <h3 class="rotation-panel-title">Rotation</h3>
-                <div id="rotationActionsHost" class="rotation-actions-host">
-                  <button id="rotationActionsToggle" type="button" aria-expanded="false" aria-controls="rotationActionsMenu">
-                    <span aria-hidden="true">⋯</span> Actions
-                  </button>
-                  <div id="rotationActionsMenu" class="rotation-actions-menu" role="group" aria-label="Rotation actions" hidden></div>
-                </div>
               </div>
               <div id="rotationQuickSkills" class="rotation-quick-skills" hidden></div>
               <div id="rotation" class="rotation-panel">
                 <div id="rotationDropZone"></div>
               </div>
-              <div id="rotationPublishActions" class="rotation-publish-actions" hidden>
-                <button id="publishRotationBtn" type="button" onclick="copyBuildShareLink()"
-                  aria-describedby="rotationPublicHint" disabled>Publish rotation</button>
-                <span id="rotationPublicHint">Public in Discover · No account required</span>
+              <div class="rotation-footer">
+                <div id="rotationPublishActions" class="rotation-publish-actions" hidden>
+                  <button id="publishRotationBtn" type="button" onclick="copyBuildShareLink()"
+                    aria-describedby="rotationPublicHint" disabled>Publish rotation</button>
+                  <span id="rotationPublicHint">Public in Discover · No account required</span>
+                </div>
+                <div id="rotationActionsHost" class="rotation-actions-host">
+                  <button id="rotationActionsToggle" type="button" aria-expanded="false" aria-controls="rotationActionsMenu">
+                    <span aria-hidden="true">⋯</span> Actions
+                  </button>
+                  <div id="rotationActionsMenu" class="rotation-actions-menu" role="group" aria-label="Rotation actions" hidden>
+                    <div id="rotationActionControls" class="rotation-action-controls">
+                      <span class="rotation-action-tooltip-host" data-action-tooltip="Create short share link">
+                        <button id="copyShareLinkBtn" class="rotation-action-btn" type="button" onclick="copyBuildShareLink()"
+                          aria-label="Create and copy short share link" disabled>
+                          <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <circle class="rotation-action-icon-dot" cx="18" cy="5" r="2.5"></circle>
+                            <circle class="rotation-action-icon-dot" cx="6" cy="12" r="2.5"></circle>
+                            <circle class="rotation-action-icon-dot" cx="18" cy="19" r="2.5"></circle>
+                            <path d="M8.3 10.8l7.4-4.4"></path>
+                            <path d="M8.3 13.2l7.4 4.4"></path>
+                          </svg>
+                          <span class="rotation-action-label" aria-hidden="true">Share link</span>
+                        </button>
+                      </span>
+                      <span class="rotation-action-tooltip-host" data-action-tooltip="Create 6-character share code">
+                        <button id="copyShareCodeBtn" class="rotation-action-btn" type="button" onclick="copyBuildShareCode()"
+                          aria-label="Create and copy 6-character share code" disabled>
+                          <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="8" y="8" width="11" height="11" rx="2"></rect>
+                            <path d="M5 15V7a2 2 0 0 1 2-2h8"></path>
+                          </svg>
+                          <span class="rotation-action-label" aria-hidden="true">Share code</span>
+                        </button>
+                      </span>
+                      <span id="saveRotationMenuHost" class="rotation-action-tooltip-host rotation-save-menu-host"
+                        data-action-tooltip="Save Rotation in...">
+                        <button id="saveRotationMenuBtn" class="rotation-action-btn" type="button"
+                          onclick="toggleRotationSaveMenu(event)" aria-label="Save to My Rotations" aria-haspopup="dialog" disabled>
+                          <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M5 4h12l2 2v14H5z"></path>
+                            <path d="M8 4v6h8V4"></path>
+                            <path d="M8 17h8"></path>
+                            <path d="M9 10h6"></path>
+                          </svg>
+                          <span class="rotation-action-label" aria-hidden="true">Save to My Rotations</span>
+                        </button>
+                      </span>
+                      <span class="rotation-action-tooltip-host" data-action-tooltip="Export rotation as PNG image">
+                        <button id="exportRotationBtn" class="rotation-action-btn rotation-action-primary" type="button"
+                          onclick="exportImage()" aria-label="Export rotation as PNG image" disabled>
+                          <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="4" y="5" width="16" height="14" rx="2"></rect>
+                            <circle cx="9" cy="10" r="1.5"></circle>
+                            <path d="M6.5 17l4.2-4.2 2.8 2.8 1.7-1.7 2.3 3.1"></path>
+                          </svg>
+                          <span class="rotation-action-label" aria-hidden="true">Export as PNG</span>
+                        </button>
+                      </span>
+                      <span class="rotation-action-tooltip-host" data-action-tooltip="Import short or legacy share code">
+                        <button class="rotation-action-btn" type="button" onclick="loadBuildShareCode()"
+                          aria-label="Import short or legacy share code or link">
+                          <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M3.5 8.5h6l2 2h9v7a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"></path>
+                            <path d="M3.5 8.5V6a2 2 0 0 1 2-2h4l2 2h4"></path>
+                            <path d="M12 13v5"></path>
+                            <path d="M9.8 15.8 12 18l2.2-2.2"></path>
+                          </svg>
+                          <span class="rotation-action-label" aria-hidden="true">Import rotation</span>
+                        </button>
+                      </span>
+                      <span class="rotation-action-tooltip-host" data-action-tooltip="Create new rotation">
+                        <button class="rotation-action-btn rotation-action-danger" type="button" onclick="createNewRotation()"
+                          aria-label="Create new rotation">
+                          <svg class="rotation-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 5v14"></path>
+                            <path d="M5 12h14"></path>
+                          </svg>
+                          <span class="rotation-action-label" aria-hidden="true">New rotation</span>
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
               <p id="publishRotationStatus" class="rotation-publish-status" role="status" aria-live="polite"></p>
               <aside id="shareMetadataCard" class="share-metadata-card" hidden>
@@ -1073,8 +1072,8 @@
   <script src="js/ui/reportIssue.js?v=3"></script>
   <script src="js/ui/onboarding.js?v=6"></script>
   <script src="js/logic/builderStartup.js?v=1"></script>
-  <script src="js/ui/rotationActions.js?v=1"></script>
-  <script src="js/main.js?v=11"></script>
+  <script src="js/ui/rotationActions.js?v=2"></script>
+  <script src="js/main.js?v=12"></script>
 </body>
 
 </html>

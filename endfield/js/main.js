@@ -20,28 +20,15 @@ function closeRotationSaveMenu() {
 
     if (menu) menu.hidden = true;
     if (host) host.classList.remove("is-menu-open");
-    if (button) button.setAttribute("aria-expanded", "false");
+    if (button) button.removeAttribute("aria-expanded");
 }
 
 function toggleRotationSaveMenu(event) {
     event?.stopPropagation();
 
     if (typeof hasCreatedRotation === "function" && !hasCreatedRotation()) return;
-    if (typeof isMobileRotationActions === "function" && isMobileRotationActions()) {
-        closeRotationActions();
-        saveRotationInMyRotations();
-        return;
-    }
-
-    const host = document.getElementById("saveRotationMenuHost");
-    const menu = document.getElementById("rotationSaveMenu");
-    const button = document.getElementById("saveRotationMenuBtn");
-    if (!menu || !button) return;
-
-    const willOpen = menu.hidden;
-    menu.hidden = !willOpen;
-    button.setAttribute("aria-expanded", willOpen ? "true" : "false");
-    if (host) host.classList.toggle("is-menu-open", willOpen);
+    if (typeof closeRotationActions === "function") closeRotationActions();
+    saveRotationInMyRotations();
 }
 
 function saveRotationInMyRotations() {

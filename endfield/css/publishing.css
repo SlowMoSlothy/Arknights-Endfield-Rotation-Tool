@@ -1,5 +1,8 @@
 .rotation-publish-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin: 12px 0; scroll-margin-top: 80px; }
 .rotation-publish-actions[hidden] { display: none !important; }
+.rotation-footer { display: flex; align-items: flex-start; gap: 12px; margin: 12px 0; }
+.rotation-footer .rotation-publish-actions { flex: 1; min-width: 0; margin: 0; }
+.rotation-footer .rotation-actions-host { margin-left: auto; }
 #publishRotationBtn { min-height: 44px; padding: 10px 18px; border: 1px solid #fc8a35; border-radius: 8px; background: #fc8a35; color: #211006; font: inherit; font-size: 1rem; font-weight: 800; cursor: pointer; }
 #publishRotationBtn:disabled { opacity: .6; cursor: default; }
 #rotationPublicHint { color: #c8cece; font-size: .875rem; line-height: 1.5; }
@@ -14,4 +17,11 @@
 .published-share-actions button, .published-share-actions a { display: inline-flex; align-items: center; min-height: 44px; box-sizing: border-box; padding: 8px 12px; border: 1px solid #697170; border-radius: 6px; background: #252f30; color: #fff; font: inherit; font-size: .875rem; text-decoration: none; cursor: pointer; }
 .rotation-publish-actions :focus-visible, #shareMetadataCard :focus-visible { outline: 2px solid #fc8a35; outline-offset: 3px; }
 .export-mode .rotation-publish-actions, .export-mode #publishRotationStatus, .export-mode #shareMetadataCard { display: none !important; }
+.export-mode .rotation-footer { display: none !important; }
+@media (max-width: 700px) {
+    .rotation-footer { flex-direction: column; gap: 8px; }
+    .rotation-footer .rotation-publish-actions { width: 100%; gap: 6px; }
+    .rotation-footer #publishRotationBtn { width: 100%; }
+    .rotation-footer .rotation-actions-host { align-self: flex-end; }
+}
 @media (max-width: 600px) { #publishRotationBtn { width: 100%; } .rotation-publish-actions { gap: 6px; } }
