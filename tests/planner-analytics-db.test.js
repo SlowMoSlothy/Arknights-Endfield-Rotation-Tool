@@ -38,6 +38,8 @@ test("analytics migration enforces anonymous writes, admin-only reports and visi
         await record(failed, ["builder_opened", "builder_failed"], "unknown");
         await record(randomUUID(), ["first_skill_placed"]); // No corresponding opened visit.
         await assert.rejects(db.query("select * from public.planner_events"), { code: "42501" });
+        await assert.rejects(db.query("select public.exclude_planner_visit($1)", [fresh]), { code: "42501" });
+        await assert.rejects(db.query("select * from public.planner_excluded_visits"), { code: "42501" });
         await assert.rejects(report(), { code: "42501" });
         await assert.rejects(record(randomUUID(), ["fake_event"]), { code: "23514" });
         await assert.rejects(db.query("select public.record_planner_events($1, '{}'::jsonb)", [randomUUID()]), { code: "22023" });
@@ -45,6 +47,7 @@ test("analytics migration enforces anonymous writes, admin-only reports and visi
 
         await db.exec("set role authenticated");
         await assert.rejects(report(), { code: "42501" });
+        await assert.rejects(db.query("select public.exclude_planner_visit($1)", [fresh]), { code: "42501" });
         await db.exec("set test.app_admin = 'true'");
         let data = await report();
         assert.equal(data.counts.builder_opened, 4);
@@ -64,7 +67,35 @@ test("analytics migration enforces anonymous writes, admin-only reports and visi
         await assert.rejects(report(7, "invalid"), { code: "22023" });
         await assert.rejects(db.query("select * from public.planner_events"), { code: "42501" });
 
+        // A signed-in administrator is ignored even when calling the write RPC directly.
+        const adminVisit = randomUUID();
+        await record(adminVisit, ["builder_opened", "builder_ready"]);
+        assert.equal((await report()).counts.builder_opened, 4);
+
+        // Signing in later suppresses both earlier events and anonymous batches in flight.
+        await db.exec("set test.app_admin = 'false'");
+        const lateAdmin = randomUUID(), inFlightAdmin = randomUUID();
+        await record(lateAdmin, ["builder_opened", "builder_ready"]);
+        await db.exec("set test.app_admin = 'true'");
+        await db.query("select public.exclude_planner_visit($1)", [lateAdmin]);
+        await db.query("select public.exclude_planner_visit($1)", [lateAdmin]);
+        await db.query("select public.exclude_planner_visit($1)", [inFlightAdmin]);
+        await assert.rejects(db.query("select public.exclude_planner_visit(null)"), { code: "22023" });
+        await db.exec("set test.app_admin = 'false'; set role anon");
+        await record(lateAdmin, ["first_skill_placed"]);
+        await record(inFlightAdmin, ["builder_opened", "builder_ready"]);
+        await db.exec("set role authenticated; set test.app_admin = 'true'");
+        data = await report();
+        assert.equal(data.counts.builder_opened, 4);
+        assert.equal(data.counts.first_skill_placed, 1);
+        assert.deepEqual(data.entries, { new: 1, restored: 1, shared: 1, unknown: 1 });
+        assert.equal((await report(7, "new")).counts.builder_opened, 1);
+        assert.equal((await report(30)).counts.builder_opened, 4);
+
         await db.exec("reset role");
+        assert.equal((await db.query("select count(*)::int as total from public.planner_events where visit_id = $1", [lateAdmin])).rows[0].total, 2);
+        assert.equal((await db.query("select count(*)::int as total from public.planner_events where visit_id in ($1, $2)", [adminVisit, inFlightAdmin])).rows[0].total, 0);
+        await db.exec(migration);
         await db.query("update public.planner_events set created_at = now() - interval '8 days' where visit_id = $1", [fresh]);
         await db.exec("set role authenticated");
         assert.equal((await report()).counts.builder_opened, 3);

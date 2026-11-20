@@ -8,8 +8,9 @@ const collector = fs.readFileSync("endfield/js/logic/plannerAnalytics.js", "utf8
 const shares = fs.readFileSync("endfield/js/logic/shareCode.js", "utf8");
 const tick = () => new Promise(resolve => setImmediate(resolve));
 
-function mount({ host = "rotationforge.gg", search = "", dnt, gpc, fetchResult } = {}) {
-    const requests = [], timers = new Map(), listeners = {};
+function mount({ host = "rotationforge.gg", search = "", dnt, gpc, fetchResult,
+    session = null, getSession, rpc = async () => ({ data: false }) } = {}) {
+    const requests = [], timers = new Map(), delays = new Map(), listeners = {}, rpcCalls = [];
     let sequence = 0;
     const context = {
         URLSearchParams, crypto: { randomUUID }, location: { hostname: host, search },
@@ -17,20 +18,33 @@ function mount({ host = "rotationforge.gg", search = "", dnt, gpc, fetchResult }
         SUPABASE_URL: "https://example.supabase.co", SUPABASE_KEY: "sb_publishable_test",
         uiSettings: { timelineMode: "slot" },
         console: { info() {} },
-        setTimeout: callback => { timers.set(++sequence, callback); return sequence; },
+        setTimeout: (callback, delay) => { timers.set(++sequence, callback); delays.set(sequence, delay); return sequence; },
         clearTimeout: id => timers.delete(id),
         addEventListener: (name, callback) => { listeners[name] = callback; },
         document: { visibilityState: "visible", addEventListener: (name, callback) => { listeners[name] = callback; } },
-        fetch: (url, options) => { requests.push({ url, options, body: JSON.parse(options.body) }); return fetchResult ? fetchResult() : Promise.resolve({ ok: true }); }
+        fetch: (url, options) => { requests.push({ url, options, body: JSON.parse(options.body) }); return fetchResult ? fetchResult() : Promise.resolve({ ok: true }); },
+        supabaseClient: {
+            auth: { getSession: getSession || (async () => ({ data: { session } })),
+                onAuthStateChange: callback => { listeners.auth = callback; } },
+            rpc: (name, args) => { rpcCalls.push({ name, args }); return rpc(name, args); }
+        }
     };
     context.window = context;
     vm.createContext(context);
     vm.runInContext(collector, context);
-    return { context, requests, listeners, timers };
+    return { context, requests, listeners, timers, rpcCalls,
+        runAuthChecks() {
+            for (const [id, callback] of [...timers]) {
+                if (delays.get(id) !== 0) continue;
+                timers.delete(id);
+                callback();
+            }
+        } };
 }
 
-test("milestones deduplicate per page load and transmit only fixed anonymous fields", () => {
+test("milestones deduplicate per page load and transmit only fixed anonymous fields", async () => {
     const { context: c, requests, listeners, timers } = mount({ search: "?leader=secret#private" });
+    await tick();
     c.markPlannerReady("restored");
     for (let i = 0; i < 20; i++) c.trackPlannerEvent("first_skill_placed");
     c.trackPlannerEvent("private title or email");
@@ -53,6 +67,7 @@ test("milestones deduplicate per page load and transmit only fixed anonymous fie
     listeners.pagehide();
     assert.equal(requests.length, 1);
     const second = mount();
+    await tick();
     second.listeners.pagehide();
     assert.notEqual(second.requests[0].body.p_visit_id, body.p_visit_id);
 });
@@ -71,6 +86,7 @@ test("local previews, privacy signals and the owner opt-out never send analytics
 test("a hidden page flushes its queue, and failed telemetry never blocks the builder", async () => {
     for (const fetchResult of [() => Promise.reject(new Error("offline")), () => Promise.resolve({ ok: false }), () => { throw new Error("blocked"); }]) {
         const { context: c, requests, listeners } = mount({ fetchResult });
+        await tick();
         c.document.visibilityState = "hidden";
         assert.doesNotThrow(listeners.visibilitychange);
         await tick();
@@ -80,19 +96,134 @@ test("a hidden page flushes its queue, and failed telemetry never blocks the bui
     }
 });
 
-test("restoring and loading an example never fabricate manual placement milestones", () => {
+test("restoring and loading an example never fabricate manual placement milestones", async () => {
     const { context: c, requests, listeners } = mount();
+    await tick();
     c.markPlannerReady("shared");
     c.trackPlannerEvent("example_loaded");
     listeners.pagehide();
     assert.deepEqual(requests[0].body.p_events.map(event => event.event_name), ["builder_opened", "builder_ready", "example_loaded"]);
 });
 
-test("an empty operator catalog is a loading failure, not a successful ready event", () => {
+test("an empty operator catalog is a loading failure, not a successful ready event", async () => {
     const { context: c, requests, listeners } = mount();
+    await tick();
     c.markPlannerReady("new", false);
     listeners.pagehide();
     assert.deepEqual(requests[0].body.p_events.map(event => event.event_name), ["builder_opened", "builder_failed"]);
+});
+
+test("events wait for the initial session and admin role before any pagehide flush", async () => {
+    let resolveSession, resolveRole;
+    const m = mount({
+        getSession: () => new Promise(resolve => { resolveSession = resolve; }),
+        rpc: () => new Promise(resolve => { resolveRole = resolve; })
+    });
+    m.context.markPlannerReady("new");
+    m.listeners.pagehide();
+    assert.equal(m.requests.length, 0);
+    resolveSession({ data: { session: { user: { id: "ordinary-user" } } } });
+    await tick();
+    m.listeners.pagehide();
+    assert.equal(m.requests.length, 0);
+    resolveRole({ data: false });
+    await tick();
+    m.listeners.pagehide();
+    assert.deepEqual(m.requests[0].body.p_events.map(event => event.event_name), ["builder_opened", "builder_ready"]);
+});
+
+test("an already signed-in admin never sends analytics, including after signing out", async () => {
+    const m = mount({ session: { user: { id: "admin" } }, rpc: async () => ({ data: true }) });
+    m.context.markPlannerReady("new");
+    m.listeners.pagehide();
+    await tick();
+    m.context.trackPlannerEvent("share_published");
+    m.listeners.auth("SIGNED_OUT", null);
+    m.runAuthChecks();
+    await tick();
+    m.listeners.pagehide();
+    assert.equal(m.requests.length, 0);
+    assert.deepEqual(m.rpcCalls.map(call => call.name), ["is_app_admin"]);
+    assert.equal(m.timers.size, 0);
+});
+
+test("signing in as admin excludes the whole current visit and drops unsent events", async () => {
+    const m = mount({ rpc: async name => name === "is_app_admin" ? { data: true } : {} });
+    await tick();
+    m.listeners.pagehide();
+    const visit = m.requests[0].body.p_visit_id;
+    m.context.markPlannerReady("restored");
+    m.listeners.auth("SIGNED_IN", { user: { id: "admin" } });
+    m.context.trackPlannerEvent("first_skill_placed");
+    m.listeners.pagehide();
+    assert.equal(m.requests.length, 1);
+    assert.equal(m.rpcCalls.length, 0, "RPC must not execute inside the auth callback");
+    m.runAuthChecks();
+    await tick();
+    assert.deepEqual(m.rpcCalls.map(call => call.name), ["is_app_admin", "exclude_planner_visit"]);
+    assert.equal(m.rpcCalls[1].args.p_visit_id, visit);
+    assert.deepEqual(Object.keys(m.rpcCalls[1].args), ["p_visit_id"]);
+    m.listeners.pagehide();
+    assert.equal(m.requests.length, 1);
+});
+
+test("an admin sign-in still excludes sent batches after a telemetry network failure", async () => {
+    const m = mount({ fetchResult: () => Promise.reject(new Error("connection lost after sending")),
+        rpc: async name => name === "is_app_admin" ? { data: true } : {} });
+    await tick();
+    m.listeners.pagehide();
+    await tick();
+    m.listeners.auth("SIGNED_IN", { user: { id: "admin" } });
+    m.runAuthChecks();
+    await tick();
+    assert.equal(m.rpcCalls[1].name, "exclude_planner_visit");
+    assert.equal(m.rpcCalls[1].args.p_visit_id, m.requests[0].body.p_visit_id);
+});
+
+test("failed auth or role checks stop collection without affecting the builder", async () => {
+    for (const options of [
+        { getSession: async () => ({ error: new Error("unavailable") }) },
+        { session: {}, rpc: async () => ({ error: new Error("unavailable") }) },
+        { session: {}, rpc: async () => { throw new Error("offline"); } }
+    ]) {
+        const m = mount(options);
+        await tick();
+        assert.doesNotThrow(() => m.context.markPlannerReady("new"));
+        m.listeners.pagehide();
+        assert.equal(m.requests.length, 0);
+    }
+});
+
+test("a stale non-admin check cannot resume tracking after an admin sign-in", async () => {
+    let resolveOldRole;
+    let count = 0;
+    const m = mount({ session: {}, rpc: async () => ++count === 1
+        ? new Promise(resolve => { resolveOldRole = resolve; }) : { data: true } });
+    await tick();
+    m.listeners.auth("SIGNED_IN", { user: { id: "admin" } });
+    m.runAuthChecks();
+    await tick();
+    resolveOldRole({ data: false });
+    await tick();
+    m.listeners.pagehide();
+    assert.equal(m.requests.length, 0);
+});
+
+test("a stale failed role check cannot disable a newer non-admin session", async () => {
+    let rejectOldRole;
+    let count = 0;
+    const m = mount({ session: {}, rpc: () => ++count === 1
+        ? new Promise((_resolve, reject) => { rejectOldRole = reject; }) : Promise.resolve({ data: false }) });
+    await tick();
+    m.listeners.auth("SIGNED_IN", { user: { id: "ordinary-user" } });
+    m.runAuthChecks();
+    await tick();
+    rejectOldRole(new Error("old request failed"));
+    await tick();
+    m.context.markPlannerReady("new");
+    m.listeners.pagehide();
+    assert.equal(m.requests.length, 1);
+    assert.equal(m.requests[0].body.p_events.length, 2);
 });
 
 function shareContext(rpc) {

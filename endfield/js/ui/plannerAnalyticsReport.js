@@ -79,6 +79,6 @@ function renderPlannerAnalyticsReport(list) {
         body.appendChild(row);
     }
     table.append(caption, head, body);
-    section.append(table, createAdminTextElement("p", "", "Only production visits with usage measurement allowed by the browser are counted. Loading an example or restoring a rotation does not count as manually placing a skill. A denied clipboard write does not undo a successful publication."));
+    section.append(table, createAdminTextElement("p", "", "Only production visits with usage measurement allowed by the browser are counted. Signed-in admins are excluded, including the current visit when signing in later. Older anonymous visits cannot be identified retroactively. Loading an example or restoring a rotation does not count as manually placing a skill. A denied clipboard write does not undo a successful publication."));
     list.appendChild(section);
 }
