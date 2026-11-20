@@ -43,12 +43,13 @@
   </script>
   <link rel="stylesheet" href="css/style.css?v=108">
   <link rel="stylesheet" href="css/mobile.css?v=26">
-  <link rel="stylesheet" href="css/onboarding.css?v=2">
+  <link rel="stylesheet" href="css/onboarding.css?v=4">
+  <link rel="stylesheet" href="css/plannerUsage.css?v=1">
     <link rel="stylesheet" href="atk-chart.css?v=19">
 </head>
 
 <body class="app-loading">
-  <link rel="stylesheet" href="css/settings.css?v=8">
+  <link rel="stylesheet" href="css/settings.css?v=9">
   <div id="globalTooltip" class="global-tooltip"></div>
 
   <header class="top">
@@ -279,10 +280,10 @@
             <div id="plannerGuideBody" hidden>
               <p id="plannerGuideProgress">Build your first rotation in 3 steps</p>
               <div class="planner-guide-intro">
-                <p>Choose your operators, equip them, then add your first skill to the timeline.</p>
+                <p>Choose your operators, arrange their skills, then share your rotation.</p>
                 <button id="plannerGuideExample" class="planner-guide-primary" type="button">Try an example rotation</button>
               </div>
-              <p class="planner-guide-note">The example includes four operators, weapons and gear. Your current setup is kept locally so you can restore it.</p>
+              <p class="planner-guide-note">Try four operators and a simple skill order in Slot mode. No equipment setup needed. Your current setup is kept locally so you can restore it.</p>
               <ol class="planner-guide-steps">
                 <li id="plannerGuideStep1">
                   <span class="planner-guide-number">01</span>
@@ -292,17 +293,17 @@
                 </li>
                 <li id="plannerGuideStep2">
                   <span class="planner-guide-number">02</span>
-                  <h2>Set up equipment</h2>
-                  <p>Equip a weapon for each operator. This opens Simulation mode, where you can also adjust gear.</p>
-                  <button id="plannerGuideEquipment" type="button" disabled>Equip a weapon</button>
-                </li>
-                <li id="plannerGuideStep3">
-                  <span class="planner-guide-number">03</span>
                   <h2>Place your first skill</h2>
                   <p>Add a Battle Skill below. Then drag more skills onto the timeline, or select a skill and click its destination.</p>
                   <label for="plannerGuideSkill">First Battle Skill</label>
                   <select id="plannerGuideSkill" disabled></select>
                   <button id="plannerGuidePlace" type="button" disabled>Add first skill</button>
+                </li>
+                <li id="plannerGuideStep3">
+                  <span class="planner-guide-number">03</span>
+                  <h2>Share your rotation</h2>
+                  <p>Publish your rotation in Discover and copy a link to share it. No account required.</p>
+                  <button id="plannerGuideShare" type="button" disabled>Publish &amp; copy link</button>
                 </li>
               </ol>
               <p id="plannerGuideStatus" class="planner-guide-status" role="status" aria-live="polite"></p>
@@ -311,10 +312,10 @@
           </section>
           <section id="rotationBuilderPanel" class="builder-panel">
             <div class="rotation-actions" aria-label="Rotation actions">
-                <div class="rotation-mode-switch" role="group" aria-label="Rotation mode">
+                <div class="rotation-mode-switch" role="group" aria-label="Rotation mode" data-experimental-simulation hidden>
                   <button class="rotation-mode-switch-btn" type="button" data-setting="timelineMode"
                     data-value="simulation" aria-pressed="false" title="0.1s free placement">
-                    Simulation
+                    Simulation (experimental)
                   </button>
                   <button class="rotation-mode-switch-btn" type="button" data-setting="timelineMode"
                     data-value="slot" aria-pressed="false" title="Fixed skill order">
@@ -529,11 +530,20 @@
         <h2 class="settings-title">Settings</h2>
         <button id="closeSettingsBtn" class="settings-close" type="button" aria-label="Close settings">×</button>
       </div>
-      <div class="settings-section">
+      <details class="settings-section settings-experimental">
+        <summary>Experimental</summary>
+        <p>Simulation is still being tested and may produce incorrect results. Slot mode is recommended for planning and sharing skill orders.</p>
+        <label class="settings-experimental-toggle">
+          <input id="experimentalSimulationToggle" type="checkbox" aria-describedby="experimentalSimulationHint">
+          Show experimental Simulation Mode
+        </label>
+        <p id="experimentalSimulationHint" hidden>To hide Simulation Mode, first select Slot in the rotation toolbar. Your saved simulation stays intact.</p>
+      </details>
+      <div class="settings-section" data-simulation-settings hidden>
         <label class="settings-label" for="simulationSpPerSecondInput">SP per second</label>
         <input id="simulationSpPerSecondInput" class="settings-number-input" type="number" min="0" max="200" step="0.1" value="8">
       </div>
-      <div class="settings-section">
+      <div class="settings-section" data-simulation-settings hidden>
         <span class="settings-label">Timeline Density</span>
         <div class="settings-option-row settings-mode-row">
           <button class="settings-option-btn settings-density-btn" data-setting="simulationTimelineDensity" data-value="compact">
@@ -979,6 +989,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabaseClient.js?v=19"></script>
+  <script src="js/logic/plannerAnalytics.js?v=1"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -1002,7 +1013,7 @@
   <script src="js/logic/weaponPassiveSimulation.js?v=4"></script>
     <script src="js/ui/damageInputs.js?v=3"></script>
     <script src="js/logic/damageBreakdown.js?v=14"></script>
-    <script src="js/logic/shareCode.js?v=11"></script>
+    <script src="js/logic/shareCode.js?v=13"></script>
   <script src="js/logic/export.js"></script>
   <script src="js/logic/snakeLayout.js"></script>
   <script src="js/logic/reactionEngine.js"></script>
@@ -1010,9 +1021,9 @@
   <script src="js/logic/comboEngine.js?v=20261107"></script>
   <script src="js/logic/operatorPassiveEngine.js?v=2"></script>
   <script src="js/logic/followUpEngine.js?v=1"></script>
-  <script src="js/logic/dragDrop.js?v=5"></script>
-  <script src="js/logic/uiSettings.js?v=5"></script>
-  <script src="js/logic/tapInput.js?v=5"></script>
+  <script src="js/logic/dragDrop.js?v=6"></script>
+  <script src="js/logic/uiSettings.js?v=7"></script>
+  <script src="js/logic/tapInput.js?v=6"></script>
   <script src="js/ui/enemyPanel.js?v=7"></script>
   <script src="js/ui/teamPreview.js"></script>
   <script src="js/ui/skillIconRenderer.js?v=2"></script>
@@ -1021,14 +1032,15 @@
     <script src="js/ui/rotationGrid.js?v=20261107"></script>
     <script src="js/ui/weaponAtkChart.js?v=26"></script>
     <script src="js/logic/weaponPassiveIntegration.js?v=10"></script>
-  <script src="js/ui/teamSelection.js"></script>
+  <script src="js/ui/teamSelection.js?v=1"></script>
   <script src="js/ui/communityRotations.js"></script>
   <script src="js/ui/operatorGallery.js?v=2"></script>
   <script src="js/ui/myRotations.js?v=6"></script>
-  <script src="js/ui/adminPanel.js?v=18"></script>
+  <script src="js/ui/adminPanel.js?v=19"></script>
+  <script src="js/ui/plannerAnalyticsReport.js?v=1"></script>
   <script src="js/ui/reportIssue.js?v=3"></script>
-  <script src="js/ui/onboarding.js?v=2"></script>
-  <script src="js/main.js?v=8"></script>
+  <script src="js/ui/onboarding.js?v=4"></script>
+  <script src="js/main.js?v=9"></script>
 </body>
 
 </html>

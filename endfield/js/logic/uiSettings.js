@@ -27,6 +27,7 @@ const DEFAULT_SIMULATION_SP_PER_SECOND = 8;
 let uiSettings = {
     rotationSkillSize: UI_SIZE_OPTIONS.medium,
     timelineMode: TIMELINE_MODE_OPTIONS.slot,
+    experimentalSimulationEnabled: false,
     simulationSpPerSecond: DEFAULT_SIMULATION_SP_PER_SECOND,
     simulationTimelineDensity: SIMULATION_TIMELINE_DENSITY_OPTIONS.normal,
     simulationDurationSeconds: null,
@@ -77,6 +78,9 @@ function applyUiSettings() {
         ? uiSettings.timelineMode
         : TIMELINE_MODE_OPTIONS.slot;
     uiSettings.timelineMode = timelineMode;
+    // Existing and imported simulations keep their timeline and expose the mode switch.
+    uiSettings.experimentalSimulationEnabled = uiSettings.experimentalSimulationEnabled === true
+        || timelineMode === TIMELINE_MODE_OPTIONS.simulation;
     root.classList.toggle("rotation-mode-simulation", timelineMode === TIMELINE_MODE_OPTIONS.simulation);
     if (timelineMode !== TIMELINE_MODE_OPTIONS.simulation && typeof closeEnemyModal === "function") {
         closeEnemyModal();
@@ -131,6 +135,7 @@ function setRotationSkillSize(size) {
 
 function setTimelineMode(mode) {
     if (!Object.values(TIMELINE_MODE_OPTIONS).includes(mode)) return;
+    if (mode === TIMELINE_MODE_OPTIONS.simulation && !uiSettings.experimentalSimulationEnabled) return;
 
     uiSettings.timelineMode = mode;
     saveUiSettings();
@@ -150,6 +155,15 @@ function setTimelineMode(mode) {
     if (typeof initSkillDragDrop === "function") {
         initSkillDragDrop();
     }
+    if (typeof refreshPlannerGuide === "function") refreshPlannerGuide();
+}
+
+function setExperimentalSimulationEnabled(enabled) {
+    // Hiding the mode must not silently reinterpret an active timed simulation.
+    if (!enabled && uiSettings.timelineMode === TIMELINE_MODE_OPTIONS.simulation) return;
+    uiSettings.experimentalSimulationEnabled = Boolean(enabled);
+    saveUiSettings();
+    applyUiSettings();
 }
 
 function setSimulationSpPerSecond(value) {
@@ -208,6 +222,21 @@ function closeSettingsModal() {
 }
 
 function updateSettingsUi() {
+    document.querySelectorAll("[data-experimental-simulation]").forEach(element => {
+        element.hidden = !uiSettings.experimentalSimulationEnabled;
+    });
+    const inSimulation = uiSettings.timelineMode === TIMELINE_MODE_OPTIONS.simulation;
+    document.querySelectorAll("[data-simulation-settings]").forEach(element => {
+        element.hidden = !inSimulation;
+    });
+    const experimentalToggle = document.getElementById("experimentalSimulationToggle");
+    if (experimentalToggle) {
+        experimentalToggle.checked = uiSettings.experimentalSimulationEnabled;
+        experimentalToggle.disabled = inSimulation;
+    }
+    const experimentalHint = document.getElementById("experimentalSimulationHint");
+    if (experimentalHint) experimentalHint.hidden = !inSimulation;
+
     document.querySelectorAll("[data-setting='rotationSkillSize']").forEach(btn => {
         const value = btn.dataset.value;
         btn.classList.toggle("active", value === uiSettings.rotationSkillSize);
@@ -300,4 +329,8 @@ function initUiSettings() {
             setSimulationSpPerSecond(spPerSecondInput.value);
         });
     }
+
+    document.getElementById("experimentalSimulationToggle")?.addEventListener("change", event => {
+        setExperimentalSimulationEnabled(event.target.checked);
+    });
 }

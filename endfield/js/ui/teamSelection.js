@@ -80,6 +80,8 @@ function confirmTeam() {
 
     saveTeam();
 
+    if (typeof trackPlannerEvent === "function") trackPlannerEvent("team_selected");
+
     closeTeamSelectionModal();
 showBuilderScreen();
 }

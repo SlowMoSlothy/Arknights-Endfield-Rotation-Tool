@@ -41,34 +41,29 @@ function createContext() {
 }
 const plain = value => JSON.parse(JSON.stringify(value));
 
-test("guide tracks partial teams, unequipped members and a first skill", () => {
+test("guide tracks team, first skill and actual publication without requiring equipment", () => {
     const { context: c } = createContext();
-    assert.deepEqual(plain(c.getPlannerGuideProgress([null], {}, [null]).complete), [false, false, false]);
-    assert.deepEqual(plain(c.getPlannerGuideProgress([1, 2, null], { 1: { weapon: { key: "x" } } }, []).missingWeapons), [2]);
-    assert.deepEqual(plain(c.getPlannerGuideProgress([1, null], { 1: { weapon: { key: "x" } } }, [{ id: 11 }]).complete), [true, true, true]);
+    assert.deepEqual(plain(c.getPlannerGuideProgress([null], [null]).complete), [false, false, false]);
+    assert.deepEqual(plain(c.getPlannerGuideProgress([1, 2, null], []).complete), [true, false, false]);
+    assert.deepEqual(plain(c.getPlannerGuideProgress([1, null], [{ id: 11 }]).complete), [true, true, false]);
+    assert.deepEqual(plain(c.getPlannerGuideProgress([1, null], [{ id: 11 }], true).complete), [true, true, true]);
 });
 
-test("example resolves real skill IDs and equips all four compatible loadouts", () => {
+test("example resolves real skill IDs without equipment or simulation timing", () => {
     const { context: c } = createContext();
     const before = JSON.stringify([c.operators, c.weapons, c.GEAR_DATABASE]);
-    const example = c.createPlannerGuideExample(c.operators, c.weapons, c.GEAR_DATABASE);
-    assert.deepEqual(plain(example.rotation), [11, 12, 13, 14].map((id, index) => ({ id, time: index * 15 })));
-    for (const operator of c.operators) {
-        const loadout = example.loadouts[operator.id];
-        assert.equal(c.weapons.find(w => w.key === loadout.weapon.key).weaponType, operator.weaponType);
-        for (const slot of ["gloves", "armor", "kit1", "kit2"]) assert.ok(loadout[slot].key);
-    }
+    const example = c.createPlannerGuideExample(c.operators);
+    assert.deepEqual(plain(example.rotation), [11, 12, 13, 14].map(id => ({ id })));
+    assert.equal(example.loadouts, undefined);
     assert.equal(JSON.stringify([c.operators, c.weapons, c.GEAR_DATABASE]), before);
 });
 
-test("unavailable catalogs leave the current setup and storage untouched", () => {
-    for (const missing of ["operators", "weapons", "gear", "enemy"]) {
+test("unavailable operators or Battle Skills leave the draft and storage untouched", () => {
+    for (const missing of ["operators", "skills"]) {
         const { context: c, storage } = createContext();
         const before = plain(c.capturePlannerGuideSetup());
         if (missing === "operators") c.operators[0].isVisible = false;
-        if (missing === "weapons") c.weapons = [];
-        if (missing === "gear") c.GEAR_DATABASE = {};
-        if (missing === "enemy") c.enemies = [];
+        if (missing === "skills") c.operators[0].skills = [];
         c.loadPlannerGuideExample();
         assert.deepEqual(plain(c.capturePlannerGuideSetup()), before);
         assert.equal(storage.size, 0);
@@ -77,9 +72,10 @@ test("unavailable catalogs leave the current setup and storage untouched", () =>
 
 test("example backup survives repeated loads and reloads and restores the entire setup", () => {
     const { context: c, storage } = createContext();
+    c.uiSettings.timelineMode = "simulation";
     const before = plain(c.capturePlannerGuideSetup());
     c.loadPlannerGuideExample();
-    assert.equal(c.uiSettings.timelineMode, "simulation");
+    assert.equal(c.uiSettings.timelineMode, "slot");
     assert.equal(c.rotation.length, 4);
     c.loadPlannerGuideExample();
     const { context: reloaded, storage: reloadedStorage } = createContext();
@@ -98,7 +94,7 @@ test("storage failure prevents replacing the current draft", () => {
     assert.match(c.document.getElementById("plannerGuideStatus").textContent, /protect your current setup/);
 });
 
-test("first skill works in both modes, requires equipment, and never duplicates an existing rotation", () => {
+test("first skill works without equipment in either mode and never duplicates the rotation", () => {
     for (const mode of ["slot", "simulation"]) {
         const { context: c } = createContext();
         c.selectedTeam = [1, null, null, null];
@@ -106,9 +102,6 @@ test("first skill works in both modes, requires equipment, and never duplicates 
         c.operatorLoadouts = {};
         c.uiSettings.timelineMode = mode;
         c.document.getElementById("plannerGuideSkill").value = "11";
-        c.placePlannerGuideFirstSkill();
-        assert.equal(c.rotation.filter(Boolean).length, 0);
-        c.operatorLoadouts = { 1: { weapon: { key: "sword" } } };
         c.placePlannerGuideFirstSkill();
         assert.equal(c.rotation.filter(Boolean).length, 1);
         assert.equal(c.rotation.find(Boolean).id, 11);
@@ -118,15 +111,29 @@ test("first skill works in both modes, requires equipment, and never duplicates 
     }
 });
 
-test("equipment step switches from the default Slot mode before opening the missing loadout", () => {
+test("example stays in Slot and preserves existing loadouts even when other catalogs fail", () => {
     const { context: c } = createContext();
-    c.selectedTeam = [1, 2, null, null];
-    c.operatorLoadouts = { 1: { weapon: { key: "sword" } } };
-    c.setTimelineMode = mode => { c.uiSettings.timelineMode = mode; };
-    let opened;
-    c.openOperatorLoadoutModal = id => { assert.equal(c.uiSettings.timelineMode, "simulation"); opened = id; };
-    c.openPlannerGuideEquipment();
-    assert.equal(opened, 2);
+    const before = plain(c.operatorLoadouts);
+    c.weapons = []; c.GEAR_DATABASE = {}; c.enemies = [];
+    c.loadPlannerGuideExample();
+    assert.equal(c.uiSettings.timelineMode, "slot");
+    assert.deepEqual(plain(c.operatorLoadouts), before);
+    assert.equal(c.rotation.length, 4);
+});
+
+test("publication completes the guide only for the submitted draft", () => {
+    const { context: c } = createContext();
+    c.initPlannerGuide();
+    assert.match(c.document.getElementById("plannerGuideProgress").textContent, /2 of 3/);
+    const submitted = c.getPlannerGuideShareSignature();
+    c.rotation.push({ id: 11 });
+    c.markPlannerGuidePublished(submitted);
+    assert.match(c.document.getElementById("plannerGuideProgress").textContent, /2 of 3/);
+    c.markPlannerGuidePublished();
+    assert.match(c.document.getElementById("plannerGuideProgress").textContent, /Ready/);
+    c.rotation.push({ id: 12 });
+    c.refreshPlannerGuide();
+    assert.match(c.document.getElementById("plannerGuideProgress").textContent, /2 of 3/);
 });
 
 test("fresh planners expand the guide; existing rotations and dismissed guides stay collapsed", () => {

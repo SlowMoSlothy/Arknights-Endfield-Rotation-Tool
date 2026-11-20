@@ -439,6 +439,7 @@ async function initApp() {
         loadTeam();
         if (typeof loadOperatorLoadouts === "function") loadOperatorLoadouts();
         loadRotation();
+        const hasLocalSetup = selectedTeam.some(id => id !== null) || rotation.some(Boolean);
         const loadedSharedBuild = await loadBuildShareCodeFromUrl();
         if (!loadedSharedBuild) {
             consumeLeaderOperatorFromUrl();
@@ -460,7 +461,12 @@ async function initApp() {
         // Direkt den Rotation Builder anzeigen
         showBuilderScreen();
         if (typeof initPlannerGuide === "function") initPlannerGuide();
+        if (typeof markPlannerReady === "function") {
+            markPlannerReady(loadedSharedBuild ? "shared"
+                : hasLocalSetup ? "restored" : "new", operators.some(operator => operator.isVisible !== false));
+        }
     } catch (error) {
+        if (typeof trackPlannerEvent === "function") trackPlannerEvent("builder_failed");
         console.error("App initialization failed:", error);
     } finally {
         setAppLoading(false);

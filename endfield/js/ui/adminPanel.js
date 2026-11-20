@@ -32,6 +32,10 @@ const ADMIN_REVIEW_TABS = [
         emptyMessage: "Anonymous reports submitted from the Rotation Builder will appear here."
     },
     {
+        id: "usage", label: "Builder usage",
+        loadingTitle: "Loading builder usage", loadingMessage: "Fetching anonymous visit counts."
+    },
+    {
         id: "operators",
         label: "Operators",
         loadingTitle: "Loading operators",
@@ -454,7 +458,7 @@ function renderAdminDetailPanel() {
     const panel = document.getElementById("adminDetailPanel");
     if (!panel) return;
 
-    if (adminPanelState.activeTab === "operators" || adminPanelState.activeTab === "reports") {
+    if (["operators", "reports", "usage"].includes(adminPanelState.activeTab)) {
         adminPanelState.detailRotationId = "";
         panel.replaceChildren();
         panel.hidden = true;
@@ -1477,7 +1481,8 @@ function renderAdminReviewList() {
         const isBatkTab = adminPanelState.activeTab === "batk";
         setAdminListState(list, {
             type: "error",
-            title: isBatkTab ? "BATK editor unavailable" : (isOperatorTab ? "Operator settings unavailable" : "Review queue unavailable"),
+            title: adminPanelState.activeTab === "usage" ? "Usage report unavailable"
+                : isBatkTab ? "BATK editor unavailable" : (isOperatorTab ? "Operator settings unavailable" : "Review queue unavailable"),
             message: adminPanelState.reviewError,
             actionLabel: "Try again",
             action: fetchAdminActiveContent
@@ -1496,6 +1501,11 @@ function renderAdminReviewList() {
                 ? "Operator visibility settings will appear here after the first refresh."
                 : "Pending rotations will appear here after the first refresh."
         });
+        return;
+    }
+
+    if (adminPanelState.activeTab === "usage") {
+        renderPlannerAnalyticsReport(list);
         return;
     }
 
@@ -1946,6 +1956,7 @@ async function setAdminIssueReportStatus(reportId, status) {
 }
 
 async function fetchAdminActiveContent() {
+    if (adminPanelState.activeTab === "usage") return fetchPlannerAnalyticsReport();
     if (adminPanelState.activeTab === "reports") return fetchAdminIssueReports();
     if (adminPanelState.activeTab === "operators") return fetchAdminOperators();
     if (adminPanelState.activeTab === "batk") return fetchAdminBatkData();

@@ -407,6 +407,7 @@ function placeSkillInSlot(index, skillId, replaceExisting = false) {
     }
     ensureSlotCount(rotation.filter(slot => slot !== null).length + 1);
     saveRotation();
+    if (typeof trackPlannerEvent === "function") trackPlannerEvent("first_skill_placed");
     if (typeof refreshSkillsAfterRotationChange === "function") {
         refreshSkillsAfterRotationChange();
     }
@@ -425,6 +426,7 @@ function placeBasicAttackInSlot(index, operatorId, replaceExisting = false) {
     compactRotation();
     ensureSlotCount(rotation.filter(slot => slot !== null).length + 1);
     saveRotation();
+    if (typeof trackPlannerEvent === "function") trackPlannerEvent("first_skill_placed");
 }
 
 function updateSelectedUI() {

@@ -1,0 +1,9 @@
+.planner-usage-report { grid-column: 1 / -1; min-width: 0; font-size: 1rem; }
+.planner-usage-report p { line-height: 1.5; color: #c8cece; }
+.planner-usage-filters { display: flex; flex-wrap: wrap; gap: 1rem; }
+.planner-usage-filters label { display: grid; gap: .4rem; font-size: .875rem; }
+.planner-usage-filters select { padding: .6rem; border: 1px solid #697170; border-radius: .4rem; background: #161c1d; color: #fff; font: inherit; max-width: 100%; }
+.planner-usage-report table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+.planner-usage-report caption { text-align: left; margin-bottom: .7rem; font-weight: 700; }
+.planner-usage-report th, .planner-usage-report td { text-align: left; padding: .65rem .4rem; border-bottom: 1px solid #404847; }
+.planner-usage-report th:not(:first-child), .planner-usage-report td:not(:first-child) { text-align: right; white-space: nowrap; }

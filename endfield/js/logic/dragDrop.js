@@ -315,6 +315,7 @@ function placeSkillAtSimulationTime(skillId, time) {
         normalizeQingboMovesInRotation();
     }
     saveRotation();
+    if (typeof trackPlannerEvent === "function") trackPlannerEvent("first_skill_placed");
     if (typeof refreshSkillsAfterRotationChange === "function") {
         refreshSkillsAfterRotationChange();
     }
@@ -534,6 +535,7 @@ function initRotationDragDrop() {
                     compactRotation();
                     ensureSlotCount(rotation.filter(slot => slot !== null).length + 1);
                     saveRotation();
+                    if (typeof trackPlannerEvent === "function") trackPlannerEvent("first_skill_placed");
                     return;
                 }
                 if (!draggedId) return;
@@ -551,6 +553,7 @@ function initRotationDragDrop() {
                 }
                 ensureSlotCount(rotation.filter(slot => slot !== null).length + 1);
                 saveRotation();
+                if (typeof trackPlannerEvent === "function") trackPlannerEvent("first_skill_placed");
                 if (typeof refreshSkillsAfterRotationChange === "function") {
                     refreshSkillsAfterRotationChange();
                 }

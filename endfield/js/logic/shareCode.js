@@ -929,6 +929,7 @@ async function requestBuildShareMetadata() {
     if (authorPreview) authorPreview.textContent = "Loading...";
     modal.classList.add("open");
     modal.setAttribute("aria-hidden", "false");
+    if (typeof trackPlannerEvent === "function") trackPlannerEvent("share_opened");
 
     getShareAuthorPreview().then(author => {
         if (authorPreview && modal.classList.contains("open")) authorPreview.textContent = author;
@@ -1002,34 +1003,47 @@ if (typeof document !== "undefined") {
 
 async function createStoredBuildShare(metadata) {
     if (typeof supabaseClient === "undefined" || !supabaseClient?.rpc) {
+        if (typeof trackPlannerEvent === "function") trackPlannerEvent("share_failed");
         throw new Error("The short share-code service is unavailable.");
     }
 
     const normalizedMetadata = normalizeBuildShareMetadata(metadata);
     const sharePayload = getDisplayBuildShareCode();
     const shareType = getCurrentBuildShareType();
+    const guideSignature = typeof getPlannerGuideShareSignature === "function" ? getPlannerGuideShareSignature() : "";
     const operatorIds = Array.from(new Set(
         (typeof selectedTeam !== "undefined" && Array.isArray(selectedTeam) ? selectedTeam : [])
             .filter(operatorId => operatorId !== null && operatorId !== undefined && operatorId !== "")
             .map(Number)
             .filter(Number.isInteger)
     ));
-    const { data, error } = await supabaseClient.rpc("create_rotation_share", {
-        p_share_type: shareType,
-        p_share_payload: sharePayload,
-        p_format_version: BUILD_PERSISTENCE_PAYLOAD_VERSION,
-        p_operator_ids: operatorIds,
-        p_title: normalizedMetadata.title,
-        p_description: normalizedMetadata.description
-    });
-
-    if (error) throw error;
+    let data;
+    try {
+        const response = await supabaseClient.rpc("create_rotation_share", {
+            p_share_type: shareType,
+            p_share_payload: sharePayload,
+            p_format_version: BUILD_PERSISTENCE_PAYLOAD_VERSION,
+            p_operator_ids: operatorIds,
+            p_title: normalizedMetadata.title,
+            p_description: normalizedMetadata.description
+        });
+        if (response.error) throw response.error;
+        data = response.data;
+    } catch (error) {
+        if (typeof trackPlannerEvent === "function") trackPlannerEvent("share_failed");
+        throw error;
+    }
 
     const result = Array.isArray(data) ? data[0] : data;
     const shortCode = normalizeShortBuildShareCode(result?.short_code);
     if (!shortCode || result?.share_type !== shareType) {
+        if (typeof trackPlannerEvent === "function") trackPlannerEvent("share_failed");
         throw new Error("Supabase returned an invalid short share code.");
     }
+
+    // Publication has succeeded even if the following clipboard write is denied.
+    if (typeof trackPlannerEvent === "function") trackPlannerEvent("share_published");
+    if (typeof markPlannerGuidePublished === "function") markPlannerGuidePublished(guideSignature);
 
     return {
         shortCode,

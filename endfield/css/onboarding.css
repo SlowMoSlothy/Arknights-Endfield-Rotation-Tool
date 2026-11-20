@@ -2,7 +2,7 @@
 .planner-guide [hidden], .planner-guide[hidden], .planner-guide-actions[hidden], .planner-guide-actions [hidden] { display: none !important; }
 :root.simulation-timeline-focus .planner-guide { display: none; }
 .planner-guide-intro { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.planner-guide button, .planner-guide select { min-height: 44px; padding: 10px 14px; border: 1px solid #68716e; border-radius: 7px; background: #303839; color: #f6f7f0; font: inherit; font-size: 13px; cursor: pointer; }
+.planner-guide button, .planner-guide select { min-height: 44px; padding: 10px 14px; border: 1px solid #68716e; border-radius: 7px; background: #303839; color: #f6f7f0; font: inherit; font-size: 14px; cursor: pointer; }
 .planner-guide button:hover:not(:disabled) { border-color: #fc8a35; }
 .planner-guide button:disabled, .planner-guide select:disabled { opacity: .55; cursor: default; }
 .planner-guide :focus-visible { outline: 2px solid #ff9d3f; outline-offset: 3px; }

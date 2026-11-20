@@ -188,6 +188,26 @@ supabase/community_rotations_review.sql
 
 Run the first query to list pending rotations. Then copy one of the commented blocks, replace the example UUID with the real `id`, and run it to approve, hide, or edit the submission.
 
+### Experimental Simulation Mode
+
+New planners start in Slot mode. To reveal the mode switch, open **Settings → Experimental → Show experimental Simulation Mode**. Simulation-specific settings appear only while Simulation is active. Switch back to Slot before hiding the experimental controls. Existing local simulations and imported simulation links keep their mode and timing data.
+
+The getting-started guide uses a Slot example and requires no weapon or gear setup. Its three steps are choosing operators, placing a first skill, and publishing a share. Existing drafts, including equipment and simulation settings, can be restored from the example backup.
+
+### Builder usage measurement
+
+Run `supabase/planner_analytics.sql` after `supabase/admin_panel.sql`, then deploy the updated website. Open **Admin → Builder usage** for counts over 7 or 30 days, filtered by an empty builder, a restored local setup, or a shared setup. Collection begins only after both updates are live; historical usage cannot be recovered.
+
+Each page load gets a random ID held only in memory. Each milestone counts once per page load, so these are visits, not unique people or a strictly sequential funnel. Team selection and first action placement require a manual action; loading an example or restoring a rotation does not fabricate those milestones. Publication is counted after database success, before copying to the clipboard. Error counts cover initialization and publication failures.
+
+The collector sends only the visit ID, fixed event name, initial setup category and current mode to the existing Supabase project. It sends no account token, URL, referrer, operator IDs, titles or rotation contents. Browser Do Not Track and Global Privacy Control disable collection. Local previews and non-production hosts are excluded. Use `/endfield/?usage=off` for your own production tests. Counts can still include bots or unmarked owner visits, and blocked/failed requests cause undercounting. Reports are restricted to verified app admins; raw events have no public read access.
+
+Events remain until removed by an administrator. For example, run this regularly in Supabase to retain 90 days:
+
+```sql
+delete from public.planner_events where created_at < now() - interval '90 days';
+```
+
 ### Admin Review Panel
 
 The in-app Admin panel uses Supabase Auth. To enable it, run:

@@ -20,9 +20,11 @@ test("planner remains visible when initialization falls back", () => {
   assert.doesNotMatch(plannerHtml, /id="builderScreen"[^>]*display\s*:\s*none/);
 });
 
-test("planner exposes a visible timeline mode switch in the rotation toolbar", () => {
+test("planner keeps the timeline mode switch behind the experimental setting", () => {
   assert.match(plannerHtml, /class="rotation-actions"[^>]*aria-label="Rotation actions"/);
   assert.match(plannerHtml, /class="rotation-mode-switch"[^>]*aria-label="Rotation mode"/);
+  assert.match(plannerHtml, /class="rotation-mode-switch"[^>]*data-experimental-simulation hidden/);
+  assert.match(plannerHtml, /id="experimentalSimulationToggle" type="checkbox"/);
   assert.match(plannerHtml, /class="rotation-mode-switch-btn"[^>]*data-setting="timelineMode"[\s\S]*data-value="simulation"/);
   assert.match(plannerHtml, /class="rotation-mode-switch-btn"[^>]*data-setting="timelineMode"[\s\S]*data-value="slot"/);
   assert.doesNotMatch(plannerHtml, /Rotation Mode/);
@@ -62,7 +64,7 @@ test("short share codes are unique, mode-aware and accessible only through valid
   assert.match(plannerHtml, /id="shareMetadataTitleInput"[^>]*required/);
   assert.match(plannerHtml, /id="shareMetadataDescriptionInput"/);
   assert.match(plannerHtml, /id="shareMetadataCardAuthor"/);
-  assert.match(plannerHtml, /shareCode\.js\?v=11/);
+  assert.match(plannerHtml, /shareCode\.js\?v=13/);
 });
 
 test("timeline mode switch has active styling and accessible pressed state", () => {
