@@ -52,7 +52,10 @@ function updateRotationActionStates() {
     const copyShareCodeButton = document.getElementById("copyShareCodeBtn");
     const copyShareLinkButton = document.getElementById("copyShareLinkBtn");
     const saveRotationMenuButton = document.getElementById("saveRotationMenuBtn");
+    const publishActions = document.getElementById("rotationPublishActions");
+    const publishButton = document.getElementById("publishRotationBtn");
     const hasRotation = hasCreatedRotation();
+    const publishing = typeof isBuildSharePublishing === "function" && isBuildSharePublishing();
     const isSimulationMode = typeof isSimulationTimelineMode === "function"
         ? isSimulationTimelineMode()
         : (typeof uiSettings !== "undefined" && uiSettings?.timelineMode === "simulation");
@@ -72,8 +75,14 @@ function updateRotationActionStates() {
                 : "Export rotation as PNG image";
         }
     }
-    if (copyShareCodeButton) copyShareCodeButton.disabled = !hasRotation;
-    if (copyShareLinkButton) copyShareLinkButton.disabled = !hasRotation;
+    if (copyShareCodeButton) copyShareCodeButton.disabled = !hasRotation || publishing;
+    if (copyShareLinkButton) copyShareLinkButton.disabled = !hasRotation || publishing;
+    if (publishActions) publishActions.hidden = !hasRotation;
+    if (publishButton) {
+        publishButton.disabled = !hasRotation || publishing;
+        const submitting = typeof isBuildShareSubmitting === "function" && isBuildShareSubmitting();
+        publishButton.textContent = submitting ? "Publishing…" : isSimulationMode ? "Publish simulation" : "Publish rotation";
+    }
     if (saveRotationMenuButton) saveRotationMenuButton.disabled = !hasRotation;
     if (!hasRotation && typeof closeRotationSaveMenu === "function") closeRotationSaveMenu();
 }

@@ -188,6 +188,12 @@ supabase/community_rotations_review.sql
 
 Run the first query to list pending rotations. Then copy one of the commented blocks, replace the example UUID with the real `id`, and run it to approve, hide, or edit the submission.
 
+### Publishing rotations
+
+After placing an action, use **Publish rotation** beside the timeline. Publishing is public in Discover and works without an account. The form suggests an editable title from the selected operators; the description is optional. A failed publication keeps the submitted title and description for retry.
+
+The result card shows the published title, author, share code and full selectable link, with **Copy link**, **Open rotation** and **View in Discover** actions. Clipboard denial does not turn a successful publication into an error; the link remains available to copy manually. Copying the published link again does not create another share, and repeated clicks during publication are ignored.
+
 ### Experimental Simulation Mode
 
 New planners start in Slot mode. To reveal the mode switch, open **Settings → Experimental → Show experimental Simulation Mode**. Simulation-specific settings appear only while Simulation is active. Switch back to Slot before hiding the experimental controls. Existing local simulations and imported simulation links keep their mode and timing data.

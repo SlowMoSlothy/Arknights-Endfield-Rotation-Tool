@@ -112,7 +112,7 @@ function shareContext(rpc) {
 
 test("a published share counts even when clipboard access is denied", async () => {
     const { c, events } = shareContext(async () => ({ data: { short_code: "ABC123", share_type: "rotation" } }));
-    assert.equal(await c.copyBuildShareCode(), false);
+    assert.equal(await c.copyBuildShareCode(), true);
     assert.deepEqual(events, ["share_published"]);
 });
 

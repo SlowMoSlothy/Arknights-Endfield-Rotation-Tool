@@ -89,7 +89,8 @@ function refreshPlannerGuide() {
     const placeButton = document.getElementById("plannerGuidePlace");
     placeButton.disabled = !progress.complete[1] && (!progress.complete[0] || skills.length === 0);
     placeButton.textContent = progress.complete[1] ? "View timeline" : "Add first skill";
-    document.getElementById("plannerGuideShare").disabled = !progress.complete[1];
+    document.getElementById("plannerGuideShare").disabled = !progress.complete[1]
+        || (typeof isBuildSharePublishing === "function" && isBuildSharePublishing());
     document.getElementById("plannerGuideRestore").hidden = !readPlannerGuideValue(PLANNER_GUIDE_BACKUP_KEY);
 }
 
@@ -97,7 +98,9 @@ function focusPlannerGuideTimeline() {
     const timeline = document.getElementById("rotationDropZone");
     timeline.setAttribute("tabindex", "-1");
     timeline.focus({ preventScroll: true });
-    timeline.scrollIntoView({ block: "start", behavior: "auto" });
+    const publishActions = document.getElementById("rotationPublishActions");
+    const destination = publishActions && !publishActions.hidden ? publishActions : timeline;
+    destination.scrollIntoView({ block: "start", behavior: "auto" });
 }
 
 function placePlannerGuideFirstSkill() {

@@ -1,0 +1,17 @@
+.rotation-publish-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin: 12px 0; scroll-margin-top: 80px; }
+.rotation-publish-actions[hidden] { display: none !important; }
+#publishRotationBtn { min-height: 44px; padding: 10px 18px; border: 1px solid #fc8a35; border-radius: 8px; background: #fc8a35; color: #211006; font: inherit; font-size: 1rem; font-weight: 800; cursor: pointer; }
+#publishRotationBtn:disabled { opacity: .6; cursor: default; }
+#rotationPublicHint { color: #c8cece; font-size: .875rem; line-height: 1.5; }
+.rotation-publish-status { font-size: .875rem; line-height: 1.5; color: #ffe0bd; }
+.rotation-publish-status:empty { display: none; }
+#shareMetadataCard .share-metadata-card-copy { flex: 1; gap: 8px; }
+#shareMetadataCard .share-metadata-card-kicker { font-size: .875rem; letter-spacing: .04em; }
+#shareMetadataCard .share-metadata-card-meta, #shareMetadataCopyStatus { font-size: .875rem; line-height: 1.5; }
+.published-share-link-label { font-size: .875rem; }
+.published-share-link { box-sizing: border-box; width: 100%; min-width: 0; min-height: 44px; padding: 10px; border: 1px solid #697170; border-radius: 6px; background: #101718; color: #fff; font: inherit; font-size: .875rem; }
+.published-share-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.published-share-actions button, .published-share-actions a { display: inline-flex; align-items: center; min-height: 44px; box-sizing: border-box; padding: 8px 12px; border: 1px solid #697170; border-radius: 6px; background: #252f30; color: #fff; font: inherit; font-size: .875rem; text-decoration: none; cursor: pointer; }
+.rotation-publish-actions :focus-visible, #shareMetadataCard :focus-visible { outline: 2px solid #fc8a35; outline-offset: 3px; }
+.export-mode .rotation-publish-actions, .export-mode #publishRotationStatus, .export-mode #shareMetadataCard { display: none !important; }
+@media (max-width: 600px) { #publishRotationBtn { width: 100%; } .rotation-publish-actions { gap: 6px; } }

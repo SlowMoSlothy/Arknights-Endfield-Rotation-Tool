@@ -1,0 +1,157 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import test from "node:test";
+import vm from "node:vm";
+
+const source = fs.readFileSync("endfield/js/logic/shareCode.js", "utf8");
+const storageSource = fs.readFileSync("endfield/js/logic/storage.js", "utf8");
+const tick = () => new Promise(resolve => setImmediate(resolve));
+function mount({ rpc, clipboardDenied = false } = {}) {
+    const elements = new Map(), calls = [], clipboardCalls = [], events = [];
+    const ids = ["shareMetadataModal", "shareMetadataForm", "shareMetadataTitleInput", "shareMetadataDescriptionInput",
+        "shareMetadataAuthorPreview", "shareMetadataIntro", "shareMetadataStatus", "shareMetadataModalTitle",
+        "cancelShareMetadataBtn", "closeShareMetadataModalBtn", "dismissShareMetadataCardBtn", "copyPublishedShareLinkBtn",
+        "shareMetadataCard", "shareMetadataCardType", "shareMetadataCardTitle", "shareMetadataCardAuthor", "shareMetadataCardCode",
+        "shareMetadataCardCreated", "shareMetadataCardDescription", "publishedShareLink", "publishedShareOpenLink",
+        "publishedShareDiscoverLink", "shareMetadataCopyStatus", "publishRotationStatus", "publishRotationBtn",
+        "rotationPublishActions", "exportRotationBtn", "copyShareCodeBtn", "copyShareLinkBtn", "saveRotationMenuBtn"];
+    for (const id of ids) {
+        const classes = new Set();
+        elements.set(id, { hidden: true, disabled: false, value: "", textContent: "", attributes: {}, listeners: {},
+            classList: { add: value => classes.add(value), remove: value => classes.delete(value), contains: value => classes.has(value) },
+            setAttribute(key, value) { this.attributes[key] = value; }, closest() { return null; },
+            addEventListener(name, callback) { this.listeners[name] = callback; }, focus() { this.focused = true; },
+            select() { this.selected = true; }, scrollIntoView() { this.scrolled = true; } });
+    }
+    const c = { URL, console: { error() {}, warn() {} },
+        location: { protocol: "https:", origin: "https://rotationforge.gg", pathname: "/endfield/" },
+        setTimeout: callback => callback(),
+        document: { readyState: "loading", addEventListener() {}, getElementById: id => elements.get(id) || null },
+        selectedTeam: [1, 2, null, null], operators: [{ id: 1, name: "Endministrator" }, { id: 2, name: "Perlica" }],
+        rotation: [{ id: 11 }], uiSettings: { timelineMode: "slot" },
+        navigator: { clipboard: { writeText: async value => {
+            clipboardCalls.push(value);
+            if (clipboardDenied) throw new Error("Clipboard denied");
+        } } },
+        supabaseClient: { rpc: async (name, args) => {
+            calls.push({ name, args });
+            return rpc ? rpc(name, args) : { data: { short_code: "ABC123", share_type: "rotation", title: args.p_title } };
+        } },
+        trackPlannerEvent: name => events.push(name),
+        getPlannerGuideShareSignature: () => "submitted-draft", markPlannerGuidePublished() {} };
+    c.window = c;
+    vm.createContext(c);
+    vm.runInContext(source, c);
+    vm.runInContext(storageSource, c);
+    c.getDisplayBuildShareCode = () => "test-payload";
+    c.initShareMetadataUi();
+    c.updateRotationActionStates();
+    const get = id => elements.get(id);
+    const submit = () => get("shareMetadataForm").listeners.submit({ preventDefault() {} });
+    return { c, get, calls, clipboardCalls, events, submit };
+}
+
+test("the permanent publish action follows rotation availability, independently of the guide", () => {
+    const { c, get } = mount();
+    c.rotation = [null];
+    c.updateRotationActionStates();
+    assert.equal(get("rotationPublishActions").hidden, true);
+    c.rotation = [{ id: 11 }];
+    c.updateRotationActionStates();
+    assert.equal(get("rotationPublishActions").hidden, false);
+    assert.equal(get("publishRotationBtn").disabled, false);
+    assert.equal(get("publishRotationBtn").textContent, "Publish rotation");
+    c.uiSettings.timelineMode = "simulation";
+    c.updateRotationActionStates();
+    assert.equal(get("publishRotationBtn").textContent, "Publish simulation");
+});
+
+test("suggested titles use the team, stay within 60 characters and remain editable", async () => {
+    const { c, get } = mount();
+    assert.equal(c.getSuggestedBuildShareTitle(), "Endministrator / Perlica rotation");
+    c.uiSettings.timelineMode = "simulation";
+    c.operators[0].name = "🌟".repeat(50);
+    const suggested = c.getSuggestedBuildShareTitle();
+    assert.ok(suggested.length <= 60);
+    assert.ok(suggested.endsWith(" simulation"));
+    assert.doesNotThrow(() => c.normalizeBuildShareMetadata({ title: suggested }));
+    c.selectedTeam = [];
+    assert.equal(c.getSuggestedBuildShareTitle(), "Team simulation");
+    c.selectedTeam = [2];
+    const publishing = c.copyBuildShareLink();
+    assert.equal(get("shareMetadataTitleInput").value, "Perlica simulation");
+    assert.match(get("shareMetadataIntro").textContent, /public in Discover/);
+    assert.match(get("shareMetadataIntro").textContent, /No account/);
+    get("cancelShareMetadataBtn").listeners.click();
+    assert.equal(await publishing, false);
+    assert.equal(c.isBuildSharePublishing(), false);
+});
+
+test("publication succeeds with a manual-copy link when clipboard access is denied", async () => {
+    const m = mount({ clipboardDenied: true });
+    const publishing = m.c.copyBuildShareLink();
+    m.get("shareMetadataTitleInput").value = "My opener";
+    m.submit();
+    assert.equal(await publishing, true);
+    assert.equal(m.calls.length, 1);
+    assert.equal(m.calls[0].args.p_title, "My opener");
+    assert.equal(m.get("shareMetadataCard").hidden, false);
+    assert.equal(m.get("shareMetadataCardType").textContent, "Published in Discover");
+    assert.equal(m.get("publishedShareLink").value, "https://rotationforge.gg/endfield/#share=ABC123");
+    assert.equal(m.get("publishedShareOpenLink").href, m.get("publishedShareLink").value);
+    assert.equal(m.get("publishedShareDiscoverLink").href, "https://rotationforge.gg/endfield/community/?type=rotation");
+    assert.match(m.get("shareMetadataCopyStatus").textContent, /Published successfully/);
+    assert.match(m.get("shareMetadataCopyStatus").textContent, /copy it manually/);
+    assert.deepEqual(m.events, ["share_opened", "share_published"]);
+    assert.equal(m.get("publishRotationBtn").disabled, false);
+    await m.get("copyPublishedShareLinkBtn").listeners.click();
+    assert.equal(m.calls.length, 1);
+    assert.equal(m.get("publishedShareLink").selected, true);
+});
+
+test("successful automatic copying and retry copying never create another publication", async () => {
+    const m = mount();
+    const publishing = m.c.copyBuildShareCode();
+    m.submit();
+    assert.equal(await publishing, true);
+    assert.deepEqual(m.clipboardCalls, ["ABC123"]);
+    assert.match(m.get("shareMetadataCopyStatus").textContent, /Share code copied/);
+    assert.equal(await m.c.copyPublishedShareLink(), true);
+    assert.equal(m.calls.length, 1);
+    assert.equal(m.clipboardCalls.at(-1), "https://rotationforge.gg/endfield/#share=ABC123");
+});
+
+test("repeated clicks during form entry and publication produce only one database request", async () => {
+    let resolve;
+    const m = mount({ rpc: () => new Promise(done => { resolve = done; }) });
+    const publishing = m.c.copyBuildShareLink();
+    assert.equal(await m.c.copyBuildShareLink(), false);
+    assert.equal(m.get("publishRotationBtn").textContent, "Publish rotation");
+    m.submit();
+    await tick();
+    assert.equal(m.get("publishRotationBtn").disabled, true);
+    assert.equal(m.get("publishRotationBtn").textContent, "Publishing…");
+    assert.equal(await m.c.copyBuildShareCode(), false);
+    assert.equal(m.calls.length, 1);
+    resolve({ data: { short_code: "ABC123", share_type: "rotation" } });
+    assert.equal(await publishing, true);
+    assert.equal(m.get("publishRotationBtn").disabled, false);
+});
+
+test("failed publications keep title and description for retry, and cancellation does not publish", async () => {
+    const m = mount({ rpc: async () => ({ error: new Error("offline") }) });
+    const publishing = m.c.copyBuildShareLink();
+    m.get("shareMetadataTitleInput").value = "Custom opener";
+    m.get("shareMetadataDescriptionInput").value = "Keep these notes";
+    m.submit();
+    assert.equal(await publishing, false);
+    assert.equal(m.get("shareMetadataCard").hidden, true);
+    assert.match(m.get("publishRotationStatus").textContent, /Could not publish/);
+    const retry = m.c.copyBuildShareLink();
+    assert.equal(m.get("shareMetadataTitleInput").value, "Custom opener");
+    assert.equal(m.get("shareMetadataDescriptionInput").value, "Keep these notes");
+    m.get("cancelShareMetadataBtn").listeners.click();
+    assert.equal(await retry, false);
+    assert.equal(m.calls.length, 1);
+    assert.equal(m.c.isBuildSharePublishing(), false);
+});

@@ -45,6 +45,7 @@
   <link rel="stylesheet" href="css/mobile.css?v=26">
   <link rel="stylesheet" href="css/onboarding.css?v=4">
   <link rel="stylesheet" href="css/plannerUsage.css?v=1">
+  <link rel="stylesheet" href="css/publishing.css?v=1">
     <link rel="stylesheet" href="atk-chart.css?v=19">
 </head>
 
@@ -409,20 +410,6 @@
                   </button>
                 </span>
               </div>
-              <aside id="shareMetadataCard" class="share-metadata-card" aria-live="polite" hidden>
-                <div class="share-metadata-card-copy">
-                  <span id="shareMetadataCardType" class="share-metadata-card-kicker">Shared Rotation</span>
-                  <strong id="shareMetadataCardTitle">Shared build</strong>
-                  <p id="shareMetadataCardDescription" hidden></p>
-                  <div class="share-metadata-card-meta">
-                    <span>By <b id="shareMetadataCardAuthor">Anonymous</b></span>
-                    <span id="shareMetadataCardCode"></span>
-                    <span id="shareMetadataCardCreated"></span>
-                  </div>
-                </div>
-                <button id="dismissShareMetadataCardBtn" class="share-metadata-card-close" type="button"
-                  aria-label="Hide share details">&times;</button>
-              </aside>
               <div class="rotation-skills-dock">
                 <h3>Skills</h3>
                 <div id="skillList" class="skills-panel"></div>
@@ -432,6 +419,34 @@
                 <button id="mobileUndoBtn" type="button" onclick="undoMobileRotationEdit()" disabled aria-label="Undo last rotation change">↶ Undo</button>
               </div>
               <h3 class="rotation-panel-title">Rotation</h3>
+              <div id="rotationPublishActions" class="rotation-publish-actions" hidden>
+                <button id="publishRotationBtn" type="button" onclick="copyBuildShareLink()"
+                  aria-describedby="rotationPublicHint" disabled>Publish rotation</button>
+                <span id="rotationPublicHint">Public in Discover · No account required</span>
+              </div>
+              <p id="publishRotationStatus" class="rotation-publish-status" role="status" aria-live="polite"></p>
+              <aside id="shareMetadataCard" class="share-metadata-card" hidden>
+                <div class="share-metadata-card-copy">
+                  <span id="shareMetadataCardType" class="share-metadata-card-kicker">Shared rotation</span>
+                  <strong id="shareMetadataCardTitle">Shared build</strong>
+                  <p id="shareMetadataCardDescription" hidden></p>
+                  <div class="share-metadata-card-meta">
+                    <span>By <b id="shareMetadataCardAuthor">Anonymous</b></span>
+                    <span id="shareMetadataCardCode"></span>
+                    <span id="shareMetadataCardCreated"></span>
+                  </div>
+                  <label class="published-share-link-label" for="publishedShareLink">Share link</label>
+                  <input id="publishedShareLink" class="published-share-link" type="text" readonly>
+                  <div class="published-share-actions">
+                    <button id="copyPublishedShareLinkBtn" type="button">Copy link</button>
+                    <a id="publishedShareOpenLink">Open rotation</a>
+                    <a id="publishedShareDiscoverLink">View in Discover</a>
+                  </div>
+                  <p id="shareMetadataCopyStatus" role="status" aria-live="polite"></p>
+                </div>
+                <button id="dismissShareMetadataCardBtn" class="share-metadata-card-close" type="button"
+                  aria-label="Hide share details">&times;</button>
+              </aside>
               <div id="rotationQuickSkills" class="rotation-quick-skills" hidden></div>
               <div id="rotation" class="rotation-panel">
                 <div id="rotationDropZone"></div>
@@ -787,12 +802,12 @@
     <div class="settings-dialog rotation-quick-save-dialog share-metadata-dialog" role="dialog" aria-modal="true"
       aria-labelledby="shareMetadataModalTitle">
       <div class="settings-header">
-        <h2 id="shareMetadataModalTitle" class="settings-title">Create Share</h2>
+        <h2 id="shareMetadataModalTitle" class="settings-title">Publish rotation</h2>
         <button id="closeShareMetadataModalBtn" class="settings-close" type="button"
-          aria-label="Close create share">&times;</button>
+          aria-label="Close publish form">&times;</button>
       </div>
 
-      <p id="shareMetadataIntro" class="my-rotations-intro">Add a short title before creating the share code.</p>
+      <p id="shareMetadataIntro" class="my-rotations-intro">Your rotation will be public in Discover. No account is required. You can edit the suggested title.</p>
       <form id="shareMetadataForm" class="rotation-quick-save-form">
         <label class="my-rotations-field">
           <span>Short title</span>
@@ -809,10 +824,10 @@
           <strong id="shareMetadataAuthorPreview">Anonymous</strong>
           <small id="shareMetadataAuthorHint">Signed-out shares are published as Anonymous.</small>
         </div>
-        <div id="shareMetadataStatus" class="my-rotations-status"></div>
+        <div id="shareMetadataStatus" class="my-rotations-status" role="status" aria-live="polite"></div>
         <div class="my-rotations-actions">
           <button id="cancelShareMetadataBtn" class="my-secondary-btn" type="button">Cancel</button>
-          <button id="submitShareMetadataBtn" class="my-primary-btn" type="submit">Create &amp; Copy</button>
+          <button id="submitShareMetadataBtn" class="my-primary-btn" type="submit">Publish &amp; copy</button>
         </div>
       </form>
     </div>
@@ -1006,14 +1021,14 @@
   <script src="js/logic/battlefieldResourceEngine.js?v=1"></script>
   <script src="js/logic/siMechanics.js?v=3"></script>
   <script src="js/logic/basicAttack.js?v=3"></script>
-  <script src="js/logic/storage.js?v=3"></script>
+  <script src="js/logic/storage.js?v=4"></script>
   <script src="js/logic/weaponPassiveEngine.js?v=3"></script>
     <script src="js/logic/weaponLoadout.js?v=17"></script>
     <script src="js/logic/sustainEngine.js?v=1"></script>
   <script src="js/logic/weaponPassiveSimulation.js?v=4"></script>
     <script src="js/ui/damageInputs.js?v=3"></script>
     <script src="js/logic/damageBreakdown.js?v=14"></script>
-    <script src="js/logic/shareCode.js?v=13"></script>
+    <script src="js/logic/shareCode.js?v=14"></script>
   <script src="js/logic/export.js"></script>
   <script src="js/logic/snakeLayout.js"></script>
   <script src="js/logic/reactionEngine.js"></script>
@@ -1039,7 +1054,7 @@
   <script src="js/ui/adminPanel.js?v=19"></script>
   <script src="js/ui/plannerAnalyticsReport.js?v=1"></script>
   <script src="js/ui/reportIssue.js?v=3"></script>
-  <script src="js/ui/onboarding.js?v=4"></script>
+  <script src="js/ui/onboarding.js?v=5"></script>
   <script src="js/main.js?v=9"></script>
 </body>
 

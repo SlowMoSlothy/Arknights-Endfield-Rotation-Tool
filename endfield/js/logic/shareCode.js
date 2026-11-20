@@ -852,6 +852,48 @@ function extractShortBuildShareCode(input) {
 }
 
 let pendingShareMetadataRequest = null;
+let buildSharePublishing = false;
+let buildShareSubmitting = false;
+let buildShareDraft = null;
+
+function isBuildSharePublishing() {
+    return buildSharePublishing;
+}
+
+function isBuildShareSubmitting() {
+    return buildShareSubmitting;
+}
+
+function getBuildShareDraftKey() {
+    return JSON.stringify([typeof selectedTeam === "undefined" ? [] : selectedTeam, getCurrentBuildShareType()]);
+}
+
+function getSuggestedBuildShareTitle() {
+    const catalog = typeof operators === "undefined" ? [] : operators;
+    const team = typeof selectedTeam === "undefined" ? [] : selectedTeam;
+    const names = [...new Set(team.filter(id => id !== null && id !== undefined)
+        .map(id => catalog.find(operator => Number(operator.id) === Number(id))?.name)
+        .filter(Boolean))];
+    const suffix = getCurrentBuildShareType() === BUILD_SHARE_TYPE_SIMULATION ? " simulation" : " rotation";
+    let prefix = names.join(" / ").trim().replace(/\s+/g, " ") || "Team";
+    while (prefix.length + suffix.length > 60) prefix = Array.from(prefix).slice(0, -1).join("");
+    return prefix.replace(/[\s/]+$/, "") + suffix;
+}
+
+function getPublishedBuildShareUrl(share) {
+    return `${getBuildShareBaseUrl()}#${BUILD_SHORT_SHARE_HASH_KEY}=${share.shortCode}`;
+}
+
+function setBuildSharePublishStatus(message) {
+    if (typeof document === "undefined") return;
+    const status = document.getElementById("publishRotationStatus");
+    if (status) status.textContent = message;
+}
+
+function refreshBuildSharePublishControls() {
+    if (typeof updateRotationActionStates === "function") updateRotationActionStates();
+    if (typeof refreshPlannerGuide === "function") refreshPlannerGuide();
+}
 
 function normalizeBuildShareMetadata(metadata = {}) {
     const title = String(metadata.title || "").trim().replace(/\s+/g, " ");
@@ -921,11 +963,14 @@ async function requestBuildShareMetadata() {
     if (!modal || !form || !titleInput || !descriptionInput) return null;
 
     if (pendingShareMetadataRequest) closeShareMetadataModal(null);
-    titleInput.value = "";
-    descriptionInput.value = "";
+    const draft = buildShareDraft?.key === getBuildShareDraftKey() ? buildShareDraft : null;
+    titleInput.value = draft?.title || getSuggestedBuildShareTitle();
+    descriptionInput.value = draft?.description || "";
     const status = document.getElementById("shareMetadataStatus");
     if (status) status.textContent = "";
-    if (intro) intro.textContent = `Add a short title for this ${getBuildShareTypeLabel(getCurrentBuildShareType()).toLowerCase()}.`;
+    const title = document.getElementById("shareMetadataModalTitle");
+    if (title) title.textContent = getCurrentBuildShareType() === BUILD_SHARE_TYPE_SIMULATION ? "Publish simulation" : "Publish rotation";
+    if (intro) intro.textContent = "Your build will be public in Discover. No account is required. You can edit the suggested title.";
     if (authorPreview) authorPreview.textContent = "Loading...";
     modal.classList.add("open");
     modal.setAttribute("aria-hidden", "false");
@@ -935,7 +980,7 @@ async function requestBuildShareMetadata() {
         if (authorPreview && modal.classList.contains("open")) authorPreview.textContent = author;
     });
 
-    window.setTimeout(() => titleInput.focus(), 0);
+    window.setTimeout(() => { titleInput.focus(); titleInput.select(); }, 0);
     return new Promise(resolve => {
         pendingShareMetadataRequest = resolve;
     });
@@ -948,6 +993,9 @@ function initShareMetadataUi() {
     const cancel = document.getElementById("cancelShareMetadataBtn");
     const close = document.getElementById("closeShareMetadataModalBtn");
     const dismiss = document.getElementById("dismissShareMetadataCardBtn");
+    document.getElementById("copyPublishedShareLinkBtn")?.addEventListener("click", copyPublishedShareLink);
+    const shareLink = document.getElementById("publishedShareLink");
+    shareLink?.addEventListener("click", () => shareLink.select());
 
     form?.addEventListener("submit", event => {
         event.preventDefault();
@@ -976,14 +1024,15 @@ function initShareMetadataUi() {
     });
 }
 
-function showBuildShareMetadata(share) {
+function showBuildShareMetadata(share, options = {}) {
     if (typeof document === "undefined" || !share?.shortCode) return;
     const card = document.getElementById("shareMetadataCard");
     if (!card) return;
 
     const description = String(share.description || "").trim();
     const created = share.createdAt ? new Date(share.createdAt) : null;
-    document.getElementById("shareMetadataCardType").textContent = `Shared ${getBuildShareTypeLabel(share.shareType)}`;
+    document.getElementById("shareMetadataCardType").textContent = options.published
+        ? "Published in Discover" : `Shared ${getBuildShareTypeLabel(share.shareType)}`;
     document.getElementById("shareMetadataCardTitle").textContent = share.title || "Shared build";
     document.getElementById("shareMetadataCardAuthor").textContent = share.authorName || "Anonymous";
     document.getElementById("shareMetadataCardCode").textContent = `Code ${share.shortCode}`;
@@ -993,7 +1042,41 @@ function showBuildShareMetadata(share) {
     const descriptionElement = document.getElementById("shareMetadataCardDescription");
     descriptionElement.textContent = description;
     descriptionElement.hidden = !description;
+    const link = getPublishedBuildShareUrl(share);
+    const linkInput = document.getElementById("publishedShareLink");
+    if (linkInput) linkInput.value = link;
+    const openLink = document.getElementById("publishedShareOpenLink");
+    if (openLink) {
+        openLink.href = link;
+        openLink.textContent = share.shareType === BUILD_SHARE_TYPE_SIMULATION ? "Open simulation" : "Open rotation";
+    }
+    const discoverLink = document.getElementById("publishedShareDiscoverLink");
+    if (discoverLink) {
+        const discover = new URL("community/", getBuildShareBaseUrl());
+        discover.searchParams.set("type", share.shareType === BUILD_SHARE_TYPE_SIMULATION ? "simulation" : "rotation");
+        discoverLink.href = discover.href;
+    }
+    const copyStatus = document.getElementById("shareMetadataCopyStatus");
+    if (copyStatus) copyStatus.textContent = options.published ? "Your build is published. The share link is ready." : "Share this link to open the build.";
     card.hidden = false;
+    if (options.published) card.scrollIntoView({ block: "nearest", behavior: "smooth" });
+}
+
+async function copyPublishedShareLink() {
+    if (typeof document === "undefined") return false;
+    const input = document.getElementById("publishedShareLink");
+    const status = document.getElementById("shareMetadataCopyStatus");
+    if (!input?.value) return false;
+    try {
+        await navigator.clipboard.writeText(input.value);
+        if (status) status.textContent = "Link copied.";
+        return true;
+    } catch {
+        if (status) status.textContent = "Automatic copying is unavailable. Select the link above to copy it manually.";
+        input.focus();
+        input.select();
+        return false;
+    }
 }
 
 if (typeof document !== "undefined") {
@@ -1105,47 +1188,52 @@ async function resolveBuildShareInput(input) {
     };
 }
 
-async function copyBuildShareCode() {
-    if (typeof hasCreatedRotation === "function" && !hasCreatedRotation()) {
-        return false;
-    }
-
-    try {
-        const metadata = await requestBuildShareMetadata();
-        if (!metadata) return false;
-        const storedShare = await createStoredBuildShare(metadata);
-        await navigator.clipboard.writeText(storedShare.shortCode);
-        showBuildShareMetadata(storedShare);
-        alert(`${getBuildShareTypeLabel(storedShare.shareType)} share code copied: ${storedShare.shortCode}`);
-    } catch (error) {
-        console.error("Short share-code copy failed:", error);
-        alert("The short share code could not be created. Please try again.");
-        return false;
-    }
-
-    return true;
+function copyBuildShareCode() {
+    return publishBuildShare("code");
 }
 
-async function copyBuildShareLink() {
-    if (typeof hasCreatedRotation === "function" && !hasCreatedRotation()) {
-        return false;
-    }
+function copyBuildShareLink() {
+    return publishBuildShare("link");
+}
 
+async function publishBuildShare(copyKind) {
+    if (buildSharePublishing || (typeof hasCreatedRotation === "function" && !hasCreatedRotation())) return false;
+    buildSharePublishing = true;
+    setBuildSharePublishStatus("");
+    refreshBuildSharePublishControls();
     try {
         const metadata = await requestBuildShareMetadata();
         if (!metadata) return false;
+        buildShareDraft = { ...metadata, key: getBuildShareDraftKey() };
+        buildShareSubmitting = true;
+        refreshBuildSharePublishControls();
+        setBuildSharePublishStatus("Publishing in Discover…");
         const storedShare = await createStoredBuildShare(metadata);
-        const link = `${getBuildShareBaseUrl()}#${BUILD_SHORT_SHARE_HASH_KEY}=${storedShare.shortCode}`;
-        await navigator.clipboard.writeText(link);
-        showBuildShareMetadata(storedShare);
-        alert("Share link copied.");
+        buildShareDraft = null;
+        // Display the persisted result before attempting the independent clipboard operation.
+        showBuildShareMetadata(storedShare, { published: true });
+        setBuildSharePublishStatus("Published successfully in Discover.");
+        let message;
+        try {
+            await navigator.clipboard.writeText(copyKind === "code" ? storedShare.shortCode : getPublishedBuildShareUrl(storedShare));
+            message = copyKind === "code" ? "Share code copied. The full link is also available above." : "Link copied.";
+        } catch {
+            message = "Published successfully. Automatic copying is unavailable; select the link above to copy it manually.";
+        }
+        if (typeof document !== "undefined") {
+            const status = document.getElementById("shareMetadataCopyStatus");
+            if (status) status.textContent = message;
+        }
+        return true;
     } catch (error) {
-        console.error("Short share-link copy failed:", error);
-        alert("The short share link could not be created. Please try again.");
+        console.error("Publication failed:", error);
+        setBuildSharePublishStatus("Could not publish. Please try again; your title and description will be kept.");
         return false;
+    } finally {
+        buildSharePublishing = false;
+        buildShareSubmitting = false;
+        refreshBuildSharePublishControls();
     }
-
-    return true;
 }
 
 function extractBuildShareCode(input) {
