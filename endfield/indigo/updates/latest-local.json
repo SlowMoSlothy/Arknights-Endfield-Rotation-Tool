@@ -3,9 +3,15 @@
   "app": "endfield-indigo",
   "platform": "win-x64",
   "edition": "local",
-  "version": "0.306.14",
-  "url": "https://github.com/SlowMoSlothy/Arknights-Endfield-Rotation-Tool/releases/download/indigo-v0.306.14/Endfield-Indigo-0.306.14-lokal-win-x64.exe",
-  "sha256": "cf4285b0bab0aaf9aa1731bddf5d3b9e407114f7ccd81192c41d88aaad0991ce",
-  "bytes": 163085685,
-  "notes": "Die Schaltfläche Update installieren erscheint nur, wenn eine neue Version verfügbar ist."
+  "version": "0.306.15",
+  "url": "https://github.com/SlowMoSlothy/Arknights-Endfield-Rotation-Tool/releases/download/indigo-v0.306.15/Endfield-Indigo-0.306.15-lokal-win-x64.exe",
+  "sha256": "6eebc938a00c6458cf7b3be3df7dde2c5536aa2cead7d19eb94575ae53dd434d",
+  "bytes": 135167861,
+  "notes": "Bilder liegen in einem separaten komprimierten Paket und werden bei unverändertem Inhalt für weitere Updates wiederverwendet.",
+  "artwork": {
+    "file": "Indigo-Artwork-6038c6d6d4632728f3e9868b.zip",
+    "url": "https://github.com/SlowMoSlothy/Arknights-Endfield-Rotation-Tool/releases/download/indigo-v0.306.15/Indigo-Artwork-6038c6d6d4632728f3e9868b.zip",
+    "sha256": "6038c6d6d4632728f3e9868b56c26bffe362bcd171ddec180131336672a615a1",
+    "bytes": 27822492
+  }
 }
