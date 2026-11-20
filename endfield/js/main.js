@@ -27,6 +27,11 @@ function toggleRotationSaveMenu(event) {
     event?.stopPropagation();
 
     if (typeof hasCreatedRotation === "function" && !hasCreatedRotation()) return;
+    if (typeof isMobileRotationActions === "function" && isMobileRotationActions()) {
+        closeRotationActions();
+        saveRotationInMyRotations();
+        return;
+    }
 
     const host = document.getElementById("saveRotationMenuHost");
     const menu = document.getElementById("rotationSaveMenu");
@@ -410,6 +415,7 @@ async function initApp() {
         if (typeof initOperatorLoadoutModal === "function") initOperatorLoadoutModal();
         initEnemyPanel();
         initRotationSaveMenu();
+        if (typeof initRotationActions === "function") initRotationActions();
         if (typeof initCommunityRotations === "function") initCommunityRotations();
         if (typeof initOperatorGallery === "function") initOperatorGallery();
         if (typeof initMyRotations === "function") initMyRotations();

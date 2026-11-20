@@ -41,7 +41,7 @@
       "isAccessibleForFree": true
     }
   </script>
-  <link rel="stylesheet" href="css/style.css?v=108">
+  <link rel="stylesheet" href="css/style.css?v=109">
   <link rel="stylesheet" href="css/mobile.css?v=26">
   <link rel="stylesheet" href="css/onboarding.css?v=4">
   <link rel="stylesheet" href="css/plannerUsage.css?v=1">
@@ -343,6 +343,7 @@
                   <button type="button" data-setting="simulationDamageMode" data-value="critical"
                     aria-pressed="false" title="Show damage when the hit is critical">Crit</button>
                 </div>
+                <div id="rotationActionControls" class="rotation-action-controls">
                 <span class="rotation-action-tooltip-host" data-action-tooltip="Export rotation as PNG image">
                   <button id="exportRotationBtn" class="rotation-action-btn rotation-action-primary" type="button"
                     onclick="exportImage()" aria-label="Export rotation as PNG image" disabled>
@@ -351,6 +352,7 @@
                       <circle cx="9" cy="10" r="1.5"></circle>
                       <path d="M6.5 17l4.2-4.2 2.8 2.8 1.7-1.7 2.3 3.1"></path>
                     </svg>
+                    <span class="rotation-action-label" aria-hidden="true">Export as PNG</span>
                   </button>
                 </span>
                 <span class="rotation-action-tooltip-host" data-action-tooltip="Create 6-character share code">
@@ -360,6 +362,7 @@
                       <rect x="8" y="8" width="11" height="11" rx="2"></rect>
                       <path d="M5 15V7a2 2 0 0 1 2-2h8"></path>
                     </svg>
+                    <span class="rotation-action-label" aria-hidden="true">Share code</span>
                   </button>
                 </span>
                 <span class="rotation-action-tooltip-host" data-action-tooltip="Create short share link">
@@ -372,6 +375,7 @@
                       <path d="M8.3 10.8l7.4-4.4"></path>
                       <path d="M8.3 13.2l7.4 4.4"></path>
                     </svg>
+                    <span class="rotation-action-label" aria-hidden="true">Share link</span>
                   </button>
                 </span>
                 <span id="saveRotationMenuHost" class="rotation-action-tooltip-host rotation-save-menu-host"
@@ -385,6 +389,7 @@
                       <path d="M8 17h8"></path>
                       <path d="M9 10h6"></path>
                     </svg>
+                    <span class="rotation-action-label" aria-hidden="true">Save to My Rotations</span>
                   </button>
                   <div id="rotationSaveMenu" class="rotation-save-menu" role="menu" hidden>
                     <button type="button" role="menuitem" onclick="saveRotationInMyRotations()">My rotations</button>
@@ -399,6 +404,7 @@
                       <path d="M12 13v5"></path>
                       <path d="M9.8 15.8 12 18l2.2-2.2"></path>
                     </svg>
+                    <span class="rotation-action-label" aria-hidden="true">Import rotation</span>
                   </button>
                 </span>
                 <span class="rotation-action-tooltip-host" data-action-tooltip="Create new rotation">
@@ -408,8 +414,10 @@
                       <path d="M12 5v14"></path>
                       <path d="M5 12h14"></path>
                     </svg>
+                    <span class="rotation-action-label" aria-hidden="true">New rotation</span>
                   </button>
                 </span>
+                </div>
               </div>
               <div class="rotation-skills-dock">
                 <h3>Skills</h3>
@@ -419,7 +427,19 @@
                 <p id="mobilePlacementHint" role="status" aria-live="polite">Tap a skill to append · Tap a slot first to replace · Hold for details</p>
                 <button id="mobileUndoBtn" type="button" onclick="undoMobileRotationEdit()" disabled aria-label="Undo last rotation change">↶ Undo</button>
               </div>
-              <h3 class="rotation-panel-title">Rotation</h3>
+              <div class="rotation-heading">
+                <h3 class="rotation-panel-title">Rotation</h3>
+                <div id="rotationActionsHost" class="rotation-actions-host">
+                  <button id="rotationActionsToggle" type="button" aria-expanded="false" aria-controls="rotationActionsMenu">
+                    <span aria-hidden="true">⋯</span> Actions
+                  </button>
+                  <div id="rotationActionsMenu" class="rotation-actions-menu" role="group" aria-label="Rotation actions" hidden></div>
+                </div>
+              </div>
+              <div id="rotationQuickSkills" class="rotation-quick-skills" hidden></div>
+              <div id="rotation" class="rotation-panel">
+                <div id="rotationDropZone"></div>
+              </div>
               <div id="rotationPublishActions" class="rotation-publish-actions" hidden>
                 <button id="publishRotationBtn" type="button" onclick="copyBuildShareLink()"
                   aria-describedby="rotationPublicHint" disabled>Publish rotation</button>
@@ -448,10 +468,6 @@
                 <button id="dismissShareMetadataCardBtn" class="share-metadata-card-close" type="button"
                   aria-label="Hide share details">&times;</button>
               </aside>
-              <div id="rotationQuickSkills" class="rotation-quick-skills" hidden></div>
-              <div id="rotation" class="rotation-panel">
-                <div id="rotationDropZone"></div>
-              </div>
           </section>
           <section id="enemyPanel" class="builder-panel">
             <h3>Enemy</h3>
@@ -1057,7 +1073,8 @@
   <script src="js/ui/reportIssue.js?v=3"></script>
   <script src="js/ui/onboarding.js?v=6"></script>
   <script src="js/logic/builderStartup.js?v=1"></script>
-  <script src="js/main.js?v=10"></script>
+  <script src="js/ui/rotationActions.js?v=1"></script>
+  <script src="js/main.js?v=11"></script>
 </body>
 
 </html>
