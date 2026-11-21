@@ -1,10 +1,39 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
+import os from 'node:os';
+import path from 'node:path';
+import { sync } from '../tools/sync-endfield-equipment.js';
 import { buildSql, diffCatalog, fetchWeaponList, formatSetDescription, mapGear, mapGearStat, mapWeapon, readExisting, requestJson, checkDatabaseWriteAccess } from '../tools/sync-endfield-equipment.js';
 
 const weapon = JSON.parse(fs.readFileSync(new URL('./fixtures/equipment-import/weapon.json', import.meta.url)));
 const empty = () => ({ weapons: [], weapon_essence_profiles: [], gear_sets: [], gear_items: [] });
+
+test('weapons-only import skips gear sources and never generates gear writes', async () => {
+  const folder = fs.mkdtempSync(path.join(os.tmpdir(), 'weapon-import-'));
+  try {
+    const result = await sync({
+      weaponsOnly: true, output: folder, keysPath: path.join(folder, 'keys.json'),
+      env: { SUPABASE_URL: 'https://example.supabase.co', SUPABASE_ANON_KEY: 'test' },
+      get: async url => {
+        if (url.includes('/rest/v1/gear_items?')) return [{ gear_key: 'retained_gear' }];
+        if (url.includes('/rest/v1/gear_sets?')) return [{ set_key: 'retained_set' }];
+        if (url.includes('/rest/v1/')) return [];
+        if (url.endsWith('/api/weapons?page=1')) return { page: 1, total: 1, data: [{ slug: weapon.slug }] };
+        if (url.endsWith('/api/weapons/' + weapon.slug)) return { data: weapon };
+        throw new Error('Unexpected source request: ' + url);
+      }
+    });
+    assert.equal(result.catalog.weapons.length, 1);
+    assert.equal(result.catalog.weapon_essence_profiles.length, 1);
+    assert.deepEqual(result.report.gear_items.retained, ['retained_gear']);
+    assert.deepEqual(result.report.gear_sets.retained, ['retained_set']);
+    assert.doesNotMatch(result.query, /insert into public\.gear_/);
+    assert.match(result.query, /insert into public\.weapons/);
+  } finally {
+    fs.rmSync(folder, { recursive: true, force: true });
+  }
+});
 
 test('write preflight only reads settings and stops on a read-only session', async () => {
   await assert.rejects(checkDatabaseWriteAccess('example', 'token', async (url, options) => {
@@ -52,6 +81,35 @@ test('weapon import preserves saved loadout keys and imports all nine skill rank
   assert.equal(Object.hasOwn(result.profile, 'primary_base_ranks'), false);
   const renamed = mapWeapon({ ...weapon, name: 'New localized name' }, existing, keys);
   assert.equal(renamed.weapon.weapon_key, 'legacy_sword');
+});
+
+test('new source mappings reuse an existing legacy weapon and Essence key', () => {
+  for (const name of ['Complexed Industry', 'Jade Vessel', 'Long Heritage']) {
+    const sourceSlug = name.toLowerCase().replaceAll(' ', '-');
+    const existing = empty();
+    existing.weapons.push({ weapon_key: 'legacy_key', name, icon_path: 'legacy.png' });
+    const keys = { [sourceSlug]: sourceSlug.replaceAll('-', '_') };
+    const result = mapWeapon({ ...weapon, slug: sourceSlug, name }, existing, keys);
+    assert.equal(result.weapon.weapon_key, 'legacy_key');
+    assert.equal(result.profile.weapon_key, 'legacy_key');
+    assert.equal(keys[sourceSlug], 'legacy_key');
+  }
+});
+
+test('Essence import leaves every tuning column out of conflict updates', () => {
+  const existing = empty(), catalog = empty();
+  const { weapon: row, profile } = mapWeapon(weapon, existing, {});
+  existing.weapon_essence_profiles.push({ ...profile,
+    primary_base_ranks: [1, 2, 3, 4, 5], secondary_base_ranks: [1, 1, 2, 2, 3],
+    primary_max_essence: 7, secondary_max_essence: 6, skill_max_essence: 8,
+    skill_name: 'Old description', verified: true
+  });
+  catalog.weapons.push(row);
+  catalog.weapon_essence_profiles.push(profile);
+  const query = buildSql(catalog, diffCatalog(catalog, existing));
+  assert.match(query, /insert into public\.weapon_essence_profiles/);
+  assert.doesNotMatch(query, /primary_base_ranks|secondary_base_ranks|primary_max_essence|secondary_max_essence|skill_max_essence/);
+  assert.equal(profile.verified, false);
 });
 
 test('missing weapon ranks fail before generating an incomplete profile', () => {
