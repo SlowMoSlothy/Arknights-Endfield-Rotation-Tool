@@ -109,7 +109,7 @@ export function renderArsenalPage(config, weapons = []) {
   </main>
   <script id="arsenal-config" type="application/json">${json(config)}</script>
   <script id="arsenal-portraits" type="application/json">${json(portraits)}</script>
-  <script type="module" src="/endfield/js/ui/marketArsenal.js?v=15"></script>
+  <script type="module" src="/endfield/js/ui/marketArsenal.js?v=16"></script>
 </body>
 </html>
 `;

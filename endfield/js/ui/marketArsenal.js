@@ -10,10 +10,12 @@ const nameKey = name => name.normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{
 const weaponRarity = ({ rarity } = {}) => Number.isInteger(rarity) && rarity >= 1 && rarity <= 6 ? rarity : 0;
 
 export function dailyOfferEnd(observedAt) {
-  const reset = new Date(observedAt);
+  // Receipt timestamps can precede the server's reset by a fraction of a second.
+  const observed = new Date(Date.parse(observedAt) + 1000);
+  const reset = new Date(observed);
   // The Americas / Europe rotation resets at 04:00 on the UTC−5 game server.
   reset.setUTCHours(9, 0, 0, 0);
-  if (reset <= new Date(observedAt)) reset.setUTCDate(reset.getUTCDate() + 1);
+  if (reset <= observed) reset.setUTCDate(reset.getUTCDate() + 1);
   return reset.toISOString();
 }
 

@@ -87,7 +87,8 @@ test('daily offers are sorted by rarity', () => {
 });
 
 test('daily offers end at the server reset, including on a Berlin daylight saving change', () => {
-  assert.equal(dailyOfferEnd('2026-03-29T08:59:59.999Z'), '2026-03-29T09:00:00.000Z');
+  assert.equal(dailyOfferEnd('2026-03-29T08:59:58.999Z'), '2026-03-29T09:00:00.000Z');
+  assert.equal(dailyOfferEnd('2026-03-29T08:59:59.999Z'), '2026-03-30T09:00:00.000Z');
   assert.equal(dailyOfferEnd('2026-03-29T09:00:00.000Z'), '2026-03-30T09:00:00.000Z');
   const cutoff = Date.parse(dailyOfferEnd(at));
   assert.match(arsenalSectionMarkup([daily], cutoff - 1)['arsenal-daily-offers'], /Long Road/);
@@ -97,6 +98,18 @@ test('daily offers end at the server reset, including on a Berlin daylight savin
   assert.equal(formatCountdown(1), '00m 01s');
   assert.equal(formatCountdown(-1000), '00m 00s');
   assert.equal(formatCountdown(90061000), '1d 01h 01m 01s');
+});
+
+test('a new rotation received just before reset stays visible throughout the new day', () => {
+  const resetRotation = { ...daily, observed_at:'2026-11-21T08:59:59.554Z' };
+  assert.equal(dailyOfferEnd(resetRotation.observed_at), '2026-11-22T09:00:00.000Z');
+  const current = arsenalSectionMarkup([resetRotation], Date.parse('2026-11-21T09:02:00Z'));
+  assert.match(current['arsenal-daily-offers'], /Long Road/);
+  assert.match(current['arsenal-daily-offers'], /data-countdown-until="2026-11-22T09:00:00.000Z"/);
+
+  const expired = arsenalSectionMarkup([resetRotation], Date.parse('2026-11-22T09:00:00Z'));
+  assert.doesNotMatch(expired['arsenal-daily-offers'], /Long Road/);
+  assert.match(expired['arsenal-daily-offers'], /Daily rotation ended/);
 });
 
 test('the live countdown advances and past daily offers expire while offline', async (t) => {
