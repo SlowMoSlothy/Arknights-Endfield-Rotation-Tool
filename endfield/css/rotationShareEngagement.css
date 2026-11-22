@@ -1,0 +1,13 @@
+.rotation-share-engagement { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.rotation-share-engagement .rotation-share-stat { display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:42px; min-width:58px; padding:7px 12px; border:1px solid #ffffff28; border-radius:9px; color:#e5e9ea; background:#131a1a; font:inherit; font-size:14px; }
+.rotation-share-engagement button.rotation-share-stat { cursor:pointer; }
+.rotation-share-engagement .rotation-share-stat svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+.rotation-share-engagement button[aria-pressed="true"] { color:#ff9b42; border-color:#ff922c; background:#ff922c18; }
+.rotation-share-engagement button:focus-visible { outline:2px solid #ff922c; outline-offset:3px; }
+.rotation-share-engagement button:disabled { opacity:.5; cursor:wait; }
+.rotation-share-social-status { flex-basis:100%; color:#bbc4c7; font-size:12px; }
+.rotation-share-social-status:empty { display:none; }
+.share-edit-note { color:#c0c8ca; font-size:13px; margin:8px 0; }
+.published-share-actions [hidden], .share-edit-note[hidden] { display:none !important; }
+.my-publications-control { display:flex; align-items:center; gap:8px; min-height:44px; }
+.my-publications-control input { width:18px; height:18px; }

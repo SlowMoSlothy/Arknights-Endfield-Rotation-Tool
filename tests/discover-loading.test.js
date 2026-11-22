@@ -8,7 +8,7 @@ const tick = () => new Promise(resolve => setImmediate(resolve));
 const emptyResult = () => ({ data: { items: [], rotation_count: 0, simulation_count: 0 } });
 const populatedResult = () => ({ data: { items: [{ short_code: "ABC123", title: "An opener", share_type: "rotation", operator_ids: [1] }], rotation_count: 1, simulation_count: 0 } });
 
-function mount({ rpc = async () => emptyResult(), missingClient = false, tableError = "" } = {}) {
+function mount({ rpc = async () => emptyResult(), missingClient = false, tableError = "", signedIn = false } = {}) {
     const elements = new Map();
     function element(tag = "div") {
         return { tag, textContent: "", value: "", hidden: true, disabled: false, children: [], listeners: {}, attributes: {}, dataset: {},
@@ -18,7 +18,7 @@ function mount({ rpc = async () => emptyResult(), missingClient = false, tableEr
             addEventListener(name, callback) { this.listeners[name] = callback; }, reset() {} };
     }
     for (const id of ["rotationGrid", "emptyState", "rotationCount", "rotationStatus", "rotationTabCount", "simulationTabCount",
-        "refreshRotations", "searchInput", "operatorFilter", "elementFilter", "classFilter", "sortSelect", "resetFilters", "communityToolbar"]) elements.set(id, element());
+        "refreshRotations", "myPublicationsOnly", "searchInput", "operatorFilter", "elementFilter", "classFilter", "sortSelect", "resetFilters", "communityToolbar"]) elements.set(id, element());
     const tabs = ["rotation", "simulation"].map(type => Object.assign(element("button"), { dataset: { shareType: type } }));
     let calls = 0, reloads = 0;
     const c = { URL, URLSearchParams, Option: class { constructor(text, value) { this.text = text; this.value = value; } },
@@ -27,6 +27,7 @@ function mount({ rpc = async () => emptyResult(), missingClient = false, tableEr
         document: { getElementById: id => elements.get(id), createElement: element,
             querySelectorAll: selector => selector === "[data-share-type]" ? tabs : [] },
         supabaseClient: missingClient ? null : {
+            auth: { getSession: async () => ({ data: { session: signedIn ? { user: { id: "creator" } } : null } }) },
             from(table) { return { select() {
                 const query = Promise.resolve({ data: table === "operators" ? [{ id: 1, name: "Perlica", element_type: "electric", operator_class: "Caster" }] : [],
                     error: tableError === table ? new Error("Unavailable table") : null });
@@ -69,6 +70,35 @@ test("a load error survives finally, filtering and tab changes without displayin
     m.get("searchInput").listeners.input({ target: { value: "test" } });
     assertLoadError(m);
     assert.equal(m.get("refreshRotations").disabled, false);
+});
+
+test("My publications uses the owner directory and asks signed-out visitors to sign in", async () => {
+    const names = [];
+    const owner = mount({ signedIn: true, rpc: async name => { names.push(name); return populatedResult(); } });
+    await tick();
+    owner.get("myPublicationsOnly").listeners.change({ target: { checked: true } });
+    await tick();
+    assert.equal(names.at(-1), "list_my_rotation_shares");
+    const anonymous = mount();
+    await tick();
+    const before = anonymous.calls();
+    anonymous.get("myPublicationsOnly").listeners.change({ target: { checked: true } });
+    await tick();
+    assert.equal(anonymous.calls(), before);
+    assert.match(anonymous.get("rotationGrid").children[0].children[1].textContent, /Sign in in the Rotation Tool/);
+    anonymous.get("myPublicationsOnly").listeners.change({ target: { checked: false } });
+    await tick();
+    assert.equal(anonymous.get("rotationCount").textContent, "0 Rotations");
+});
+
+test("a slow engagement service cannot hold the directory in its loading state", async () => {
+    const m = mount({ rpc: async () => populatedResult() });
+    let finish;
+    m.c.RotationShareEngagement = { loadMany: () => new Promise(resolve => { finish = resolve; }) };
+    await tick();
+    assert.equal(m.get("rotationCount").textContent, "1 Rotation");
+    assert.equal(m.get("refreshRotations").disabled, false);
+    finish();
 });
 
 test("Try again transitions through loading and restores real results without duplicate requests", async () => {

@@ -9,6 +9,7 @@ const discoverState = {
   element: "all",
   operatorClass: "all",
   sort: "newest",
+  mine: false,
   rotationCount: 0,
   simulationCount: 0,
   loading: false,
@@ -334,6 +335,10 @@ function card(share) {
   );
   const open = create("a", "planner-link", "Open ↗");
   open.href = plannerUrl(share);
+  if (share.can_edit) {
+    open.textContent = "Edit ↗";
+    open.setAttribute("aria-label", `Edit ${share.title || share.short_code} in Rotation Tool`);
+  }
   head.append(titleWrap, open);
 
   item.append(meta, head);
@@ -351,6 +356,7 @@ function card(share) {
   copy.addEventListener("click", () => copyShare(share, copy));
   footer.appendChild(copy);
   item.appendChild(footer);
+  if (window.RotationShareEngagement) item.appendChild(window.RotationShareEngagement.create(share.short_code));
 
   const openShare = () => {
     window.location.href = plannerUrl(share);
@@ -439,6 +445,8 @@ function render() {
   grid.setAttribute("aria-busy", String(discoverState.loading));
   const refresh = document.getElementById("refreshRotations");
   if (refresh) refresh.disabled = discoverState.loading;
+  const mine = document.getElementById("myPublicationsOnly");
+  if (mine) mine.disabled = discoverState.loading;
   if (discoverState.loading) {
     grid.appendChild(create("div", "state-card", "Loading public shares..."));
     count.textContent = "Public shares";
@@ -501,10 +509,16 @@ async function loadData() {
 
   try {
     if (typeof supabaseClient === "undefined" || !supabaseClient) throw new Error("Share client unavailable");
+    if (discoverState.mine) {
+      const session = await supabaseClient.auth?.getSession();
+      if (!session?.data?.session?.user) throw new Error("Sign in in the Rotation Tool to view your publications.");
+    }
     const [operatorResult, skillResult, shareResult] = await Promise.all([
       supabaseClient.from("operators").select("id,name,operator_class,element_type,icon_path,is_visible").eq("game", "arknights_endfield"),
       supabaseClient.from("operator_skills").select("id,name,operator_id,skill_type,short_type,element_type,icon_path,icon_small_path"),
-      supabaseClient.rpc("list_public_rotation_shares", { p_limit: 500 })
+      discoverState.mine
+        ? supabaseClient.rpc("list_my_rotation_shares", { p_limit: 500 })
+        : supabaseClient.rpc("list_public_rotation_shares", { p_limit: 500 })
     ]);
     if (operatorResult.error) throw operatorResult.error;
     if (skillResult.error) throw skillResult.error;
@@ -537,6 +551,7 @@ async function loadData() {
       });
     });
     discoverState.shares = list(shareResult.data?.items);
+    if (window.RotationShareEngagement) void window.RotationShareEngagement.loadMany(discoverState.shares.map(share => share.short_code));
     discoverState.rotationCount = Number(shareResult.data?.rotation_count) || 0;
     discoverState.simulationCount = Number(shareResult.data?.simulation_count) || 0;
     fillFilters();
@@ -545,7 +560,8 @@ async function loadData() {
     discoverState.shares = [];
     discoverState.rotationCount = 0;
     discoverState.simulationCount = 0;
-    discoverState.error = "Public rotations and simulations could not be loaded. Please try again.";
+    discoverState.error = discoverState.mine && /Sign in/.test(error?.message || "")
+      ? error.message : "Public rotations and simulations could not be loaded. Please try again.";
   } finally {
     discoverState.loading = false;
     render();
@@ -599,6 +615,13 @@ function init() {
   });
   document.getElementById("resetFilters").addEventListener("click", resetFilters);
   document.getElementById("refreshRotations").addEventListener("click", loadData);
+  document.getElementById("myPublicationsOnly")?.addEventListener("change", event => {
+    discoverState.mine = event.target.checked;
+    loadData();
+  });
+  if (typeof supabaseClient !== "undefined" && supabaseClient?.auth?.onAuthStateChange) supabaseClient.auth.onAuthStateChange(() => {
+    if (discoverState.mine) setTimeout(loadData, 0);
+  });
   loadData();
 }
 

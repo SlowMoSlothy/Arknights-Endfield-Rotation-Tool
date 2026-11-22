@@ -28,6 +28,24 @@
 .planner-guide-steps select { width: 100%; margin-bottom: 8px; }
 .planner-guide .planner-guide-status { color: #ffe0bd; }
 .planner-guide-status:empty { display: none; }
+.rotation-start { margin: 8px 0 12px; padding: 18px; border: 1px solid #89633d; border-radius: 12px; background: #202628; color: #f6f7f0; }
+.rotation-start[hidden], .rotation-start [hidden] { display: none !important; }
+.rotation-start h4 { margin: 0 0 6px; font-size: 1rem; color: #fff2df; }
+.rotation-start p { margin: 0 0 14px; max-width: 66ch; color: #c8cece; font-size: .875rem; line-height: 1.5; }
+.rotation-start-skill-controls { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 12px; }
+.rotation-start-field { flex: 1 1 260px; min-width: 0; max-width: 480px; }
+.rotation-start label { display: block; margin-bottom: 6px; font-size: .875rem; }
+.rotation-start select { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #68716e; border-radius: 8px; background: #101718; color: #f6f7f0; font: inherit; font-size: .875rem; }
+.rotation-start button { min-height: 44px; padding: 10px 16px; border: 1px solid #fc8a35; border-radius: 8px; background: #fc8a35; color: #211006; font: inherit; font-size: .875rem; font-weight: 800; cursor: pointer; }
+.rotation-start :focus-visible { outline: 2px solid #ff9d3f; outline-offset: 3px; }
+#rotationStart:not([hidden]) ~ #rotation .rotation-empty-drop-hint { display: none; }
+:root.simulation-timeline-focus .rotation-start, .export-mode .rotation-start { display: none; }
+@media (max-width: 700px) {
+  .rotation-start { padding: 14px; }
+  .rotation-start-skill-controls { align-items: stretch; flex-direction: column; }
+  .rotation-start-field { flex-basis: auto; max-width: none; }
+  .rotation-start button { width: 100%; }
+}
 @media (max-width: 760px) {
   .planner-guide-intro { flex-direction: column; align-items: stretch; gap: 8px; }
   .planner-guide-actions { margin-left: 0; justify-content: flex-start; }

@@ -111,6 +111,60 @@ test("first skill works without equipment in either mode and never duplicates th
     }
 });
 
+test("the empty timeline offers a next step even when the getting-started guide is dismissed", () => {
+    const { context: c, storage } = createContext();
+    storage.set("rotationforge.plannerGuide.dismissed.v1", "1");
+    c.rotation = [null];
+    c.selectedTeam = [null, null, null, null];
+    c.initPlannerGuide();
+    const get = id => c.document.getElementById(id);
+    assert.equal(get("plannerGuideBody").hidden, true);
+    assert.equal(get("rotationStart").hidden, false);
+    assert.equal(get("rotationStartChoose").hidden, false);
+    assert.equal(get("rotationStartSkillControls").hidden, true);
+
+    c.selectedTeam[0] = 1;
+    c.refreshPlannerGuide();
+    assert.equal(get("rotationStartChoose").hidden, true);
+    assert.equal(get("rotationStartSkillControls").hidden, false);
+    assert.equal(get("rotationStartSkill").value, "11");
+
+    c.operators[0].skills = [];
+    c.refreshPlannerGuide();
+    assert.equal(get("rotationStartChoose").hidden, false);
+    assert.equal(get("rotationStartPlace").disabled, true);
+
+    c.rotation = [{ id: 99 }];
+    c.refreshPlannerGuide();
+    assert.equal(get("rotationStart").hidden, true);
+    assert.equal(c.rotation[0].id, 99);
+});
+
+test("the timeline shortcut validates the selected team's skill and counts only the actual placement", () => {
+    for (const mode of ["slot", "simulation"]) {
+        const { context: c } = createContext();
+        const events = [];
+        c.trackPlannerEvent = name => events.push(name);
+        c.selectedTeam = [1, null, null, null];
+        c.rotation = [null];
+        c.uiSettings.timelineMode = mode;
+        c.initPlannerGuide();
+        c.document.getElementById("rotationStartSkill").value = "12";
+        c.placeRotationStartSkill();
+        assert.deepEqual(plain(c.rotation), [null]);
+        assert.deepEqual(events, []);
+        c.document.getElementById("rotationStartSkill").value = "11";
+        c.placeRotationStartSkill();
+        c.placeRotationStartSkill();
+        assert.equal(c.rotation.filter(Boolean).length, 1);
+        assert.equal(c.rotation[0].id, 11);
+        if (mode === "simulation") assert.equal(c.rotation[0].time, 0);
+        assert.deepEqual(events, ["first_skill_placed"]);
+        c.refreshPlannerGuide();
+        assert.equal(c.document.getElementById("rotationStart").hidden, true);
+    }
+});
+
 test("example stays in Slot and preserves existing loadouts even when other catalogs fail", () => {
     const { context: c } = createContext();
     const before = plain(c.operatorLoadouts);
@@ -136,14 +190,19 @@ test("publication completes the guide only for the submitted draft", () => {
     assert.match(c.document.getElementById("plannerGuideProgress").textContent, /2 of 3/);
 });
 
-test("fresh planners expand the guide; existing rotations and dismissed guides stay collapsed", () => {
+test("the full guide starts collapsed for every visit and remains available on request", () => {
     for (const mode of ["fresh", "existing", "dismissed"]) {
         const { context: c, storage } = createContext();
         if (mode !== "existing") c.rotation = [null];
         if (mode === "dismissed") storage.set("rotationforge.plannerGuide.dismissed.v1", "1");
         c.initPlannerGuide();
-        assert.equal(c.document.getElementById("plannerGuideBody").hidden, mode !== "fresh");
-        assert.equal(c.document.getElementById("plannerGuide").hidden, mode !== "fresh");
+        assert.equal(c.document.getElementById("plannerGuideBody").hidden, true);
+        assert.equal(c.document.getElementById("plannerGuide").hidden, true);
         assert.equal(c.document.getElementById("plannerGuideActions").hidden, false);
+        c.setPlannerGuideExpanded(true);
+        assert.equal(c.document.getElementById("plannerGuideBody").hidden, false);
+        assert.equal(c.document.getElementById("plannerGuideToggle").attributes["aria-expanded"], "true");
+        c.refreshPlannerGuide();
+        assert.equal(c.document.getElementById("plannerGuideBody").hidden, false);
     }
 });

@@ -74,15 +74,18 @@ function refreshPlannerGuide() {
     const skillSelect = document.getElementById("plannerGuideSkill");
     const signature = JSON.stringify(skills.map(item => [item.skill.id, item.operator.name, item.skill.name]));
     if (signature !== plannerGuideSkillSignature) {
-        const previous = skillSelect.value;
-        skillSelect.replaceChildren();
-        skills.forEach(({ operator, skill }) => {
-            const option = document.createElement("option");
-            option.value = String(skill.id);
-            option.textContent = `${operator.name} — ${skill.name}`;
-            skillSelect.appendChild(option);
+        [skillSelect, document.getElementById("rotationStartSkill")].filter(Boolean).forEach(select => {
+            const previous = select.value;
+            select.replaceChildren();
+            skills.forEach(({ operator, skill }) => {
+                const option = document.createElement("option");
+                option.value = String(skill.id);
+                option.textContent = `${operator.name} — ${skill.name}`;
+                select.appendChild(option);
+            });
+            select.value = skills.some(item => String(item.skill.id) === previous)
+                ? previous : String(skills[0]?.skill.id || "");
         });
-        if (skills.some(item => String(item.skill.id) === previous)) skillSelect.value = previous;
         plannerGuideSkillSignature = signature;
     }
     skillSelect.disabled = !progress.complete[0] || progress.complete[1] || skills.length === 0;
@@ -92,6 +95,34 @@ function refreshPlannerGuide() {
     document.getElementById("plannerGuideShare").disabled = !progress.complete[1]
         || (typeof isBuildSharePublishing === "function" && isBuildSharePublishing());
     document.getElementById("plannerGuideRestore").hidden = !readPlannerGuideValue(PLANNER_GUIDE_BACKUP_KEY);
+    refreshRotationStart(progress, skills);
+}
+
+function refreshRotationStart(progress, skills) {
+    const start = document.getElementById("rotationStart");
+    if (!start) return;
+    start.hidden = progress.complete[1];
+    if (start.hidden) return;
+    const hasTeam = progress.complete[0];
+    const canPlace = hasTeam && skills.length > 0;
+    document.getElementById("rotationStartTitle").textContent = canPlace ? "Add your first skill"
+        : hasTeam ? "Choose another operator" : "Start with one operator";
+    document.getElementById("rotationStartDescription").textContent = canPlace
+        ? "Choose a Battle Skill below to place it on the timeline. Then add more skills to build your rotation."
+        : hasTeam ? "Your selected operators have no available Battle Skill. Choose another operator to start."
+            : "Choose an operator to unlock their skills. One operator is enough to start.";
+    const choose = document.getElementById("rotationStartChoose");
+    choose.hidden = canPlace;
+    choose.textContent = hasTeam ? "Choose operators" : "Choose your first operator";
+    document.getElementById("rotationStartSkillControls").hidden = !canPlace;
+    document.getElementById("rotationStartPlace").disabled = !canPlace;
+}
+
+function placeRotationStartSkill() {
+    const select = document.getElementById("rotationStartSkill");
+    if (!select || rotation.some(Boolean)) return;
+    document.getElementById("plannerGuideSkill").value = select.value;
+    placePlannerGuideFirstSkill();
 }
 
 function focusPlannerGuideTimeline() {
@@ -208,7 +239,8 @@ function initPlannerGuide() {
     if (plannerGuideInitialized || !document.getElementById("plannerGuide")) return;
     plannerGuideInitialized = true;
     document.getElementById("plannerGuideActions").hidden = false;
-    const expanded = !readPlannerGuideValue(PLANNER_GUIDE_DISMISSED_KEY) && !rotation.some(Boolean);
+    // The empty timeline supplies the next step; the full guide opens on request.
+    const expanded = false;
     document.getElementById("plannerGuide").hidden = !expanded;
     document.getElementById("plannerGuideBody").hidden = !expanded;
     document.getElementById("plannerGuideToggle").setAttribute("aria-expanded", String(expanded));
@@ -224,5 +256,7 @@ function initPlannerGuide() {
     document.getElementById("plannerGuidePlace").addEventListener("click", placePlannerGuideFirstSkill);
     document.getElementById("plannerGuideExample").addEventListener("click", loadPlannerGuideExample);
     document.getElementById("plannerGuideRestore").addEventListener("click", restorePlannerGuideSetup);
+    document.getElementById("rotationStartChoose")?.addEventListener("click", () => openTeamSelectionModal());
+    document.getElementById("rotationStartPlace")?.addEventListener("click", placeRotationStartSkill);
     refreshPlannerGuide();
 }

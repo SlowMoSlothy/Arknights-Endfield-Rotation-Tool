@@ -855,6 +855,9 @@ let pendingShareMetadataRequest = null;
 let buildSharePublishing = false;
 let buildShareSubmitting = false;
 let buildShareDraft = null;
+let activePublishedShare = null;
+let buildShareEditDraft = null;
+let shareOwnershipCheck = 0;
 
 function isBuildSharePublishing() {
     return buildSharePublishing;
@@ -891,6 +894,8 @@ function setBuildSharePublishStatus(message) {
 }
 
 function refreshBuildSharePublishControls() {
+    const edit = typeof document !== "undefined" ? document.getElementById("updatePublishedShareBtn") : null;
+    if (edit) edit.disabled = buildSharePublishing;
     if (typeof updateRotationActionStates === "function") updateRotationActionStates();
     if (typeof refreshPlannerGuide === "function") refreshPlannerGuide();
 }
@@ -912,7 +917,10 @@ function getStoredShareMetadata(result, fallback = {}) {
         title: String(result?.title || fallback.title || "Shared build"),
         description: String(result?.description || fallback.description || ""),
         authorName: String(result?.author_name || "Anonymous"),
-        createdAt: result?.created_at || null
+        createdAt: result?.created_at || null,
+        updatedAt: result?.updated_at || null,
+        revision: Number(result?.revision) || 1,
+        canEdit: result?.can_edit === true
     };
 }
 
@@ -952,7 +960,7 @@ function closeShareMetadataModal(result = null) {
     }
 }
 
-async function requestBuildShareMetadata() {
+async function requestBuildShareMetadata(editingShare = null) {
     if (typeof document === "undefined") return null;
     const modal = document.getElementById("shareMetadataModal");
     const form = document.getElementById("shareMetadataForm");
@@ -963,7 +971,9 @@ async function requestBuildShareMetadata() {
     if (!modal || !form || !titleInput || !descriptionInput) return null;
 
     if (pendingShareMetadataRequest) closeShareMetadataModal(null);
-    const draft = buildShareDraft?.key === getBuildShareDraftKey() ? buildShareDraft : null;
+    const draft = editingShare
+        ? (buildShareEditDraft?.shortCode === editingShare.shortCode ? buildShareEditDraft : editingShare)
+        : (buildShareDraft?.key === getBuildShareDraftKey() ? buildShareDraft : null);
     titleInput.value = draft?.title || getSuggestedBuildShareTitle();
     descriptionInput.value = draft?.description || "";
     const status = document.getElementById("shareMetadataStatus");
@@ -971,6 +981,16 @@ async function requestBuildShareMetadata() {
     const title = document.getElementById("shareMetadataModalTitle");
     if (title) title.textContent = getCurrentBuildShareType() === BUILD_SHARE_TYPE_SIMULATION ? "Publish simulation" : "Publish rotation";
     if (intro) intro.textContent = "Your build will be public in Discover. No account is required. You can edit the suggested title.";
+    const submit = document.getElementById("submitShareMetadataBtn");
+    if (submit) submit.textContent = editingShare ? "Save changes" : "Publish & copy";
+    const hint = document.getElementById("shareMetadataAuthorHint");
+    if (hint) hint.textContent = editingShare
+        ? "Only the account that published this build can save these changes."
+        : "Sign in before publishing to edit this build later. Anonymous publications cannot be assigned to an account afterwards.";
+    if (editingShare) {
+        if (title) title.textContent = "Update published build";
+        if (intro) intro.textContent = `Replace the published timeline for ${editingShare.shortCode} with the current builder. Its link, views and reactions will stay the same.`;
+    }
     if (authorPreview) authorPreview.textContent = "Loading...";
     modal.classList.add("open");
     modal.setAttribute("aria-hidden", "false");
@@ -994,6 +1014,25 @@ function initShareMetadataUi() {
     const close = document.getElementById("closeShareMetadataModalBtn");
     const dismiss = document.getElementById("dismissShareMetadataCardBtn");
     document.getElementById("copyPublishedShareLinkBtn")?.addEventListener("click", copyPublishedShareLink);
+    document.getElementById("updatePublishedShareBtn")?.addEventListener("click", updatePublishedBuildShare);
+    if (typeof supabaseClient !== "undefined" && supabaseClient?.auth?.onAuthStateChange) {
+        supabaseClient.auth.onAuthStateChange(() => {
+            const check = ++shareOwnershipCheck;
+            if (activePublishedShare) activePublishedShare.canEdit = false;
+            refreshPublishedShareOwnership();
+            // Supabase auth callbacks must not await other client requests.
+            setTimeout(async () => {
+                const code = activePublishedShare?.shortCode;
+                if (!code) return;
+                try {
+                    const fresh = await resolveStoredBuildShare(code);
+                    if (check !== shareOwnershipCheck || activePublishedShare?.shortCode !== code) return;
+                    activePublishedShare.canEdit = fresh.canEdit;
+                    refreshPublishedShareOwnership();
+                } catch { /* Signed-out and unavailable shares remain read-only. */ }
+            }, 0);
+        });
+    }
     const shareLink = document.getElementById("publishedShareLink");
     shareLink?.addEventListener("click", () => shareLink.select());
 
@@ -1028,6 +1067,14 @@ function showBuildShareMetadata(share, options = {}) {
     if (typeof document === "undefined" || !share?.shortCode) return;
     const card = document.getElementById("shareMetadataCard");
     if (!card) return;
+    activePublishedShare = { ...share };
+    ++shareOwnershipCheck;
+    refreshPublishedShareOwnership();
+    const social = document.getElementById("publishedShareEngagement");
+    if (social && window.RotationShareEngagement) {
+        social.replaceChildren(window.RotationShareEngagement.create(share.shortCode, { recordView: !options.published && !options.updated }));
+        if (options.published || options.updated) window.RotationShareEngagement.loadMany([share.shortCode]);
+    }
 
     const description = String(share.description || "").trim();
     const created = share.createdAt ? new Date(share.createdAt) : null;
@@ -1057,9 +1104,63 @@ function showBuildShareMetadata(share, options = {}) {
         discoverLink.href = discover.href;
     }
     const copyStatus = document.getElementById("shareMetadataCopyStatus");
-    if (copyStatus) copyStatus.textContent = options.published ? "Your build is published. The share link is ready." : "Share this link to open the build.";
+    if (copyStatus) copyStatus.textContent = options.updated ? "Changes saved. Your existing link now opens the updated build." : options.published ? "Your build is published. The share link is ready." : "Share this link to open the build.";
     card.hidden = false;
     if (options.published) card.scrollIntoView({ block: "nearest", behavior: "smooth" });
+}
+
+function refreshPublishedShareOwnership() {
+    if (typeof document === "undefined") return;
+    const owned = activePublishedShare?.canEdit === true;
+    const button = document.getElementById("updatePublishedShareBtn");
+    const note = document.getElementById("publishedShareEditNote");
+    if (button) button.hidden = !owned;
+    if (note) note.hidden = !owned;
+}
+
+async function updatePublishedBuildShare() {
+    if (buildSharePublishing || !activePublishedShare?.canEdit) return false;
+    const target = { ...activePublishedShare };
+    if (typeof hasCreatedRotation === "function" && !hasCreatedRotation()) {
+        setBuildSharePublishStatus("Add at least one action before saving this publication.");
+        return false;
+    }
+    if (getCurrentBuildShareType() !== target.shareType) {
+        setBuildSharePublishStatus("Switch back to the publication's planner mode or publish a new build.");
+        return false;
+    }
+    buildSharePublishing = true;
+    refreshBuildSharePublishControls();
+    try {
+        const metadata = await requestBuildShareMetadata(target);
+        if (!metadata) return false;
+        buildShareEditDraft = { ...metadata, shortCode: target.shortCode };
+        if (activePublishedShare?.shortCode !== target.shortCode) throw new Error("The loaded publication changed. Reopen its link before saving.");
+        const sharePayload = getDisplayBuildShareCode();
+        const operatorIds = [...new Set(selectedTeam.filter(id => id !== null && id !== undefined && id !== "").map(Number).filter(Number.isInteger))];
+        const { data, error } = await supabaseClient.rpc("update_rotation_share", {
+            p_short_code: target.shortCode, p_expected_revision: target.revision,
+            p_share_type: target.shareType, p_share_payload: sharePayload,
+            p_format_version: BUILD_PERSISTENCE_PAYLOAD_VERSION, p_operator_ids: operatorIds,
+            p_title: metadata.title, p_description: metadata.description
+        });
+        if (error) throw error;
+        const result = Array.isArray(data) ? data[0] : data;
+        if (result?.short_code !== target.shortCode || Number(result?.revision) !== target.revision + 1) throw new Error("Invalid update response. Reopen the publication to check its latest version.");
+        buildShareEditDraft = null;
+        showBuildShareMetadata({ shortCode: target.shortCode, shareType: target.shareType, sharePayload, ...getStoredShareMetadata(result) }, { updated: true });
+        setBuildSharePublishStatus("Publication updated. Its existing link and reactions were preserved.");
+        return true;
+    } catch (error) {
+        const conflict = error?.code === "40001";
+        setBuildSharePublishStatus(conflict
+            ? "This publication was changed in another tab. Open its link again before saving; your local changes are still here."
+            : "Could not update this publication. Check that you are signed in with its creator account and try again. Your changes are still here.");
+        return false;
+    } finally {
+        buildSharePublishing = false;
+        refreshBuildSharePublishControls();
+    }
 }
 
 async function copyPublishedShareLink() {

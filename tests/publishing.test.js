@@ -14,6 +14,7 @@ function mount({ rpc, clipboardDenied = false } = {}) {
         "shareMetadataCard", "shareMetadataCardType", "shareMetadataCardTitle", "shareMetadataCardAuthor", "shareMetadataCardCode",
         "shareMetadataCardCreated", "shareMetadataCardDescription", "publishedShareLink", "publishedShareOpenLink",
         "publishedShareDiscoverLink", "shareMetadataCopyStatus", "publishRotationStatus", "publishRotationBtn",
+        "updatePublishedShareBtn", "publishedShareEditNote", "submitShareMetadataBtn",
         "rotationPublishActions", "exportRotationBtn", "copyShareCodeBtn", "copyShareLinkBtn", "saveRotationMenuBtn"];
     for (const id of ids) {
         const classes = new Set();
@@ -64,6 +65,86 @@ test("the permanent publish action follows rotation availability, independently 
     c.uiSettings.timelineMode = "simulation";
     c.updateRotationActionStates();
     assert.equal(get("publishRotationBtn").textContent, "Publish simulation");
+});
+
+test("only owned publications offer updating, and saving retains the original short link", async () => {
+    const m = mount({ rpc: async (name, args) => ({ data: {
+        short_code: args.p_short_code, share_type: "rotation", title: args.p_title,
+        description: args.p_description, revision: args.p_expected_revision + 1, can_edit: true
+    } }) });
+    const share = { shortCode: "ABC123", shareType: "rotation", title: "Original title", description: "Original notes", revision: 4, canEdit: false };
+    m.c.showBuildShareMetadata(share);
+    assert.equal(m.get("updatePublishedShareBtn").hidden, true);
+    assert.equal(await m.c.updatePublishedBuildShare(), false);
+    m.c.showBuildShareMetadata({ ...share, canEdit: true });
+    assert.equal(m.get("updatePublishedShareBtn").hidden, false);
+    const saving = m.c.updatePublishedBuildShare();
+    assert.equal(m.get("shareMetadataTitleInput").value, "Original title");
+    assert.match(m.get("shareMetadataIntro").textContent, /link, views and reactions/);
+    assert.equal(m.get("submitShareMetadataBtn").textContent, "Save changes");
+    assert.equal(await m.c.updatePublishedBuildShare(), false);
+    m.get("shareMetadataTitleInput").value = "Updated title";
+    m.submit();
+    assert.equal(await saving, true);
+    assert.equal(m.calls.length, 1);
+    assert.equal(m.calls[0].name, "update_rotation_share");
+    assert.equal(m.calls[0].args.p_expected_revision, 4);
+    assert.equal(m.calls[0].args.p_short_code, "ABC123");
+    assert.equal(m.calls[0].args.p_share_payload, "test-payload");
+    assert.equal(m.get("publishedShareLink").value, "https://rotationforge.gg/endfield/#share=ABC123");
+    assert.equal(m.get("shareMetadataCardTitle").textContent, "Updated title");
+    assert.equal(m.clipboardCalls.length, 0);
+    const next = m.c.updatePublishedBuildShare();
+    m.submit();
+    assert.equal(await next, true);
+    assert.equal(m.calls[1].args.p_expected_revision, 5);
+});
+
+test("a revision conflict retains the local draft and metadata without publishing a duplicate", async () => {
+    const m = mount({ rpc: async () => ({ error: { code: "40001" } }) });
+    m.c.showBuildShareMetadata({ shortCode: "ABC123", shareType: "rotation", title: "Original", canEdit: true, revision: 1 });
+    const saving = m.c.updatePublishedBuildShare();
+    m.get("shareMetadataTitleInput").value = "My changed title";
+    m.get("shareMetadataDescriptionInput").value = "Keep these edits";
+    m.submit();
+    assert.equal(await saving, false);
+    assert.match(m.get("publishRotationStatus").textContent, /another tab/);
+    assert.equal(m.c.rotation.length, 1);
+    const retry = m.c.updatePublishedBuildShare();
+    assert.equal(m.get("shareMetadataTitleInput").value, "My changed title");
+    assert.equal(m.get("shareMetadataDescriptionInput").value, "Keep these edits");
+    m.get("cancelShareMetadataBtn").listeners.click();
+    assert.equal(await retry, false);
+    assert.equal(m.calls.length, 1);
+    assert.equal(m.get("updatePublishedShareBtn").disabled, false);
+});
+
+test("changing planner mode requires a new publication, and cancellation never updates", async () => {
+    const m = mount();
+    m.c.showBuildShareMetadata({ shortCode: "ABC123", shareType: "rotation", title: "Original", canEdit: true, revision: 1 });
+    m.c.uiSettings.timelineMode = "simulation";
+    assert.equal(await m.c.updatePublishedBuildShare(), false);
+    assert.equal(m.calls.length, 0);
+    m.c.uiSettings.timelineMode = "slot";
+    const saving = m.c.updatePublishedBuildShare();
+    m.get("cancelShareMetadataBtn").listeners.click();
+    assert.equal(await saving, false);
+    assert.equal(m.calls.length, 0);
+});
+
+test("account changes immediately hide editing and stale ownership responses cannot affect another share", async () => {
+    const m = mount();
+    let authChanged, finish;
+    m.c.supabaseClient.auth = { onAuthStateChange(callback) { authChanged = callback; } };
+    m.c.initShareMetadataUi();
+    m.c.resolveStoredBuildShare = () => new Promise(resolve => { finish = resolve; });
+    m.c.showBuildShareMetadata({ shortCode: "ABC123", shareType: "rotation", canEdit: true });
+    authChanged();
+    assert.equal(m.get("updatePublishedShareBtn").hidden, true);
+    m.c.showBuildShareMetadata({ shortCode: "XYZ789", shareType: "rotation", canEdit: false });
+    finish({ canEdit: true });
+    await tick();
+    assert.equal(m.get("updatePublishedShareBtn").hidden, true);
 });
 
 test("suggested titles use the team, stay within 60 characters and remain editable", async () => {

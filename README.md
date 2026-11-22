@@ -202,11 +202,19 @@ After placing an action, use **Publish rotation** beside the timeline. Publishin
 
 The result card shows the published title, author, share code and full selectable link, with **Copy link**, **Open rotation** and **View in Discover** actions. Clipboard denial does not turn a successful publication into an error; the link remains available to copy manually. Copying the published link again does not create another share, and repeated clicks during publication are ignored.
 
+To enable editing and engagement, run **`supabase/rotation_share_editing_engagement.sql` after `supabase/rotation_share_codes.sql`**, before deploying the updated frontend. The additive migration is safe to rerun and preserves existing publications. Do not rerun the older setup migration after this update: the new migration also extends its publishing, resolving and listing functions.
+
+Sign in **before publishing** to associate a build with your account. In **Discover → My publications**, open your build, change its team or timeline and choose **Save changes to publication** in the share details below the timeline. The form also edits its title and description. Saving keeps the short code, original creation date, views and reactions. A revision check rejects overwriting changes saved from another tab; reopen the published link to load its latest version. **Publish rotation** continues to create a separate publication. Private **My Rotations** saves remain independent. Earlier anonymous publications cannot be claimed retroactively.
+
+Discover cards show views, likes and dislikes. Opening a successfully loaded public build records a view; browsing cards and hovering previews do not. As in the Operator Database, views count once per browser identifier, and each browser can like, dislike, switch its reaction or remove it by clicking again. This uses the same local visitor identifier (`rotationforge.profileVisitorId.v1`); it is not a unique-person count or an account-based voting system. Clearing browser storage or using a different browser creates a new visitor. Raw visitor rows are not publicly readable. Stats load in a single batch for the displayed directory; a stats-service failure leaves Discover usable.
+
 ### Experimental Simulation Mode
 
 New planners start in Slot mode. To reveal the mode switch, open **Settings → Experimental → Show experimental Simulation Mode**. Simulation-specific settings appear only while Simulation is active. Switch back to Slot before hiding the experimental controls. Existing local simulations and imported simulation links keep their mode and timing data.
 
-The getting-started guide uses a Slot example and requires no weapon or gear setup. Its three steps are choosing operators, placing a first skill, and publishing a share. Existing drafts, including equipment and simulation settings, can be restored from the example backup.
+The getting-started guide starts collapsed and opens through **Getting started**. It uses a Slot example and requires no weapon or gear setup. Its three steps are choosing operators, placing a first skill, and publishing a share. Existing drafts, including equipment and simulation settings, can be restored from the example backup.
+
+An empty timeline also shows its next step when the guide is collapsed: choose an operator, then select a Battle Skill and use **Add first skill**. The shortcut uses the normal placement and measurement flow, hides once the rotation contains an action, and preserves existing drafts.
 
 ### Builder usage measurement
 

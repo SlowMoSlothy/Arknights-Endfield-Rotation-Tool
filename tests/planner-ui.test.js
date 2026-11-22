@@ -64,7 +64,7 @@ test("short share codes are unique, mode-aware and accessible only through valid
   assert.match(plannerHtml, /id="shareMetadataTitleInput"[^>]*required/);
   assert.match(plannerHtml, /id="shareMetadataDescriptionInput"/);
   assert.match(plannerHtml, /id="shareMetadataCardAuthor"/);
-  assert.match(plannerHtml, /shareCode\.js\?v=15/);
+  assert.match(plannerHtml, /shareCode\.js\?v=16/);
 });
 
 test("timeline mode switch has active styling and accessible pressed state", () => {
