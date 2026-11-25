@@ -8,14 +8,18 @@ import { createIndexPage, writeGeneratedOutput, baseStyles, siteHeader } from '.
 
 test('the official nine cards cover ten figures without inventing combat classifications', () => {
   assert.equal(upcomingOperatorPreviews.length, 10);
-  assert.equal(new Set(upcomingOperatorPreviews.map(row => row.icon_path)).size, 9);
+  assert.equal(new Set(upcomingOperatorPreviews.map(row => row.icon_path)).size, 10);
+  assert.equal(new Set(upcomingOperatorPreviews.map(row => row.raw_data.teaserPath)).size, 9);
   assert.equal(upcomingOperatorPreviews.filter(row => row.name.startsWith('Unrevealed Operator')).length, 8);
   for (const row of upcomingOperatorPreviews) {
     assert.equal(row.star, null);
     assert.equal(row.weapon_type, null);
     assert.equal(row.operator_class, 'unannounced');
     assert.equal(row.element_type, 'unannounced');
-    assert.ok(fs.statSync(path.join('endfield', row.icon_path)).size > 100);
+    const avatar = fs.readFileSync(path.join('endfield', row.icon_path));
+    assert.equal(avatar.subarray(1, 4).toString(), 'PNG');
+    assert.equal(avatar[25], 6, 'Avatar must retain its RGBA alpha channel');
+    assert.ok(fs.statSync(path.join('endfield', row.raw_data.teaserPath)).size > 100);
     const [x, y, size] = row.raw_data.crop;
     assert.ok(x >= 0 && y >= 0 && x + size <= 1400 && y + size <= 596);
     assert.doesNotMatch(previewPortraitStyle(row), /NaN|Infinity/);
@@ -38,6 +42,8 @@ test('preview pages show unknown fields and sources without made-up stars or a p
     assert.match(html, /Upcoming · Preview/);
     assert.match(html, /<dd>Not announced<\/dd>/);
     assert.match(html, /5-m2XEedNlU/);
+    assert.ok(html.includes(`/endfield/${row.icon_path}`));
+    assert.ok(html.includes(`<img src="/endfield/${row.raw_data.teaserPath}" alt="Official SIGNAL PRELINK`));
     assert.doesNotMatch(html, /[★☆]|leader=|data-profile-engagement|0-star|null-star/);
     for (const match of html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)) assert.doesNotThrow(() => JSON.parse(match[1]));
   }

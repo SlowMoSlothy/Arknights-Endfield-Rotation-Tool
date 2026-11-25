@@ -10,7 +10,7 @@ Sources:
 - [Teaser card image mirrors](https://endsync.vercel.app/versions/2-0/)
 - Named identity cross-checks: [Warfarin](https://endfieldtools.dev/characters/warfarin/), [M3](https://endfieldtools.dev/characters/m3/).
 
-`tools/upcoming-operator-previews.js` records each stable preview slug, card, portrait crop and provenance. The original, unedited teaser cards are stored in `endfield/assets/operators/previews/`. CSS selects the head/upper-body crop for both the index and detail frame without AI reconstruction. The full card remains available in an expandable section on each detail page.
+`tools/upcoming-operator-previews.js` records each stable preview slug, card, portrait crop and provenance. The original, unedited teaser cards are stored in `endfield/assets/operators/previews/`. Ten separate transparent, AI-assisted head cutouts are stored in `endfield/assets/operators/avatars/previews/`. They are derived from the original teaser cards using the built-in image editor, like Mimino. The shared avatar scale and lower transform origin fill both index and detail frames without floating neck edges. See `docs/upcoming-portrait-prompts.md` for the prompt set. The full card remains available in an expandable section on each detail page.
 
 These are display-only announcements, generated alongside public Supabase operators. They have no database operator IDs, invented rarity/class/element/weapon, placeholder physical skills, simulation actions or planner links. Missing combat details and individual dates remain explicitly unannounced. The cards participate in catalog search and sorting; unknown classifications and rarity have their own filter choices. Original profiles retain their normal pages and engagement counters.
 
