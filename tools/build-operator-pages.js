@@ -1,4 +1,5 @@
 import { withMobileLandingNav } from './mobile-landing-nav.js';
+import { isUpcomingPreview, selectUpcomingPreviews, upcomingIndexCard, createUpcomingOperatorPage } from './upcoming-operator-previews.js';
 import { operatorProgression } from './operator-progression.js';
 import { catalogSkills, catalogSections } from './operator-catalog-markup.js';
 import { createClient } from "@supabase/supabase-js";
@@ -963,6 +964,7 @@ function relatedCard(operator) {
 }
 
 function indexCard(operator) {
+  if (isUpcomingPreview(operator)) return upcomingIndexCard(operator);
   const avatar = operatorAvatarPath(operator);
   const classIcon = classIconPath(operator.operator_class);
   const elementIcon = elementIconPath(operator.element_type);
@@ -1457,8 +1459,9 @@ export function createIndexPage(operators) {
   const elementOptions = filterOptions(operators.map((operator) => operator.element_type));
   const rarityOptions = numericValues(operators.map((operator) => operator.star))
     .sort((a, b) => Number(b) - Number(a))
+    .filter(value => value > 0)
     .map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)} stars</option>`)
-    .join("");
+    .join("") + (operators.some(isUpcomingPreview) ? '<option value="0">Not announced</option>' : "");
 
   return `<!doctype html>
 <html lang="en">
@@ -1477,6 +1480,7 @@ export function createIndexPage(operators) {
   <script type="application/ld+json">${JSON.stringify(itemListSchema)}</script>
   ${baseStyles()}
   <style>.operator-tile[data-name="mimino"] .tile-avatar{transform:scale(2.2);transform-origin:50% 64%}</style>
+  <link rel="stylesheet" href="/endfield/css/upcomingOperators.css?v=1">
   <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6">
 </head>
 <body class="operator-index">
@@ -1486,7 +1490,7 @@ export function createIndexPage(operators) {
     <section class="index-hero">
       <div class="eyebrow">RotationForge Database</div>
       <h1>Arknights: Endfield Operators</h1>
-      <p>Browse all operators stored in the RotationForge database. Each page includes operator stats, class and element icons, skills, related operators and a direct link into the rotation planner.</p>
+      <p>Browse operators and officially announced previews. Upcoming profiles show the confirmed teaser information; stats, skills and rotation planning follow when gameplay details are published.</p>
     </section>
     <details class="database-filters" open><summary><span class="filter-show">Show filters</span><span class="filter-hide">Hide filters</span></summary>
     <form class="operator-toolbar" aria-label="Filter and sort operators">
@@ -1814,12 +1818,14 @@ function removeIfExists(targetPath, options = {}) {
 
 export function writeGeneratedOutput({
   operators,
+  previewOperators = [],
   skillsByOperator,
   basicAttackFormsByOperator = new Map(),
   outputDir = OUTPUT_DIR,
   sitemapPath = SITEMAP_PATH
 }) {
   validateOperators(operators);
+  const catalogOperators = validateOperators([...operators, ...previewOperators]);
 
   const suffix = `${process.pid}-${Date.now()}`;
   const tempOutputDir = `${outputDir}.tmp-${suffix}`;
@@ -1834,19 +1840,21 @@ export function writeGeneratedOutput({
 
   try {
     fs.mkdirSync(tempOutputDir, { recursive: true });
-    fs.writeFileSync(path.join(tempOutputDir, "index.html"), withMobileLandingNav(createIndexPage(operators)), "utf8");
+    fs.writeFileSync(path.join(tempOutputDir, "index.html"), withMobileLandingNav(createIndexPage(catalogOperators)), "utf8");
 
-    for (const operator of operators) {
+    for (const operator of catalogOperators) {
       const folder = path.join(tempOutputDir, operator.slug);
       fs.mkdirSync(folder, { recursive: true });
       fs.writeFileSync(
         path.join(folder, "index.html"),
-        createOperatorPage(operator, operators, skillsByOperator, basicAttackFormsByOperator),
+        isUpcomingPreview(operator)
+          ? createUpcomingOperatorPage(operator, { styles: baseStyles(), header: siteHeader({ showOperatorLink: true }) })
+          : createOperatorPage(operator, operators, skillsByOperator, basicAttackFormsByOperator),
         "utf8"
       );
     }
 
-    fs.writeFileSync(tempSitemapPath, createSitemap(operators), "utf8");
+    fs.writeFileSync(tempSitemapPath, createSitemap(catalogOperators), "utf8");
 
     if (fs.existsSync(outputDir)) {
       fs.renameSync(outputDir, backupOutputDir);
@@ -1917,9 +1925,10 @@ export async function build({ supabase = createSupabaseClient() } = {}) {
     if (!hasCanonicalBasicAttack && basicAttack) operator.basicAttack = basicAttack;
   }
 
-  writeGeneratedOutput({ operators, skillsByOperator, basicAttackFormsByOperator });
+  const previewOperators = selectUpcomingPreviews(operatorRows || []);
+  writeGeneratedOutput({ operators, previewOperators, skillsByOperator, basicAttackFormsByOperator });
 
-  console.log(`Fertig: ${operators.length} Operator-Seiten erstellt.`);
+  console.log(`Fertig: ${operators.length} Operator-Seiten und ${previewOperators.length} Vorschauseiten erstellt.`);
 }
 
 const isMainModule = process.argv[1]

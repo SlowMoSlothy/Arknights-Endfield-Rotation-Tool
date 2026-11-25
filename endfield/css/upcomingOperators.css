@@ -1,0 +1,19 @@
+.upcoming-portrait{position:relative;overflow:hidden}
+.upcoming-portrait .preview-avatar{position:absolute;display:block;width:var(--preview-width);height:auto;max-width:none;left:var(--preview-left);top:var(--preview-top);border-radius:0}
+.operator-page .portrait-media.upcoming-portrait{position:absolute}
+.preview-badge{display:inline-block;color:var(--accent);font-size:.72rem;font-weight:900;letter-spacing:.04em}
+.upcoming-tile .tile-stars{letter-spacing:0;font-size:.65rem}
+.upcoming-tile h2{overflow-wrap:anywhere}
+.preview-tile-note{margin:9px 0 0;color:var(--muted);font-size:.63rem;line-height:1.5}
+.upcoming-page h1{margin-top:14px;white-space:normal;font-size:clamp(2.1rem,4vw,3.7rem);line-height:1.05;letter-spacing:-.05em;overflow-wrap:anywhere}
+.preview-facts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:0}
+.preview-facts>div{min-width:0;padding:10px;border:1px solid var(--border);border-radius:7px;background:#7e807c14}
+.preview-facts dt{color:var(--silver);font-size:.63rem;font-weight:850;text-transform:uppercase}
+.preview-facts dd{margin:7px 0 0;font-size:.78rem;font-weight:850;overflow-wrap:anywhere}
+.upcoming-page .panel p{color:var(--muted);line-height:1.75}
+.upcoming-page .panel a,.preview-back a{color:var(--accent)}
+.preview-artwork{margin-top:20px}
+.preview-artwork summary{cursor:pointer;font-weight:800}
+.preview-artwork img{display:block;width:100%;height:auto;margin-top:12px;border-radius:10px}
+.preview-back{margin-top:24px}
+@media(max-width:760px){.preview-facts{grid-template-columns:repeat(2,minmax(0,1fr))}.upcoming-page .info-panel{width:100%}}
