@@ -1310,7 +1310,7 @@ export function createOperatorPage(
   <script type="application/ld+json">${JSON.stringify(breadcrumbSchema)}</script>
   <script type="application/ld+json">${JSON.stringify(webPageSchema)}</script>
   ${baseStyles()}
-  <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6">
+${operator.slug === "mimino" ? '  <style>.operator-page .portrait-media .portrait{transform:translateX(-50%) scale(2.2);transform-origin:50% 64%}</style>\n' : ""}  <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6">
   ${attributeVariantStyles()}
   <link rel="stylesheet" href="/endfield/css/operatorProgression.css?v=1">
   <link rel="stylesheet" href="/endfield/css/operatorCatalog.css?v=1">
