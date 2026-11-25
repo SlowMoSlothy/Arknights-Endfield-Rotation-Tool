@@ -1,4 +1,5 @@
 import { profileEngagementMarkup, profileEngagementSummaryMarkup } from './profile-engagement-markup.js';
+import '../endfield/js/data/operatorPortraits.js';
 export { profileEngagementMarkup, profileEngagementSummaryMarkup } from './profile-engagement-markup.js';
 import { withMobileLandingNav } from './mobile-landing-nav.js';
 import { isUpcomingPreview, selectUpcomingPreviews, upcomingIndexCard, createUpcomingOperatorPage } from './upcoming-operator-previews.js';
@@ -25,8 +26,6 @@ const OPERATOR_AVATAR_OVERRIDES = new Map([
 
 const OPERATOR_DETAIL_PORTRAIT_STYLES = new Map([
   ["mimino", "transform:translateX(-50%) scale(2.2);transform-origin:50% 64%"],
-  ["argent_flow", "object-fit:cover;object-position:50% 35%"],
-  ["purrchena", "object-fit:cover;object-position:50% 35%"]
 ]);
 
 export function createSupabaseClient(env = process.env) {
@@ -90,7 +89,10 @@ export function normalizeAssetPath(assetPath) {
 
 function operatorAvatarPath(operator) {
   const slug = String(operator?.slug || "").toLowerCase();
-  const sourcePath = OPERATOR_AVATAR_OVERRIDES.get(slug) || operator?.icon_path;
+  const portraitName = globalThis.ROTATIONFORGE_OPERATOR_PORTRAITS[slug];
+  const sourcePath = portraitName
+    ? `assets/operators/avatars/refined/${portraitName}.png`
+    : OPERATOR_AVATAR_OVERRIDES.get(slug) || operator?.icon_path;
   const normalizedPath = normalizeAssetPath(sourcePath);
   if (!normalizedPath || normalizedPath.includes("?")) return normalizedPath;
 
@@ -1279,6 +1281,7 @@ ${portraitStyle ? `  <style>.operator-page .portrait-media .portrait{${portraitS
   ${attributeVariantStyles()}
   <link rel="stylesheet" href="/endfield/css/operatorProgression.css?v=1">
   <link rel="stylesheet" href="/endfield/css/operatorCatalog.css?v=1">
+  <link rel="stylesheet" href="/endfield/css/operatorPortraits.css?v=1">
 </head>
 <body class="operator-page">
   ${siteHeader({ showOperatorLink: false, showToolCta: false })}
@@ -1437,6 +1440,7 @@ export function createIndexPage(operators) {
   ${baseStyles()}
   <style>.operator-tile[data-name="mimino"] .tile-avatar{transform:scale(2.2);transform-origin:50% 64%}</style>
   <link rel="stylesheet" href="/endfield/css/upcomingOperators.css?v=5">
+  <link rel="stylesheet" href="/endfield/css/operatorPortraits.css?v=1">
   <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6">
 </head>
 <body class="operator-index">

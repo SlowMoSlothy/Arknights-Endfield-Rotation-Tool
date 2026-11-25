@@ -245,6 +245,8 @@ function applyEffectDurationOverridesToOperators(operators, overrides) {
 
 function mapDatabaseOperator(row, skillRows, basicAttackConfig = null) {
     const raw = isPlainObject(row.raw_data) ? row.raw_data : {};
+    const portraitName = globalThis.ROTATIONFORGE_OPERATOR_PORTRAITS?.[row.slug || raw.slug];
+    const originalIcon = row.icon_path || raw.icon;
 
     return {
         ...raw,
@@ -254,8 +256,9 @@ function mapDatabaseOperator(row, skillRows, basicAttackConfig = null) {
         star: row.star ?? raw.star,
         operatorClass: row.operator_class || raw.operatorClass,
         sortOrder: row.sort_order ?? raw.sortOrder,
-        icon: (row.icon_path || raw.icon) === 'assets/operators/avatars/Mimino.webp'
-            ? 'assets/operators/avatars/Mimino.png' : (row.icon_path || raw.icon),
+        icon: portraitName ? `assets/operators/avatars/refined/${portraitName}.png`
+            : originalIcon === 'assets/operators/avatars/Mimino.webp'
+                ? 'assets/operators/avatars/Mimino.png' : originalIcon,
         isVisible: row.is_visible !== false,
         canEnterUltimateState: row.can_enter_ultimate_state ?? raw.canEnterUltimateState,
         elementType: row.element_type || raw.elementType,

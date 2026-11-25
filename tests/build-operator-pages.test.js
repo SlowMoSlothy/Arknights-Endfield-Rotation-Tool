@@ -376,7 +376,7 @@ test("operator pages read attributes stored by the admin editor in raw_data", ()
 });
 
 test("generated pages use placeholders when an operator image is missing", () => {
-  const entry = operator({ icon_path: "" });
+  const entry = operator({ slug: "missing_portrait", icon_path: "" });
   const page = createOperatorPage(entry, [entry], new Map());
   const index = createIndexPage([entry]);
 
@@ -582,7 +582,7 @@ test("operator pages render the compact rotation overview without redundant fiel
   assert.match(page, /class="batk-export-button"/);
   assert.match(page, /data-batk-export/);
   assert.match(page, /class="batk-export-data"/);
-  assert.match(page, /"operator":\{"name":"Mi Fu","avatar":"\/endfield\/assets\/operators\/mi_fu\.webp"/);
+  assert.match(page, /"operator":\{"name":"Mi Fu","avatar":"\/endfield\/assets\/operators\/avatars\/refined\/Mi_Fu\.png\?v=[a-f0-9]{12}"/);
   assert.match(page, /"pageUrl":"https:\/\/rotationforge\.gg\/endfield\/operators\/mi_fu\/"/);
   assert.match(page, /"timeline":\{"name":"Measured Combo","kicker":"BATK timeline","totalDuration":2\.5/);
   assert.match(page, /"hitMultipliers":\[0\.2,0\.4\],"atkMultiplierTotal":0\.6/);
@@ -656,9 +656,9 @@ test("Liino pages use the current versioned PNG avatar despite a stale SVG datab
   const page = createOperatorPage(liino, [liino], new Map());
   const index = createIndexPage([liino]);
 
-  assert.match(page, /avatars\/Liino\.png\?v=[a-f0-9]{12}/);
+  assert.match(page, /avatars\/refined\/Liino\.png\?v=[a-f0-9]{12}/);
   assert.doesNotMatch(page, /avatars\/Liino\.svg/);
-  assert.match(index, /avatars\/Liino\.png\?v=[a-f0-9]{12}/);
+  assert.match(index, /avatars\/refined\/Liino\.png\?v=[a-f0-9]{12}/);
   assert.doesNotMatch(index, /avatars\/Liino\.svg/);
 });
 
@@ -673,9 +673,9 @@ test("operator pages expose local avatars as content-versioned image URLs", () =
   const index = createIndexPage([miFu]);
   const sitemap = createSitemap([miFu]);
 
-  assert.match(page, /avatars\/Mi_Fu\.png\?v=[a-f0-9]{12}/);
-  assert.match(index, /avatars\/Mi_Fu\.png\?v=[a-f0-9]{12}/);
-  assert.match(sitemap, /avatars\/Mi_Fu\.png\?v=[a-f0-9]{12}/);
+  assert.match(page, /avatars\/refined\/Mi_Fu\.png\?v=[a-f0-9]{12}/);
+  assert.match(index, /avatars\/refined\/Mi_Fu\.png\?v=[a-f0-9]{12}/);
+  assert.match(sitemap, /avatars\/refined\/Mi_Fu\.png\?v=[a-f0-9]{12}/);
 });
 
 test("BATK PNG export renders a complete standalone canvas and downloads it", () => {

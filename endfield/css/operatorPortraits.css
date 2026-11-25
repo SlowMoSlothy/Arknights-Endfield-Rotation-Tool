@@ -1,0 +1,17 @@
+/* Busts are anchored to the frame: no transparent gap beneath neck/shoulders. */
+.operator-index .tile-avatar-frame .tile-avatar[src*="/avatars/refined/"],
+.operator-page .related-avatar-frame .related-avatar[src*="/avatars/refined/"] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: cover;
+    transform: scale(1.1);
+    transform-origin: 50% 65%;
+}
+
+.operator-page .portrait-media .portrait[src*="/avatars/refined/"] {
+    transform: translateX(-50%) scale(1.1);
+    transform-origin: 50% 65%;
+}
