@@ -108,8 +108,10 @@ function mapDatabaseSkill(row) {
         cooldown: row.cooldown ?? raw.cooldown,
         energy: row.energy ?? raw.energy,
         elementType: row.element_type || raw.elementType,
-        icon: row.icon_path || raw.icon,
-        iconSmall: row.icon_small_path || raw.iconSmall,
+        icon: (row.icon_path || raw.icon) === 'assets/operators/avatars/Mimino.webp'
+            ? 'assets/ui/elements/physical.webp' : (row.icon_path || raw.icon),
+        iconSmall: (row.icon_small_path || raw.iconSmall || row.icon_path || raw.icon) === 'assets/operators/avatars/Mimino.webp'
+            ? 'assets/ui/elements/physical.webp' : (row.icon_small_path || raw.iconSmall),
         description: row.description || raw.description,
         comboTrigger: row.combo_trigger || raw.comboTrigger,
         comboTriggerMode: row.combo_trigger_mode || raw.comboTriggerMode,
@@ -252,7 +254,8 @@ function mapDatabaseOperator(row, skillRows, basicAttackConfig = null) {
         star: row.star ?? raw.star,
         operatorClass: row.operator_class || raw.operatorClass,
         sortOrder: row.sort_order ?? raw.sortOrder,
-        icon: row.icon_path || raw.icon,
+        icon: (row.icon_path || raw.icon) === 'assets/operators/avatars/Mimino.webp'
+            ? 'assets/operators/avatars/Mimino.png' : (row.icon_path || raw.icon),
         isVisible: row.is_visible !== false,
         canEnterUltimateState: row.can_enter_ultimate_state ?? raw.canEnterUltimateState,
         elementType: row.element_type || raw.elementType,

@@ -16,7 +16,8 @@ const SKILL_PAGE_SIZE = 1000;
 const OPERATOR_ID_CHUNK_SIZE = 100;
 const OPERATOR_SLUG_PATTERN = /^[a-z0-9]+(?:[_-][a-z0-9]+)*$/;
 const OPERATOR_AVATAR_OVERRIDES = new Map([
-  ["liino", "assets/operators/avatars/Liino.png"]
+  ["liino", "assets/operators/avatars/Liino.png"],
+  ["mimino", "assets/operators/avatars/Mimino.png"]
 ]);
 
 export function createSupabaseClient(env = process.env) {
@@ -894,7 +895,9 @@ function skillForAttributeVariant(skill, variantKey) {
 }
 
 function skillCard(skill) {
-  const iconPath = skill.iconSmall || skill.icon || skill.icon_small_path || skill.icon_path;
+  const storedIconPath = skill.iconSmall || skill.icon || skill.icon_small_path || skill.icon_path;
+  const iconPath = storedIconPath === 'assets/operators/avatars/Mimino.webp'
+    ? 'assets/ui/elements/physical.webp' : storedIconPath;
   const icon = iconPath ? normalizeAssetPath(iconPath) : "";
   const elementIcon = elementIconPath(skill.element_type);
   const skillElement = skillElementKey(skill.element_type);

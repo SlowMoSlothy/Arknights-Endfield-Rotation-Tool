@@ -6,7 +6,8 @@ const materials=items=>`<ul class="catalog-materials">${items.map(item=>`<li><sp
 export function catalogSkillHeader(skill,operator,existingSkills=[]) {
  const key=value=>String(value||'').toLowerCase().replace(/[ _-]/g,'');
  const existing=existingSkills.find(s=>key(s.skill_type)===key(skill.type));
- const raw=existing?.icon_small_path||existing?.iconSmall||existing?.icon_path||existing?.icon||(skill.type==='Dive Attack'?'assets/operators/skills/shared/dive_attack.png':'');
+ const stored=existing?.icon_small_path||existing?.iconSmall||existing?.icon_path||existing?.icon||(skill.type==='Dive Attack'?'assets/operators/skills/shared/dive_attack.png':'');
+ const raw=stored==='assets/operators/avatars/Mimino.webp'?'assets/ui/elements/physical.webp':stored;
  const relative=String(raw||'').replace(/^\/?endfield\//,'').replace(/^\//,'');
  const local=/^assets\/[a-zA-Z0-9_./-]+$/.test(relative)&&!relative.includes('..')&&fs.existsSync(new URL('../endfield/'+relative,import.meta.url));
  const source=skillIcons[skill.id];
