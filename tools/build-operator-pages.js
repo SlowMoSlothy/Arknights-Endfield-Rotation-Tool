@@ -20,6 +20,12 @@ const OPERATOR_AVATAR_OVERRIDES = new Map([
   ["mimino", "assets/operators/avatars/Mimino.png"]
 ]);
 
+const OPERATOR_DETAIL_PORTRAIT_STYLES = new Map([
+  ["mimino", "transform:translateX(-50%) scale(2.2);transform-origin:50% 64%"],
+  ["argent_flow", "object-fit:cover;object-position:50% 35%"],
+  ["purrchena", "object-fit:cover;object-position:50% 35%"]
+]);
+
 export function createSupabaseClient(env = process.env) {
   const url = String(env.SUPABASE_URL || "").trim();
   const anonKey = String(env.SUPABASE_ANON_KEY || "").trim();
@@ -1280,6 +1286,7 @@ export function createOperatorPage(
         }
       : {})
   };
+  const portraitStyle = OPERATOR_DETAIL_PORTRAIT_STYLES.get(operator.slug) || "";
   const portraitMarkup = avatarPath
     ? `<img class="portrait" src="${escapeHtml(avatarPath)}" alt="${escapeHtml(name)} icon" width="330" height="330" fetchpriority="high" decoding="async">`
     : `<img class="portrait-placeholder avatar-placeholder" src="${BRAND_ICON_PATH}" alt="No image available for ${escapeHtml(name)}" width="330" height="330" decoding="async">`;
@@ -1310,7 +1317,7 @@ export function createOperatorPage(
   <script type="application/ld+json">${JSON.stringify(breadcrumbSchema)}</script>
   <script type="application/ld+json">${JSON.stringify(webPageSchema)}</script>
   ${baseStyles()}
-${operator.slug === "mimino" ? '  <style>.operator-page .portrait-media .portrait{transform:translateX(-50%) scale(2.2);transform-origin:50% 64%}</style>\n' : ""}  <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6">
+${portraitStyle ? `  <style>.operator-page .portrait-media .portrait{${portraitStyle}}</style>\n` : ""}  <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6">
   ${attributeVariantStyles()}
   <link rel="stylesheet" href="/endfield/css/operatorProgression.css?v=1">
   <link rel="stylesheet" href="/endfield/css/operatorCatalog.css?v=1">
