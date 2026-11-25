@@ -91,6 +91,12 @@ img[src*="/avatars/Mimino.png"],
     background-position: center var(--portrait-y);
 }
 
+@media (min-width: 761px) {
+    .rotation-builder .operators-skills-grid :is(.operator-skill-card, .operator-skill-add-card) {
+        min-height: 152px;
+    }
+}
+
 /* PNG exports already provide a rounded overflow-hidden avatar wrapper. */
 img.export-operator-portrait:is([src*="/avatars/refined/"], [src*="/avatars/Mimino.png"]) {
     transform: scale(var(--portrait-zoom));
