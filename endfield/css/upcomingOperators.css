@@ -3,10 +3,11 @@
 .operator-page .portrait-media.upcoming-portrait{position:absolute}
 .preview-badge{display:inline-block;color:var(--accent);font-size:.72rem;font-weight:900;letter-spacing:.04em}
 .upcoming-tile .tile-stars{letter-spacing:0;font-size:.65rem}
-.upcoming-tile{display:flex;flex-direction:column}
-.upcoming-tile .tile-avatar-frame{flex-shrink:0}
-.upcoming-tile .tile-body{display:flex;flex:1;flex-direction:column}
-.upcoming-tile .tile-engagement{margin-top:auto}
+.operator-index .operator-tile{display:flex;flex-direction:column}
+.operator-index .tile-avatar-frame{flex-shrink:0}
+.operator-index .tile-body{display:flex;flex:1;flex-direction:column}
+.operator-index .tile-engagement{margin-top:auto}
+.operator-index .operator-tile:not(.upcoming-tile) .tile-chips{margin-bottom:9px}
 .upcoming-tile .preview-tile-note{margin-bottom:9px}
 .upcoming-tile h2{overflow-wrap:anywhere}
 .preview-tile-note{margin:9px 0 0;color:var(--muted);font-size:.63rem;line-height:1.5}

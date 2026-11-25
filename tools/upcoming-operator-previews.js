@@ -68,7 +68,7 @@ export function createUpcomingOperatorPage(row, { styles, header }) {
   <title>${escape(title)}</title><meta name="description" content="${escape(description)}"><link rel="canonical" href="${url}"><link rel="icon" href="/favicon-flat.png"><meta name="theme-color" content="#313739">
   <meta property="og:type" content="website"><meta property="og:title" content="${escape(title)}"><meta property="og:description" content="${escape(description)}"><meta property="og:url" content="${url}"><meta property="og:image" content="https://rotationforge.gg${imagePath(row)}"><meta name="twitter:card" content="summary_large_image">
   ${schema.map(value => `<script type="application/ld+json">${JSON.stringify(value).replaceAll('<', '\\u003c')}</script>`).join('\n')}
-  ${styles}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6"><link rel="stylesheet" href="/endfield/css/upcomingOperators.css?v=4"></head>
+  ${styles}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6"><link rel="stylesheet" href="/endfield/css/upcomingOperators.css?v=5"></head>
   <body class="operator-page upcoming-page">${header}<main class="page">
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><a href="/endfield/operators/">Operators</a><span>›</span><strong>${name}</strong></nav>
   <nav class="section-nav" aria-label="On this page"><a href="#overview">Overview</a><a href="#details">Details</a><a href="#skills">Skills</a><a href="#source">Source</a></nav>
