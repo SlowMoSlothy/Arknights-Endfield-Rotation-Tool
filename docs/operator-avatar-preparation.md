@@ -6,6 +6,8 @@ The current user requirement takes precedence over the older head-only prompts: 
 
 The user's subsequent framing request is a close-up of the face, using Kay as the reference. Catalog cards, related cards and profiles now enlarge most of these assets to 1.9×, with individual origins and scale adjustments for angled or wide faces. Kay keeps its reviewed 1.1× crop. The connected shoulder area remains behind the frame, preventing a floating head or a gap beneath the neck. This is a CSS framing change; no source artwork or prepared PNG is regenerated.
 
+The Rotation Tool shares these same crop values in team selection, team slots, gallery, loadout, mobile summaries and timeline portraits. Direct images are scaled and clipped back to their original visible box, preserving card sizes and surrounding controls. Wide skill-header backgrounds use their visible height for the crop; the PNG export uses its existing overflow-hidden wrapper. Legacy large skill-image paths are upgraded only when they identify one of the known operator avatars, leaving small skill glyphs intact.
+
 `endfield/js/data/operatorPortraits.js` supplies the shared display-only mapping to the classic-script planner and the static page generator. Database rows, canonical operator identities, profile addresses and engagement counters are unchanged. `tools/build-operator-pages.js` adds content hashes to the generated image URLs; `endfield/css/operatorPortraits.css` anchors the busts within their existing frames.
 
 The original game avatar for each name is the only image-generation input. No character features are copied from Mimino or another operator. Per-asset prompts follow below. Generated-file paths identify the selected tool outputs; final project assets are all inside the repository.

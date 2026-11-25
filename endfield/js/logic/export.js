@@ -107,6 +107,7 @@ function createExportTeamStrip(targetDoc, teamOperators) {
         avatarWrap.style.background = "rgba(0,0,0,0.5)";
 
         const image = targetDoc.createElement("img");
+        image.className = "export-operator-portrait";
         image.src = new URL(operator.icon, document.baseURI).href;
         image.alt = operator.name;
         image.crossOrigin = "anonymous";
@@ -181,6 +182,24 @@ function cleanupExportRotationClone(clonedRotation) {
 
     clonedRotation.querySelectorAll(".rotation-arrow.is-unused").forEach(arrow => {
         arrow.style.display = "none";
+    });
+}
+
+function prepareExportOperatorPortraits(clonedDoc, clonedRotation) {
+    // html2canvas handles overflow wrappers, while CSS clip-path is not rendered.
+    clonedRotation.querySelectorAll('img[src*="/avatars/refined/"], img[src*="/avatars/Mimino.png"]').forEach(image => {
+        if (image.classList.contains("export-operator-portrait")) return;
+        const style = clonedDoc.defaultView.getComputedStyle(image);
+        const frame = clonedDoc.createElement("span");
+        Object.assign(frame.style, {
+            display: "block", width: style.width, height: style.height,
+            flex: `0 0 ${style.width}`, overflow: "hidden",
+            borderRadius: style.borderRadius, position: "relative", zIndex: style.zIndex
+        });
+        image.parentNode.insertBefore(frame, image);
+        frame.appendChild(image);
+        image.classList.add("export-operator-portrait");
+        Object.assign(image.style, {width: "100%", height: "100%", clipPath: "none"});
     });
 }
 
@@ -301,6 +320,8 @@ function exportImage() {
             if (clonedTeamStrip) {
                 clonedTeamStrip.style.visibility = "visible";
             }
+
+            prepareExportOperatorPortraits(clonedDoc, clonedRotation);
 
             const nodes = [
                 clonedRotation,

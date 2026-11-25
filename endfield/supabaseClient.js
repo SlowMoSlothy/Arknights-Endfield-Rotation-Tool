@@ -109,7 +109,9 @@ function mapDatabaseSkill(row) {
         energy: row.energy ?? raw.energy,
         elementType: row.element_type || raw.elementType,
         icon: (row.icon_path || raw.icon) === 'assets/operators/avatars/Mimino.webp'
-            ? 'assets/ui/elements/physical.webp' : (row.icon_path || raw.icon),
+            ? 'assets/ui/elements/physical.webp'
+            : typeof globalThis.resolveOperatorPortraitAsset === 'function'
+                ? globalThis.resolveOperatorPortraitAsset(row.icon_path || raw.icon) : (row.icon_path || raw.icon),
         iconSmall: (row.icon_small_path || raw.iconSmall || row.icon_path || raw.icon) === 'assets/operators/avatars/Mimino.webp'
             ? 'assets/ui/elements/physical.webp' : (row.icon_small_path || raw.iconSmall),
         description: row.description || raw.description,

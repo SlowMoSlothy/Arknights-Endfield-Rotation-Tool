@@ -13,3 +13,13 @@ globalThis.ROTATIONFORGE_OPERATOR_PORTRAITS = Object.freeze({
     typhoeus: "typhoeus", wulfgard: "Wulfgard", xaihi: "Xaihi",
     yvonne: "Yvonne", zhuang: "Zhuang"
 });
+
+// Large skill portraits can still point at legacy avatar paths. Keep glyphs intact.
+globalThis.resolveOperatorPortraitAsset = function (assetPath) {
+    if (typeof assetPath !== "string") return assetPath;
+    const match = assetPath.match(/^(?:\/?endfield\/|\/)?assets\/operators\/avatars\/([^/]+)\.(?:png|webp|svg)(?:\?[^#]*)?$/i);
+    if (!match) return assetPath;
+    const name = Object.values(globalThis.ROTATIONFORGE_OPERATOR_PORTRAITS)
+        .find(value => value.toLowerCase() === match[1].toLowerCase());
+    return name ? `assets/operators/avatars/refined/${name}.png` : assetPath;
+};

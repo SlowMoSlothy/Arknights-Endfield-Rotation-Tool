@@ -710,6 +710,7 @@ function resolveSkillForAttributeSelection(skill, op) {
 }
 
 function getOperatorSkillCardBackground(op) {
+    if (/\/avatars\/(?:refined\/|Mimino\.png)/.test(String(op?.icon || ""))) return op.icon;
     const operatorSlug = String(op?.slug || "").trim().toLowerCase();
     if (operatorSlug === "liino") {
         const battleSkill = Array.isArray(op?.skills)
@@ -792,6 +793,7 @@ function renderSkills() {
         card.className = "operator-skill-card";
         const bgPath = getOperatorSkillCardBackground(op);
         const bgUrl = new URL(bgPath, document.baseURI).href;
+        card.dataset.operatorPortrait = bgPath;
 
         card.style.setProperty("--operator-bg", `url("${bgUrl}")`);
         if (index === 0) card.classList.add("leader");

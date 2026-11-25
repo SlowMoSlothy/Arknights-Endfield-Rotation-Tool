@@ -1281,7 +1281,7 @@ ${portraitStyle ? `  <style>.operator-page .portrait-media .portrait{${portraitS
   ${attributeVariantStyles()}
   <link rel="stylesheet" href="/endfield/css/operatorProgression.css?v=1">
   <link rel="stylesheet" href="/endfield/css/operatorCatalog.css?v=1">
-  <link rel="stylesheet" href="/endfield/css/operatorPortraits.css?v=2">
+  <link rel="stylesheet" href="/endfield/css/operatorPortraits.css?v=3">
 </head>
 <body class="operator-page">
   ${siteHeader({ showOperatorLink: false, showToolCta: false })}
@@ -1440,7 +1440,7 @@ export function createIndexPage(operators) {
   ${baseStyles()}
   <style>.operator-tile[data-name="mimino"] .tile-avatar{transform:scale(2.2);transform-origin:50% 64%}</style>
   <link rel="stylesheet" href="/endfield/css/upcomingOperators.css?v=5">
-  <link rel="stylesheet" href="/endfield/css/operatorPortraits.css?v=2">
+  <link rel="stylesheet" href="/endfield/css/operatorPortraits.css?v=3">
   <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6">
 </head>
 <body class="operator-index">

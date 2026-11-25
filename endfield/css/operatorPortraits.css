@@ -1,43 +1,43 @@
 /* Face crops keep the connected bust below the frame, without a neck gap. */
-.operator-index .tile-avatar[src*="/avatars/refined/"],
-.operator-page img[src*="/avatars/refined/"] {
+img[src*="/avatars/refined/"],
+[data-operator-portrait*="/avatars/refined/"] {
     --portrait-zoom: 1.9;
     --portrait-x: 50%;
     --portrait-y: 58%;
 }
 
-.operator-index .tile-avatar[src*="/refined/Kay.png"],
-.operator-page img[src*="/refined/Kay.png"] { --portrait-zoom: 1.1; --portrait-y: 65%; }
+img[src*="/refined/Kay.png"],
+[data-operator-portrait*="/refined/Kay.png"] { --portrait-zoom: 1.1; --portrait-y: 65%; }
 
-.operator-index .tile-avatar[src*="/refined/Si.png"],
-.operator-page img[src*="/refined/Si.png"] { --portrait-zoom: 1.45; --portrait-x: 65%; --portrait-y: 70%; }
+img[src*="/refined/Si.png"],
+[data-operator-portrait*="/refined/Si.png"] { --portrait-zoom: 1.45; --portrait-x: 65%; --portrait-y: 70%; }
 
-.operator-index .tile-avatar[src*="/refined/Argent_Flow.png"],
-.operator-page img[src*="/refined/Argent_Flow.png"] { --portrait-zoom: 1.8; --portrait-x: 72%; --portrait-y: 55%; }
+img[src*="/refined/Argent_Flow.png"],
+[data-operator-portrait*="/refined/Argent_Flow.png"] { --portrait-zoom: 1.8; --portrait-x: 72%; --portrait-y: 55%; }
 
-.operator-index .tile-avatar[src*="/refined/Purrchena.png"],
-.operator-page img[src*="/refined/Purrchena.png"] { --portrait-zoom: 1.3; --portrait-x: 55%; --portrait-y: 60%; }
+img[src*="/refined/Purrchena.png"],
+[data-operator-portrait*="/refined/Purrchena.png"] { --portrait-zoom: 1.3; --portrait-x: 55%; --portrait-y: 60%; }
 
-.operator-index .tile-avatar[src*="/refined/Dapan.png"],
-.operator-page img[src*="/refined/Dapan.png"] { --portrait-zoom: 1.55; --portrait-y: 60%; }
+img[src*="/refined/Dapan.png"],
+[data-operator-portrait*="/refined/Dapan.png"] { --portrait-zoom: 1.55; --portrait-y: 60%; }
 
-.operator-index .tile-avatar[src*="/refined/Antal.png"],
-.operator-page img[src*="/refined/Antal.png"] { --portrait-zoom: 1.75; --portrait-y: 60%; }
+img[src*="/refined/Antal.png"],
+[data-operator-portrait*="/refined/Antal.png"] { --portrait-zoom: 1.75; --portrait-y: 60%; }
 
-.operator-index .tile-avatar[src*="/refined/Alesh.png"],
-.operator-page img[src*="/refined/Alesh.png"] { --portrait-zoom: 1.8; --portrait-y: 60%; }
+img[src*="/refined/Alesh.png"],
+[data-operator-portrait*="/refined/Alesh.png"] { --portrait-zoom: 1.8; --portrait-y: 60%; }
 
-.operator-index .tile-avatar[src*="/refined/Ardelia.png"],
-.operator-page img[src*="/refined/Ardelia.png"] { --portrait-x: 55%; }
+img[src*="/refined/Ardelia.png"],
+[data-operator-portrait*="/refined/Ardelia.png"] { --portrait-x: 55%; }
 
-.operator-index .tile-avatar[src*="/refined/Perlica.png"],
-.operator-index .tile-avatar[src*="/refined/Lifeng.png"],
-.operator-index .tile-avatar[src*="/refined/Fluorite.png"],
-.operator-index .tile-avatar[src*="/refined/Laevatain.png"],
-.operator-page img[src*="/refined/Perlica.png"],
-.operator-page img[src*="/refined/Lifeng.png"],
-.operator-page img[src*="/refined/Fluorite.png"],
-.operator-page img[src*="/refined/Laevatain.png"] { --portrait-zoom: 2; --portrait-y: 55%; }
+img[src*="/refined/Perlica.png"],
+img[src*="/refined/Lifeng.png"],
+img[src*="/refined/Fluorite.png"],
+img[src*="/refined/Laevatain.png"],
+[data-operator-portrait*="/refined/Perlica.png"],
+[data-operator-portrait*="/refined/Lifeng.png"],
+[data-operator-portrait*="/refined/Fluorite.png"],
+[data-operator-portrait*="/refined/Laevatain.png"] { --portrait-zoom: 2; --portrait-y: 55%; }
 
 .operator-index .tile-avatar-frame .tile-avatar[src*="/avatars/refined/"],
 .operator-page .related-avatar-frame .related-avatar[src*="/avatars/refined/"] {
@@ -53,5 +53,46 @@
 
 .operator-page .portrait-media .portrait[src*="/avatars/refined/"] {
     transform: translateX(-50%) scale(var(--portrait-zoom));
+    transform-origin: var(--portrait-x) var(--portrait-y);
+}
+
+img[src*="/avatars/Mimino.png"],
+[data-operator-portrait*="/avatars/Mimino.png"] {
+    --portrait-zoom: 2.2;
+    --portrait-x: 50%;
+    --portrait-y: 64%;
+}
+
+/* Direct planner images keep their existing layout and visible hit area. */
+@supports (clip-path: inset(calc((1 - 1 / 2) * 50%) round calc(10px / 2))) {
+    .rotation-builder img:is([src*="/avatars/refined/"], [src*="/avatars/Mimino.png"]):not(.export-operator-portrait) {
+        --portrait-radius: var(--portrait-corner, 10px);
+        transform: scale(var(--portrait-zoom));
+        transform-origin: var(--portrait-x) var(--portrait-y);
+        clip-path: inset(
+            calc((1 - 1 / var(--portrait-zoom)) * var(--portrait-y))
+            calc((1 - 1 / var(--portrait-zoom)) * (100% - var(--portrait-x)))
+            calc((1 - 1 / var(--portrait-zoom)) * (100% - var(--portrait-y)))
+            calc((1 - 1 / var(--portrait-zoom)) * var(--portrait-x))
+            round calc(var(--portrait-radius) / var(--portrait-zoom))
+        );
+    }
+
+    .rotation-builder img.rotation-skill-portrait { --portrait-corner: 12px; }
+    .rotation-builder :is(.team-preview-header, .mobile-operator-summary) img,
+    .rotation-builder img.my-operator-avatar { --portrait-corner: 6px; }
+}
+
+/* Wide skill headers show the full face within their visible height. */
+.rotation-builder .operator-skill-card:is([data-operator-portrait*="/avatars/refined/"], [data-operator-portrait*="/avatars/Mimino.png"])::before {
+    bottom: 0;
+    height: auto;
+    background-size: auto calc(100% * var(--portrait-zoom));
+    background-position: center var(--portrait-y);
+}
+
+/* PNG exports already provide a rounded overflow-hidden avatar wrapper. */
+img.export-operator-portrait:is([src*="/avatars/refined/"], [src*="/avatars/Mimino.png"]) {
+    transform: scale(var(--portrait-zoom));
     transform-origin: var(--portrait-x) var(--portrait-y);
 }
