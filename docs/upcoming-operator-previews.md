@@ -1,6 +1,6 @@
 # Upcoming operator previews
 
-The catalog includes all ten figures shown across the nine official *Ensemble: SIGNAL PRELINK* teaser cards, revealed on November 21, 2026. Warfarin and M3 are named; eight figures keep neutral `Unrevealed Operator` labels. Card 3 shows both M3 in front and a second unnamed figure behind her.
+The catalog includes all ten figures shown across the nine official *Ensemble: SIGNAL PRELINK* teaser cards, revealed on November 21, 2026. Warfarin and M3 are named; eight figures use compact `Operator 1`–`Operator 8` display labels. Their canonical `Unrevealed Operator` matching names and stable engagement IDs are retained. Card 3 shows both M3 in front and a second unnamed figure behind her.
 
 Sources:
 

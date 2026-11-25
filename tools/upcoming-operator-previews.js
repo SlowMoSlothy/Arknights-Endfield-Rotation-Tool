@@ -17,7 +17,7 @@ const entries = [
 ];
 
 export const upcomingOperatorPreviews = entries.map(([slug, name, card, crop, summary], index) => ({
-  id: `preview:${slug}`, slug, name, star: null,
+  id: `preview:${slug}`, slug, name, display_name: name.replace(/^Unrevealed Operator /, 'Operator '), star: null,
   operator_class: 'unannounced', element_type: 'unannounced', weapon_type: null,
   icon_path: `assets/operators/avatars/previews/${slug}.png`,
   created_at: TEASER_ANNOUNCED_AT, sort_order: 10000 + index,
@@ -50,19 +50,20 @@ export function previewPortraitStyle(row) {
 
 export function upcomingIndexCard(row) {
   return `<a class="operator-tile upcoming-tile" href="${pagePath(row)}" data-added="${Date.parse(row.created_at)}" data-name="${escape(row.name.toLowerCase())}" data-class="unannounced" data-element="unannounced" data-rarity="0" data-order="${row.sort_order}">
-    <span class="tile-avatar-frame upcoming-portrait" style="${previewPortraitStyle(row)}"><img class="preview-avatar" src="${imagePath(row)}" alt="${escape(row.name)} — portrait from the official teaser" loading="lazy" width="1254" height="1254"></span>
-    <div class="tile-body"><span class="tile-stars preview-badge">Upcoming · Preview</span><h2>${escape(row.name)}</h2>
+    <span class="tile-avatar-frame upcoming-portrait" style="${previewPortraitStyle(row)}"><img class="preview-avatar" src="${imagePath(row)}" alt="${escape(row.display_name || row.name)} — portrait from the official teaser" loading="lazy" width="1254" height="1254"></span>
+    <div class="tile-body"><span class="tile-stars preview-badge">Upcoming · Preview</span><h2>${escape(row.display_name || row.name)}</h2>
     <div class="tile-chips"><span class="tile-chip">Details not announced</span></div><p class="preview-tile-note">Version 2.0 and beyond · Release date TBA</p>${profileEngagementSummaryMarkup("operator", row.id)}</div>
   </a>`;
 }
 
 export function createUpcomingOperatorPage(row, { styles, header }) {
-  const name = escape(row.name), url = `https://rotationforge.gg${pagePath(row)}`;
-  const title = `${row.name} — Upcoming Operator Preview | RotationForge`;
-  const description = `${row.name}: official Arknights: Endfield operator teaser. Release date, rarity, class, element, weapon and skills have not been announced.`;
+  const label = row.display_name || row.name;
+  const name = escape(label), url = `https://rotationforge.gg${pagePath(row)}`;
+  const title = `${label} — Upcoming Operator Preview | RotationForge`;
+  const description = `${label}: official Arknights: Endfield operator teaser. Release date, rarity, class, element, weapon and skills have not been announced.`;
   const schema = [
     { '@context': 'https://schema.org', '@type': 'WebPage', name: title, description, url, datePublished: TEASER_ANNOUNCED_AT, about: { '@type': 'VideoGame', name: 'Arknights: Endfield' }, primaryImageOfPage: { '@type': 'ImageObject', url: `https://rotationforge.gg${imagePath(row)}`, caption: 'Portrait adapted from official SIGNAL PRELINK teaser artwork' } },
-    { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://rotationforge.gg/' }, { '@type': 'ListItem', position: 2, name: 'Operators', item: 'https://rotationforge.gg/endfield/operators/' }, { '@type': 'ListItem', position: 3, name: row.name, item: url }] }
+    { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://rotationforge.gg/' }, { '@type': 'ListItem', position: 2, name: 'Operators', item: 'https://rotationforge.gg/endfield/operators/' }, { '@type': 'ListItem', position: 3, name: label, item: url }] }
   ];
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${escape(title)}</title><meta name="description" content="${escape(description)}"><link rel="canonical" href="${url}"><link rel="icon" href="/favicon-flat.png"><meta name="theme-color" content="#313739">
