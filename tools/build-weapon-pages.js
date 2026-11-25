@@ -18,7 +18,7 @@ export const isWeaponKey = value => typeof value === 'string' && /^[a-z0-9]+(?:[
 
 export function safeUrl(value, localImages = false) {
   const input = String(value || '');
-  if (localImages && /^(?:\/endfield\/)?assets\/weapons\/[a-z0-9_-]+\.(?:png|webp|jpg)$/i.test(input)) return input.startsWith('/') ? input : '/endfield/' + input;
+  if (localImages && /^(?:\/endfield\/)?assets\/weapons\/(?:[a-z0-9_-]+\/)*[a-z0-9_-]+\.(?:png|webp|jpg)$/i.test(input)) return input.startsWith('/') ? input : '/endfield/' + input;
   try {
     const url = new URL(input);
     return url.protocol === 'https:' && !url.username && !url.password ? url.href : '';
@@ -141,7 +141,7 @@ export function createWeaponPage(row, rows) {
 <body class="operator-index weapon-index weapon-profile">${siteHeader({ showWeaponLink: false }).replace(/[ \t]+$/gm, '')}<main class="page">${breadcrumbs(row)}
 <nav class="weapon-section-links" aria-label="Weapon sections"><a href="#weapon-atk">ATK by level</a><a href="#weapon-attributes">Attributes</a><a href="#weapon-skill">Weapon skill</a></nav>
 <section class="weapon-hero" data-rarity="${row.rarity}"><div class="portrait-card weapon-portrait"><div class="weapon-portrait-media"><img src="${escape(weaponImage(row))}" alt="${escape(row.name)}" width="360" height="360" fetchpriority="high"></div><span class="barcode">ROTATIONFORGE DATABASE</span></div>
-<div class="weapon-hero-copy"><div class="eyebrow">Arknights: Endfield Weapon</div>${stars(row)}<h1>${escape(row.name)}</h1><p class="weapon-subtitle">${escape(typeName(row))} <span aria-hidden="true">/</span> ${escape(row.passive_name || 'Weapon skill not recorded')}</p>
+<div class="weapon-hero-copy"><div class="eyebrow">Arknights: Endfield Weapon</div>${stars(row)}<h1>${escape(row.name)}</h1><p class="weapon-subtitle">${escape(typeName(row))} <span aria-hidden="true">/</span> ${escape(row.passive_name || 'Weapon skill not recorded')}</p>${row.raw_data?.dataStatus === 'announced_preview' ? `<p class="highlight"><strong>Announced preview</strong> — ${escape(row.raw_data.sourceNote || 'Combat values have not been published yet.')}</p>` : ''}
 <dl class="weapon-stat-grid"><div><dt>Base ATK · Level ${number(row.base_stats_level)}</dt><dd>${number(row.base_atk)}</dd></div><div><dt>${escape(profile?.primary_label || row.main_attribute || 'Primary attribute')}${primaryRank ? ` · Rank ${primaryRank}` : ''}</dt><dd>${stat(primaryMax, profile?.primary_is_percent)}</dd></div>${profile?.secondary_label ? `<div><dt>${escape(profile.secondary_label)} · Rank ${profile.secondary_values?.length || '—'}</dt><dd>${stat(secondaryMax, profile.secondary_is_percent)}</dd></div>` : ''}</dl>
 </div></section>
 <section class="weapon-section" id="weapon-atk"><div class="section-kicker">Weapon growth</div><h2>Base ATK by level</h2>${atkProgression(row)}</section>

@@ -95,7 +95,8 @@ function createInflictionBurstEvent(sourceEvent, application, burstIndex) {
         inflictionBurst: {
             effectKey: application.key,
             burstKey: mechanic.burstKey,
-            sourceSkillId: sourceEvent?.skillData?.id
+            sourceSkillId: sourceEvent?.skillData?.id,
+            sourceSkillType: sourceEvent?.skillData?.type
         }
     };
 }
@@ -113,6 +114,10 @@ function enrichSimulationEventsWithInflictionBursts(events) {
             Number(effect?.currentStacks ?? effect?.stackCount ?? effect?.stacks ?? 0) || 0
         ]));
         let burstIndex = 0;
+        (event.skillData.forcedInflictionBursts || []).forEach(key => {
+            const mechanic = getInflictionMechanic(key);
+            if (mechanic) result.push(createInflictionBurstEvent(event, { key, mechanic }, burstIndex++));
+        });
         getSkillInflictionApplications(event.skillData, event.activeDebuffsBefore).forEach(application => {
             const previousStacks = Math.max(0, Number(stacksBefore.get(application.key)) || 0);
             const burstCount = previousStacks > 0

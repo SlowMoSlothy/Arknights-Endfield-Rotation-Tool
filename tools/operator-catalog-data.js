@@ -57,7 +57,7 @@ export function mapOperatorCatalog(detail,{text,items}) {
   const potentials=(detail.potentials?.potentialUnlockBundle||[]).map(p=>{
     const values={};
     for(const effect of p.effectData?.dataList||[]){
-      const attr=effect.attrModifier,key=({1:'MaxHp',2:'Atk',3:'Def',9:'CriticalRate',17:'NormalAttackDamageIncrease',29:'HealOutputIncrease',32:'NormalSkillDamageIncrease',39:'Str',40:'Agi',41:'Wisd',42:'Will',50:'PhysicalDamageIncrease',52:'PulseDamageIncrease',53:'CrystDamageIncrease',87:'PhysicalAndSpellInflictionEnhance'})[attr?.attrType];
+      const attr=effect.attrModifier,key=({1:'MaxHp',2:'Atk',3:'Def',9:'CriticalRate',17:'NormalAttackDamageIncrease',29:'HealOutputIncrease',32:'NormalSkillDamageIncrease',39:'Str',40:'Agi',41:'Wisd',42:'Will',50:'PhysicalDamageIncrease',51:'FireDamageIncrease',52:'PulseDamageIncrease',53:'CrystDamageIncrease',54:'NaturalDamageIncrease',87:'PhysicalAndSpellInflictionEnhance'})[attr?.attrType];
       if(key)values[key]=attr.attrValue;
       const bb=effect.skillBbModifier;if(bb?.bbKey)values[bb.bbKey]=bb.floatValue;
       for(const b of [...(effect.attachBuff?.blackboard||[]),...(effect.attachSkill?.blackboard||[])])values[b.key]=b.value;

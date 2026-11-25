@@ -1,0 +1,5197 @@
+{
+  "version": 1,
+  "releaseDate": "2026-11-25",
+  "officialSource": "https://endfield.gryphline.com/en-us/news/0740",
+  "sources": [
+    {
+      "url": "https://www.endfieldtools.dev/localdb/optimized/characters/details/chr_0040_sweetpie.json",
+      "sha256": "51516eb21fda75b0f3fd132787241a87e6f2d6f629b039353792fa64d888ccf4"
+    },
+    {
+      "url": "https://www.endfieldtools.dev/localdb/optimized/weapons/details/wpn_lance_0017.json",
+      "sha256": "58e8d2334d5e9b89f9b8971ce8b44022f396e2a26f7a1d6dc73f3957471bae7d"
+    },
+    {
+      "url": "https://www.endfieldtools.dev/localdb/optimized/weapons/details/wpn_lance_0018.json",
+      "sha256": "9c45fcd9f089fc4837898b53db263600933d27f0ee39534ab2582c9d5143d066"
+    },
+    {
+      "url": "https://www.endfieldtools.dev/localdb/optimized/i18n/I18nTextTable_EN.json",
+      "sha256": "19d2119db12880c44fb40733e1d6289531da42a69d5b5130d55ebb959ffbafb3"
+    },
+    {
+      "url": "https://www.endfieldtools.dev/localdb/optimized/items/items-list.json",
+      "sha256": "fa7395b7b28fe549a8cd85ac294e933a2fd88a413ad40e5b187ea51c250c229b"
+    }
+  ],
+  "operators": [
+    {
+      "id": 35,
+      "game": "arknights_endfield",
+      "slug": "kay",
+      "name": "Kay",
+      "star": 6,
+      "operator_class": "Vanguard",
+      "element_type": "nature",
+      "weapon_type": "polearm",
+      "main_attribute": "Strength",
+      "secondary_attribute": "Agility",
+      "icon_path": "assets/operators/avatars/Kay.png",
+      "can_enter_ultimate_state": false,
+      "is_visible": true,
+      "sort_order": 35,
+      "raw_data": {
+        "id": 35,
+        "name": "Kay",
+        "icon": "assets/operators/avatars/Kay.png",
+        "star": 6,
+        "operatorClass": "Vanguard",
+        "elementType": "nature",
+        "weaponType": "polearm",
+        "mainAttribute": "Strength",
+        "secondaryAttribute": "Agility",
+        "dataStatus": "catalog_only",
+        "sourceNote": "API catalog and base attributes imported. Skills and rotation mechanics have not been implemented.",
+        "baseStatsLevel": 90,
+        "baseHp": 5495,
+        "baseHpLevel1": 500,
+        "baseAtk": 318,
+        "baseAtkLevel1": 30,
+        "baseStrength": 171,
+        "baseStrengthLevel1": 22.3,
+        "baseAgility": 121,
+        "baseAgilityLevel1": 15,
+        "baseIntellect": 89,
+        "baseIntellectLevel1": 9.3,
+        "baseWill": 96,
+        "baseWillLevel1": 11.3,
+        "baseStatsMissing": false,
+        "operatorCatalogDetails": {
+          "version": 1,
+          "source": "https://endfieldtools.dev/localdb/optimized/characters/details/chr_0040_sweetpie.json",
+          "skills": [
+            {
+              "id": "chr_0040_sweetpie_NormalAttack",
+              "name": "Wild Wacky-Whack",
+              "descriptions": [
+                "BASIC ATTACK: \nAn attack with up to 5 sequences that deals Physical DMG. As the controlled operator, Final Strike also deals 17 Stagger. \n\nDIVE ATTACK: \nBasic attack performed in mid-air becomes a dive attack that deals Physical DMG to nearby enemies. \n\nFINISHER: \nBasic attack performed near a Staggered enemy becomes a finisher attack that deals massive Physical DMG and recovers some SP.",
+                "BASIC ATTACK: \nAn attack with up to 5 sequences that deals Physical DMG. As the controlled operator, Final Strike also deals 17 Stagger. \n\nDIVE ATTACK: \nBasic attack performed in mid-air becomes a dive attack that deals Physical DMG to nearby enemies. \n\nFINISHER: \nBasic attack performed near a Staggered enemy becomes a finisher attack that deals massive Physical DMG and recovers some SP.",
+                "BASIC ATTACK: \nAn attack with up to 5 sequences that deals Physical DMG. As the controlled operator, Final Strike also deals 17 Stagger. \n\nDIVE ATTACK: \nBasic attack performed in mid-air becomes a dive attack that deals Physical DMG to nearby enemies. \n\nFINISHER: \nBasic attack performed near a Staggered enemy becomes a finisher attack that deals massive Physical DMG and recovers some SP.",
+                "BASIC ATTACK: \nAn attack with up to 5 sequences that deals Physical DMG. As the controlled operator, Final Strike also deals 17 Stagger. \n\nDIVE ATTACK: \nBasic attack performed in mid-air becomes a dive attack that deals Physical DMG to nearby enemies. \n\nFINISHER: \nBasic attack performed near a Staggered enemy becomes a finisher attack that deals massive Physical DMG and recovers some SP.",
+                "BASIC ATTACK: \nAn attack with up to 5 sequences that deals Physical DMG. As the controlled operator, Final Strike also deals 17 Stagger. \n\nDIVE ATTACK: \nBasic attack performed in mid-air becomes a dive attack that deals Physical DMG to nearby enemies. \n\nFINISHER: \nBasic attack performed near a Staggered enemy becomes a finisher attack that deals massive Physical DMG and recovers some SP.",
+                "BASIC ATTACK: \nAn attack with up to 5 sequences that deals Physical DMG. As the controlled operator, Final Strike also deals 17 Stagger. \n\nDIVE ATTACK: \nBasic attack performed in mid-air becomes a dive attack that deals Physical DMG to nearby enemies. \n\nFINISHER: \nBasic attack performed near a Staggered enemy becomes a finisher attack that deals massive Physical DMG and recovers some SP.",
+                "BASIC ATTACK: \nAn attack with up to 5 sequences that deals Physical DMG. As the controlled operator, Final Strike also deals 17 Stagger. \n\nDIVE ATTACK: \nBasic attack performed in mid-air becomes a dive attack that deals Physical DMG to nearby enemies. \n\nFINISHER: \nBasic attack performed near a Staggered enemy becomes a finisher attack that deals massive Physical DMG and recovers some SP.",
+                "BASIC ATTACK: \nAn attack with up to 5 sequences that deals Physical DMG. As the controlled operator, Final Strike also deals 17 Stagger. \n\nDIVE ATTACK: \nBasic attack performed in mid-air becomes a dive attack that deals Physical DMG to nearby enemies. \n\nFINISHER: \nBasic attack performed near a Staggered enemy becomes a finisher attack that deals massive Physical DMG and recovers some SP.",
+                "BASIC ATTACK: \nAn attack with up to 5 sequences that deals Physical DMG. As the controlled operator, Final Strike also deals 17 Stagger. \n\nDIVE ATTACK: \nBasic attack performed in mid-air becomes a dive attack that deals Physical DMG to nearby enemies. \n\nFINISHER: \nBasic attack performed near a Staggered enemy becomes a finisher attack that deals massive Physical DMG and recovers some SP.",
+                "BASIC ATTACK: \nAn attack with up to 5 sequences that deals Physical DMG. As the controlled operator, Final Strike also deals 17 Stagger. \n\nDIVE ATTACK: \nBasic attack performed in mid-air becomes a dive attack that deals Physical DMG to nearby enemies. \n\nFINISHER: \nBasic attack performed near a Staggered enemy becomes a finisher attack that deals massive Physical DMG and recovers some SP.",
+                "BASIC ATTACK: \nAn attack with up to 5 sequences that deals Physical DMG. As the controlled operator, Final Strike also deals 17 Stagger. \n\nDIVE ATTACK: \nBasic attack performed in mid-air becomes a dive attack that deals Physical DMG to nearby enemies. \n\nFINISHER: \nBasic attack performed near a Staggered enemy becomes a finisher attack that deals massive Physical DMG and recovers some SP.",
+                "BASIC ATTACK: \nAn attack with up to 5 sequences that deals Physical DMG. As the controlled operator, Final Strike also deals 17 Stagger. \n\nDIVE ATTACK: \nBasic attack performed in mid-air becomes a dive attack that deals Physical DMG to nearby enemies. \n\nFINISHER: \nBasic attack performed near a Staggered enemy becomes a finisher attack that deals massive Physical DMG and recovers some SP."
+              ],
+              "type": "Basic Attack",
+              "variants": [
+                {
+                  "id": "chr_0040_sweetpie_attack1",
+                  "label": "Attack 1",
+                  "ranks": [
+                    {
+                      "level": 1,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 1 Multiplier",
+                          "value": "21%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 2,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 1 Multiplier",
+                          "value": "23%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 3,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 1 Multiplier",
+                          "value": "26%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 4,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 1 Multiplier",
+                          "value": "28%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 5,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 1 Multiplier",
+                          "value": "30%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 6,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 1 Multiplier",
+                          "value": "32%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 7,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 1 Multiplier",
+                          "value": "34%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 8,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 1 Multiplier",
+                          "value": "36%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 9,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 1 Multiplier",
+                          "value": "38%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 10,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 1 Multiplier",
+                          "value": "41%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 11,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 1 Multiplier",
+                          "value": "44%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 12,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 1 Multiplier",
+                          "value": "48%"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "chr_0040_sweetpie_attack2",
+                  "label": "Attack 2",
+                  "ranks": [
+                    {
+                      "level": 1,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 2 Multiplier",
+                          "value": "24%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 2,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 2 Multiplier",
+                          "value": "26%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 3,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 2 Multiplier",
+                          "value": "28%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 4,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 2 Multiplier",
+                          "value": "30%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 5,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 2 Multiplier",
+                          "value": "32%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 6,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 2 Multiplier",
+                          "value": "34%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 7,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 2 Multiplier",
+                          "value": "36%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 8,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 2 Multiplier",
+                          "value": "40%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 9,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 2 Multiplier",
+                          "value": "42%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 10,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 2 Multiplier",
+                          "value": "44%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 11,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 2 Multiplier",
+                          "value": "48%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 12,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 2 Multiplier",
+                          "value": "52%"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "chr_0040_sweetpie_attack3",
+                  "label": "Attack 3",
+                  "ranks": [
+                    {
+                      "level": 1,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 3 Multiplier",
+                          "value": "28%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 2,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 3 Multiplier",
+                          "value": "28%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 3,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 3 Multiplier",
+                          "value": "32%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 4,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 3 Multiplier",
+                          "value": "36%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 5,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 3 Multiplier",
+                          "value": "36%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 6,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 3 Multiplier",
+                          "value": "40%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 7,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 3 Multiplier",
+                          "value": "44%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 8,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 3 Multiplier",
+                          "value": "44%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 9,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 3 Multiplier",
+                          "value": "48%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 10,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 3 Multiplier",
+                          "value": "52%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 11,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 3 Multiplier",
+                          "value": "56%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 12,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 3 Multiplier",
+                          "value": "60%"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "chr_0040_sweetpie_attack4",
+                  "label": "Attack 4",
+                  "ranks": [
+                    {
+                      "level": 1,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 4 Multiplier",
+                          "value": "42%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 2,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 4 Multiplier",
+                          "value": "42%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 3,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 4 Multiplier",
+                          "value": "48%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 4,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 4 Multiplier",
+                          "value": "54%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 5,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 4 Multiplier",
+                          "value": "54%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 6,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 4 Multiplier",
+                          "value": "60%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 7,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 4 Multiplier",
+                          "value": "66%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 8,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 4 Multiplier",
+                          "value": "66%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 9,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 4 Multiplier",
+                          "value": "72%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 10,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 4 Multiplier",
+                          "value": "78%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 11,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 4 Multiplier",
+                          "value": "84%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 12,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 4 Multiplier",
+                          "value": "90%"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "chr_0040_sweetpie_attack5",
+                  "label": "Attack 5",
+                  "ranks": [
+                    {
+                      "level": 1,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 5 Multiplier",
+                          "value": "59%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 2,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 5 Multiplier",
+                          "value": "65%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 3,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 5 Multiplier",
+                          "value": "70%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 4,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 5 Multiplier",
+                          "value": "76%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 5,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 5 Multiplier",
+                          "value": "82%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 6,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 5 Multiplier",
+                          "value": "88%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 7,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 5 Multiplier",
+                          "value": "94%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 8,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 5 Multiplier",
+                          "value": "100%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 9,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 5 Multiplier",
+                          "value": "106%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 10,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 5 Multiplier",
+                          "value": "113%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 11,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 5 Multiplier",
+                          "value": "122%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 12,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "BATK SEQ 5 Multiplier",
+                          "value": "132%"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "chr_0040_sweetpie_power_attack",
+                  "label": "Finisher",
+                  "ranks": [
+                    {
+                      "level": 1,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Finisher ATK Multiplier",
+                          "value": "400%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 2,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Finisher ATK Multiplier",
+                          "value": "440%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 3,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Finisher ATK Multiplier",
+                          "value": "480%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 4,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Finisher ATK Multiplier",
+                          "value": "520%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 5,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Finisher ATK Multiplier",
+                          "value": "560%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 6,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Finisher ATK Multiplier",
+                          "value": "600%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 7,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Finisher ATK Multiplier",
+                          "value": "640%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 8,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Finisher ATK Multiplier",
+                          "value": "680%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 9,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Finisher ATK Multiplier",
+                          "value": "720%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 10,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Finisher ATK Multiplier",
+                          "value": "770%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 11,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Finisher ATK Multiplier",
+                          "value": "830%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 12,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Finisher ATK Multiplier",
+                          "value": "900%"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "chr_0040_sweetpie_plunging_attack_end",
+                  "label": "Dive attack",
+                  "ranks": [
+                    {
+                      "level": 1,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Dive ATK Multiplier",
+                          "value": "80%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 2,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Dive ATK Multiplier",
+                          "value": "88%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 3,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Dive ATK Multiplier",
+                          "value": "96%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 4,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Dive ATK Multiplier",
+                          "value": "104%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 5,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Dive ATK Multiplier",
+                          "value": "112%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 6,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Dive ATK Multiplier",
+                          "value": "120%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 7,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Dive ATK Multiplier",
+                          "value": "128%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 8,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Dive ATK Multiplier",
+                          "value": "136%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 9,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Dive ATK Multiplier",
+                          "value": "144%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 10,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Dive ATK Multiplier",
+                          "value": "154%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 11,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Dive ATK Multiplier",
+                          "value": "166%"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 12,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "Dive ATK Multiplier",
+                          "value": "180%"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "chr_0040_sweetpie_NormalSkill",
+              "name": "\"Really Heavy Bash\"",
+              "descriptions": [
+                "Kay leaps into mid-air for a short power-up, salvages all her Weapons, then unleashes a powerful ground bash with her heavy hammer. The bash deals Nature DMG (based on her Hot Edgy Naives stacks), applies Nature Infliction on enemies within the area of effect, and consumes all Hot Edgy Naives stacks. If Kay consumes 3 Hot Edgy Naives stacks, she also forcibly applies Combustion on enemies.\nIf ＞ 3 Hot Edgy Naives stacks are consumed, the effects will be the same as those for 3 stacks.",
+                "Kay leaps into mid-air for a short power-up, salvages all her Weapons, then unleashes a powerful ground bash with her heavy hammer. The bash deals Nature DMG (based on her Hot Edgy Naives stacks), applies Nature Infliction on enemies within the area of effect, and consumes all Hot Edgy Naives stacks. If Kay consumes 3 Hot Edgy Naives stacks, she also forcibly applies Combustion on enemies.\nIf ＞ 3 Hot Edgy Naives stacks are consumed, the effects will be the same as those for 3 stacks.",
+                "Kay leaps into mid-air for a short power-up, salvages all her Weapons, then unleashes a powerful ground bash with her heavy hammer. The bash deals Nature DMG (based on her Hot Edgy Naives stacks), applies Nature Infliction on enemies within the area of effect, and consumes all Hot Edgy Naives stacks. If Kay consumes 3 Hot Edgy Naives stacks, she also forcibly applies Combustion on enemies.\nIf ＞ 3 Hot Edgy Naives stacks are consumed, the effects will be the same as those for 3 stacks.",
+                "Kay leaps into mid-air for a short power-up, salvages all her Weapons, then unleashes a powerful ground bash with her heavy hammer. The bash deals Nature DMG (based on her Hot Edgy Naives stacks), applies Nature Infliction on enemies within the area of effect, and consumes all Hot Edgy Naives stacks. If Kay consumes 3 Hot Edgy Naives stacks, she also forcibly applies Combustion on enemies.\nIf ＞ 3 Hot Edgy Naives stacks are consumed, the effects will be the same as those for 3 stacks.",
+                "Kay leaps into mid-air for a short power-up, salvages all her Weapons, then unleashes a powerful ground bash with her heavy hammer. The bash deals Nature DMG (based on her Hot Edgy Naives stacks), applies Nature Infliction on enemies within the area of effect, and consumes all Hot Edgy Naives stacks. If Kay consumes 3 Hot Edgy Naives stacks, she also forcibly applies Combustion on enemies.\nIf ＞ 3 Hot Edgy Naives stacks are consumed, the effects will be the same as those for 3 stacks.",
+                "Kay leaps into mid-air for a short power-up, salvages all her Weapons, then unleashes a powerful ground bash with her heavy hammer. The bash deals Nature DMG (based on her Hot Edgy Naives stacks), applies Nature Infliction on enemies within the area of effect, and consumes all Hot Edgy Naives stacks. If Kay consumes 3 Hot Edgy Naives stacks, she also forcibly applies Combustion on enemies.\nIf ＞ 3 Hot Edgy Naives stacks are consumed, the effects will be the same as those for 3 stacks.",
+                "Kay leaps into mid-air for a short power-up, salvages all her Weapons, then unleashes a powerful ground bash with her heavy hammer. The bash deals Nature DMG (based on her Hot Edgy Naives stacks), applies Nature Infliction on enemies within the area of effect, and consumes all Hot Edgy Naives stacks. If Kay consumes 3 Hot Edgy Naives stacks, she also forcibly applies Combustion on enemies.\nIf ＞ 3 Hot Edgy Naives stacks are consumed, the effects will be the same as those for 3 stacks.",
+                "Kay leaps into mid-air for a short power-up, salvages all her Weapons, then unleashes a powerful ground bash with her heavy hammer. The bash deals Nature DMG (based on her Hot Edgy Naives stacks), applies Nature Infliction on enemies within the area of effect, and consumes all Hot Edgy Naives stacks. If Kay consumes 3 Hot Edgy Naives stacks, she also forcibly applies Combustion on enemies.\nIf ＞ 3 Hot Edgy Naives stacks are consumed, the effects will be the same as those for 3 stacks.",
+                "Kay leaps into mid-air for a short power-up, salvages all her Weapons, then unleashes a powerful ground bash with her heavy hammer. The bash deals Nature DMG (based on her Hot Edgy Naives stacks), applies Nature Infliction on enemies within the area of effect, and consumes all Hot Edgy Naives stacks. If Kay consumes 3 Hot Edgy Naives stacks, she also forcibly applies Combustion on enemies.\nIf ＞ 3 Hot Edgy Naives stacks are consumed, the effects will be the same as those for 3 stacks.",
+                "Kay leaps into mid-air for a short power-up, salvages all her Weapons, then unleashes a powerful ground bash with her heavy hammer. The bash deals Nature DMG (based on her Hot Edgy Naives stacks), applies Nature Infliction on enemies within the area of effect, and consumes all Hot Edgy Naives stacks. If Kay consumes 3 Hot Edgy Naives stacks, she also forcibly applies Combustion on enemies.\nIf ＞ 3 Hot Edgy Naives stacks are consumed, the effects will be the same as those for 3 stacks.",
+                "Kay leaps into mid-air for a short power-up, salvages all her Weapons, then unleashes a powerful ground bash with her heavy hammer. The bash deals Nature DMG (based on her Hot Edgy Naives stacks), applies Nature Infliction on enemies within the area of effect, and consumes all Hot Edgy Naives stacks. If Kay consumes 3 Hot Edgy Naives stacks, she also forcibly applies Combustion on enemies.\nIf ＞ 3 Hot Edgy Naives stacks are consumed, the effects will be the same as those for 3 stacks.",
+                "Kay leaps into mid-air for a short power-up, salvages all her Weapons, then unleashes a powerful ground bash with her heavy hammer. The bash deals Nature DMG (based on her Hot Edgy Naives stacks), applies Nature Infliction on enemies within the area of effect, and consumes all Hot Edgy Naives stacks. If Kay consumes 3 Hot Edgy Naives stacks, she also forcibly applies Combustion on enemies.\nIf ＞ 3 Hot Edgy Naives stacks are consumed, the effects will be the same as those for 3 stacks."
+              ],
+              "type": "Battle Skill",
+              "variants": [
+                {
+                  "id": "chr_0040_sweetpie_normal_skill",
+                  "label": "\"Really Heavy Bash\"",
+                  "ranks": [
+                    {
+                      "level": 1,
+                      "cooldown": 0,
+                      "cost": 100,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "133%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "10"
+                        },
+                        {
+                          "label": "Bonus DMG Multiplier per Hot Edgy Naives",
+                          "value": "44%"
+                        },
+                        {
+                          "label": "Combustion Duration (s)",
+                          "value": "5"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 2,
+                      "cooldown": 0,
+                      "cost": 100,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "147%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "10"
+                        },
+                        {
+                          "label": "Bonus DMG Multiplier per Hot Edgy Naives",
+                          "value": "49%"
+                        },
+                        {
+                          "label": "Combustion Duration (s)",
+                          "value": "5"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 3,
+                      "cooldown": 0,
+                      "cost": 100,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "160%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "10"
+                        },
+                        {
+                          "label": "Bonus DMG Multiplier per Hot Edgy Naives",
+                          "value": "53%"
+                        },
+                        {
+                          "label": "Combustion Duration (s)",
+                          "value": "5"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 4,
+                      "cooldown": 0,
+                      "cost": 100,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "173%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "10"
+                        },
+                        {
+                          "label": "Bonus DMG Multiplier per Hot Edgy Naives",
+                          "value": "58%"
+                        },
+                        {
+                          "label": "Combustion Duration (s)",
+                          "value": "5"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 5,
+                      "cooldown": 0,
+                      "cost": 100,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "187%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "10"
+                        },
+                        {
+                          "label": "Bonus DMG Multiplier per Hot Edgy Naives",
+                          "value": "62%"
+                        },
+                        {
+                          "label": "Combustion Duration (s)",
+                          "value": "5"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 6,
+                      "cooldown": 0,
+                      "cost": 100,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "200%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "10"
+                        },
+                        {
+                          "label": "Bonus DMG Multiplier per Hot Edgy Naives",
+                          "value": "67%"
+                        },
+                        {
+                          "label": "Combustion Duration (s)",
+                          "value": "5"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 7,
+                      "cooldown": 0,
+                      "cost": 100,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "213%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "10"
+                        },
+                        {
+                          "label": "Bonus DMG Multiplier per Hot Edgy Naives",
+                          "value": "71%"
+                        },
+                        {
+                          "label": "Combustion Duration (s)",
+                          "value": "5"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 8,
+                      "cooldown": 0,
+                      "cost": 100,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "227%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "10"
+                        },
+                        {
+                          "label": "Bonus DMG Multiplier per Hot Edgy Naives",
+                          "value": "76%"
+                        },
+                        {
+                          "label": "Combustion Duration (s)",
+                          "value": "5"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 9,
+                      "cooldown": 0,
+                      "cost": 100,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "240%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "10"
+                        },
+                        {
+                          "label": "Bonus DMG Multiplier per Hot Edgy Naives",
+                          "value": "80%"
+                        },
+                        {
+                          "label": "Combustion Duration (s)",
+                          "value": "5"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 10,
+                      "cooldown": 0,
+                      "cost": 100,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "257%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "10"
+                        },
+                        {
+                          "label": "Bonus DMG Multiplier per Hot Edgy Naives",
+                          "value": "86%"
+                        },
+                        {
+                          "label": "Combustion Duration (s)",
+                          "value": "5"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 11,
+                      "cooldown": 0,
+                      "cost": 100,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "277%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "10"
+                        },
+                        {
+                          "label": "Bonus DMG Multiplier per Hot Edgy Naives",
+                          "value": "92%"
+                        },
+                        {
+                          "label": "Combustion Duration (s)",
+                          "value": "5"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 12,
+                      "cooldown": 0,
+                      "cost": 100,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "300%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "10"
+                        },
+                        {
+                          "label": "Bonus DMG Multiplier per Hot Edgy Naives",
+                          "value": "100%"
+                        },
+                        {
+                          "label": "Combustion Duration (s)",
+                          "value": "5"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "chr_0040_sweetpie_ComboSkill",
+              "name": "\"Really Kwik Smash\"",
+              "descriptions": [
+                "COMBO TRIGGER: While Kay has ≥ 1 Weapon and either Nature Infliction is applied OR Arts Burst DMG is dealt to the enemy.\nKay throws a Weapon at the target to deal Nature DMG. Hitting the enemy recovers some SP and also forcibly applies a Nature Burst. The Weapon will then drop at a random location in the battlefield. Kay salvages the said Weapon when the controlled operator touches it.",
+                "COMBO TRIGGER: While Kay has ≥ 1 Weapon and either Nature Infliction is applied OR Arts Burst DMG is dealt to the enemy.\nKay throws a Weapon at the target to deal Nature DMG. Hitting the enemy recovers some SP and also forcibly applies a Nature Burst. The Weapon will then drop at a random location in the battlefield. Kay salvages the said Weapon when the controlled operator touches it.",
+                "COMBO TRIGGER: While Kay has ≥ 1 Weapon and either Nature Infliction is applied OR Arts Burst DMG is dealt to the enemy.\nKay throws a Weapon at the target to deal Nature DMG. Hitting the enemy recovers some SP and also forcibly applies a Nature Burst. The Weapon will then drop at a random location in the battlefield. Kay salvages the said Weapon when the controlled operator touches it.",
+                "COMBO TRIGGER: While Kay has ≥ 1 Weapon and either Nature Infliction is applied OR Arts Burst DMG is dealt to the enemy.\nKay throws a Weapon at the target to deal Nature DMG. Hitting the enemy recovers some SP and also forcibly applies a Nature Burst. The Weapon will then drop at a random location in the battlefield. Kay salvages the said Weapon when the controlled operator touches it.",
+                "COMBO TRIGGER: While Kay has ≥ 1 Weapon and either Nature Infliction is applied OR Arts Burst DMG is dealt to the enemy.\nKay throws a Weapon at the target to deal Nature DMG. Hitting the enemy recovers some SP and also forcibly applies a Nature Burst. The Weapon will then drop at a random location in the battlefield. Kay salvages the said Weapon when the controlled operator touches it.",
+                "COMBO TRIGGER: While Kay has ≥ 1 Weapon and either Nature Infliction is applied OR Arts Burst DMG is dealt to the enemy.\nKay throws a Weapon at the target to deal Nature DMG. Hitting the enemy recovers some SP and also forcibly applies a Nature Burst. The Weapon will then drop at a random location in the battlefield. Kay salvages the said Weapon when the controlled operator touches it.",
+                "COMBO TRIGGER: While Kay has ≥ 1 Weapon and either Nature Infliction is applied OR Arts Burst DMG is dealt to the enemy.\nKay throws a Weapon at the target to deal Nature DMG. Hitting the enemy recovers some SP and also forcibly applies a Nature Burst. The Weapon will then drop at a random location in the battlefield. Kay salvages the said Weapon when the controlled operator touches it.",
+                "COMBO TRIGGER: While Kay has ≥ 1 Weapon and either Nature Infliction is applied OR Arts Burst DMG is dealt to the enemy.\nKay throws a Weapon at the target to deal Nature DMG. Hitting the enemy recovers some SP and also forcibly applies a Nature Burst. The Weapon will then drop at a random location in the battlefield. Kay salvages the said Weapon when the controlled operator touches it.",
+                "COMBO TRIGGER: While Kay has ≥ 1 Weapon and either Nature Infliction is applied OR Arts Burst DMG is dealt to the enemy.\nKay throws a Weapon at the target to deal Nature DMG. Hitting the enemy recovers some SP and also forcibly applies a Nature Burst. The Weapon will then drop at a random location in the battlefield. Kay salvages the said Weapon when the controlled operator touches it.",
+                "COMBO TRIGGER: While Kay has ≥ 1 Weapon and either Nature Infliction is applied OR Arts Burst DMG is dealt to the enemy.\nKay throws a Weapon at the target to deal Nature DMG. Hitting the enemy recovers some SP and also forcibly applies a Nature Burst. The Weapon will then drop at a random location in the battlefield. Kay salvages the said Weapon when the controlled operator touches it.",
+                "COMBO TRIGGER: While Kay has ≥ 1 Weapon and either Nature Infliction is applied OR Arts Burst DMG is dealt to the enemy.\nKay throws a Weapon at the target to deal Nature DMG. Hitting the enemy recovers some SP and also forcibly applies a Nature Burst. The Weapon will then drop at a random location in the battlefield. Kay salvages the said Weapon when the controlled operator touches it.",
+                "COMBO TRIGGER: While Kay has ≥ 1 Weapon and either Nature Infliction is applied OR Arts Burst DMG is dealt to the enemy.\nKay throws a Weapon at the target to deal Nature DMG. Hitting the enemy recovers some SP and also forcibly applies a Nature Burst. The Weapon will then drop at a random location in the battlefield. Kay salvages the said Weapon when the controlled operator touches it."
+              ],
+              "type": "Combo Skill",
+              "variants": [
+                {
+                  "id": "chr_0040_sweetpie_combo_skill",
+                  "label": "\"Really Kwik Smash\"",
+                  "ranks": [
+                    {
+                      "level": 1,
+                      "cooldown": 7,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "31%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "5"
+                        },
+                        {
+                          "label": "Ultimate Energy Gain",
+                          "value": "5"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "10"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 2,
+                      "cooldown": 7,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "34%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "5"
+                        },
+                        {
+                          "label": "Ultimate Energy Gain",
+                          "value": "5"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "10"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 3,
+                      "cooldown": 7,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "37%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "5"
+                        },
+                        {
+                          "label": "Ultimate Energy Gain",
+                          "value": "5"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "10"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 4,
+                      "cooldown": 7,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "40%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "5"
+                        },
+                        {
+                          "label": "Ultimate Energy Gain",
+                          "value": "5"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "10"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 5,
+                      "cooldown": 7,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "44%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "5"
+                        },
+                        {
+                          "label": "Ultimate Energy Gain",
+                          "value": "5"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "10"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 6,
+                      "cooldown": 7,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "47%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "5"
+                        },
+                        {
+                          "label": "Ultimate Energy Gain",
+                          "value": "5"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "10"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 7,
+                      "cooldown": 7,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "50%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "5"
+                        },
+                        {
+                          "label": "Ultimate Energy Gain",
+                          "value": "5"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "10"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 8,
+                      "cooldown": 7,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "53%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "5"
+                        },
+                        {
+                          "label": "Ultimate Energy Gain",
+                          "value": "5"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "10"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 9,
+                      "cooldown": 7,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "56%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "5"
+                        },
+                        {
+                          "label": "Ultimate Energy Gain",
+                          "value": "5"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "11"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 10,
+                      "cooldown": 7,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "60%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "5"
+                        },
+                        {
+                          "label": "Ultimate Energy Gain",
+                          "value": "5"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "11"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 11,
+                      "cooldown": 7,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "65%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "5"
+                        },
+                        {
+                          "label": "Ultimate Energy Gain",
+                          "value": "5"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "11"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 12,
+                      "cooldown": 6,
+                      "cost": 0,
+                      "stats": [
+                        {
+                          "label": "DMG Multiplier",
+                          "value": "70%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "5"
+                        },
+                        {
+                          "label": "Ultimate Energy Gain",
+                          "value": "5"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "12"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "chr_0040_sweetpie_UltimateSkill",
+              "name": "\"Really Sweet Combi-Bonker!\"",
+              "descriptions": [
+                "Kay kitbashes a combi-bonker that she swings multiple times before throwing it to cause an explosion that deals Nature DMG and applies Nature Infliction on enemies within the area of effect, recovers some SP, and leaves behind multiple Picnic Snacks. When the controlled operator touches a Picnic Snack and picks it up, Kay grants HP treatment to the said operator and recovers some SP. The attribute of Agility increases the amount of HP treatment.",
+                "Kay kitbashes a combi-bonker that she swings multiple times before throwing it to cause an explosion that deals Nature DMG and applies Nature Infliction on enemies within the area of effect, recovers some SP, and leaves behind multiple Picnic Snacks. When the controlled operator touches a Picnic Snack and picks it up, Kay grants HP treatment to the said operator and recovers some SP. The attribute of Agility increases the amount of HP treatment.",
+                "Kay kitbashes a combi-bonker that she swings multiple times before throwing it to cause an explosion that deals Nature DMG and applies Nature Infliction on enemies within the area of effect, recovers some SP, and leaves behind multiple Picnic Snacks. When the controlled operator touches a Picnic Snack and picks it up, Kay grants HP treatment to the said operator and recovers some SP. The attribute of Agility increases the amount of HP treatment.",
+                "Kay kitbashes a combi-bonker that she swings multiple times before throwing it to cause an explosion that deals Nature DMG and applies Nature Infliction on enemies within the area of effect, recovers some SP, and leaves behind multiple Picnic Snacks. When the controlled operator touches a Picnic Snack and picks it up, Kay grants HP treatment to the said operator and recovers some SP. The attribute of Agility increases the amount of HP treatment.",
+                "Kay kitbashes a combi-bonker that she swings multiple times before throwing it to cause an explosion that deals Nature DMG and applies Nature Infliction on enemies within the area of effect, recovers some SP, and leaves behind multiple Picnic Snacks. When the controlled operator touches a Picnic Snack and picks it up, Kay grants HP treatment to the said operator and recovers some SP. The attribute of Agility increases the amount of HP treatment.",
+                "Kay kitbashes a combi-bonker that she swings multiple times before throwing it to cause an explosion that deals Nature DMG and applies Nature Infliction on enemies within the area of effect, recovers some SP, and leaves behind multiple Picnic Snacks. When the controlled operator touches a Picnic Snack and picks it up, Kay grants HP treatment to the said operator and recovers some SP. The attribute of Agility increases the amount of HP treatment.",
+                "Kay kitbashes a combi-bonker that she swings multiple times before throwing it to cause an explosion that deals Nature DMG and applies Nature Infliction on enemies within the area of effect, recovers some SP, and leaves behind multiple Picnic Snacks. When the controlled operator touches a Picnic Snack and picks it up, Kay grants HP treatment to the said operator and recovers some SP. The attribute of Agility increases the amount of HP treatment.",
+                "Kay kitbashes a combi-bonker that she swings multiple times before throwing it to cause an explosion that deals Nature DMG and applies Nature Infliction on enemies within the area of effect, recovers some SP, and leaves behind multiple Picnic Snacks. When the controlled operator touches a Picnic Snack and picks it up, Kay grants HP treatment to the said operator and recovers some SP. The attribute of Agility increases the amount of HP treatment.",
+                "Kay kitbashes a combi-bonker that she swings multiple times before throwing it to cause an explosion that deals Nature DMG and applies Nature Infliction on enemies within the area of effect, recovers some SP, and leaves behind multiple Picnic Snacks. When the controlled operator touches a Picnic Snack and picks it up, Kay grants HP treatment to the said operator and recovers some SP. The attribute of Agility increases the amount of HP treatment.",
+                "Kay kitbashes a combi-bonker that she swings multiple times before throwing it to cause an explosion that deals Nature DMG and applies Nature Infliction on enemies within the area of effect, recovers some SP, and leaves behind multiple Picnic Snacks. When the controlled operator touches a Picnic Snack and picks it up, Kay grants HP treatment to the said operator and recovers some SP. The attribute of Agility increases the amount of HP treatment.",
+                "Kay kitbashes a combi-bonker that she swings multiple times before throwing it to cause an explosion that deals Nature DMG and applies Nature Infliction on enemies within the area of effect, recovers some SP, and leaves behind multiple Picnic Snacks. When the controlled operator touches a Picnic Snack and picks it up, Kay grants HP treatment to the said operator and recovers some SP. The attribute of Agility increases the amount of HP treatment.",
+                "Kay kitbashes a combi-bonker that she swings multiple times before throwing it to cause an explosion that deals Nature DMG and applies Nature Infliction on enemies within the area of effect, recovers some SP, and leaves behind multiple Picnic Snacks. When the controlled operator touches a Picnic Snack and picks it up, Kay grants HP treatment to the said operator and recovers some SP. The attribute of Agility increases the amount of HP treatment."
+              ],
+              "type": "Ultimate",
+              "variants": [
+                {
+                  "id": "chr_0040_sweetpie_ultimate_skill",
+                  "label": "\"Really Sweet Combi-Bonker!\"",
+                  "ranks": [
+                    {
+                      "level": 1,
+                      "cooldown": 20,
+                      "cost": 150,
+                      "stats": [
+                        {
+                          "label": "SEQ 1 DMG Multiplier",
+                          "value": "71%"
+                        },
+                        {
+                          "label": "SEQ 2 DMG Multiplier",
+                          "value": "89%"
+                        },
+                        {
+                          "label": "SEQ 3 DMG Multiplier",
+                          "value": "107%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "20"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "24"
+                        },
+                        {
+                          "label": "Base Treatment",
+                          "value": "180"
+                        },
+                        {
+                          "label": "Treatment Increase per Agility",
+                          "value": "0.42"
+                        },
+                        {
+                          "label": "SP Recovery per Picnic Snack",
+                          "value": "10"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 2,
+                      "cooldown": 20,
+                      "cost": 150,
+                      "stats": [
+                        {
+                          "label": "SEQ 1 DMG Multiplier",
+                          "value": "78%"
+                        },
+                        {
+                          "label": "SEQ 2 DMG Multiplier",
+                          "value": "98%"
+                        },
+                        {
+                          "label": "SEQ 3 DMG Multiplier",
+                          "value": "117%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "20"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "24"
+                        },
+                        {
+                          "label": "Base Treatment",
+                          "value": "216"
+                        },
+                        {
+                          "label": "Treatment Increase per Agility",
+                          "value": "0.5"
+                        },
+                        {
+                          "label": "SP Recovery per Picnic Snack",
+                          "value": "10"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 3,
+                      "cooldown": 20,
+                      "cost": 150,
+                      "stats": [
+                        {
+                          "label": "SEQ 1 DMG Multiplier",
+                          "value": "85%"
+                        },
+                        {
+                          "label": "SEQ 2 DMG Multiplier",
+                          "value": "107%"
+                        },
+                        {
+                          "label": "SEQ 3 DMG Multiplier",
+                          "value": "128%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "20"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "24"
+                        },
+                        {
+                          "label": "Base Treatment",
+                          "value": "252"
+                        },
+                        {
+                          "label": "Treatment Increase per Agility",
+                          "value": "0.59"
+                        },
+                        {
+                          "label": "SP Recovery per Picnic Snack",
+                          "value": "10"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 4,
+                      "cooldown": 20,
+                      "cost": 150,
+                      "stats": [
+                        {
+                          "label": "SEQ 1 DMG Multiplier",
+                          "value": "92%"
+                        },
+                        {
+                          "label": "SEQ 2 DMG Multiplier",
+                          "value": "116%"
+                        },
+                        {
+                          "label": "SEQ 3 DMG Multiplier",
+                          "value": "139%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "20"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "24"
+                        },
+                        {
+                          "label": "Base Treatment",
+                          "value": "288"
+                        },
+                        {
+                          "label": "Treatment Increase per Agility",
+                          "value": "0.67"
+                        },
+                        {
+                          "label": "SP Recovery per Picnic Snack",
+                          "value": "10"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 5,
+                      "cooldown": 20,
+                      "cost": 150,
+                      "stats": [
+                        {
+                          "label": "SEQ 1 DMG Multiplier",
+                          "value": "100%"
+                        },
+                        {
+                          "label": "SEQ 2 DMG Multiplier",
+                          "value": "124%"
+                        },
+                        {
+                          "label": "SEQ 3 DMG Multiplier",
+                          "value": "149%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "20"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "24"
+                        },
+                        {
+                          "label": "Base Treatment",
+                          "value": "306"
+                        },
+                        {
+                          "label": "Treatment Increase per Agility",
+                          "value": "0.71"
+                        },
+                        {
+                          "label": "SP Recovery per Picnic Snack",
+                          "value": "10"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 6,
+                      "cooldown": 20,
+                      "cost": 150,
+                      "stats": [
+                        {
+                          "label": "SEQ 1 DMG Multiplier",
+                          "value": "107%"
+                        },
+                        {
+                          "label": "SEQ 2 DMG Multiplier",
+                          "value": "133%"
+                        },
+                        {
+                          "label": "SEQ 3 DMG Multiplier",
+                          "value": "160%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "20"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "24"
+                        },
+                        {
+                          "label": "Base Treatment",
+                          "value": "324"
+                        },
+                        {
+                          "label": "Treatment Increase per Agility",
+                          "value": "0.76"
+                        },
+                        {
+                          "label": "SP Recovery per Picnic Snack",
+                          "value": "10"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 7,
+                      "cooldown": 20,
+                      "cost": 150,
+                      "stats": [
+                        {
+                          "label": "SEQ 1 DMG Multiplier",
+                          "value": "114%"
+                        },
+                        {
+                          "label": "SEQ 2 DMG Multiplier",
+                          "value": "142%"
+                        },
+                        {
+                          "label": "SEQ 3 DMG Multiplier",
+                          "value": "171%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "20"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "24"
+                        },
+                        {
+                          "label": "Base Treatment",
+                          "value": "342"
+                        },
+                        {
+                          "label": "Treatment Increase per Agility",
+                          "value": "0.8"
+                        },
+                        {
+                          "label": "SP Recovery per Picnic Snack",
+                          "value": "10"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 8,
+                      "cooldown": 20,
+                      "cost": 150,
+                      "stats": [
+                        {
+                          "label": "SEQ 1 DMG Multiplier",
+                          "value": "121%"
+                        },
+                        {
+                          "label": "SEQ 2 DMG Multiplier",
+                          "value": "151%"
+                        },
+                        {
+                          "label": "SEQ 3 DMG Multiplier",
+                          "value": "181%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "20"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "24"
+                        },
+                        {
+                          "label": "Base Treatment",
+                          "value": "360"
+                        },
+                        {
+                          "label": "Treatment Increase per Agility",
+                          "value": "0.84"
+                        },
+                        {
+                          "label": "SP Recovery per Picnic Snack",
+                          "value": "10"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 9,
+                      "cooldown": 20,
+                      "cost": 150,
+                      "stats": [
+                        {
+                          "label": "SEQ 1 DMG Multiplier",
+                          "value": "128%"
+                        },
+                        {
+                          "label": "SEQ 2 DMG Multiplier",
+                          "value": "160%"
+                        },
+                        {
+                          "label": "SEQ 3 DMG Multiplier",
+                          "value": "192%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "20"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "27"
+                        },
+                        {
+                          "label": "Base Treatment",
+                          "value": "378"
+                        },
+                        {
+                          "label": "Treatment Increase per Agility",
+                          "value": "0.88"
+                        },
+                        {
+                          "label": "SP Recovery per Picnic Snack",
+                          "value": "10"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 10,
+                      "cooldown": 20,
+                      "cost": 150,
+                      "stats": [
+                        {
+                          "label": "SEQ 1 DMG Multiplier",
+                          "value": "137%"
+                        },
+                        {
+                          "label": "SEQ 2 DMG Multiplier",
+                          "value": "171%"
+                        },
+                        {
+                          "label": "SEQ 3 DMG Multiplier",
+                          "value": "205%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "20"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "27"
+                        },
+                        {
+                          "label": "Base Treatment",
+                          "value": "387"
+                        },
+                        {
+                          "label": "Treatment Increase per Agility",
+                          "value": "0.9"
+                        },
+                        {
+                          "label": "SP Recovery per Picnic Snack",
+                          "value": "10"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 11,
+                      "cooldown": 20,
+                      "cost": 150,
+                      "stats": [
+                        {
+                          "label": "SEQ 1 DMG Multiplier",
+                          "value": "148%"
+                        },
+                        {
+                          "label": "SEQ 2 DMG Multiplier",
+                          "value": "184%"
+                        },
+                        {
+                          "label": "SEQ 3 DMG Multiplier",
+                          "value": "221%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "20"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "27"
+                        },
+                        {
+                          "label": "Base Treatment",
+                          "value": "396"
+                        },
+                        {
+                          "label": "Treatment Increase per Agility",
+                          "value": "0.92"
+                        },
+                        {
+                          "label": "SP Recovery per Picnic Snack",
+                          "value": "10"
+                        }
+                      ]
+                    },
+                    {
+                      "level": 12,
+                      "cooldown": 20,
+                      "cost": 150,
+                      "stats": [
+                        {
+                          "label": "SEQ 1 DMG Multiplier",
+                          "value": "160%"
+                        },
+                        {
+                          "label": "SEQ 2 DMG Multiplier",
+                          "value": "200%"
+                        },
+                        {
+                          "label": "SEQ 3 DMG Multiplier",
+                          "value": "240%"
+                        },
+                        {
+                          "label": "Stagger",
+                          "value": "20"
+                        },
+                        {
+                          "label": "SP Recovery",
+                          "value": "30"
+                        },
+                        {
+                          "label": "Base Treatment",
+                          "value": "405"
+                        },
+                        {
+                          "label": "Treatment Increase per Agility",
+                          "value": "0.95"
+                        },
+                        {
+                          "label": "SP Recovery per Picnic Snack",
+                          "value": "10"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "chr_0040_sweetpie_passive_talent2",
+                  "label": "\"Really Sweet Combi-Bonker!\" — variant 2",
+                  "ranks": [
+                    {
+                      "level": 1,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": []
+                    },
+                    {
+                      "level": 2,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": []
+                    },
+                    {
+                      "level": 3,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": []
+                    },
+                    {
+                      "level": 4,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": []
+                    },
+                    {
+                      "level": 5,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": []
+                    },
+                    {
+                      "level": 6,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": []
+                    },
+                    {
+                      "level": 7,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": []
+                    },
+                    {
+                      "level": 8,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": []
+                    },
+                    {
+                      "level": 9,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": []
+                    },
+                    {
+                      "level": 10,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": []
+                    },
+                    {
+                      "level": 11,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": []
+                    },
+                    {
+                      "level": 12,
+                      "cooldown": 0,
+                      "cost": 0,
+                      "stats": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "potentials": [
+            {
+              "level": 1,
+              "name": "Wildness Ignited",
+              "description": "When entering battle, Kay gains 1 stack of Hot Edgy Naives.\nTalent Bottomless Arsenal improved: Each Weapon salvage gives the entire team an additional Arts DMG Dealt +2%, with additional Nature DMG Dealt getting another +2%, for an additional duration of +10s."
+            },
+            {
+              "level": 2,
+              "name": "Expert Roamer",
+              "description": "Strength +20, Nature DMG Dealt +10%."
+            },
+            {
+              "level": 3,
+              "name": "Picnic Prep",
+              "description": "Battle skill \"Really Heavy Bash\" enhanced: Bonus DMG Multiplier per Hot Edgy Naives stack is increased to 1.2 times the original. Ultimate \"Really Sweet Combi-Bonker!\" improved: DMG Multiplier is increased to 1.2 times the original."
+            },
+            {
+              "level": 4,
+              "name": "\"Bonkie I Made\"",
+              "description": "Ultimate \"Really Sweet Combi-Bonker!\" improved: Ultimate Energy cost -15%."
+            },
+            {
+              "level": 5,
+              "name": "\"Kwikker Smash\"",
+              "description": "Combo skill \"Really Kwik Smash\" improved: Length of cooldown -1s. DMG Multiplier is increased to 1.2 times the original. SP Recovery is increased to 1.3 times the original."
+            }
+          ],
+          "promotions": [
+            {
+              "name": "Promotion III",
+              "materials": [
+                {
+                  "id": "item_char_break_stage_3_4",
+                  "name": "Protoset",
+                  "count": 24
+                },
+                {
+                  "id": "item_plant_mushroom_1_3",
+                  "name": "Ruby Bolete",
+                  "count": 5
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 18000
+                }
+              ]
+            },
+            {
+              "name": "Promotion IV",
+              "materials": [
+                {
+                  "id": "item_char_break_stage_3_4",
+                  "name": "Protoset",
+                  "count": 36
+                },
+                {
+                  "id": "item_char_skill_specialize_1",
+                  "name": "Metadiastima Photoemission Tube",
+                  "count": 20
+                },
+                {
+                  "id": "item_plant_mushroom_2_1",
+                  "name": "Bloodcap",
+                  "count": 8
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 100000
+                }
+              ]
+            },
+            {
+              "name": "Promotion II",
+              "materials": [
+                {
+                  "id": "item_char_break_stage_1_2",
+                  "name": "Protodisk",
+                  "count": 25
+                },
+                {
+                  "id": "item_plant_mushroom_1_2",
+                  "name": "Red Bolete",
+                  "count": 5
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 6500
+                }
+              ]
+            },
+            {
+              "name": "Outfitting II",
+              "materials": [
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 6500
+                }
+              ]
+            },
+            {
+              "name": "Outfitting I",
+              "materials": [
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 1600
+                }
+              ]
+            },
+            {
+              "name": "Outfitting III",
+              "materials": [
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 18000
+                }
+              ]
+            },
+            {
+              "name": "Promotion I",
+              "materials": [
+                {
+                  "id": "item_char_break_stage_1_2",
+                  "name": "Protodisk",
+                  "count": 8
+                },
+                {
+                  "id": "item_plant_mushroom_1_1",
+                  "name": "Pink Bolete",
+                  "count": 3
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 1600
+                }
+              ]
+            }
+          ],
+          "upgrades": [
+            {
+              "skill": "\"Really Heavy Bash\"",
+              "level": 2,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_1_6",
+                  "name": "Protoprism",
+                  "count": 6
+                },
+                {
+                  "id": "item_plant_crylplant_1_1",
+                  "name": "Kalkodendra",
+                  "count": 1
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 1000
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Heavy Bash\"",
+              "level": 3,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_1_6",
+                  "name": "Protoprism",
+                  "count": 12
+                },
+                {
+                  "id": "item_plant_crylplant_1_1",
+                  "name": "Kalkodendra",
+                  "count": 2
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 2700
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Heavy Bash\"",
+              "level": 4,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_1_6",
+                  "name": "Protoprism",
+                  "count": 16
+                },
+                {
+                  "id": "item_plant_crylplant_1_2",
+                  "name": "Chrysodendra",
+                  "count": 1
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 3200
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Heavy Bash\"",
+              "level": 5,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_1_6",
+                  "name": "Protoprism",
+                  "count": 21
+                },
+                {
+                  "id": "item_plant_crylplant_1_2",
+                  "name": "Chrysodendra",
+                  "count": 1
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 4200
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Heavy Bash\"",
+              "level": 6,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_1_6",
+                  "name": "Protoprism",
+                  "count": 27
+                },
+                {
+                  "id": "item_plant_crylplant_1_2",
+                  "name": "Chrysodendra",
+                  "count": 2
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 5400
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Heavy Bash\"",
+              "level": 7,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 6
+                },
+                {
+                  "id": "item_plant_crylplant_1_3",
+                  "name": "Vitrodendra",
+                  "count": 1
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 8200
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Heavy Bash\"",
+              "level": 8,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 8
+                },
+                {
+                  "id": "item_plant_crylplant_1_3",
+                  "name": "Vitrodendra",
+                  "count": 1
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 10500
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Heavy Bash\"",
+              "level": 9,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 15
+                },
+                {
+                  "id": "item_plant_crylplant_1_3",
+                  "name": "Vitrodendra",
+                  "count": 2
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 18000
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Heavy Bash\"",
+              "level": 10,
+              "materials": [
+                {
+                  "id": "item_char_skill_crown",
+                  "name": "Mark of Perseverance",
+                  "count": 1
+                },
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 15
+                },
+                {
+                  "id": "item_char_skill_specialize_5",
+                  "name": "Triphasic Nanoflake",
+                  "count": 6
+                },
+                {
+                  "id": "item_plant_crylplant_2_1",
+                  "name": "Blighted Jadeleaf",
+                  "count": 3
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 24000
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Heavy Bash\"",
+              "level": 11,
+              "materials": [
+                {
+                  "id": "item_char_skill_crown",
+                  "name": "Mark of Perseverance",
+                  "count": 2
+                },
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 24
+                },
+                {
+                  "id": "item_char_skill_specialize_5",
+                  "name": "Triphasic Nanoflake",
+                  "count": 16
+                },
+                {
+                  "id": "item_plant_crylplant_2_1",
+                  "name": "Blighted Jadeleaf",
+                  "count": 6
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 30000
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Heavy Bash\"",
+              "level": 12,
+              "materials": [
+                {
+                  "id": "item_char_skill_crown",
+                  "name": "Mark of Perseverance",
+                  "count": 3
+                },
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 50
+                },
+                {
+                  "id": "item_char_skill_specialize_5",
+                  "name": "Triphasic Nanoflake",
+                  "count": 36
+                },
+                {
+                  "id": "item_plant_crylplant_2_1",
+                  "name": "Blighted Jadeleaf",
+                  "count": 12
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 65000
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Sweet Combi-Bonker!\"",
+              "level": 2,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_1_6",
+                  "name": "Protoprism",
+                  "count": 6
+                },
+                {
+                  "id": "item_plant_crylplant_1_1",
+                  "name": "Kalkodendra",
+                  "count": 1
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 1000
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Sweet Combi-Bonker!\"",
+              "level": 3,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_1_6",
+                  "name": "Protoprism",
+                  "count": 12
+                },
+                {
+                  "id": "item_plant_crylplant_1_1",
+                  "name": "Kalkodendra",
+                  "count": 2
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 2700
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Sweet Combi-Bonker!\"",
+              "level": 4,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_1_6",
+                  "name": "Protoprism",
+                  "count": 16
+                },
+                {
+                  "id": "item_plant_crylplant_1_2",
+                  "name": "Chrysodendra",
+                  "count": 1
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 3200
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Sweet Combi-Bonker!\"",
+              "level": 5,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_1_6",
+                  "name": "Protoprism",
+                  "count": 21
+                },
+                {
+                  "id": "item_plant_crylplant_1_2",
+                  "name": "Chrysodendra",
+                  "count": 1
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 4200
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Sweet Combi-Bonker!\"",
+              "level": 6,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_1_6",
+                  "name": "Protoprism",
+                  "count": 27
+                },
+                {
+                  "id": "item_plant_crylplant_1_2",
+                  "name": "Chrysodendra",
+                  "count": 2
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 5400
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Sweet Combi-Bonker!\"",
+              "level": 7,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 6
+                },
+                {
+                  "id": "item_plant_crylplant_1_3",
+                  "name": "Vitrodendra",
+                  "count": 1
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 8200
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Sweet Combi-Bonker!\"",
+              "level": 8,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 8
+                },
+                {
+                  "id": "item_plant_crylplant_1_3",
+                  "name": "Vitrodendra",
+                  "count": 1
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 10500
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Sweet Combi-Bonker!\"",
+              "level": 9,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 15
+                },
+                {
+                  "id": "item_plant_crylplant_1_3",
+                  "name": "Vitrodendra",
+                  "count": 2
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 18000
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Sweet Combi-Bonker!\"",
+              "level": 10,
+              "materials": [
+                {
+                  "id": "item_char_skill_crown",
+                  "name": "Mark of Perseverance",
+                  "count": 1
+                },
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 15
+                },
+                {
+                  "id": "item_char_skill_specialize_5",
+                  "name": "Triphasic Nanoflake",
+                  "count": 6
+                },
+                {
+                  "id": "item_plant_crylplant_2_1",
+                  "name": "Blighted Jadeleaf",
+                  "count": 3
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 24000
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Sweet Combi-Bonker!\"",
+              "level": 11,
+              "materials": [
+                {
+                  "id": "item_char_skill_crown",
+                  "name": "Mark of Perseverance",
+                  "count": 2
+                },
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 24
+                },
+                {
+                  "id": "item_char_skill_specialize_5",
+                  "name": "Triphasic Nanoflake",
+                  "count": 16
+                },
+                {
+                  "id": "item_plant_crylplant_2_1",
+                  "name": "Blighted Jadeleaf",
+                  "count": 6
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 30000
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Sweet Combi-Bonker!\"",
+              "level": 12,
+              "materials": [
+                {
+                  "id": "item_char_skill_crown",
+                  "name": "Mark of Perseverance",
+                  "count": 3
+                },
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 50
+                },
+                {
+                  "id": "item_char_skill_specialize_5",
+                  "name": "Triphasic Nanoflake",
+                  "count": 36
+                },
+                {
+                  "id": "item_plant_crylplant_2_1",
+                  "name": "Blighted Jadeleaf",
+                  "count": 12
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 65000
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Kwik Smash\"",
+              "level": 2,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_1_6",
+                  "name": "Protoprism",
+                  "count": 6
+                },
+                {
+                  "id": "item_plant_crylplant_1_1",
+                  "name": "Kalkodendra",
+                  "count": 1
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 1000
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Kwik Smash\"",
+              "level": 3,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_1_6",
+                  "name": "Protoprism",
+                  "count": 12
+                },
+                {
+                  "id": "item_plant_crylplant_1_1",
+                  "name": "Kalkodendra",
+                  "count": 2
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 2700
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Kwik Smash\"",
+              "level": 4,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_1_6",
+                  "name": "Protoprism",
+                  "count": 16
+                },
+                {
+                  "id": "item_plant_crylplant_1_2",
+                  "name": "Chrysodendra",
+                  "count": 1
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 3200
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Kwik Smash\"",
+              "level": 5,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_1_6",
+                  "name": "Protoprism",
+                  "count": 21
+                },
+                {
+                  "id": "item_plant_crylplant_1_2",
+                  "name": "Chrysodendra",
+                  "count": 1
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 4200
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Kwik Smash\"",
+              "level": 6,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_1_6",
+                  "name": "Protoprism",
+                  "count": 27
+                },
+                {
+                  "id": "item_plant_crylplant_1_2",
+                  "name": "Chrysodendra",
+                  "count": 2
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 5400
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Kwik Smash\"",
+              "level": 7,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 6
+                },
+                {
+                  "id": "item_plant_crylplant_1_3",
+                  "name": "Vitrodendra",
+                  "count": 1
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 8200
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Kwik Smash\"",
+              "level": 8,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 8
+                },
+                {
+                  "id": "item_plant_crylplant_1_3",
+                  "name": "Vitrodendra",
+                  "count": 1
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 10500
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Kwik Smash\"",
+              "level": 9,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 15
+                },
+                {
+                  "id": "item_plant_crylplant_1_3",
+                  "name": "Vitrodendra",
+                  "count": 2
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 18000
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Kwik Smash\"",
+              "level": 10,
+              "materials": [
+                {
+                  "id": "item_char_skill_crown",
+                  "name": "Mark of Perseverance",
+                  "count": 1
+                },
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 15
+                },
+                {
+                  "id": "item_char_skill_specialize_6",
+                  "name": "Warp Plasma-Coated Slide",
+                  "count": 6
+                },
+                {
+                  "id": "item_plant_crylplant_2_1",
+                  "name": "Blighted Jadeleaf",
+                  "count": 3
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 24000
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Kwik Smash\"",
+              "level": 11,
+              "materials": [
+                {
+                  "id": "item_char_skill_crown",
+                  "name": "Mark of Perseverance",
+                  "count": 2
+                },
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 24
+                },
+                {
+                  "id": "item_char_skill_specialize_6",
+                  "name": "Warp Plasma-Coated Slide",
+                  "count": 16
+                },
+                {
+                  "id": "item_plant_crylplant_2_1",
+                  "name": "Blighted Jadeleaf",
+                  "count": 6
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 30000
+                }
+              ]
+            },
+            {
+              "skill": "\"Really Kwik Smash\"",
+              "level": 12,
+              "materials": [
+                {
+                  "id": "item_char_skill_crown",
+                  "name": "Mark of Perseverance",
+                  "count": 3
+                },
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 50
+                },
+                {
+                  "id": "item_char_skill_specialize_6",
+                  "name": "Warp Plasma-Coated Slide",
+                  "count": 36
+                },
+                {
+                  "id": "item_plant_crylplant_2_1",
+                  "name": "Blighted Jadeleaf",
+                  "count": 12
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 65000
+                }
+              ]
+            },
+            {
+              "skill": "Wild Wacky-Whack",
+              "level": 2,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_1_6",
+                  "name": "Protoprism",
+                  "count": 6
+                },
+                {
+                  "id": "item_plant_crylplant_1_1",
+                  "name": "Kalkodendra",
+                  "count": 1
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 1000
+                }
+              ]
+            },
+            {
+              "skill": "Wild Wacky-Whack",
+              "level": 3,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_1_6",
+                  "name": "Protoprism",
+                  "count": 12
+                },
+                {
+                  "id": "item_plant_crylplant_1_1",
+                  "name": "Kalkodendra",
+                  "count": 2
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 2700
+                }
+              ]
+            },
+            {
+              "skill": "Wild Wacky-Whack",
+              "level": 4,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_1_6",
+                  "name": "Protoprism",
+                  "count": 16
+                },
+                {
+                  "id": "item_plant_crylplant_1_2",
+                  "name": "Chrysodendra",
+                  "count": 1
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 3200
+                }
+              ]
+            },
+            {
+              "skill": "Wild Wacky-Whack",
+              "level": 5,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_1_6",
+                  "name": "Protoprism",
+                  "count": 21
+                },
+                {
+                  "id": "item_plant_crylplant_1_2",
+                  "name": "Chrysodendra",
+                  "count": 1
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 4200
+                }
+              ]
+            },
+            {
+              "skill": "Wild Wacky-Whack",
+              "level": 6,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_1_6",
+                  "name": "Protoprism",
+                  "count": 27
+                },
+                {
+                  "id": "item_plant_crylplant_1_2",
+                  "name": "Chrysodendra",
+                  "count": 2
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 5400
+                }
+              ]
+            },
+            {
+              "skill": "Wild Wacky-Whack",
+              "level": 7,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 6
+                },
+                {
+                  "id": "item_plant_crylplant_1_3",
+                  "name": "Vitrodendra",
+                  "count": 1
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 8200
+                }
+              ]
+            },
+            {
+              "skill": "Wild Wacky-Whack",
+              "level": 8,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 8
+                },
+                {
+                  "id": "item_plant_crylplant_1_3",
+                  "name": "Vitrodendra",
+                  "count": 1
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 10500
+                }
+              ]
+            },
+            {
+              "skill": "Wild Wacky-Whack",
+              "level": 9,
+              "materials": [
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 15
+                },
+                {
+                  "id": "item_plant_crylplant_1_3",
+                  "name": "Vitrodendra",
+                  "count": 2
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 18000
+                }
+              ]
+            },
+            {
+              "skill": "Wild Wacky-Whack",
+              "level": 10,
+              "materials": [
+                {
+                  "id": "item_char_skill_crown",
+                  "name": "Mark of Perseverance",
+                  "count": 1
+                },
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 15
+                },
+                {
+                  "id": "item_char_skill_specialize_6",
+                  "name": "Warp Plasma-Coated Slide",
+                  "count": 6
+                },
+                {
+                  "id": "item_plant_crylplant_2_1",
+                  "name": "Blighted Jadeleaf",
+                  "count": 3
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 24000
+                }
+              ]
+            },
+            {
+              "skill": "Wild Wacky-Whack",
+              "level": 11,
+              "materials": [
+                {
+                  "id": "item_char_skill_crown",
+                  "name": "Mark of Perseverance",
+                  "count": 2
+                },
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 24
+                },
+                {
+                  "id": "item_char_skill_specialize_6",
+                  "name": "Warp Plasma-Coated Slide",
+                  "count": 16
+                },
+                {
+                  "id": "item_plant_crylplant_2_1",
+                  "name": "Blighted Jadeleaf",
+                  "count": 6
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 30000
+                }
+              ]
+            },
+            {
+              "skill": "Wild Wacky-Whack",
+              "level": 12,
+              "materials": [
+                {
+                  "id": "item_char_skill_crown",
+                  "name": "Mark of Perseverance",
+                  "count": 3
+                },
+                {
+                  "id": "item_char_skill_level_7_12",
+                  "name": "Protohedron",
+                  "count": 50
+                },
+                {
+                  "id": "item_char_skill_specialize_6",
+                  "name": "Warp Plasma-Coated Slide",
+                  "count": 36
+                },
+                {
+                  "id": "item_plant_crylplant_2_1",
+                  "name": "Blighted Jadeleaf",
+                  "count": 12
+                },
+                {
+                  "id": "item_gold",
+                  "name": "T-Creds",
+                  "count": 65000
+                }
+              ]
+            }
+          ]
+        },
+        "operatorCatalogImport": {
+          "sourceId": "chr_0040_sweetpie",
+          "source": "https://endfieldtools.dev/localdb/optimized/characters/details/chr_0040_sweetpie.json",
+          "levels": [
+            {
+              "level": 1,
+              "hp": 500,
+              "atk": 30,
+              "strength": 22.268041237113408,
+              "agility": 14.969072164948441,
+              "intellect": 9.27835051546395,
+              "will": 11.340206185567052
+            },
+            {
+              "level": 2,
+              "hp": 556,
+              "atk": 33,
+              "strength": 23.94950557542606,
+              "agility": 16.166042499474006,
+              "intellect": 10.183463075952062,
+              "will": 12.29244687565752
+            },
+            {
+              "level": 3,
+              "hp": 612,
+              "atk": 36,
+              "strength": 25.63096991373871,
+              "agility": 17.363012833999573,
+              "intellect": 11.088575636440176,
+              "will": 13.244687565747988
+            },
+            {
+              "level": 4,
+              "hp": 668,
+              "atk": 40,
+              "strength": 27.31243425205136,
+              "agility": 18.55998316852514,
+              "intellect": 11.993688196928288,
+              "will": 14.196928255838458
+            },
+            {
+              "level": 5,
+              "hp": 724,
+              "atk": 43,
+              "strength": 28.993898590364008,
+              "agility": 19.756953503050706,
+              "intellect": 12.8988007574164,
+              "will": 15.149168945928926
+            },
+            {
+              "level": 6,
+              "hp": 781,
+              "atk": 46,
+              "strength": 30.67536292867666,
+              "agility": 20.953923837576273,
+              "intellect": 13.803913317904511,
+              "will": 16.101409636019394
+            },
+            {
+              "level": 7,
+              "hp": 837,
+              "atk": 49,
+              "strength": 32.35682726698931,
+              "agility": 22.15089417210184,
+              "intellect": 14.709025878392623,
+              "will": 17.053650326109864
+            },
+            {
+              "level": 8,
+              "hp": 893,
+              "atk": 53,
+              "strength": 34.03829160530196,
+              "agility": 23.347864506627403,
+              "intellect": 15.614138438880737,
+              "will": 18.00589101620033
+            },
+            {
+              "level": 9,
+              "hp": 949,
+              "atk": 56,
+              "strength": 35.71975594361461,
+              "agility": 24.54483484115297,
+              "intellect": 16.51925099936885,
+              "will": 18.9581317062908
+            },
+            {
+              "level": 10,
+              "hp": 1005,
+              "atk": 59,
+              "strength": 37.40122028192726,
+              "agility": 25.741805175678536,
+              "intellect": 17.42436355985696,
+              "will": 19.91037239638127
+            },
+            {
+              "level": 11,
+              "hp": 1061,
+              "atk": 62,
+              "strength": 39.08268462023991,
+              "agility": 26.938775510204103,
+              "intellect": 18.32947612034507,
+              "will": 20.862613086471736
+            },
+            {
+              "level": 12,
+              "hp": 1117,
+              "atk": 66,
+              "strength": 40.76414895855256,
+              "agility": 28.13574584472967,
+              "intellect": 19.234588680833184,
+              "will": 21.814853776562206
+            },
+            {
+              "level": 13,
+              "hp": 1173,
+              "atk": 69,
+              "strength": 42.44561329686521,
+              "agility": 29.332716179255236,
+              "intellect": 20.139701241321298,
+              "will": 22.767094466652672
+            },
+            {
+              "level": 14,
+              "hp": 1230,
+              "atk": 72,
+              "strength": 44.12707763517786,
+              "agility": 30.529686513780803,
+              "intellect": 21.04481380180941,
+              "will": 23.719335156743142
+            },
+            {
+              "level": 15,
+              "hp": 1286,
+              "atk": 75,
+              "strength": 45.808541973490506,
+              "agility": 31.72665684830637,
+              "intellect": 21.949926362297525,
+              "will": 24.671575846833612
+            },
+            {
+              "level": 16,
+              "hp": 1342,
+              "atk": 78,
+              "strength": 47.49000631180316,
+              "agility": 32.923627182831936,
+              "intellect": 22.855038922785635,
+              "will": 25.623816536924082
+            },
+            {
+              "level": 17,
+              "hp": 1398,
+              "atk": 82,
+              "strength": 49.17147065011581,
+              "agility": 34.1205975173575,
+              "intellect": 23.760151483273745,
+              "will": 26.576057227014548
+            },
+            {
+              "level": 18,
+              "hp": 1454,
+              "atk": 85,
+              "strength": 50.85293498842846,
+              "agility": 35.31756785188307,
+              "intellect": 24.66526404376186,
+              "will": 27.528297917105018
+            },
+            {
+              "level": 19,
+              "hp": 1510,
+              "atk": 88,
+              "strength": 52.53439932674111,
+              "agility": 36.514538186408636,
+              "intellect": 25.570376604249972,
+              "will": 28.480538607195484
+            },
+            {
+              "level": 20,
+              "hp": 1566,
+              "atk": 91,
+              "strength": 54.21586366505376,
+              "agility": 37.7115085209342,
+              "intellect": 26.475489164738086,
+              "will": 29.432779297285954
+            },
+            {
+              "level": 21,
+              "hp": 1622,
+              "atk": 95,
+              "strength": 55.89732800336641,
+              "agility": 38.90847885545977,
+              "intellect": 27.380601725226192,
+              "will": 30.38501998737642
+            },
+            {
+              "level": 22,
+              "hp": 1679,
+              "atk": 98,
+              "strength": 57.57879234167906,
+              "agility": 40.10544918998533,
+              "intellect": 28.285714285714306,
+              "will": 31.33726067746689
+            },
+            {
+              "level": 23,
+              "hp": 1735,
+              "atk": 101,
+              "strength": 59.26025667999171,
+              "agility": 41.302419524510896,
+              "intellect": 29.19082684620242,
+              "will": 32.289501367557364
+            },
+            {
+              "level": 24,
+              "hp": 1791,
+              "atk": 104,
+              "strength": 60.941721018304364,
+              "agility": 42.49938985903646,
+              "intellect": 30.095939406690533,
+              "will": 33.241742057647826
+            },
+            {
+              "level": 25,
+              "hp": 1847,
+              "atk": 108,
+              "strength": 62.623185356617014,
+              "agility": 43.69636019356203,
+              "intellect": 31.001051967178647,
+              "will": 34.193982747738296
+            },
+            {
+              "level": 26,
+              "hp": 1903,
+              "atk": 111,
+              "strength": 64.30464969492967,
+              "agility": 44.893330528087596,
+              "intellect": 31.90616452766676,
+              "will": 35.146223437828766
+            },
+            {
+              "level": 27,
+              "hp": 1959,
+              "atk": 114,
+              "strength": 65.98611403324232,
+              "agility": 46.09030086261316,
+              "intellect": 32.81127708815487,
+              "will": 36.09846412791923
+            },
+            {
+              "level": 28,
+              "hp": 2015,
+              "atk": 117,
+              "strength": 67.66757837155495,
+              "agility": 47.28727119713873,
+              "intellect": 33.71638964864298,
+              "will": 37.050704818009706
+            },
+            {
+              "level": 29,
+              "hp": 2071,
+              "atk": 120,
+              "strength": 69.3490427098676,
+              "agility": 48.484241531664296,
+              "intellect": 34.621502209131094,
+              "will": 38.00294550810017
+            },
+            {
+              "level": 30,
+              "hp": 2128,
+              "atk": 124,
+              "strength": 71.03050704818025,
+              "agility": 49.68121186618986,
+              "intellect": 35.52661476961921,
+              "will": 38.95518619819064
+            },
+            {
+              "level": 31,
+              "hp": 2184,
+              "atk": 127,
+              "strength": 72.7119713864929,
+              "agility": 50.87818220071543,
+              "intellect": 36.43172733010732,
+              "will": 39.90742688828111
+            },
+            {
+              "level": 32,
+              "hp": 2240,
+              "atk": 130,
+              "strength": 74.39343572480556,
+              "agility": 52.075152535240996,
+              "intellect": 37.33683989059543,
+              "will": 40.85966757837157
+            },
+            {
+              "level": 33,
+              "hp": 2296,
+              "atk": 133,
+              "strength": 76.0749000631182,
+              "agility": 53.27212286976656,
+              "intellect": 38.24195245108354,
+              "will": 41.81190826846205
+            },
+            {
+              "level": 34,
+              "hp": 2352,
+              "atk": 137,
+              "strength": 77.75636440143086,
+              "agility": 54.46909320429213,
+              "intellect": 39.147065011571655,
+              "will": 42.76414895855251
+            },
+            {
+              "level": 35,
+              "hp": 2408,
+              "atk": 140,
+              "strength": 79.43782873974351,
+              "agility": 55.666063538817696,
+              "intellect": 40.05217757205977,
+              "will": 43.71638964864299
+            },
+            {
+              "level": 36,
+              "hp": 2464,
+              "atk": 143,
+              "strength": 81.11929307805616,
+              "agility": 56.86303387334326,
+              "intellect": 40.95729013254788,
+              "will": 44.66863033873345
+            },
+            {
+              "level": 37,
+              "hp": 2520,
+              "atk": 146,
+              "strength": 82.80075741636881,
+              "agility": 58.06000420786883,
+              "intellect": 41.86240269303599,
+              "will": 45.62087102882391
+            },
+            {
+              "level": 38,
+              "hp": 2577,
+              "atk": 150,
+              "strength": 84.48222175468146,
+              "agility": 59.256974542394396,
+              "intellect": 42.7675152535241,
+              "will": 46.57311171891439
+            },
+            {
+              "level": 39,
+              "hp": 2633,
+              "atk": 153,
+              "strength": 86.16368609299411,
+              "agility": 60.45394487691996,
+              "intellect": 43.672627814012216,
+              "will": 47.52535240900485
+            },
+            {
+              "level": 40,
+              "hp": 2689,
+              "atk": 156,
+              "strength": 87.84515043130676,
+              "agility": 61.65091521144553,
+              "intellect": 44.57774037450033,
+              "will": 48.47759309909533
+            },
+            {
+              "level": 41,
+              "hp": 2745,
+              "atk": 159,
+              "strength": 89.52661476961941,
+              "agility": 62.847885545971096,
+              "intellect": 45.482852934988436,
+              "will": 49.42983378918579
+            },
+            {
+              "level": 42,
+              "hp": 2801,
+              "atk": 162,
+              "strength": 91.20807910793206,
+              "agility": 64.04485588049666,
+              "intellect": 46.38796549547655,
+              "will": 50.382074479276255
+            },
+            {
+              "level": 43,
+              "hp": 2857,
+              "atk": 166,
+              "strength": 92.88954344624472,
+              "agility": 65.24182621502221,
+              "intellect": 47.29307805596466,
+              "will": 51.33431516936673
+            },
+            {
+              "level": 44,
+              "hp": 2913,
+              "atk": 169,
+              "strength": 94.57100778455737,
+              "agility": 66.43879654954779,
+              "intellect": 48.19819061645278,
+              "will": 52.286555859457195
+            },
+            {
+              "level": 45,
+              "hp": 2969,
+              "atk": 172,
+              "strength": 96.25247212287002,
+              "agility": 67.63576688407335,
+              "intellect": 49.10330317694089,
+              "will": 53.23879654954767
+            },
+            {
+              "level": 46,
+              "hp": 3026,
+              "atk": 175,
+              "strength": 97.93393646118267,
+              "agility": 68.83273721859892,
+              "intellect": 50.008415737429004,
+              "will": 54.191037239638135
+            },
+            {
+              "level": 47,
+              "hp": 3082,
+              "atk": 179,
+              "strength": 99.61540079949532,
+              "agility": 70.02970755312448,
+              "intellect": 50.91352829791711,
+              "will": 55.1432779297286
+            },
+            {
+              "level": 48,
+              "hp": 3138,
+              "atk": 182,
+              "strength": 101.29686513780797,
+              "agility": 71.22667788765006,
+              "intellect": 51.818640858405224,
+              "will": 56.095518619819075
+            },
+            {
+              "level": 49,
+              "hp": 3194,
+              "atk": 185,
+              "strength": 102.97832947612062,
+              "agility": 72.42364822217561,
+              "intellect": 52.72375341889334,
+              "will": 57.04775930990954
+            },
+            {
+              "level": 50,
+              "hp": 3250,
+              "atk": 188,
+              "strength": 104.65979381443327,
+              "agility": 73.62061855670119,
+              "intellect": 53.62886597938145,
+              "will": 58.000000000000014
+            },
+            {
+              "level": 51,
+              "hp": 3306,
+              "atk": 192,
+              "strength": 106.34125815274592,
+              "agility": 74.81758889122675,
+              "intellect": 54.533978539869565,
+              "will": 58.95224069009048
+            },
+            {
+              "level": 52,
+              "hp": 3362,
+              "atk": 195,
+              "strength": 108.02272249105857,
+              "agility": 76.01455922575232,
+              "intellect": 55.43909110035767,
+              "will": 59.90448138018094
+            },
+            {
+              "level": 53,
+              "hp": 3418,
+              "atk": 198,
+              "strength": 109.70418682937122,
+              "agility": 77.21152956027788,
+              "intellect": 56.344203660845785,
+              "will": 60.85672207027142
+            },
+            {
+              "level": 54,
+              "hp": 3474,
+              "atk": 201,
+              "strength": 111.38565116768387,
+              "agility": 78.40849989480346,
+              "intellect": 57.2493162213339,
+              "will": 61.80896276036188
+            },
+            {
+              "level": 55,
+              "hp": 3531,
+              "atk": 204,
+              "strength": 113.06711550599651,
+              "agility": 79.60547022932901,
+              "intellect": 58.15442878182201,
+              "will": 62.761203450452356
+            },
+            {
+              "level": 56,
+              "hp": 3587,
+              "atk": 208,
+              "strength": 114.74857984430916,
+              "agility": 80.80244056385459,
+              "intellect": 59.059541342310126,
+              "will": 63.71344414054282
+            },
+            {
+              "level": 57,
+              "hp": 3643,
+              "atk": 211,
+              "strength": 116.43004418262181,
+              "agility": 81.99941089838015,
+              "intellect": 59.96465390279824,
+              "will": 64.6656848306333
+            },
+            {
+              "level": 58,
+              "hp": 3699,
+              "atk": 214,
+              "strength": 118.11150852093446,
+              "agility": 83.19638123290572,
+              "intellect": 60.869766463286346,
+              "will": 65.61792552072376
+            },
+            {
+              "level": 59,
+              "hp": 3755,
+              "atk": 217,
+              "strength": 119.79297285924712,
+              "agility": 84.39335156743128,
+              "intellect": 61.77487902377446,
+              "will": 66.57016621081422
+            },
+            {
+              "level": 60,
+              "hp": 3811,
+              "atk": 221,
+              "strength": 121.47443719755977,
+              "agility": 85.59032190195686,
+              "intellect": 62.679991584262574,
+              "will": 67.5224069009047
+            },
+            {
+              "level": 61,
+              "hp": 3867,
+              "atk": 224,
+              "strength": 123.15590153587242,
+              "agility": 86.78729223648241,
+              "intellect": 63.58510414475069,
+              "will": 68.47464759099516
+            },
+            {
+              "level": 62,
+              "hp": 3923,
+              "atk": 227,
+              "strength": 124.83736587418507,
+              "agility": 87.98426257100799,
+              "intellect": 64.49021670523881,
+              "will": 69.42688828108564
+            },
+            {
+              "level": 63,
+              "hp": 3980,
+              "atk": 230,
+              "strength": 126.51883021249772,
+              "agility": 89.18123290553355,
+              "intellect": 65.39532926572691,
+              "will": 70.3791289711761
+            },
+            {
+              "level": 64,
+              "hp": 4036,
+              "atk": 234,
+              "strength": 128.20029455081038,
+              "agility": 90.37820324005912,
+              "intellect": 66.30044182621502,
+              "will": 71.33136966126656
+            },
+            {
+              "level": 65,
+              "hp": 4092,
+              "atk": 237,
+              "strength": 129.88175888912303,
+              "agility": 91.57517357458468,
+              "intellect": 67.20555438670314,
+              "will": 72.28361035135704
+            },
+            {
+              "level": 66,
+              "hp": 4148,
+              "atk": 240,
+              "strength": 131.56322322743569,
+              "agility": 92.77214390911024,
+              "intellect": 68.11066694719125,
+              "will": 73.2358510414475
+            },
+            {
+              "level": 67,
+              "hp": 4204,
+              "atk": 243,
+              "strength": 133.24468756574834,
+              "agility": 93.96911424363581,
+              "intellect": 69.01577950767937,
+              "will": 74.18809173153798
+            },
+            {
+              "level": 68,
+              "hp": 4260,
+              "atk": 247,
+              "strength": 134.926151904061,
+              "agility": 95.16608457816137,
+              "intellect": 69.92089206816748,
+              "will": 75.14033242162844
+            },
+            {
+              "level": 69,
+              "hp": 4316,
+              "atk": 250,
+              "strength": 136.60761624237364,
+              "agility": 96.36305491268695,
+              "intellect": 70.82600462865558,
+              "will": 76.09257311171892
+            },
+            {
+              "level": 70,
+              "hp": 4372,
+              "atk": 253,
+              "strength": 138.2890805806863,
+              "agility": 97.56002524721251,
+              "intellect": 71.7311171891437,
+              "will": 77.04481380180938
+            },
+            {
+              "level": 71,
+              "hp": 4429,
+              "atk": 256,
+              "strength": 139.97054491899894,
+              "agility": 98.75699558173808,
+              "intellect": 72.63622974963181,
+              "will": 77.99705449189985
+            },
+            {
+              "level": 72,
+              "hp": 4485,
+              "atk": 259,
+              "strength": 141.6520092573116,
+              "agility": 99.95396591626364,
+              "intellect": 73.54134231011993,
+              "will": 78.94929518199032
+            },
+            {
+              "level": 73,
+              "hp": 4541,
+              "atk": 263,
+              "strength": 143.33347359562424,
+              "agility": 101.15093625078921,
+              "intellect": 74.44645487060804,
+              "will": 79.90153587208079
+            },
+            {
+              "level": 74,
+              "hp": 4597,
+              "atk": 266,
+              "strength": 145.0149379339369,
+              "agility": 102.34790658531477,
+              "intellect": 75.35156743109616,
+              "will": 80.85377656217126
+            },
+            {
+              "level": 75,
+              "hp": 4653,
+              "atk": 269,
+              "strength": 146.69640227224954,
+              "agility": 103.54487691984035,
+              "intellect": 76.25667999158426,
+              "will": 81.80601725226173
+            },
+            {
+              "level": 76,
+              "hp": 4709,
+              "atk": 272,
+              "strength": 148.37786661056217,
+              "agility": 104.74184725436591,
+              "intellect": 77.16179255207237,
+              "will": 82.75825794235219
+            },
+            {
+              "level": 77,
+              "hp": 4765,
+              "atk": 276,
+              "strength": 150.05933094887482,
+              "agility": 105.93881758889148,
+              "intellect": 78.06690511256049,
+              "will": 83.71049863244266
+            },
+            {
+              "level": 78,
+              "hp": 4821,
+              "atk": 279,
+              "strength": 151.74079528718747,
+              "agility": 107.13578792341704,
+              "intellect": 78.9720176730486,
+              "will": 84.66273932253313
+            },
+            {
+              "level": 79,
+              "hp": 4878,
+              "atk": 282,
+              "strength": 153.42225962550012,
+              "agility": 108.33275825794261,
+              "intellect": 79.87713023353672,
+              "will": 85.6149800126236
+            },
+            {
+              "level": 80,
+              "hp": 4934,
+              "atk": 285,
+              "strength": 155.10372396381277,
+              "agility": 109.52972859246817,
+              "intellect": 80.78224279402482,
+              "will": 86.56722070271407
+            },
+            {
+              "level": 81,
+              "hp": 4990,
+              "atk": 289,
+              "strength": 156.78518830212542,
+              "agility": 110.72669892699375,
+              "intellect": 81.68735535451293,
+              "will": 87.51946139280453
+            },
+            {
+              "level": 82,
+              "hp": 5046,
+              "atk": 292,
+              "strength": 158.46665264043807,
+              "agility": 111.92366926151931,
+              "intellect": 82.59246791500105,
+              "will": 88.471702082895
+            },
+            {
+              "level": 83,
+              "hp": 5102,
+              "atk": 295,
+              "strength": 160.14811697875072,
+              "agility": 113.12063959604487,
+              "intellect": 83.49758047548916,
+              "will": 89.42394277298547
+            },
+            {
+              "level": 84,
+              "hp": 5158,
+              "atk": 298,
+              "strength": 161.82958131706337,
+              "agility": 114.31760993057044,
+              "intellect": 84.40269303597728,
+              "will": 90.37618346307595
+            },
+            {
+              "level": 85,
+              "hp": 5214,
+              "atk": 301,
+              "strength": 163.51104565537602,
+              "agility": 115.514580265096,
+              "intellect": 85.30780559646539,
+              "will": 91.32842415316641
+            },
+            {
+              "level": 86,
+              "hp": 5270,
+              "atk": 305,
+              "strength": 165.19250999368867,
+              "agility": 116.71155059962157,
+              "intellect": 86.2129181569535,
+              "will": 92.28066484325689
+            },
+            {
+              "level": 87,
+              "hp": 5327,
+              "atk": 308,
+              "strength": 166.87397433200132,
+              "agility": 117.90852093414713,
+              "intellect": 87.11803071744161,
+              "will": 93.23290553334735
+            },
+            {
+              "level": 88,
+              "hp": 5383,
+              "atk": 311,
+              "strength": 168.55543867031398,
+              "agility": 119.10549126867271,
+              "intellect": 88.02314327792972,
+              "will": 94.18514622343781
+            },
+            {
+              "level": 89,
+              "hp": 5439,
+              "atk": 314,
+              "strength": 170.23690300862663,
+              "agility": 120.30246160319827,
+              "intellect": 88.92825583841784,
+              "will": 95.13738691352829
+            },
+            {
+              "level": 90,
+              "hp": 5495,
+              "atk": 318,
+              "strength": 171.91836734693928,
+              "agility": 121.49943193772384,
+              "intellect": 89.83336839890595,
+              "will": 96.08962760361875
+            }
+          ],
+          "stats": {
+            "base_stats_level": 90,
+            "base_hp": 5495,
+            "base_hp_level_1": 500,
+            "base_atk": 318,
+            "base_atk_level_1": 30,
+            "base_strength": 171,
+            "base_strength_level_1": 22.3,
+            "base_agility": 121,
+            "base_agility_level_1": 15,
+            "base_intellect": 89,
+            "base_intellect_level_1": 9.3,
+            "base_will": 96,
+            "base_will_level_1": 11.3
+          },
+          "rawStats": {
+            "baseStatsLevel": 90,
+            "baseHp": 5495,
+            "baseHpLevel1": 500,
+            "baseAtk": 318,
+            "baseAtkLevel1": 30,
+            "baseStrength": 171,
+            "baseStrengthLevel1": 22.3,
+            "baseAgility": 121,
+            "baseAgilityLevel1": 15,
+            "baseIntellect": 89,
+            "baseIntellectLevel1": 9.3,
+            "baseWill": 96,
+            "baseWillLevel1": 11.3
+          }
+        }
+      },
+      "base_stats_level": 90,
+      "base_hp": 5495,
+      "base_hp_level_1": 500,
+      "base_atk": 318,
+      "base_atk_level_1": 30,
+      "base_strength": 171,
+      "base_strength_level_1": 22.3,
+      "base_agility": 121,
+      "base_agility_level_1": 15,
+      "base_intellect": 89,
+      "base_intellect_level_1": 9.3,
+      "base_will": 96,
+      "base_will_level_1": 11.3
+    },
+    {
+      "id": 36,
+      "game": "arknights_endfield",
+      "slug": "mimino",
+      "name": "Mimino",
+      "star": 5,
+      "operator_class": "Supporter",
+      "element_type": "physical",
+      "weapon_type": "handcannon",
+      "icon_path": "assets/operators/avatars/Mimino.webp",
+      "is_visible": true,
+      "sort_order": 36,
+      "can_enter_ultimate_state": false,
+      "raw_data": {
+        "dataStatus": "announced_preview",
+        "baseStatsMissing": true,
+        "sourceUrl": "https://endfieldtools.dev/characters/mimino/",
+        "sourceNote": "Announced for December 16, 2026. Attributes, skill values and durations have not been published."
+      }
+    }
+  ],
+  "weapons": [
+    {
+      "weapon_key": "sweet_deal",
+      "game": "arknights_endfield",
+      "name": "Sweet Deal",
+      "weapon_type": "polearm",
+      "rarity": 6,
+      "main_attribute": "Strength",
+      "secondary_attribute": "Nature DMG",
+      "secondary_value": 43.3,
+      "secondary_is_percent": true,
+      "passive_name": "Flow: Sweetening Function",
+      "icon_path": "assets/weapons/shrooms/sweet_deal.png",
+      "base_atk": 500,
+      "base_stats_level": 90,
+      "sort_order": 85,
+      "raw_data": {
+        "catalogImport": {
+          "source": "https://www.endfieldtools.dev/localdb/optimized/weapons/details/wpn_lance_0017.json",
+          "sourceId": "wpn_lance_0017",
+          "atkStats": [
+            {
+              "level": 1,
+              "atk": 51
+            },
+            {
+              "level": 2,
+              "atk": 56
+            },
+            {
+              "level": 3,
+              "atk": 61
+            },
+            {
+              "level": 4,
+              "atk": 66
+            },
+            {
+              "level": 5,
+              "atk": 71
+            },
+            {
+              "level": 6,
+              "atk": 76
+            },
+            {
+              "level": 7,
+              "atk": 81
+            },
+            {
+              "level": 8,
+              "atk": 86
+            },
+            {
+              "level": 9,
+              "atk": 91
+            },
+            {
+              "level": 10,
+              "atk": 96
+            },
+            {
+              "level": 11,
+              "atk": 101
+            },
+            {
+              "level": 12,
+              "atk": 106
+            },
+            {
+              "level": 13,
+              "atk": 111
+            },
+            {
+              "level": 14,
+              "atk": 116
+            },
+            {
+              "level": 15,
+              "atk": 121
+            },
+            {
+              "level": 16,
+              "atk": 126
+            },
+            {
+              "level": 17,
+              "atk": 131
+            },
+            {
+              "level": 18,
+              "atk": 136
+            },
+            {
+              "level": 19,
+              "atk": 141
+            },
+            {
+              "level": 20,
+              "atk": 146
+            },
+            {
+              "level": 21,
+              "atk": 152
+            },
+            {
+              "level": 22,
+              "atk": 157
+            },
+            {
+              "level": 23,
+              "atk": 162
+            },
+            {
+              "level": 24,
+              "atk": 167
+            },
+            {
+              "level": 25,
+              "atk": 172
+            },
+            {
+              "level": 26,
+              "atk": 177
+            },
+            {
+              "level": 27,
+              "atk": 182
+            },
+            {
+              "level": 28,
+              "atk": 187
+            },
+            {
+              "level": 29,
+              "atk": 192
+            },
+            {
+              "level": 30,
+              "atk": 197
+            },
+            {
+              "level": 31,
+              "atk": 202
+            },
+            {
+              "level": 32,
+              "atk": 207
+            },
+            {
+              "level": 33,
+              "atk": 212
+            },
+            {
+              "level": 34,
+              "atk": 217
+            },
+            {
+              "level": 35,
+              "atk": 222
+            },
+            {
+              "level": 36,
+              "atk": 227
+            },
+            {
+              "level": 37,
+              "atk": 232
+            },
+            {
+              "level": 38,
+              "atk": 237
+            },
+            {
+              "level": 39,
+              "atk": 242
+            },
+            {
+              "level": 40,
+              "atk": 247
+            },
+            {
+              "level": 41,
+              "atk": 253
+            },
+            {
+              "level": 42,
+              "atk": 258
+            },
+            {
+              "level": 43,
+              "atk": 263
+            },
+            {
+              "level": 44,
+              "atk": 268
+            },
+            {
+              "level": 45,
+              "atk": 273
+            },
+            {
+              "level": 46,
+              "atk": 278
+            },
+            {
+              "level": 47,
+              "atk": 283
+            },
+            {
+              "level": 48,
+              "atk": 288
+            },
+            {
+              "level": 49,
+              "atk": 293
+            },
+            {
+              "level": 50,
+              "atk": 298
+            },
+            {
+              "level": 51,
+              "atk": 303
+            },
+            {
+              "level": 52,
+              "atk": 308
+            },
+            {
+              "level": 53,
+              "atk": 313
+            },
+            {
+              "level": 54,
+              "atk": 318
+            },
+            {
+              "level": 55,
+              "atk": 323
+            },
+            {
+              "level": 56,
+              "atk": 328
+            },
+            {
+              "level": 57,
+              "atk": 333
+            },
+            {
+              "level": 58,
+              "atk": 338
+            },
+            {
+              "level": 59,
+              "atk": 343
+            },
+            {
+              "level": 60,
+              "atk": 348
+            },
+            {
+              "level": 61,
+              "atk": 354
+            },
+            {
+              "level": 62,
+              "atk": 359
+            },
+            {
+              "level": 63,
+              "atk": 364
+            },
+            {
+              "level": 64,
+              "atk": 369
+            },
+            {
+              "level": 65,
+              "atk": 374
+            },
+            {
+              "level": 66,
+              "atk": 379
+            },
+            {
+              "level": 67,
+              "atk": 384
+            },
+            {
+              "level": 68,
+              "atk": 389
+            },
+            {
+              "level": 69,
+              "atk": 394
+            },
+            {
+              "level": 70,
+              "atk": 399
+            },
+            {
+              "level": 71,
+              "atk": 404
+            },
+            {
+              "level": 72,
+              "atk": 409
+            },
+            {
+              "level": 73,
+              "atk": 414
+            },
+            {
+              "level": 74,
+              "atk": 419
+            },
+            {
+              "level": 75,
+              "atk": 424
+            },
+            {
+              "level": 76,
+              "atk": 429
+            },
+            {
+              "level": 77,
+              "atk": 434
+            },
+            {
+              "level": 78,
+              "atk": 439
+            },
+            {
+              "level": 79,
+              "atk": 444
+            },
+            {
+              "level": 80,
+              "atk": 449
+            },
+            {
+              "level": 81,
+              "atk": 455
+            },
+            {
+              "level": 82,
+              "atk": 460
+            },
+            {
+              "level": 83,
+              "atk": 465
+            },
+            {
+              "level": 84,
+              "atk": 470
+            },
+            {
+              "level": 85,
+              "atk": 475
+            },
+            {
+              "level": 86,
+              "atk": 480
+            },
+            {
+              "level": 87,
+              "atk": 485
+            },
+            {
+              "level": 88,
+              "atk": 490
+            },
+            {
+              "level": 89,
+              "atk": 495
+            },
+            {
+              "level": 90,
+              "atk": 500
+            }
+          ]
+        }
+      }
+    },
+    {
+      "weapon_key": "raid_comet",
+      "game": "arknights_endfield",
+      "name": "Raid Comet",
+      "weapon_type": "polearm",
+      "rarity": 6,
+      "main_attribute": "Strength",
+      "secondary_attribute": "Ultimate Gain Efficiency",
+      "secondary_value": 46.4,
+      "secondary_is_percent": true,
+      "passive_name": "Detonate: Skybreaker",
+      "icon_path": "assets/weapons/shrooms/raid_comet.png",
+      "base_atk": 485,
+      "base_stats_level": 90,
+      "sort_order": 86,
+      "raw_data": {
+        "catalogImport": {
+          "source": "https://www.endfieldtools.dev/localdb/optimized/weapons/details/wpn_lance_0018.json",
+          "sourceId": "wpn_lance_0018",
+          "atkStats": [
+            {
+              "level": 1,
+              "atk": 49
+            },
+            {
+              "level": 2,
+              "atk": 54
+            },
+            {
+              "level": 3,
+              "atk": 59
+            },
+            {
+              "level": 4,
+              "atk": 64
+            },
+            {
+              "level": 5,
+              "atk": 69
+            },
+            {
+              "level": 6,
+              "atk": 74
+            },
+            {
+              "level": 7,
+              "atk": 78
+            },
+            {
+              "level": 8,
+              "atk": 83
+            },
+            {
+              "level": 9,
+              "atk": 88
+            },
+            {
+              "level": 10,
+              "atk": 93
+            },
+            {
+              "level": 11,
+              "atk": 98
+            },
+            {
+              "level": 12,
+              "atk": 103
+            },
+            {
+              "level": 13,
+              "atk": 108
+            },
+            {
+              "level": 14,
+              "atk": 113
+            },
+            {
+              "level": 15,
+              "atk": 118
+            },
+            {
+              "level": 16,
+              "atk": 123
+            },
+            {
+              "level": 17,
+              "atk": 127
+            },
+            {
+              "level": 18,
+              "atk": 132
+            },
+            {
+              "level": 19,
+              "atk": 137
+            },
+            {
+              "level": 20,
+              "atk": 142
+            },
+            {
+              "level": 21,
+              "atk": 147
+            },
+            {
+              "level": 22,
+              "atk": 152
+            },
+            {
+              "level": 23,
+              "atk": 157
+            },
+            {
+              "level": 24,
+              "atk": 162
+            },
+            {
+              "level": 25,
+              "atk": 167
+            },
+            {
+              "level": 26,
+              "atk": 172
+            },
+            {
+              "level": 27,
+              "atk": 176
+            },
+            {
+              "level": 28,
+              "atk": 181
+            },
+            {
+              "level": 29,
+              "atk": 186
+            },
+            {
+              "level": 30,
+              "atk": 191
+            },
+            {
+              "level": 31,
+              "atk": 196
+            },
+            {
+              "level": 32,
+              "atk": 201
+            },
+            {
+              "level": 33,
+              "atk": 206
+            },
+            {
+              "level": 34,
+              "atk": 211
+            },
+            {
+              "level": 35,
+              "atk": 216
+            },
+            {
+              "level": 36,
+              "atk": 221
+            },
+            {
+              "level": 37,
+              "atk": 225
+            },
+            {
+              "level": 38,
+              "atk": 230
+            },
+            {
+              "level": 39,
+              "atk": 235
+            },
+            {
+              "level": 40,
+              "atk": 240
+            },
+            {
+              "level": 41,
+              "atk": 245
+            },
+            {
+              "level": 42,
+              "atk": 250
+            },
+            {
+              "level": 43,
+              "atk": 255
+            },
+            {
+              "level": 44,
+              "atk": 260
+            },
+            {
+              "level": 45,
+              "atk": 265
+            },
+            {
+              "level": 46,
+              "atk": 270
+            },
+            {
+              "level": 47,
+              "atk": 274
+            },
+            {
+              "level": 48,
+              "atk": 279
+            },
+            {
+              "level": 49,
+              "atk": 284
+            },
+            {
+              "level": 50,
+              "atk": 289
+            },
+            {
+              "level": 51,
+              "atk": 294
+            },
+            {
+              "level": 52,
+              "atk": 299
+            },
+            {
+              "level": 53,
+              "atk": 304
+            },
+            {
+              "level": 54,
+              "atk": 309
+            },
+            {
+              "level": 55,
+              "atk": 314
+            },
+            {
+              "level": 56,
+              "atk": 319
+            },
+            {
+              "level": 57,
+              "atk": 323
+            },
+            {
+              "level": 58,
+              "atk": 328
+            },
+            {
+              "level": 59,
+              "atk": 333
+            },
+            {
+              "level": 60,
+              "atk": 338
+            },
+            {
+              "level": 61,
+              "atk": 343
+            },
+            {
+              "level": 62,
+              "atk": 348
+            },
+            {
+              "level": 63,
+              "atk": 353
+            },
+            {
+              "level": 64,
+              "atk": 358
+            },
+            {
+              "level": 65,
+              "atk": 363
+            },
+            {
+              "level": 66,
+              "atk": 368
+            },
+            {
+              "level": 67,
+              "atk": 372
+            },
+            {
+              "level": 68,
+              "atk": 377
+            },
+            {
+              "level": 69,
+              "atk": 382
+            },
+            {
+              "level": 70,
+              "atk": 387
+            },
+            {
+              "level": 71,
+              "atk": 392
+            },
+            {
+              "level": 72,
+              "atk": 397
+            },
+            {
+              "level": 73,
+              "atk": 402
+            },
+            {
+              "level": 74,
+              "atk": 407
+            },
+            {
+              "level": 75,
+              "atk": 412
+            },
+            {
+              "level": 76,
+              "atk": 417
+            },
+            {
+              "level": 77,
+              "atk": 421
+            },
+            {
+              "level": 78,
+              "atk": 426
+            },
+            {
+              "level": 79,
+              "atk": 431
+            },
+            {
+              "level": 80,
+              "atk": 436
+            },
+            {
+              "level": 81,
+              "atk": 441
+            },
+            {
+              "level": 82,
+              "atk": 446
+            },
+            {
+              "level": 83,
+              "atk": 451
+            },
+            {
+              "level": 84,
+              "atk": 456
+            },
+            {
+              "level": 85,
+              "atk": 461
+            },
+            {
+              "level": 86,
+              "atk": 466
+            },
+            {
+              "level": 87,
+              "atk": 470
+            },
+            {
+              "level": 88,
+              "atk": 475
+            },
+            {
+              "level": 89,
+              "atk": 480
+            },
+            {
+              "level": 90,
+              "atk": 485
+            }
+          ]
+        }
+      }
+    },
+    {
+      "weapon_key": "star_of_tomorrow",
+      "game": "arknights_endfield",
+      "name": "Star of Tomorrow",
+      "weapon_type": "handcannon",
+      "rarity": 5,
+      "main_attribute": "Strength",
+      "secondary_attribute": "Ultimate Gain Efficiency",
+      "secondary_value": null,
+      "secondary_is_percent": true,
+      "passive_name": "Assault (announced)",
+      "icon_path": "/favicon-flat.png",
+      "base_atk": null,
+      "base_stats_level": null,
+      "sort_order": 87,
+      "raw_data": {
+        "dataStatus": "announced_preview",
+        "catalogImport": {
+          "source": "https://endfieldtools.dev/weapons/star-of-tomorrow/",
+          "sourceId": "star-of-tomorrow"
+        },
+        "sourceNote": "Announced for December 16, 2026. ATK, rank values, passive effects and item artwork are not published."
+      }
+    }
+  ],
+  "profiles": [
+    {
+      "weapon_key": "sweet_deal",
+      "primary_label": "Strength",
+      "primary_values": [
+        20,
+        36,
+        52,
+        68,
+        84,
+        100,
+        116,
+        132,
+        156
+      ],
+      "primary_is_percent": false,
+      "secondary_label": "Nature DMG",
+      "secondary_values": [
+        5.6,
+        10,
+        14.4,
+        18.9,
+        23.3,
+        27.8,
+        32.2,
+        36.7,
+        43.3
+      ],
+      "secondary_is_percent": true,
+      "skill_name": "Flow: Sweetening Function",
+      "skill_descriptions": [
+        "Ultimate Gain Efficiency +18%.\nAfter the wielder's skill recovers SP, the entire team gains ATK +2% for 30s.\nMax stacks for this effect: 3. Duration of each stack is counted separately. Effect only triggers once every 0.1s.\nAfter the wielder's skill applies an Arts Burst, the entire team gains Arts DMG Dealt +6% for 15s.\nThis effect cannot stack.",
+        "Ultimate Gain Efficiency +21.6%.\nAfter the wielder's skill recovers SP, the entire team gains ATK +2.4% for 30s.\nMax stacks for this effect: 3. Duration of each stack is counted separately. Effect only triggers once every 0.1s.\nAfter the wielder's skill applies an Arts Burst, the entire team gains Arts DMG Dealt +7.2% for 15s.\nThis effect cannot stack.",
+        "Ultimate Gain Efficiency +25.2%.\nAfter the wielder's skill recovers SP, the entire team gains ATK +2.8% for 30s.\nMax stacks for this effect: 3. Duration of each stack is counted separately. Effect only triggers once every 0.1s.\nAfter the wielder's skill applies an Arts Burst, the entire team gains Arts DMG Dealt +8.4% for 15s.\nThis effect cannot stack.",
+        "Ultimate Gain Efficiency +28.8%.\nAfter the wielder's skill recovers SP, the entire team gains ATK +3.2% for 30s.\nMax stacks for this effect: 3. Duration of each stack is counted separately. Effect only triggers once every 0.1s.\nAfter the wielder's skill applies an Arts Burst, the entire team gains Arts DMG Dealt +9.6% for 15s.\nThis effect cannot stack.",
+        "Ultimate Gain Efficiency +32.4%.\nAfter the wielder's skill recovers SP, the entire team gains ATK +3.6% for 30s.\nMax stacks for this effect: 3. Duration of each stack is counted separately. Effect only triggers once every 0.1s.\nAfter the wielder's skill applies an Arts Burst, the entire team gains Arts DMG Dealt +10.8% for 15s.\nThis effect cannot stack.",
+        "Ultimate Gain Efficiency +36%.\nAfter the wielder's skill recovers SP, the entire team gains ATK +4% for 30s.\nMax stacks for this effect: 3. Duration of each stack is counted separately. Effect only triggers once every 0.1s.\nAfter the wielder's skill applies an Arts Burst, the entire team gains Arts DMG Dealt +12% for 15s.\nThis effect cannot stack.",
+        "Ultimate Gain Efficiency +39.6%.\nAfter the wielder's skill recovers SP, the entire team gains ATK +4.4% for 30s.\nMax stacks for this effect: 3. Duration of each stack is counted separately. Effect only triggers once every 0.1s.\nAfter the wielder's skill applies an Arts Burst, the entire team gains Arts DMG Dealt +13.2% for 15s.\nThis effect cannot stack.",
+        "Ultimate Gain Efficiency +43.2%.\nAfter the wielder's skill recovers SP, the entire team gains ATK +4.8% for 30s.\nMax stacks for this effect: 3. Duration of each stack is counted separately. Effect only triggers once every 0.1s.\nAfter the wielder's skill applies an Arts Burst, the entire team gains Arts DMG Dealt +14.4% for 15s.\nThis effect cannot stack.",
+        "Ultimate Gain Efficiency +50.4%.\nAfter the wielder's skill recovers SP, the entire team gains ATK +5.6% for 30s.\nMax stacks for this effect: 3. Duration of each stack is counted separately. Effect only triggers once every 0.1s.\nAfter the wielder's skill applies an Arts Burst, the entire team gains Arts DMG Dealt +16.8% for 15s.\nThis effect cannot stack."
+      ],
+      "verified": false,
+      "source_url": "https://www.endfieldtools.dev/localdb/optimized/weapons/details/wpn_lance_0017.json",
+      "source_note": "Version 1.7 community game-data export. All nine ranks; in-game tuning verification pending."
+    },
+    {
+      "weapon_key": "raid_comet",
+      "primary_label": "Strength",
+      "primary_values": [
+        20,
+        36,
+        52,
+        68,
+        84,
+        100,
+        116,
+        132,
+        156
+      ],
+      "primary_is_percent": false,
+      "secondary_label": "Ultimate Gain Efficiency",
+      "secondary_values": [
+        6,
+        10.7,
+        15.5,
+        20.2,
+        25,
+        29.8,
+        34.5,
+        39.3,
+        46.4
+      ],
+      "secondary_is_percent": true,
+      "skill_name": "Detonate: Skybreaker",
+      "skill_descriptions": [
+        "Nature DMG Dealt +7%.\nAfter the wielder applies a Nature Burst, the wielder gains Nature DMG Dealt +12% for 20s.\nAfter the wielder's skill recovers SP, the entire team gains Arts DMG Dealt +2% for 20s.\nThe two effects apply separately and do not stack with themselves.",
+        "Nature DMG Dealt +8.4%.\nAfter the wielder applies a Nature Burst, the wielder gains Nature DMG Dealt +14.4% for 20s.\nAfter the wielder's skill recovers SP, the entire team gains Arts DMG Dealt +2.4% for 20s.\nThe two effects apply separately and do not stack with themselves.",
+        "Nature DMG Dealt +9.8%.\nAfter the wielder applies a Nature Burst, the wielder gains Nature DMG Dealt +16.8% for 20s.\nAfter the wielder's skill recovers SP, the entire team gains Arts DMG Dealt +2.8% for 20s.\nThe two effects apply separately and do not stack with themselves.",
+        "Nature DMG Dealt +11.2%.\nAfter the wielder applies a Nature Burst, the wielder gains Nature DMG Dealt +19.2% for 20s.\nAfter the wielder's skill recovers SP, the entire team gains Arts DMG Dealt +3.2% for 20s.\nThe two effects apply separately and do not stack with themselves.",
+        "Nature DMG Dealt +12.6%.\nAfter the wielder applies a Nature Burst, the wielder gains Nature DMG Dealt +21.6% for 20s.\nAfter the wielder's skill recovers SP, the entire team gains Arts DMG Dealt +3.6% for 20s.\nThe two effects apply separately and do not stack with themselves.",
+        "Nature DMG Dealt +14%.\nAfter the wielder applies a Nature Burst, the wielder gains Nature DMG Dealt +24% for 20s.\nAfter the wielder's skill recovers SP, the entire team gains Arts DMG Dealt +4% for 20s.\nThe two effects apply separately and do not stack with themselves.",
+        "Nature DMG Dealt +15.4%.\nAfter the wielder applies a Nature Burst, the wielder gains Nature DMG Dealt +26.4% for 20s.\nAfter the wielder's skill recovers SP, the entire team gains Arts DMG Dealt +4.4% for 20s.\nThe two effects apply separately and do not stack with themselves.",
+        "Nature DMG Dealt +16.8%.\nAfter the wielder applies a Nature Burst, the wielder gains Nature DMG Dealt +28.8% for 20s.\nAfter the wielder's skill recovers SP, the entire team gains Arts DMG Dealt +4.8% for 20s.\nThe two effects apply separately and do not stack with themselves.",
+        "Nature DMG Dealt +19.6%.\nAfter the wielder applies a Nature Burst, the wielder gains Nature DMG Dealt +33.6% for 20s.\nAfter the wielder's skill recovers SP, the entire team gains Arts DMG Dealt +5.6% for 20s.\nThe two effects apply separately and do not stack with themselves."
+      ],
+      "verified": false,
+      "source_url": "https://www.endfieldtools.dev/localdb/optimized/weapons/details/wpn_lance_0018.json",
+      "source_note": "Version 1.7 community game-data export. All nine ranks; in-game tuning verification pending."
+    }
+  ]
+}

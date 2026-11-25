@@ -140,4 +140,12 @@
     <loc>https://rotationforge.gg/endfield/operators/argent_flow/</loc>
     <image:image><image:loc>https://rotationforge.gg/endfield/assets/operators/avatars/Argent_Flow.png?v=0635cebed969</image:loc></image:image>
   </url>
+  <url>
+    <loc>https://rotationforge.gg/endfield/operators/kay/</loc>
+    <image:image><image:loc>https://rotationforge.gg/endfield/assets/operators/avatars/Kay.png?v=3426dc16bcbb</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://rotationforge.gg/endfield/operators/mimino/</loc>
+    <image:image><image:loc>https://rotationforge.gg/endfield/assets/operators/avatars/Mimino.webp?v=a2f99188c0cb</image:loc></image:image>
+  </url>
 </urlset>

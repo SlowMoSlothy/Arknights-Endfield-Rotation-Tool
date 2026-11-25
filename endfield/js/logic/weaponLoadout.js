@@ -180,6 +180,7 @@ function getOperatorSimulationLoadoutStats(operatorId) {
     let treatmentEffectPercent = 0;
     let gearDefense = 0;
     let artsIntensity = 0;
+    let ultimateGainEfficiencyPercent = 0;
     const operatorBaseCritRatePercent = Number(
         operator.baseCritRatePercent ?? operator.baseCriticalRatePercent ?? operator.critRatePercent
     );
@@ -250,6 +251,11 @@ function getOperatorSimulationLoadoutStats(operatorId) {
             return;
         }
 
+        if (labelKey.includes("ultimategain") || labelKey.includes("ultefficiency")) {
+            ultimateGainEfficiencyPercent += value;
+            return;
+        }
+
         if (labelKey.includes("hp") && stat.isPercent) {
             hpPercentBonus += value;
             return;
@@ -287,6 +293,7 @@ function getOperatorSimulationLoadoutStats(operatorId) {
         ? getWeaponPassiveStaticBonuses(weapon.key, activation?.skill?.rank || 1)
         : { flatAtk: 0, atkPercent: 0 };
     flatAtkBonus += Number(passiveStaticBonuses.flatAtk) || 0;
+    ultimateGainEfficiencyPercent += Number(passiveStaticBonuses.ultimateGainEfficiencyPercent) || 0;
     atkPercentBonus += Number(passiveStaticBonuses.atkPercent) || 0;
     Object.entries(passiveStaticBonuses.elementDamageBonuses || {}).forEach(([element, value]) => {
         if (Object.prototype.hasOwnProperty.call(elementDamageBonuses, element)) {
@@ -537,6 +544,7 @@ function getOperatorSimulationLoadoutStats(operatorId) {
         flatAtkBonus,
         atkPercentBonus,
         passiveStaticBonuses,
+        ultimateGainEfficiencyPercent,
         attackBeforePercent,
         attributeBonus,
         totalAtk,

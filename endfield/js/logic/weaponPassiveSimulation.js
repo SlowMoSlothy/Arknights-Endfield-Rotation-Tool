@@ -51,9 +51,15 @@ function getSimulationWeaponPassiveTriggerContext(event) {
     const declaredBuffs = Array.isArray(event?.skillData?.buffs) ? event.skillData.buffs : [];
     const consumedDebuffs = Array.isArray(event?.skillData?.consumeDebuffs) ? event.skillData.consumeDebuffs : [];
     return {
+        skillTriggerType: getSimulationWeaponPassiveTriggerType(event)
+            || String(event?.inflictionBurst?.sourceSkillType || "").toLowerCase().replace(/ /g, "_"),
         appliedEffectKeys: [...new Set([
             ...getSimulationWeaponPassiveTransitionKeys(debuffsBefore, debuffsAfter),
-            ...declaredDebuffs.map(normalizeSimulationWeaponPassiveEffectKey)
+            ...declaredDebuffs.map(normalizeSimulationWeaponPassiveEffectKey),
+            ...((event?.kind === "arts-burst" || event?.skillData?.forcedInflictionBursts?.length)
+                ? ["arts_burst"] : []),
+            ...(event?.inflictionBurst?.burstKey ? [event.inflictionBurst.burstKey] : []),
+            ...(event?.skillData?.forcedInflictionBursts || []).map(key => key.replace(/_infliction$/, "_burst"))
         ].filter(Boolean))],
         gainedBuffKeys: [...new Set([
             ...getSimulationWeaponPassiveTransitionKeys(buffsBefore, buffsAfter),
@@ -173,6 +179,7 @@ function enrichSimulationSkillEventsWithWeaponPassives(events, finalStrikeTimes,
     const activeEffects = [];
     const effectHistory = [];
     const passiveEvents = [];
+    const lastActivationTimes = new Map();
     const stream = [
         ...events.map(event => ({ event, time: Number(event.time) || 0, order: Number(event.order) || 0 })),
         ...(Array.isArray(finalStrikeTimes) ? finalStrikeTimes : []).map((time, index) => ({
@@ -240,6 +247,11 @@ function enrichSimulationSkillEventsWithWeaponPassives(events, finalStrikeTimes,
             ));
 
             effects.forEach(effect => {
+                const activationKey = `${passiveLoadout.operatorId}:${passiveLoadout.weaponKey}:${effect.id || triggerType}`;
+                const lastActivation = lastActivationTimes.get(activationKey);
+                if (effect.triggerCooldown > 0 && lastActivation !== undefined
+                    && eventTime < lastActivation + effect.triggerCooldown - 0.0001) return;
+                lastActivationTimes.set(activationKey, eventTime);
                 const targets = effect.target === "enemy"
                     ? []
                     : effect.target === "team"

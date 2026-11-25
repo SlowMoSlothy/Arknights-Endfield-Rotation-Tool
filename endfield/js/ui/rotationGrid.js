@@ -1853,7 +1853,7 @@ function getSimulationCurrentTriggerEffectNames(skillData, currentEffectMap) {
 }
 
 function getSimulationComboSkillsFromEffects(effectMap, currentEffectMap, sourceOperatorId) {
-    return getComboSkillsFromEffects(effectMap, sourceOperatorId)
+    return getComboSkillsFromEffects(effectMap, sourceOperatorId, currentEffectMap)
         .filter(comboSkill => hasSimulationCurrentComboTrigger(comboSkill, currentEffectMap));
 }
 
@@ -1881,7 +1881,7 @@ function applySimulationSkillToPersistentComboState(skillData, persistentEffectM
     if (!skillData) return;
 
     if (typeof applySkillEffectsToComboMap === "function") {
-        applySkillEffectsToComboMap(skillData, persistentEffectMap, true, false, persistentEffectMap);
+        applySkillEffectsToComboMap(skillData, persistentEffectMap, true, false, persistentEffectMap, true);
     }
 
     if (!options.skipStackConsumption && typeof consumeStackedComboEffectsForSkill === "function") {
@@ -4469,7 +4469,8 @@ function collectSimulationFinalStrikeComboSkills(sourceOperatorId, finalStrikeTi
     const seen = new Set();
     const blockedSeen = new Set();
     const cooldownState = {};
-    const persistentEffectMap = {};
+    const persistentEffectMap = typeof createInitialComboResourceState === "function"
+        ? createInitialComboResourceState() : {};
     const formActivationEvents = [...manualEvents];
     const formUseCounts = new Map();
     const manualComboTimeKeys = new Set(
@@ -4505,6 +4506,10 @@ function collectSimulationFinalStrikeComboSkills(sourceOperatorId, finalStrikeTi
             const activationUseIndex = useKey ? (formUseCounts.get(useKey) || 0) + 1 : 0;
             if (useKey) formUseCounts.set(useKey, activationUseIndex);
             event.skillData = resolveOperatorFormAction(baseSkill, event.sourceOperatorId, event.time, intervals, { activationUseIndex, eventOrder: event.order });
+        }
+        if (event.skillData && typeof resolveComboResourceSkill === "function") {
+            event.skillData = resolveComboResourceSkill(event.skillData, persistentEffectMap);
+            applyComboResourceUpdates(event.skillData, persistentEffectMap);
         }
         if (event.skillData && isComboSkillData(event.skillData)) {
             markSimulationComboCooldown(event.skillData, event.time, cooldownState);
@@ -4555,7 +4560,7 @@ function collectSimulationFinalStrikeComboSkills(sourceOperatorId, finalStrikeTi
         const triggerComboSkills = (comboSkills, sourceOperatorId, triggerContext = {}) => {
             comboSkills.forEach(baseComboSkill => {
                 const baseComboOperatorId = getSimulationSourceOperatorId(baseComboSkill) ?? sourceOperatorId;
-                const comboSkill = typeof resolveOperatorFormAction === "function"
+                let comboSkill = typeof resolveOperatorFormAction === "function"
                     ? resolveOperatorFormAction(
                         baseComboSkill,
                         baseComboOperatorId,
@@ -4593,6 +4598,11 @@ function collectSimulationFinalStrikeComboSkills(sourceOperatorId, finalStrikeTi
                         });
                     }
                     return;
+                }
+                if (typeof resolveComboResourceSkill === "function") {
+                    comboSkill = resolveComboResourceSkill(comboSkill, persistentEffectMap);
+                    if (comboSkill.comboResourceResolution?.unavailable) return;
+                    applyComboResourceUpdates(comboSkill, persistentEffectMap);
                 }
                 seen.add(key);
                 markSimulationComboCooldown(comboSkill, event.time, cooldownState);
@@ -4982,6 +4992,8 @@ function enrichSimulationSkillEventsWithEffects(events) {
     const rotationBuffStackState = {};
     const rotationBuffMetaState = {};
     const battlefieldResourceState = {};
+    const comboResourceState = typeof createInitialComboResourceState === "function"
+        ? createInitialComboResourceState() : {};
 
     const enrichedEvents = [];
     const getEffectStackCount = effect => Math.max(0, Number(
@@ -5115,9 +5127,12 @@ function enrichSimulationSkillEventsWithEffects(events) {
             const activeBuffStacksBeforeSkill = {
                 ...rotationBuffStackState
             };
+            const resourceSkill = typeof resolveComboResourceSkill === "function"
+                ? resolveComboResourceSkill(event.skillData, comboResourceState) : event.skillData;
+            if (typeof applyComboResourceUpdates === "function") applyComboResourceUpdates(resourceSkill, comboResourceState);
             const resourceResolution = typeof resolveBattlefieldResourceSkill === "function"
-                ? resolveBattlefieldResourceSkill(event.skillData, activeDebuffsBeforeSkill, event.time, battlefieldResourceState)
-                : { skillData: event.skillData, resourceState: battlefieldResourceState };
+                ? resolveBattlefieldResourceSkill(resourceSkill, activeDebuffsBeforeSkill, event.time, battlefieldResourceState)
+                : { skillData: resourceSkill, resourceState: battlefieldResourceState };
             const physicalStatusSkillData = typeof resolveSimulationPhysicalStatusSkill === "function"
                 ? resolveSimulationPhysicalStatusSkill(resourceResolution.skillData, activeDebuffsBeforeSkill)
                 : resourceResolution.skillData;

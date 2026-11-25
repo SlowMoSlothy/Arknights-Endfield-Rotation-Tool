@@ -1,4 +1,36 @@
 const WEAPON_PASSIVE_RULES = Object.freeze({
+    sweet_deal: {
+        sourceUrl: "https://www.endfieldtools.dev/localdb/optimized/weapons/details/wpn_lance_0017.json",
+        staticUltimateGainEfficiencyPercent: [18, 21.6, 25.2, 28.8, 32.4, 36, 39.6, 43.2, 50.4],
+        triggers: [{
+            id: "skill-sp-team-atk", type: "sp_recovery", target: "team",
+            conditions: { skillOnly: true }, triggerCooldown: 0.1,
+            atkPercent: [2, 2.4, 2.8, 3.2, 3.6, 4, 4.4, 4.8, 5.6],
+            duration: 30, maxStacks: 3
+        }, {
+            id: "skill-burst-team-arts", type: "effect_applied", target: "team",
+            conditions: { appliedAnyEffect: ["arts_burst"], skillOnly: true }, triggerCooldown: 0.1,
+            elementDamageBonuses: Object.fromEntries(["heat", "cryo", "electric", "nature"].map(element =>
+                [element, [6, 7.2, 8.4, 9.6, 10.8, 12, 13.2, 14.4, 16.8]])),
+            duration: 15, maxStacks: 1
+        }]
+    },
+    raid_comet: {
+        sourceUrl: "https://www.endfieldtools.dev/localdb/optimized/weapons/details/wpn_lance_0018.json",
+        staticElementDamageBonuses: { nature: [7, 8.4, 9.8, 11.2, 12.6, 14, 15.4, 16.8, 19.6] },
+        triggers: [{
+            id: "nature-burst-self-nature", type: "effect_applied", target: "self",
+            conditions: { appliedAnyEffect: ["nature_burst"] }, triggerCooldown: 0.1,
+            elementDamageBonuses: { nature: [12, 14.4, 16.8, 19.2, 21.6, 24, 26.4, 28.8, 33.6] },
+            duration: 20, maxStacks: 1
+        }, {
+            id: "skill-sp-team-arts", type: "sp_recovery", target: "team",
+            conditions: { skillOnly: true }, triggerCooldown: 0.1,
+            elementDamageBonuses: Object.fromEntries(["heat", "cryo", "electric", "nature"].map(element =>
+                [element, [2, 2.4, 2.8, 3.2, 3.6, 4, 4.4, 4.8, 5.6]])),
+            duration: 20, maxStacks: 1
+        }]
+    },
     exemplar: {
         verified: true,
         sourceUrl: "https://www.icy-veins.com/arknights-endfield/weapons/exemplar",
@@ -279,6 +311,7 @@ function weaponPassiveConditionMatches(actualValues, expectedValues) {
 
 function doesWeaponPassiveTriggerMatch(trigger, options = {}) {
     const conditions = trigger?.conditions || {};
+    if (conditions.skillOnly && !["battle_skill", "combo_skill", "ultimate"].includes(options.skillTriggerType)) return false;
     if (conditions.appliedAnyEffect && !weaponPassiveConditionMatches(options.appliedEffectKeys, conditions.appliedAnyEffect)) return false;
     if (conditions.gainedAnyBuff && !weaponPassiveConditionMatches(options.gainedBuffKeys, conditions.gainedAnyBuff)) return false;
     if (conditions.consumedAnyEffect && !weaponPassiveConditionMatches(options.consumedEffectKeys, conditions.consumedAnyEffect)) return false;
@@ -290,6 +323,7 @@ function getWeaponPassiveStaticBonuses(weaponKey, rank = 1) {
     const rule = getWeaponPassiveRule(weaponKey);
     return {
         flatAtk: getWeaponPassiveRankValue(rule?.staticAtkFlat, rank),
+        ultimateGainEfficiencyPercent: getWeaponPassiveRankValue(rule?.staticUltimateGainEfficiencyPercent, rank),
         atkPercent: getWeaponPassiveRankValue(rule?.staticAtkPercent, rank),
         elementDamageBonuses: getWeaponPassiveRankedBonuses(rule?.staticElementDamageBonuses, rank),
         skillDamageBonuses: getWeaponPassiveRankedBonuses(rule?.staticSkillDamageBonuses, rank),

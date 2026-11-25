@@ -1336,7 +1336,7 @@ export function createOperatorPage(
       <section class="hero-copy">
         <div class="eyebrow">Arknights: Endfield Operator</div>
         <h1><span class="operator-name">${escapeHtml(name)}</span><span class="rotation-guide-label">Rotation Guide</span></h1>
-        <div class="stars" aria-label="${operator.star} star operator">${stars(operator.star)}</div>
+        <div class="stars" aria-label="${operator.star} star operator">${stars(operator.star)}</div>${operator.raw_data?.dataStatus === 'announced_preview' ? `<p class="highlight"><strong>Announced preview</strong> — ${escapeHtml(operator.raw_data.sourceNote || 'Combat values have not been published yet.')}</p>` : ''}
         ${profileEngagementMarkup("operator", String(operator.id))}
         <div class="actions" data-operator-share-browser data-operator-id="${Number(operator.id)}" data-operator-name="${escapeHtml(name)}">
           <button class="operator-share-count-button is-loading" type="button" data-share-type="rotation" aria-controls="operator-share-results" aria-pressed="false"><span>Rotations</span><strong data-share-count="rotation" aria-label="Rotation count">...</strong></button>

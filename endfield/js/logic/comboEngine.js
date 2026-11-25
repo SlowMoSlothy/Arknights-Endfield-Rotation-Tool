@@ -61,7 +61,78 @@ function getPhysicalStatusStackCount(effectState, effectName) {
     return Math.max(0, Number(effectState?.[key] || 0));
 }
 
+// Operator-owned counters are supplied by database profiles, independently of
+// enemy Inflictions. Zero is meaningful (an exhausted resource must stay empty).
+function createInitialComboResourceState() {
+    const state = {};
+    const team = typeof selectedTeam !== "undefined" ? selectedTeam : [];
+    const roster = typeof operators !== "undefined" ? operators : [];
+    roster.filter(operator => team.includes(operator.id)).forEach(operator => {
+        (operator.comboResources || []).forEach(resource => {
+            state[resource.effect] = Math.max(0, Number(resource.initialStacks) || 0);
+        });
+    });
+    return state;
+}
+
+function applyComboResourceUpdates(skillData, state) {
+    const resolution = skillData?.comboResourceResolution;
+    if (!resolution) return;
+    for (const change of skillData.resourceChanges || []) {
+        for (const key of [change.effect, ...(change.grants || []).map(grant => grant.effect)]) {
+            state[key] = Number(resolution.after[key] || 0);
+        }
+    }
+}
+
+function resolveComboResourceSkill(skillData, effectState = {}) {
+    if (!skillData?.resourceChanges || skillData.comboResourceResolution) return skillData;
+    const state = { ...createInitialComboResourceState() };
+    if (Array.isArray(effectState)) {
+        effectState.forEach(effect => {
+            state[getPhysicalStatusEffectKey(effect)] = getPhysicalStatusStackCount(effectState, getPhysicalStatusEffectKey(effect));
+        });
+    } else Object.assign(state, effectState);
+    const before = { ...state }, captured = {};
+    const valid = (skillData.resourceRequirements || []).every(rule =>
+        Number(state[rule.effect] || 0) >= Number(rule.minStacks || 1));
+    if (!valid) return {
+        ...skillData, damageProfile: null, damageSequences: [], buffs: [], debuffs: [],
+        consumeDebuffs: [], spRecovery: null, energy: 0, sp_cost: 0,
+        forcedInflictionBursts: [],
+        comboResourceResolution: { before, after: before, captured, unavailable: true }
+    };
+    for (const change of skillData.resourceChanges) {
+        const available = Math.max(0, Number(state[change.effect]) || 0);
+        const consumed = change.consume === "all" ? available
+            : Math.min(available, Math.max(0, Number(change.consume) || 0));
+        state[change.effect] = change.set !== undefined ? Number(change.set)
+            : Math.min(Number(change.maxStacks ?? Infinity), available - consumed + Number(change.add || 0));
+        if (change.capture) captured[change.capture] = consumed;
+        for (const grant of change.grants || []) {
+            state[grant.effect] = Math.min(Number(grant.maxStacks ?? Infinity),
+                Number(state[grant.effect] || 0) + consumed * Number(grant.ratio ?? 1));
+        }
+    }
+    let resolved = { ...skillData, comboResourceResolution: { before, after: state, captured } };
+    const scaling = skillData.resourceDamageScaling;
+    if (scaling && skillData.damageProfile) resolved.damageProfile = {
+        ...skillData.damageProfile,
+        atkMultiplier: Number(skillData.damageProfile.atkMultiplier) +
+            Math.min(Number(scaling.maxStacks ?? Infinity), Number(captured[scaling.capture] || 0)) * Number(scaling.perStack || 0)
+    };
+    for (const outcome of skillData.resourceOutcomes || []) {
+        if (Number(captured[outcome.capture] || 0) < Number(outcome.minStacks || 1)) continue;
+        resolved = { ...resolved,
+            buffs: [...(resolved.buffs || []), ...(outcome.buffs || [])],
+            debuffs: [...(resolved.debuffs || []), ...(outcome.debuffs || [])]
+        };
+    }
+    return resolved;
+}
+
 function resolveSimulationPhysicalStatusSkill(skillData, effectState = {}) {
+    skillData = resolveComboResourceSkill(skillData, effectState);
     skillData = resolveSimulationForcedArtsStatusSkill(skillData, effectState);
     const config = skillData?.physicalStatusResolution;
     if (!config || typeof config !== "object" || Array.isArray(config)) return skillData;
@@ -193,6 +264,10 @@ function addTransientSkillTypeTriggers(skillData, effectMap) {
     if (type === "battle skill") addAmountToEffectMap(effectMap, "battle_skill", 1);
     if (type === "ultimate") addAmountToEffectMap(effectMap, "ultimate", 1);
     if (type === "arts burst") addAmountToEffectMap(effectMap, "arts_burst", 1);
+    (skillData.forcedInflictionBursts || []).forEach(effect => {
+        addAmountToEffectMap(effectMap, "arts_burst", 1);
+        addAmountToEffectMap(effectMap, effect.replace(/_infliction$/, "_burst"), 1);
+    });
 }
 
 function normalizeComboEffectKey(value) {
@@ -457,7 +532,8 @@ function applySkillEffectsToComboMap(
     effectMap,
     includeAvailableAfterChain = false,
     includeTransientTriggers = false,
-    contextEffectMap = effectMap
+    contextEffectMap = effectMap,
+    skipResourceUpdates = false
 ) {
     if (typeof resolveSimulationAttributeVariant === "function") {
         skillData = resolveSimulationAttributeVariant(skillData, skillData?.operatorId);
@@ -524,10 +600,11 @@ function applySkillEffectsToComboMap(
             matchingInfliction.maxStacks
         );
     }
+    if (!skipResourceUpdates && effectMap === contextEffectMap) applyComboResourceUpdates(skillData, effectMap);
 }
 
 function collectPersistentEffectsFromRotationUpToIndex(endIndex) {
-    const effectMap = {};
+    const effectMap = createInitialComboResourceState();
 
     for (let i = 0; i <= endIndex; i++) {
         const entry = rotation[i];
@@ -564,7 +641,7 @@ function collectEffectsFromSkill(skillData, contextEffectMap = {}) {
 }
 
 function collectEffectsFromRotationUpToIndex(endIndex) {
-    const effectMap = {};
+    const effectMap = createInitialComboResourceState();
     
     for (let i = 0; i <= endIndex; i++) {
         const entry = rotation[i];
@@ -585,7 +662,7 @@ function collectEffectsFromRotationUpToIndex(endIndex) {
     return effectMap;
 }
 
-function getComboSkillsFromEffects(effectMap, sourceOperatorId) {
+function getComboSkillsFromEffects(effectMap, sourceOperatorId, currentEffectMap = effectMap) {
     const activeOperators = selectedTeam
         .filter(id => id !== null)
         .map(id => operators.find(op => op.id === id))
@@ -602,6 +679,10 @@ function getComboSkillsFromEffects(effectMap, sourceOperatorId) {
                 ? resolveSimulationAttributeVariant(baseSkill, op.id)
                 : baseSkill;
             if (isSameOperator && !skill.allowSelfTrigger) continue;
+            if (!(skill.resourceRequirements || []).every(rule =>
+                Number(effectMap[rule.effect] || 0) >= Number(rule.minStacks || 1))) continue;
+            if (skill.comboEventTriggers && !skill.comboEventTriggers.some(effect =>
+                Number(currentEffectMap[effect] || 0) > 0)) continue;
 
             const triggers = normalizeComboTriggerDefinitions(skill);
 
@@ -693,7 +774,7 @@ function insertComboChain(startSkillId, startIndex) {
         }
 
         const currentSkillId = queue.shift();
-        const currentSkillData = getSkillById(currentSkillId);
+        let currentSkillData = getSkillById(currentSkillId);
         const sourceOperator = getOperatorBySkillId(currentSkillId);
 
         if (!currentSkillData || !sourceOperator) continue;
@@ -703,7 +784,9 @@ function insertComboChain(startSkillId, startIndex) {
             addAmountToEffectMap(effectMapBeforeSkill, effectName, amount);
         });
         
+        currentSkillData = resolveComboResourceSkill(currentSkillData, effectMapBeforeSkill);
         const currentEffects = collectEffectsFromSkill(currentSkillData, effectMapBeforeSkill);
+        applyComboResourceUpdates(currentSkillData, persistentEffectMap);
 
 Object.entries(currentEffects).forEach(([effectName, amount]) => {
     addAmountToEffectMap(chainEffectMap, effectName, amount);
@@ -733,7 +816,7 @@ Object.entries(chainEffectMap).forEach(([effectName, amount]) => {
                 ? resolveArtsReactions(effectMapAfterConsume, Object.keys(currentEffects))
                 : effectMapAfterConsume;
 
-        const comboSkills = getComboSkillsFromEffects(resolvedEffectMap, sourceOperator.id);
+        const comboSkills = getComboSkillsFromEffects(resolvedEffectMap, sourceOperator.id, currentEffects);
 
         comboSkills.forEach(comboSkill => {
             if (alreadyInsertedIds.has(comboSkill.id)) return;
