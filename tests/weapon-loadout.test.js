@@ -1558,7 +1558,9 @@ test("loadout modal exposes Supabase weapon Essence activation profiles", () => 
   assert.match(weaponCatalogMigration, /type_42_solemn_phalanx/);
   assert.match(weaponCatalogMigration, /blessing_of_lustrous_carmine/);
   const weaponIconFiles = fs.readdirSync("endfield/assets/weapons").filter(file => file.endsWith(".png"));
-  assert.equal(weaponIconFiles.length, 76);
+  const importedWeaponIcons = [...weaponCatalogMigration.matchAll(/'assets\/weapons\/([^']+\.png)'/g)].map(match => match[1]);
+  assert.equal(new Set(importedWeaponIcons).size, 76);
+  importedWeaponIcons.forEach(file => assert.ok(weaponIconFiles.includes(file), `Missing imported weapon icon: ${file}`));
   weaponIconFiles.forEach(file => assert.ok(fs.statSync(`endfield/assets/weapons/${file}`).size > 100));
   const gearCatalogMigration = fs.readFileSync("supabase/gear_catalog_complete.sql", "utf8");
   const gearIconPaths = [...gearCatalogMigration.matchAll(/'assets\/gear\/([^']+\.png)'/g)].map(match => match[1]);
