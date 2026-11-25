@@ -1480,7 +1480,7 @@ export function createIndexPage(operators) {
   <script type="application/ld+json">${JSON.stringify(itemListSchema)}</script>
   ${baseStyles()}
   <style>.operator-tile[data-name="mimino"] .tile-avatar{transform:scale(2.2);transform-origin:50% 64%}</style>
-  <link rel="stylesheet" href="/endfield/css/upcomingOperators.css?v=2">
+  <link rel="stylesheet" href="/endfield/css/upcomingOperators.css?v=3">
   <link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6">
 </head>
 <body class="operator-index">

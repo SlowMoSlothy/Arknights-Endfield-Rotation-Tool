@@ -38,7 +38,12 @@ const pagePath = row => `/endfield/operators/${row.slug}/`;
 
 export function previewPortraitStyle(row) {
   const originX = { 'signal-prelink-03-background': 80, 'signal-prelink-06': 70 }[row.slug] ?? 50;
-  return `--preview-scale:1.7;--preview-origin-x:${originX}%;--preview-origin-y:64%`;
+  const closerCrop = /^signal-prelink-0[4-8]$/.test(row.slug);
+  const silverPortrait = row.slug === 'signal-prelink-09';
+  const scale = closerCrop ? 1.95 : silverPortrait ? 1.85 : 1.7;
+  const originY = silverPortrait ? 70 : 64;
+  const offsetY = closerCrop ? 7 : silverPortrait ? 5 : 0;
+  return `--preview-scale:${scale};--preview-origin-x:${originX}%;--preview-origin-y:${originY}%;--preview-offset-y:${offsetY}%`;
 }
 
 export function upcomingIndexCard(row) {
@@ -61,7 +66,7 @@ export function createUpcomingOperatorPage(row, { styles, header }) {
   <title>${escape(title)}</title><meta name="description" content="${escape(description)}"><link rel="canonical" href="${url}"><link rel="icon" href="/favicon-flat.png"><meta name="theme-color" content="#313739">
   <meta property="og:type" content="website"><meta property="og:title" content="${escape(title)}"><meta property="og:description" content="${escape(description)}"><meta property="og:url" content="${url}"><meta property="og:image" content="https://rotationforge.gg${imagePath(row)}"><meta name="twitter:card" content="summary_large_image">
   ${schema.map(value => `<script type="application/ld+json">${JSON.stringify(value).replaceAll('<', '\\u003c')}</script>`).join('\n')}
-  ${styles}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6"><link rel="stylesheet" href="/endfield/css/upcomingOperators.css?v=2"></head>
+  ${styles}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6"><link rel="stylesheet" href="/endfield/css/upcomingOperators.css?v=3"></head>
   <body class="operator-page upcoming-page">${header}<main class="page">
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><a href="/endfield/operators/">Operators</a><span>›</span><strong>${name}</strong></nav>
   <nav class="section-nav" aria-label="On this page"><a href="#overview">Overview</a><a href="#details">Details</a><a href="#skills">Skills</a><a href="#source">Source</a></nav>

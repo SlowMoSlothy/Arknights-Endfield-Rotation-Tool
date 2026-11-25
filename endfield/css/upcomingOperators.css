@@ -1,5 +1,5 @@
 .upcoming-portrait{position:relative;overflow:hidden}
-.upcoming-portrait .preview-avatar{position:absolute;display:block;inset:0;z-index:1;width:100%;height:100%;max-width:none;object-fit:contain;border-radius:0;transform:scale(var(--preview-scale,1.7));transform-origin:var(--preview-origin-x,50%) var(--preview-origin-y,64%);filter:drop-shadow(0 14px 16px rgba(0,0,0,.35))}
+.upcoming-portrait .preview-avatar{position:absolute;display:block;inset:0;z-index:1;width:100%;height:100%;max-width:none;object-fit:contain;border-radius:0;transform:translateY(var(--preview-offset-y,0%)) scale(var(--preview-scale,1.7));transform-origin:var(--preview-origin-x,50%) var(--preview-origin-y,64%);filter:drop-shadow(0 14px 16px rgba(0,0,0,.35))}
 .operator-page .portrait-media.upcoming-portrait{position:absolute}
 .preview-badge{display:inline-block;color:var(--accent);font-size:.72rem;font-weight:900;letter-spacing:.04em}
 .upcoming-tile .tile-stars{letter-spacing:0;font-size:.65rem}
