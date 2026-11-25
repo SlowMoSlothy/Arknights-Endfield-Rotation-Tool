@@ -26,7 +26,7 @@ export function safeUrl(value, localImages = false) {
 }
 const STAR_OF_TOMORROW_ART = '/endfield/assets/weapons/star_of_tomorrow.png';
 export const weaponImage = row => safeUrl(row.icon_path, true) || (row.weapon_key === 'star_of_tomorrow' ? STAR_OF_TOMORROW_ART : '/favicon-flat.png');
-const weaponArtworkStyle = row => weaponImage(row) === STAR_OF_TOMORROW_ART ? ' style="transform:scaleX(-1) scale(.86)"' : '';
+const weaponArtworkStyle = row => weaponImage(row) === STAR_OF_TOMORROW_ART ? ' style="transform:rotate(60deg) scale(.86)"' : '';
 const absoluteImage = row => weaponImage(row).startsWith('/') ? SITE + weaponImage(row) : weaponImage(row);
 const addedAt = row => Number.isFinite(Date.parse(row.created_at)) ? Date.parse(row.created_at) : 0;
 const newestFirst = (a, b) => addedAt(b) - addedAt(a) || a.name.localeCompare(b.name, 'en', { sensitivity: 'base' });

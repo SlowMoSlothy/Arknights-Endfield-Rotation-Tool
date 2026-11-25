@@ -4,7 +4,7 @@
 - Alternate source found during research: https://perlica.moe/weapons/star-of-tomorrow (128px icon; not used in final artwork).
 - Output: `endfield/assets/weapons/star_of_tomorrow.png`, 1254 × 1254 RGBA PNG.
 - Built-in Imagegen used for AI-assisted extraction and upscaling of the large artwork on the right. Fine details may be reconstructed; this is not a lossless extraction.
-- Display orientation: horizontal mirror, scale .86 (muzzle toward lower right, matching the other handcannons), applied in the weapon catalog generator for this asset only. The download retains the unrotated cutout.
+- Display orientation: 60 degrees clockwise, scale .86 (muzzle toward upper left, as requested), applied in the weapon catalog generator for this asset only. The download retains the unrotated cutout.
 - Replaces the legacy site-logo placeholder in catalog/detail pages and their image metadata. Future valid database artwork takes precedence.
 
 ## Final extraction prompt
