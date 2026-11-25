@@ -2,7 +2,9 @@
 
 The 35 remaining regular operator portraits were prepared with the built-in `image_gen` tool in edit mode. These are AI-assisted derivatives of the existing game portraits, retaining each source's illustration or 3D-render style and character identity. Original PNGs remain unchanged in `endfield/assets/operators/avatars/`; the final 1254 × 1254 RGBA files are saved in its `refined/` subdirectory. Mimino and the upcoming teaser portraits retain their already reviewed assets.
 
-The current user requirement takes precedence over the older head-only prompts: every new portrait is a connected head/neck/collar/shoulder bust extending through the lower image edge. Transparent padding below a detached head is not allowed. Surrounding backgrounds are transparent, with no gray scene rectangles. The catalog and profile image frames enlarge these busts slightly and clip the lower edge naturally.
+The current user requirement takes precedence over the older head-only prompts: every new portrait is a connected head/neck/collar/shoulder bust extending through the lower image edge. Transparent padding below a detached head is not allowed. Surrounding backgrounds are transparent, with no gray scene rectangles.
+
+The user's subsequent framing request is a close-up of the face, using Kay as the reference. Catalog cards, related cards and profiles now enlarge most of these assets to 1.9×, with individual origins and scale adjustments for angled or wide faces. Kay keeps its reviewed 1.1× crop. The connected shoulder area remains behind the frame, preventing a floating head or a gap beneath the neck. This is a CSS framing change; no source artwork or prepared PNG is regenerated.
 
 `endfield/js/data/operatorPortraits.js` supplies the shared display-only mapping to the classic-script planner and the static page generator. Database rows, canonical operator identities, profile addresses and engagement counters are unchanged. `tools/build-operator-pages.js` adds content hashes to the generated image URLs; `endfield/css/operatorPortraits.css` anchors the busts within their existing frames.
 

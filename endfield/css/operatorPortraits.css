@@ -1,4 +1,44 @@
-/* Busts are anchored to the frame: no transparent gap beneath neck/shoulders. */
+/* Face crops keep the connected bust below the frame, without a neck gap. */
+.operator-index .tile-avatar[src*="/avatars/refined/"],
+.operator-page img[src*="/avatars/refined/"] {
+    --portrait-zoom: 1.9;
+    --portrait-x: 50%;
+    --portrait-y: 58%;
+}
+
+.operator-index .tile-avatar[src*="/refined/Kay.png"],
+.operator-page img[src*="/refined/Kay.png"] { --portrait-zoom: 1.1; --portrait-y: 65%; }
+
+.operator-index .tile-avatar[src*="/refined/Si.png"],
+.operator-page img[src*="/refined/Si.png"] { --portrait-zoom: 1.45; --portrait-x: 65%; --portrait-y: 70%; }
+
+.operator-index .tile-avatar[src*="/refined/Argent_Flow.png"],
+.operator-page img[src*="/refined/Argent_Flow.png"] { --portrait-zoom: 1.8; --portrait-x: 72%; --portrait-y: 55%; }
+
+.operator-index .tile-avatar[src*="/refined/Purrchena.png"],
+.operator-page img[src*="/refined/Purrchena.png"] { --portrait-zoom: 1.3; --portrait-x: 55%; --portrait-y: 60%; }
+
+.operator-index .tile-avatar[src*="/refined/Dapan.png"],
+.operator-page img[src*="/refined/Dapan.png"] { --portrait-zoom: 1.55; --portrait-y: 60%; }
+
+.operator-index .tile-avatar[src*="/refined/Antal.png"],
+.operator-page img[src*="/refined/Antal.png"] { --portrait-zoom: 1.75; --portrait-y: 60%; }
+
+.operator-index .tile-avatar[src*="/refined/Alesh.png"],
+.operator-page img[src*="/refined/Alesh.png"] { --portrait-zoom: 1.8; --portrait-y: 60%; }
+
+.operator-index .tile-avatar[src*="/refined/Ardelia.png"],
+.operator-page img[src*="/refined/Ardelia.png"] { --portrait-x: 55%; }
+
+.operator-index .tile-avatar[src*="/refined/Perlica.png"],
+.operator-index .tile-avatar[src*="/refined/Lifeng.png"],
+.operator-index .tile-avatar[src*="/refined/Fluorite.png"],
+.operator-index .tile-avatar[src*="/refined/Laevatain.png"],
+.operator-page img[src*="/refined/Perlica.png"],
+.operator-page img[src*="/refined/Lifeng.png"],
+.operator-page img[src*="/refined/Fluorite.png"],
+.operator-page img[src*="/refined/Laevatain.png"] { --portrait-zoom: 2; --portrait-y: 55%; }
+
 .operator-index .tile-avatar-frame .tile-avatar[src*="/avatars/refined/"],
 .operator-page .related-avatar-frame .related-avatar[src*="/avatars/refined/"] {
     position: absolute;
@@ -7,11 +47,11 @@
     height: 100%;
     border-radius: inherit;
     object-fit: cover;
-    transform: scale(1.1);
-    transform-origin: 50% 65%;
+    transform: scale(var(--portrait-zoom));
+    transform-origin: var(--portrait-x) var(--portrait-y);
 }
 
 .operator-page .portrait-media .portrait[src*="/avatars/refined/"] {
-    transform: translateX(-50%) scale(1.1);
-    transform-origin: 50% 65%;
+    transform: translateX(-50%) scale(var(--portrait-zoom));
+    transform-origin: var(--portrait-x) var(--portrait-y);
 }
