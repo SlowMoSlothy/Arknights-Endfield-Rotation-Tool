@@ -1,3 +1,5 @@
+import { profileEngagementMarkup, profileEngagementSummaryMarkup } from './profile-engagement-markup.js';
+
 // Official SIGNAL PRELINK teaser order. No rarity, class, element or kit is inferred.
 export const TEASER_VIDEO = 'https://www.youtube.com/watch?v=5-m2XEedNlU';
 export const TEASER_ANNOUNCED_AT = '2026-11-21T11:30:00Z';
@@ -50,7 +52,7 @@ export function upcomingIndexCard(row) {
   return `<a class="operator-tile upcoming-tile" href="${pagePath(row)}" data-added="${Date.parse(row.created_at)}" data-name="${escape(row.name.toLowerCase())}" data-class="unannounced" data-element="unannounced" data-rarity="0" data-order="${row.sort_order}">
     <span class="tile-avatar-frame upcoming-portrait" style="${previewPortraitStyle(row)}"><img class="preview-avatar" src="${imagePath(row)}" alt="${escape(row.name)} — portrait from the official teaser" loading="lazy" width="1254" height="1254"></span>
     <div class="tile-body"><span class="tile-stars preview-badge">Upcoming · Preview</span><h2>${escape(row.name)}</h2>
-    <div class="tile-chips"><span class="tile-chip">Details not announced</span></div><p class="preview-tile-note">Version 2.0 and beyond · Release date TBA</p></div>
+    <div class="tile-chips"><span class="tile-chip">Details not announced</span></div><p class="preview-tile-note">Version 2.0 and beyond · Release date TBA</p>${profileEngagementSummaryMarkup("operator", row.id)}</div>
   </a>`;
 }
 
@@ -66,17 +68,17 @@ export function createUpcomingOperatorPage(row, { styles, header }) {
   <title>${escape(title)}</title><meta name="description" content="${escape(description)}"><link rel="canonical" href="${url}"><link rel="icon" href="/favicon-flat.png"><meta name="theme-color" content="#313739">
   <meta property="og:type" content="website"><meta property="og:title" content="${escape(title)}"><meta property="og:description" content="${escape(description)}"><meta property="og:url" content="${url}"><meta property="og:image" content="https://rotationforge.gg${imagePath(row)}"><meta name="twitter:card" content="summary_large_image">
   ${schema.map(value => `<script type="application/ld+json">${JSON.stringify(value).replaceAll('<', '\\u003c')}</script>`).join('\n')}
-  ${styles}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6"><link rel="stylesheet" href="/endfield/css/upcomingOperators.css?v=3"></head>
+  ${styles}<link rel="stylesheet" href="/endfield/css/databaseControls.css?v=6"><link rel="stylesheet" href="/endfield/css/upcomingOperators.css?v=4"></head>
   <body class="operator-page upcoming-page">${header}<main class="page">
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><a href="/endfield/operators/">Operators</a><span>›</span><strong>${name}</strong></nav>
   <nav class="section-nav" aria-label="On this page"><a href="#overview">Overview</a><a href="#details">Details</a><a href="#skills">Skills</a><a href="#source">Source</a></nav>
   <section class="hero" id="overview"><div class="portrait-card"><div class="portrait-media upcoming-portrait" style="${previewPortraitStyle(row)}"><img class="preview-avatar" src="${imagePath(row)}" alt="${name} — portrait from the official teaser" width="1254" height="1254" fetchpriority="high"></div><span class="barcode">ROTATIONFORGE DATABASE</span></div>
-  <div class="hero-copy"><div class="eyebrow">Arknights: Endfield Operator</div><span class="preview-badge">Upcoming · Preview</span><h1>${name}</h1><p class="subtitle">${escape(row.raw_data.summary)}</p><p class="highlight"><strong>Official teaser</strong> — Shown for Version 2.0 and beyond. No individual release date or banner has been announced.</p></div>
+  <div class="hero-copy"><div class="eyebrow">Arknights: Endfield Operator</div><span class="preview-badge">Upcoming · Preview</span><h1>${name}</h1><p class="subtitle">${escape(row.raw_data.summary)}</p><p class="highlight"><strong>Official teaser</strong> — Shown for Version 2.0 and beyond. No individual release date or banner has been announced.</p>${profileEngagementMarkup("operator", row.id)}</div>
   <div class="info-panel" id="details"><dl class="preview-facts">${['Rarity', 'Class', 'Element', 'Weapon', 'Release date'].map(label => `<div><dt>${label}</dt><dd>Not announced</dd></div>`).join('')}</dl></div></section>
   <section class="panel skills-section" id="skills"><h2>${name} Skills &amp; Stats</h2><p>Skills, Combo conditions, base attributes and combat values have not been announced. Rotation planning will become available when supported gameplay information is published.</p></section>
   <section class="panel profile-section" id="source"><h2>Official announcement</h2><p>Revealed on November 21, 2026 in <em>Ensemble: SIGNAL PRELINK</em>. This profile records the teaser only; it does not confirm a playable kit or an individual banner.</p>
   <p><a href="${TEASER_VIDEO}" target="_blank" rel="noopener noreferrer">Watch the official operator teaser ↗</a> · <a href="https://www.youtube.com/watch?v=7YZ4VIUwn5c" target="_blank" rel="noopener noreferrer">Official special program ↗</a></p>
   <details class="preview-artwork"><summary>View the full official teaser card</summary><img src="/endfield/${row.raw_data.teaserPath}" alt="Official SIGNAL PRELINK teaser card ${row.raw_data.card}" loading="lazy" width="1400" height="596"></details></section>
   <p class="preview-back"><a href="/endfield/operators/">← Browse all operators</a></p><footer>RotationForge is an unofficial fan-made tool for Arknights: Endfield. Artwork © GRYPHLINE.</footer>
-  </main><script src="/endfield/js/ui/enemySectionNav.js?v=2" defer></script></body></html>`;
+  </main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/endfield/supabaseClient.js?v=14"></script><script src="/endfield/js/ui/profileEngagement.js?v=2"></script><script src="/endfield/js/ui/enemySectionNav.js?v=2" defer></script></body></html>`;
 }

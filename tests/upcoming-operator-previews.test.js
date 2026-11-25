@@ -42,12 +42,19 @@ test('preview pages show unknown fields and sources without made-up stars or a p
     assert.match(html, /Upcoming · Preview/);
     assert.match(html, /<dd>Not announced<\/dd>/);
     assert.match(html, /5-m2XEedNlU/);
+    assert.ok(html.includes(`data-content-id="${row.id}"`));
+    assert.match(html, /data-profile-reaction="like"/);
+    assert.match(html, /data-profile-reaction="dislike"/);
+    assert.match(html, /supabaseClient\.js\?v=14/);
+    assert.match(html, /profileEngagement\.js\?v=2/);
     assert.ok(html.includes(`/endfield/${row.icon_path}`));
     assert.ok(html.includes(`<img src="/endfield/${row.raw_data.teaserPath}" alt="Official SIGNAL PRELINK`));
-    assert.doesNotMatch(html, /[★☆]|leader=|data-profile-engagement|0-star|null-star/);
+    assert.doesNotMatch(html, /[★☆]|leader=|0-star|null-star/);
     for (const match of html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)) assert.doesNotThrow(() => JSON.parse(match[1]));
   }
   const index = createIndexPage(upcomingOperatorPreviews);
+  assert.equal((index.match(/data-engagement-mode="summary"/g) || []).length, 10);
+  assert.doesNotMatch(index, /data-profile-reaction/);
   assert.match(index, /value="0">Not announced<\/option>/);
   assert.doesNotMatch(index, />0 stars<\/option>/);
   assert.equal((index.match(/class="operator-tile upcoming-tile"/g) || []).length, 10);
