@@ -1,0 +1,187 @@
+/* Element effects belong to the selection portrait, below names and badges. */
+#operatorList .operator-avatar-frame {
+    --avatar-highlight: #f6f7f0;
+    --avatar-speed: 12s;
+    --avatar-radius: 10px;
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    display: block;
+    flex: 0 0 auto;
+    width: 70px;
+    height: 70px;
+    margin-bottom: 5px;
+    border-radius: var(--avatar-radius);
+    box-shadow: 0 0 10px var(--element-glow), 0 0 18px var(--element-glow);
+    transition: box-shadow .2s ease;
+}
+
+#operatorList .operator-avatar-ring,
+#operatorList .operator-avatar-effects {
+    position: absolute;
+    inset: -2px;
+    display: block;
+    border-radius: calc(var(--avatar-radius) + 2px);
+    pointer-events: none;
+}
+
+#operatorList .operator-avatar-ring {
+    z-index: 0;
+    overflow: hidden;
+    background: var(--element-color);
+    box-shadow: 0 0 0 1px rgba(255,255,255,.18);
+}
+
+#operatorList .operator-avatar-ring::before {
+    content: "";
+    position: absolute;
+    inset: -70%;
+    background: conic-gradient(from 25deg, #172023 0deg 30deg, var(--element-color) 55deg, var(--avatar-highlight) 74deg, var(--element-color) 93deg, #172023 118deg 205deg, var(--element-color) 230deg, var(--avatar-highlight) 248deg, var(--element-color) 270deg, #172023 305deg 360deg);
+    animation: rf-avatar-orbit var(--avatar-speed) linear infinite;
+    animation-delay: var(--avatar-phase, 0s);
+}
+
+#operatorList .operator-avatar-ring::after {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+#operatorList .operator-avatar-crop {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: block;
+    overflow: hidden;
+    border-radius: inherit;
+    background: #151c1e;
+}
+
+#operatorList .operator-avatar-crop > img {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    border-radius: inherit;
+    object-fit: cover;
+    clip-path: none;
+}
+
+#operatorList .operator-avatar-effects { inset: -3px; z-index: 2; overflow: hidden; border-radius: calc(var(--avatar-radius) + 3px); }
+#operatorList .operator-avatar-effects::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    animation-delay: var(--avatar-phase, 0s);
+}
+
+/* Heat: a warm rim with embers rising along its sides. */
+#operatorList [data-element="heat"] { --avatar-highlight: #fff1b0; --avatar-speed: 5.5s; }
+#operatorList [data-element="heat"] .operator-avatar-effects::after {
+    background: radial-gradient(circle at 2% 88%, #ffe5a1 0 1px, transparent 2px), radial-gradient(circle at 98% 69%, #ffab51 0 1.5px, transparent 2.5px), radial-gradient(circle at 2% 42%, #ffce74 0 1px, transparent 2px), radial-gradient(circle at 98% 22%, #fff0c0 0 1px, transparent 2px);
+    animation: rf-avatar-embers 3.8s ease-out infinite;
+    animation-delay: var(--avatar-phase, 0s);
+}
+
+/* Cryo: slow icy highlights and crystalline corner glints. */
+#operatorList [data-element="cryo"] { --avatar-highlight: #f3ffff; --avatar-speed: 10.5s; }
+#operatorList [data-element="cryo"] .operator-avatar-effects::after {
+    background: linear-gradient(#e9ffff, #e9ffff) 6% 8% / 7px 1px no-repeat, linear-gradient(#e9ffff, #e9ffff) 9% 5% / 1px 7px no-repeat, linear-gradient(#bcefff, #bcefff) 94% 91% / 7px 1px no-repeat, linear-gradient(#bcefff, #bcefff) 91% 94% / 1px 7px no-repeat;
+    animation: rf-avatar-frost 5s ease-in-out infinite;
+    animation-delay: var(--avatar-phase, 0s);
+}
+
+/* Electric: a bright orbit and a small arc on the rim. */
+#operatorList [data-element="electric"] { --avatar-highlight: #fffde4; --avatar-speed: 3.8s; }
+#operatorList [data-element="electric"] .operator-avatar-effects::after {
+    inset: auto;
+    left: 0;
+    top: 16%;
+    width: 5px;
+    height: 28px;
+    background: #fff5bd;
+    clip-path: polygon(60% 0, 0 52%, 44% 44%, 20% 100%, 100% 36%, 58% 44%);
+    animation: rf-avatar-arc 4.6s ease-in-out infinite;
+    animation-delay: var(--avatar-phase, 0s);
+}
+
+/* Nature: green light and a drifting leaf at the border. */
+#operatorList [data-element="nature"] { --avatar-highlight: #ddffc6; --avatar-speed: 8s; }
+#operatorList [data-element="nature"] .operator-avatar-effects::after {
+    inset: auto;
+    left: 1px;
+    bottom: 13%;
+    width: 5px;
+    height: 9px;
+    border-radius: 100% 0 100% 0;
+    background: linear-gradient(135deg, #edffd0, #5fd96f);
+    animation: rf-avatar-leaf 6.5s ease-in-out infinite;
+    animation-delay: var(--avatar-phase, 0s);
+}
+
+/* Physical: polished silver with a restrained moving metal glint. */
+#operatorList [data-element="physical"] { --avatar-highlight: #fff; --avatar-speed: 12s; }
+#operatorList [data-element="physical"] .operator-avatar-effects::after {
+    inset: auto;
+    left: 8%;
+    top: 1px;
+    width: 14px;
+    height: 2px;
+    border-radius: 100%;
+    background: linear-gradient(90deg, transparent, #fff, transparent);
+    animation: rf-avatar-metal 6s ease-in-out infinite;
+    animation-delay: var(--avatar-phase, 0s);
+}
+
+#operatorList .operator-card:not(.disabled):hover .operator-avatar-frame {
+    box-shadow: 0 0 12px var(--element-glow), 0 0 24px var(--element-glow);
+}
+#operatorList .operator-card.disabled :is(.operator-avatar-ring, .operator-avatar-effects)::before,
+#operatorList .operator-card.disabled .operator-avatar-effects::after { animation-play-state: paused; }
+
+@keyframes rf-avatar-orbit { to { transform: rotate(360deg); } }
+@keyframes rf-avatar-embers {
+    0% { transform: translateY(7px); opacity: 0; }
+    25% { opacity: 1; }
+    100% { transform: translateY(-10px); opacity: 0; }
+}
+@keyframes rf-avatar-frost {
+    0%, 100% { transform: scale(.96); opacity: .35; }
+    50% { transform: scale(1.015); opacity: 1; }
+}
+@keyframes rf-avatar-arc {
+    0%, 32%, 100% { transform: translateY(0); opacity: .15; }
+    13%, 64% { transform: translateY(4px); opacity: 1; }
+    24%, 76% { transform: translateY(10px); opacity: .4; }
+}
+@keyframes rf-avatar-leaf {
+    0%, 100% { transform: translateY(3px) rotate(-30deg); opacity: .2; }
+    45% { transform: translateY(-15px) rotate(24deg); opacity: 1; }
+    80% { transform: translateY(-22px) rotate(40deg); opacity: 0; }
+}
+@keyframes rf-avatar-metal {
+    0%, 15%, 100% { transform: translateX(0); opacity: 0; }
+    35% { opacity: .95; }
+    65% { transform: translateX(42px); opacity: 0; }
+}
+
+@media (min-width: 901px) {
+    #operatorList .operator-avatar-frame { width: 76px; height: 76px; margin-bottom: 6px; --avatar-radius: 11px; }
+}
+@media (max-width: 900px) {
+    #operatorList .operator-avatar-frame { width: 50px; height: 50px; --avatar-radius: 15px; }
+    #selectionScreen.team-modal-open #operatorList .operator-avatar-frame { width: 52px; height: 52px; --avatar-radius: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    #operatorList .operator-avatar-ring::before,
+    #operatorList .operator-avatar-effects::after { animation: none; }
+    #operatorList .operator-card:hover { animation: none; transform: none; }
+    #operatorList .operator-avatar-frame { transition: none; }
+}

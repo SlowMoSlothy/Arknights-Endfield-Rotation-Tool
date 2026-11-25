@@ -371,6 +371,28 @@ function renderOperatorFilters() {
     container.appendChild(createOperatorFilterGroup("Element", "element", getAvailableElements()));
 }
 
+function createSelectionAvatar(op, elementType, cardIndex) {
+    const frame = document.createElement("span");
+    frame.className = "operator-avatar-frame";
+    frame.dataset.element = elementType;
+    frame.style.setProperty("--avatar-phase", `${-(cardIndex % 9) * 0.53}s`);
+
+    const ring = document.createElement("span");
+    ring.className = "operator-avatar-ring";
+    ring.setAttribute("aria-hidden", "true");
+    const crop = document.createElement("span");
+    crop.className = "operator-avatar-crop";
+    const image = document.createElement("img");
+    image.src = op.icon;
+    image.alt = op.name;
+    crop.appendChild(image);
+    const effects = document.createElement("span");
+    effects.className = "operator-avatar-effects";
+    effects.setAttribute("aria-hidden", "true");
+    frame.append(ring, crop, effects);
+    return frame;
+}
+
 function renderOperatorList() {
     const grid = document.getElementById("operatorList");
     if (!grid) return;
@@ -387,7 +409,7 @@ function renderOperatorList() {
         return;
     }
 
-    visibleOperators.forEach(op => {
+    visibleOperators.forEach((op, cardIndex) => {
         const isSelected = selectedTeam.includes(op.id);
         const elementType = getOperatorMainElement(op);
 
@@ -400,16 +422,12 @@ function renderOperatorList() {
             card.title = "Bereits im Team";
         }
 
-        const img = document.createElement("img");
-        img.src = op.icon;
-        img.alt = op.name;
-
         const name = document.createElement("div");
         name.className = "operator-name";
         name.textContent = op.name;
 
         card.appendChild(createOperatorCardMeta(op, elementType));
-        card.appendChild(img);
+        card.appendChild(createSelectionAvatar(op, elementType, cardIndex));
         card.appendChild(name);
 
         if (!isSelected) {
