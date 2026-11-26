@@ -93,12 +93,14 @@ function shareLink(share) {
 
 function avatar(operator) {
   if (!operator?.icon) return create("span", "operator-placeholder", "?");
+  const frame = create("span", "operator-avatar-frame");
   const image = create("img", "operator-avatar");
   image.src = assetUrl(operator.icon);
   image.alt = operator.name || "Operator";
   image.loading = "lazy";
-  image.addEventListener("error", () => image.replaceWith(create("span", "operator-placeholder", "?")), { once: true });
-  return image;
+  image.addEventListener("error", () => frame.replaceWith(create("span", "operator-placeholder", "?")), { once: true });
+  frame.appendChild(image);
+  return frame;
 }
 
 function teamStrip(share) {
@@ -514,7 +516,7 @@ async function loadData() {
       if (!session?.data?.session?.user) throw new Error("Sign in in the Rotation Tool to view your publications.");
     }
     const [operatorResult, skillResult, shareResult] = await Promise.all([
-      supabaseClient.from("operators").select("id,name,operator_class,element_type,icon_path,is_visible").eq("game", "arknights_endfield"),
+      supabaseClient.from("operators").select("id,slug,name,operator_class,element_type,icon_path,is_visible").eq("game", "arknights_endfield"),
       supabaseClient.from("operator_skills").select("id,name,operator_id,skill_type,short_type,element_type,icon_path,icon_small_path"),
       discoverState.mine
         ? supabaseClient.rpc("list_my_rotation_shares", { p_limit: 500 })
@@ -535,7 +537,7 @@ async function loadData() {
         name: text(row.name) || "Operator",
         operatorClass: row.operator_class,
         elementType: row.element_type,
-        icon: row.icon_path
+        icon: mapDatabaseOperator(row, []).icon
       });
     });
     list(skillResult.data).forEach(row => {

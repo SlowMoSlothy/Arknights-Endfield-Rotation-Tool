@@ -13,8 +13,8 @@ test("Discover is a standalone directory linked from the planner", () => {
   assert.doesNotMatch(plannerHtml, /onclick="saveRotationInCommunity\(\)"/);
   assert.match(communityHtml, /<h1 id="pageTitle">Rotations &amp; Simulations<\/h1>/);
   assert.match(communityHtml, /id="rotationGrid"/);
-  assert.match(communityHtml, /style\.css\?v=5/);
-  assert.match(communityHtml, /community-page\.js\?v=7/);
+  assert.match(communityHtml, /style\.css\?v=6/);
+  assert.match(communityHtml, /community-page\.js\?v=8/);
 });
 
 test("Discover separates rotation and simulation shares", () => {

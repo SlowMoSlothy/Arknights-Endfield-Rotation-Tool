@@ -422,7 +422,7 @@ h1 {
   white-space: nowrap;
 }
 
-.operator-avatar,
+.operator-avatar-frame,
 .operator-placeholder {
   width: 100%;
   max-width: 66px;
@@ -433,9 +433,18 @@ h1 {
   background: rgba(7, 9, 10, 0.62);
 }
 
+.operator-avatar-frame {
+  display: block;
+  overflow: hidden;
+}
+
 .operator-avatar {
   display: block;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
+  transform: scale(var(--portrait-zoom, 1));
+  transform-origin: var(--portrait-x, 50%) var(--portrait-y, 50%);
 }
 
 .operator-placeholder {

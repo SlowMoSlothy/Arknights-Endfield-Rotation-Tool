@@ -29,7 +29,7 @@ function mount({ rpc = async () => emptyResult(), missingClient = false, tableEr
         supabaseClient: missingClient ? null : {
             auth: { getSession: async () => ({ data: { session: signedIn ? { user: { id: "creator" } } : null } }) },
             from(table) { return { select() {
-                const query = Promise.resolve({ data: table === "operators" ? [{ id: 1, name: "Perlica", element_type: "electric", operator_class: "Caster" }] : [],
+                const query = Promise.resolve({ data: table === "operators" ? [{ id: 1, slug: "perlica", name: "Perlica", element_type: "electric", operator_class: "Caster", icon_path: "assets/operators/avatars/Perlica.png" }] : [],
                     error: tableError === table ? new Error("Unavailable table") : null });
                 query.eq = () => query;
                 return query;
@@ -37,7 +37,10 @@ function mount({ rpc = async () => emptyResult(), missingClient = false, tableEr
             rpc: (...args) => { calls++; return rpc(...args); }
         } };
     c.window = c;
+    c.supabase = { createClient: () => c.supabaseClient };
     vm.createContext(c);
+    vm.runInContext(fs.readFileSync("endfield/js/data/operatorPortraits.js", "utf8"), c);
+    vm.runInContext(fs.readFileSync("endfield/supabaseClient.js", "utf8"), c);
     vm.runInContext(source, c);
     // Cards are covered separately; this suite exercises the loading and rendering state machine.
     c.card = share => Object.assign(element("article"), { textContent: share.title });
@@ -97,6 +100,7 @@ test("a slow engagement service cannot hold the directory in its loading state",
     m.c.RotationShareEngagement = { loadMany: () => new Promise(resolve => { finish = resolve; }) };
     await tick();
     assert.equal(m.get("rotationCount").textContent, "1 Rotation");
+    assert.equal(m.c.getOperator(1).icon, "assets/operators/avatars/refined/Perlica.png");
     assert.equal(m.get("refreshRotations").disabled, false);
     finish();
 });
