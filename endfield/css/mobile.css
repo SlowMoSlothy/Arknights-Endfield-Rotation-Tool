@@ -709,11 +709,8 @@
     }
 
     .rotation-sim .rotation-sim-skill.is-auto-event .rotation-debuff-tray {
-        bottom: -34px;
-    }
-
-    .rotation-sim .rotation-sim-skill.is-auto-event .rotation-debuff-tray.is-multi-row {
-        bottom: -50px;
+        top: calc(100% + 34px - var(--rotation-effect-size));
+        bottom: auto;
     }
 
     .rotation-sim-cooldown-track {

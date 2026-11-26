@@ -106,6 +106,10 @@
     padding-bottom: 24px;
 }
 
+:root:not(.rotation-mode-simulation) #rotationBuilderPanel #rotationDropZone:has(.rotation-debuff-tray) {
+    padding-bottom: calc(0px - var(--rotation-debuff-offset) + var(--rotation-effect-size) + var(--rotation-effect-row-gap) + 8px);
+}
+
 .rotation-panel {
     border: 1px solid rgba(248,245,70,0.18);
     border-radius: 18px;
@@ -3004,11 +3008,8 @@
 }
 
 .rotation-sim .rotation-sim-skill.is-auto-event .rotation-debuff-tray {
-    bottom: -38px;
-}
-
-.rotation-sim .rotation-sim-skill.is-auto-event .rotation-debuff-tray.is-multi-row {
-    bottom: -56px;
+    top: calc(100% + 38px - var(--rotation-effect-size));
+    bottom: auto;
 }
 
 .rotation-sim .rotation-sim-skill.is-cs-stack .rotation-skill-composite {
@@ -4394,11 +4395,8 @@
 }
 
 .rotation-skill.basic-attack-action .rotation-debuff-tray {
-    bottom: calc(var(--rotation-debuff-offset) - 20px);
-}
-
-.rotation-skill.basic-attack-action .rotation-debuff-tray.is-multi-row {
-    bottom: calc(var(--rotation-debuff-offset) - var(--rotation-effect-size) - var(--rotation-effect-row-gap) - 22px);
+    top: calc(100% - var(--rotation-debuff-offset) - var(--rotation-effect-size) + 20px);
+    bottom: auto;
 }
 
 .rotation-buff-tray,
@@ -4422,11 +4420,9 @@
 }
 
 .rotation-debuff-tray {
-    bottom: var(--rotation-debuff-offset);
-}
-
-.rotation-debuff-tray.is-multi-row {
-    bottom: calc(var(--rotation-debuff-offset) - var(--rotation-effect-size) - var(--rotation-effect-row-gap) - 2px);
+    /* Keep the first row below the portrait; wrapped rows must grow downward. */
+    top: calc(100% - var(--rotation-debuff-offset) - var(--rotation-effect-size));
+    bottom: auto;
 }
 
 .rotation-buff-item,
