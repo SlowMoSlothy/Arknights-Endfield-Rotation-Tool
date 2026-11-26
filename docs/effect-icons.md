@@ -38,7 +38,7 @@ No unique icon was identified for some trigger-only, generic or unverified statu
 | `electrification` | assets/ui/effects/icon_battle_conduct.png |
 | `electrification_consumed` | assets/ui/effects/icon_battle_conduct.png |
 | `final_strike` | Hidden: no unambiguous original status sprite |
-| `firefang_vesperwings` | assets/operators/skills/rossi/ult_small.png — Original source-skill glyph; distinct status sprite not identified |
+| `firefang_vesperwings` | Hidden: no verified dedicated status sprite; removed unrelated Rossi Ultimate glyph. Camille's effect remains in details. |
 | `focus` | assets/operators/skills/yvonne/cs_small.png — Original source-skill glyph; distinct status sprite not identified |
 | `gloompurge_arts_amp` | assets/ui/effects/icon_battle_affix_spell_enhance.png |
 | `gloompurger_array` | assets/operators/skills/zhuang/ult_small.png — Original source-skill glyph; distinct status sprite not identified |

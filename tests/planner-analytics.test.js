@@ -107,6 +107,26 @@ test("the device group stays fixed for all later steps in the same visit", async
     assert.ok(m.requests.every(request => request.body.p_events.every(event => event.device_type === "mobile")));
 });
 
+test("all twelve milestones fit a single batch and retain only the first fixed failure category per visit", async () => {
+    const m = mount();
+    await tick();
+    m.context.markPlannerReady("new");
+    for (const name of ["builder_failed", "team_selected", "first_skill_placed", "share_opened", "share_invalid", "share_cancelled", "share_submitted", "share_published", "example_loaded"]) m.context.trackPlannerEvent(name, { private: "secret title" });
+    m.context.trackPlannerEvent("share_failed", { failure_kind: "network", message: "secret token" });
+    m.context.trackPlannerEvent("share_failed", { failure_kind: "database" });
+    m.context.trackPlannerEvent("share_invalid");
+    m.listeners.pagehide();
+    const batch = m.requests[0].body.p_events;
+    assert.equal(batch.length, 12);
+    assert.equal(batch.find(event => event.event_name === "share_failed").failure_kind, "network");
+    assert.equal(batch.filter(event => event.event_name === "share_invalid").length, 1);
+    assert.doesNotMatch(m.requests[0].options.body, /secret|message|token|private/);
+    const invalid = mount(); await tick();
+    invalid.context.trackPlannerEvent("share_failed", { failure_kind: "raw private error text" });
+    invalid.listeners.pagehide();
+    assert.equal(invalid.requests[0].body.p_events.at(-1).failure_kind, "unknown");
+});
+
 test("local previews, privacy signals and the owner opt-out never send analytics", () => {
     for (const options of [{ host: "localhost" }, { host: "127.0.0.1" }, { host: "preview.example" }, { dnt: "1" }, { gpc: true }, { search: "?usage=off" }]) {
         const { context: c, requests, listeners, timers } = mount(options);
@@ -279,14 +299,14 @@ function shareContext(rpc) {
 test("a published share counts even when clipboard access is denied", async () => {
     const { c, events } = shareContext(async () => ({ data: { short_code: "ABC123", share_type: "rotation" } }));
     assert.equal(await c.copyBuildShareCode(), true);
-    assert.deepEqual(events, ["share_published"]);
+    assert.deepEqual(events, ["share_submitted", "share_published"]);
 });
 
 test("database errors, network rejection and invalid share responses count as failure", async () => {
     for (const rpc of [async () => ({ error: new Error("RLS denied") }), async () => { throw new Error("Network failure"); }, async () => ({ data: { short_code: "bad" } })]) {
         const { c, events } = shareContext(rpc);
         await assert.rejects(c.createStoredBuildShare({ title: "Test build" }));
-        assert.deepEqual(events, ["share_failed"]);
+        assert.deepEqual(events, ["share_submitted", "share_failed"]);
     }
 });
 
@@ -430,4 +450,22 @@ test("signing out clears cached device statistics before rendering the report ag
     m.c.renderPlannerAnalyticsReport(m.root);
     assert.equal(m.root.children.length, 0);
     assert.equal(vm.runInContext("plannerAnalyticsReport.data", m.c), null);
+});
+
+test("the report explains publication milestones and renders fixed failure categories with the selected filters", async () => {
+    const m = reportContext(async () => ({ data: {
+        counts: { builder_opened: 10, share_opened: 6, share_submitted: 5, share_invalid: 2, share_cancelled: 1, share_failed: 3 },
+        failure_counts: { network: 2, unknown: 1 }, publishing_started_at: "2026-11-26T15:00:00Z"
+    } }));
+    await m.c.fetchPlannerAnalyticsReport();
+    m.c.renderPlannerAnalyticsReport(m.root);
+    const row = label => findReportNode(m.root, node => node.tag === "tr" && node.children[0]?.textContent === label);
+    assert.equal(row("Publication send attempted").children[1].textContent, "5");
+    assert.equal(row("Share form input invalid").children[1].textContent, "2");
+    assert.equal(row("Share form closed without sending").children[1].textContent, "1");
+    assert.equal(row("Network problem").children[1].textContent, "2");
+    assert.equal(row("Database problem").children[1].textContent, "0");
+    assert.equal(row("Other / legacy").children[1].textContent, "1");
+    assert.ok(findReportNode(m.root, node => /Additional publication tracking enabled/.test(node.textContent || "")));
+    assert.ok(findReportNode(m.root, node => /first recorded publication failure/.test(node.textContent || "")));
 });

@@ -128,8 +128,8 @@
       "note": "No unambiguous dedicated original icon identified; hidden in compact icon trays, name retained in details"
     },
     "firefang_vesperwings": {
-      "icon": "assets/operators/skills/rossi/ult_small.png",
-      "note": "Original source-skill glyph; distinct status sprite not identified"
+      "icon": null,
+      "note": "Camille status; Rossi's Ultimate glyph is unrelated. No verified dedicated status sprite identified; hidden in compact icon trays, name retained in details"
     },
     "focus": {
       "icon": "assets/operators/skills/yvonne/cs_small.png",

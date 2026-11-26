@@ -98,7 +98,7 @@ const PLANNER_EFFECT_ICONS = {
     "icon": null
   },
   "firefang_vesperwings": {
-    "icon": "assets/operators/skills/rossi/ult_small.png"
+    "icon": null
   },
   "focus": {
     "icon": "assets/operators/skills/yvonne/cs_small.png"

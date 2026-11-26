@@ -43,7 +43,7 @@ test("analytics migration enforces anonymous writes, admin-only reports and visi
         await assert.rejects(report(), { code: "42501" });
         await assert.rejects(record(randomUUID(), ["fake_event"]), { code: "23514" });
         await assert.rejects(db.query("select public.record_planner_events($1, '{}'::jsonb)", [randomUUID()]), { code: "22023" });
-        await assert.rejects(record(randomUUID(), Array(10).fill("builder_opened")), { code: "22023" });
+        await assert.rejects(record(randomUUID(), Array(13).fill("builder_opened")), { code: "22023" });
 
         await db.exec("set role authenticated");
         await assert.rejects(report(), { code: "42501" });

@@ -2,8 +2,10 @@
 (() => {
     const events = new Set([
         "builder_opened", "builder_ready", "builder_failed", "team_selected",
-        "first_skill_placed", "share_opened", "share_published", "share_failed", "example_loaded"
+        "first_skill_placed", "share_opened", "share_submitted", "share_cancelled", "share_invalid",
+        "share_published", "share_failed", "example_loaded"
     ]);
+    const failureKinds = new Set(["network", "validation", "database", "unavailable", "unknown"]);
     const sent = new Set();
     const pending = [];
     let entryKind = "unknown";
@@ -123,15 +125,17 @@
         }).catch(() => { if (initialVersion === authVersion) stopCollection(); });
     }
 
-    window.trackPlannerEvent = function (name) {
+    window.trackPlannerEvent = function (name, details = {}) {
         if (!enabled || disabled || !events.has(name) || sent.has(name)) return;
         sent.add(name);
-        pending.push({
+        const event = {
             event_name: name,
             entry_kind: entryKind,
             device_type: deviceType,
             mode: typeof uiSettings !== "undefined" && uiSettings?.timelineMode === "simulation" ? "simulation" : "slot"
-        });
+        };
+        if (name === "share_failed") event.failure_kind = failureKinds.has(details?.failure_kind) ? details.failure_kind : "unknown";
+        pending.push(event);
         scheduleFlush();
     };
 

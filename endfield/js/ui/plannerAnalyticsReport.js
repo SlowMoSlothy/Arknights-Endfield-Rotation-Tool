@@ -20,7 +20,7 @@ async function fetchPlannerAnalyticsReport() {
         if (error) throw error;
         if (current()) plannerAnalyticsReport.data = data;
     } catch {
-        if (current()) adminPanelState.reviewError = "Usage could not be loaded. Run supabase/planner_analytics_devices.sql after planner_analytics.sql, then refresh.";
+        if (current()) adminPanelState.reviewError = "Usage could not be loaded. Run supabase/planner_analytics_publishing.sql after planner_analytics_devices.sql, then refresh.";
     } finally {
         if (current()) {
             adminPanelState.loading = false;
@@ -116,6 +116,8 @@ function renderPlannerAnalyticsReport(list) {
     }
     const reset = plannerAnalyticsReport.data?.reset_at ? new Date(plannerAnalyticsReport.data.reset_at) : null;
     if (reset && !Number.isNaN(reset.getTime())) panel.appendChild(createAdminTextElement("p", "planner-usage-reset-date", `Statistics restarted: ${reset.toLocaleString()}. Earlier visits are excluded.`));
+    const publishingStart = plannerAnalyticsReport.data?.publishing_started_at ? new Date(plannerAnalyticsReport.data.publishing_started_at) : null;
+    if (publishingStart && !Number.isNaN(publishingStart.getTime())) panel.appendChild(createAdminTextElement("p", "planner-usage-reset-date", `Additional publication tracking enabled: ${publishingStart.toLocaleString()}. Earlier visits have no send, cancellation or input-validation detail.`));
     panel.appendChild(createAdminTextElement("p", "", "One visit means one page load, not one unique person. Each step counts at most once per visit. Steps can be skipped when using existing setups."));
     const counts = plannerAnalyticsReport.data?.counts || {};
     const total = Number(counts.builder_opened) || 0;
@@ -136,7 +138,9 @@ function renderPlannerAnalyticsReport(list) {
     for (const [event, label] of [
         ["builder_opened", "Builder opened"], ["builder_ready", "Builder loaded successfully"],
         ["team_selected", "Team selected manually"], ["first_skill_placed", "First action placed manually"],
-        ["share_opened", "Share form opened"], ["share_published", "Published successfully"],
+        ["share_opened", "Share form opened"], ["share_invalid", "Share form input invalid"],
+        ["share_cancelled", "Share form closed without sending"], ["share_submitted", "Publication send attempted"],
+        ["share_published", "Published successfully"],
         ["builder_failed", "Builder or operator loading failed"], ["share_failed", "Publication failed"],
         ["example_loaded", "Example loaded"]
     ]) {
@@ -147,7 +151,25 @@ function renderPlannerAnalyticsReport(list) {
         body.appendChild(row);
     }
     table.append(caption, head, body);
-    panel.append(table,
+    panel.appendChild(table);
+    const failures = document.createElement("table");
+    const failureCaption = createAdminTextElement("caption", "", "Publication failures by type");
+    const failureHead = document.createElement("thead");
+    const failureHeader = document.createElement("tr");
+    for (const text of ["Type", "Visits"]) {
+        const th = createAdminTextElement("th", "", text); th.scope = "col"; failureHeader.appendChild(th);
+    }
+    failureHead.appendChild(failureHeader);
+    const failureBody = document.createElement("tbody");
+    const failureCounts = plannerAnalyticsReport.data?.failure_counts || {};
+    for (const [kind, label] of [["network", "Network problem"], ["validation", "Request rejected (validation)"], ["database", "Database problem"], ["unavailable", "Publication service unavailable"], ["unknown", "Other / legacy"]]) {
+        const row = document.createElement("tr");
+        row.append(createAdminTextElement("td", "", label), createAdminTextElement("td", "", String(Number(failureCounts[kind]) || 0)));
+        failureBody.appendChild(row);
+    }
+    failures.append(failureCaption, failureHead, failureBody);
+    panel.append(failures,
+        createAdminTextElement("p", "", "Publication steps count once per visit and can overlap: a visitor can correct an invalid entry, reopen a cancelled form or retry a failure and publish successfully. Only the first recorded publication failure per visit determines its failure type. Editing an existing publication and clipboard errors do not count as new publication attempts or failures."),
         createAdminTextElement("p", "", "Device type is estimated once per visit. Unknown includes browsers without a usable device hint. Resizing or rotating the screen does not change the group."),
         createAdminTextElement("p", "", "Only production visits with usage measurement allowed by the browser are counted. Signed-in admins are excluded, including the current visit when signing in later. Older anonymous visits cannot be identified retroactively. Loading an example or restoring a rotation does not count as manually placing a skill. A denied clipboard write does not undo a successful publication."));
 }

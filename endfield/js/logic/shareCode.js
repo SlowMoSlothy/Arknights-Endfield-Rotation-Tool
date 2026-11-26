@@ -852,6 +852,7 @@ function extractShortBuildShareCode(input) {
 }
 
 let pendingShareMetadataRequest = null;
+let pendingShareMetadataPurpose = null;
 let buildSharePublishing = false;
 let buildShareSubmitting = false;
 let buildShareDraft = null;
@@ -949,13 +950,32 @@ async function getShareAuthorPreview() {
     }
 }
 
-function closeShareMetadataModal(result = null) {
+function trackBuildPublishEvent(name, details) {
+    try { if (typeof trackPlannerEvent === "function") trackPlannerEvent(name, details); }
+    catch { /* Optional usage measurement must never interrupt publication. */ }
+}
+
+function classifyBuildPublishFailure(error) {
+    const code = String(error?.code || "");
+    if (code === "SHARE_SERVICE_UNAVAILABLE" || code === "PGRST202") return "unavailable";
+    if (code === "SHARE_INVALID_RESPONSE") return "database";
+    if (/^(22|23)/.test(code)) return "validation";
+    if (error?.name === "AbortError"
+        || /^(NETWORK_ERROR|ECONNRESET|ENOTFOUND|ETIMEDOUT)$/.test(code)
+        || /failed to fetch|fetch failed|network(?:error| request| failure)|load failed|timed? ?out/i.test(String(error?.message || ""))) return "network";
+    if (/^[0-9A-Z]{5}$/.test(code) || /^PGRST/.test(code) || Number(error?.status) >= 400) return "database";
+    return "unknown";
+}
+
+function closeShareMetadataModal(result = null, userCancelled = false) {
     const modal = typeof document !== "undefined" ? document.getElementById("shareMetadataModal") : null;
     modal?.classList.remove("open");
     modal?.setAttribute("aria-hidden", "true");
     if (pendingShareMetadataRequest) {
+        if (userCancelled && !result && pendingShareMetadataPurpose === "publish") trackBuildPublishEvent("share_cancelled");
         const resolve = pendingShareMetadataRequest;
         pendingShareMetadataRequest = null;
+        pendingShareMetadataPurpose = null;
         resolve(result);
     }
 }
@@ -994,7 +1014,8 @@ async function requestBuildShareMetadata(editingShare = null) {
     if (authorPreview) authorPreview.textContent = "Loading...";
     modal.classList.add("open");
     modal.setAttribute("aria-hidden", "false");
-    if (typeof trackPlannerEvent === "function") trackPlannerEvent("share_opened");
+    pendingShareMetadataPurpose = editingShare ? "edit" : "publish";
+    if (!editingShare) trackBuildPublishEvent("share_opened");
 
     getShareAuthorPreview().then(author => {
         if (authorPreview && modal.classList.contains("open")) authorPreview.textContent = author;
@@ -1038,6 +1059,7 @@ function initShareMetadataUi() {
 
     form?.addEventListener("submit", event => {
         event.preventDefault();
+        if (!pendingShareMetadataRequest) return;
         try {
             const metadata = normalizeBuildShareMetadata({
                 title: document.getElementById("shareMetadataTitleInput")?.value,
@@ -1045,21 +1067,26 @@ function initShareMetadataUi() {
             });
             closeShareMetadataModal(metadata);
         } catch (error) {
+            if (pendingShareMetadataPurpose === "publish") trackBuildPublishEvent("share_invalid");
             const status = document.getElementById("shareMetadataStatus");
             if (status) status.textContent = error.message;
         }
     });
-    cancel?.addEventListener("click", () => closeShareMetadataModal(null));
-    close?.addEventListener("click", () => closeShareMetadataModal(null));
+    // Native required/minlength/maxlength checks happen before a submit event.
+    form?.addEventListener("invalid", () => {
+        if (pendingShareMetadataRequest && pendingShareMetadataPurpose === "publish") trackBuildPublishEvent("share_invalid");
+    }, true);
+    cancel?.addEventListener("click", () => closeShareMetadataModal(null, true));
+    close?.addEventListener("click", () => closeShareMetadataModal(null, true));
     modal?.addEventListener("click", event => {
-        if (event.target === modal) closeShareMetadataModal(null);
+        if (event.target === modal) closeShareMetadataModal(null, true);
     });
     dismiss?.addEventListener("click", () => {
         const card = document.getElementById("shareMetadataCard");
         if (card) card.hidden = true;
     });
     document.addEventListener("keydown", event => {
-        if (event.key === "Escape" && modal?.classList.contains("open")) closeShareMetadataModal(null);
+        if (event.key === "Escape" && modal?.classList.contains("open")) closeShareMetadataModal(null, true);
     });
 }
 
@@ -1186,23 +1213,23 @@ if (typeof document !== "undefined") {
 }
 
 async function createStoredBuildShare(metadata) {
-    if (typeof supabaseClient === "undefined" || !supabaseClient?.rpc) {
-        if (typeof trackPlannerEvent === "function") trackPlannerEvent("share_failed");
-        throw new Error("The short share-code service is unavailable.");
-    }
-
-    const normalizedMetadata = normalizeBuildShareMetadata(metadata);
-    const sharePayload = getDisplayBuildShareCode();
-    const shareType = getCurrentBuildShareType();
-    const guideSignature = typeof getPlannerGuideShareSignature === "function" ? getPlannerGuideShareSignature() : "";
-    const operatorIds = Array.from(new Set(
-        (typeof selectedTeam !== "undefined" && Array.isArray(selectedTeam) ? selectedTeam : [])
-            .filter(operatorId => operatorId !== null && operatorId !== undefined && operatorId !== "")
-            .map(Number)
-            .filter(Number.isInteger)
-    ));
-    let data;
+    let normalizedMetadata;
+    try { normalizedMetadata = normalizeBuildShareMetadata(metadata); }
+    catch (error) { trackBuildPublishEvent("share_invalid"); throw error; }
+    trackBuildPublishEvent("share_submitted");
+    let sharePayload, shareType, guideSignature, result, shortCode;
     try {
+        if (typeof supabaseClient === "undefined" || !supabaseClient?.rpc) {
+            throw Object.assign(new Error("The short share-code service is unavailable."), { code: "SHARE_SERVICE_UNAVAILABLE" });
+        }
+        sharePayload = getDisplayBuildShareCode();
+        shareType = getCurrentBuildShareType();
+        guideSignature = typeof getPlannerGuideShareSignature === "function" ? getPlannerGuideShareSignature() : "";
+        const operatorIds = Array.from(new Set(
+            (typeof selectedTeam !== "undefined" && Array.isArray(selectedTeam) ? selectedTeam : [])
+                .filter(operatorId => operatorId !== null && operatorId !== undefined && operatorId !== "")
+                .map(Number).filter(Number.isInteger)
+        ));
         const response = await supabaseClient.rpc("create_rotation_share", {
             p_share_type: shareType,
             p_share_payload: sharePayload,
@@ -1212,29 +1239,20 @@ async function createStoredBuildShare(metadata) {
             p_description: normalizedMetadata.description
         });
         if (response.error) throw response.error;
-        data = response.data;
+        result = Array.isArray(response.data) ? response.data[0] : response.data;
+        shortCode = normalizeShortBuildShareCode(result?.short_code);
+        if (!shortCode || result?.share_type !== shareType) {
+            throw Object.assign(new Error("Supabase returned an invalid short share code."), { code: "SHARE_INVALID_RESPONSE" });
+        }
     } catch (error) {
-        if (typeof trackPlannerEvent === "function") trackPlannerEvent("share_failed");
+        trackBuildPublishEvent("share_failed", { failure_kind: classifyBuildPublishFailure(error) });
         throw error;
     }
 
-    const result = Array.isArray(data) ? data[0] : data;
-    const shortCode = normalizeShortBuildShareCode(result?.short_code);
-    if (!shortCode || result?.share_type !== shareType) {
-        if (typeof trackPlannerEvent === "function") trackPlannerEvent("share_failed");
-        throw new Error("Supabase returned an invalid short share code.");
-    }
-
     // Publication has succeeded even if the following clipboard write is denied.
-    if (typeof trackPlannerEvent === "function") trackPlannerEvent("share_published");
+    trackBuildPublishEvent("share_published");
     if (typeof markPlannerGuidePublished === "function") markPlannerGuidePublished(guideSignature);
-
-    return {
-        shortCode,
-        shareType,
-        sharePayload,
-        ...getStoredShareMetadata(result, normalizedMetadata)
-    };
+    return { shortCode, shareType, sharePayload, ...getStoredShareMetadata(result, normalizedMetadata) };
 }
 
 async function createBuildShareLink(metadata) {
