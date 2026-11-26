@@ -1465,6 +1465,12 @@ function renderAdminReviewList() {
     list.classList.toggle("is-batk", adminPanelState.activeTab === "batk");
     list.innerHTML = "";
 
+    // Keep the device tabs and filters available during loading and retrying.
+    if (adminPanelState.activeTab === "usage") {
+        renderPlannerAnalyticsReport(list);
+        return;
+    }
+
     if (adminPanelState.loading) {
         const activeTab = getActiveAdminTab();
         setAdminListState(list, {
@@ -1504,10 +1510,6 @@ function renderAdminReviewList() {
         return;
     }
 
-    if (adminPanelState.activeTab === "usage") {
-        renderPlannerAnalyticsReport(list);
-        return;
-    }
 
     if (adminPanelState.activeTab === "batk") {
         renderAdminBatkEditor(list);

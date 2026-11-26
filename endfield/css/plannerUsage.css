@@ -7,3 +7,10 @@
 .planner-usage-report caption { text-align: left; margin-bottom: .7rem; font-weight: 700; }
 .planner-usage-report th, .planner-usage-report td { text-align: left; padding: .65rem .4rem; border-bottom: 1px solid #404847; }
 .planner-usage-report th:not(:first-child), .planner-usage-report td:not(:first-child) { text-align: right; white-space: nowrap; }
+.planner-usage-device-tabs { display:flex; flex-wrap:wrap; gap:.5rem; margin:1rem 0; }
+.planner-usage-device-tab, .planner-usage-retry { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; min-height:44px; padding:.6rem .9rem; border:1px solid #697170; border-radius:.5rem; background:#161c1d; color:#fff; font:inherit; cursor:pointer; }
+.planner-usage-device-tab strong { min-width:1.2em; font-size:.875rem; }
+.planner-usage-device-tab[aria-selected="true"] { border-color:#f4ed39; color:#f4ed39; background:#f4ed3914; }
+.planner-usage-device-tab:focus-visible, .planner-usage-retry:focus-visible { outline:2px solid #fc8a35; outline-offset:3px; }
+.planner-usage-reset-date { font-size:.875rem; }
+@media (max-width:600px) { .planner-usage-device-tab { flex:1 1 85px; padding:.55rem .65rem; } }

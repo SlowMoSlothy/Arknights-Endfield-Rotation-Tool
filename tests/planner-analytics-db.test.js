@@ -96,6 +96,8 @@ test("analytics migration enforces anonymous writes, admin-only reports and visi
         assert.equal((await db.query("select count(*)::int as total from public.planner_events where visit_id = $1", [lateAdmin])).rows[0].total, 2);
         assert.equal((await db.query("select count(*)::int as total from public.planner_events where visit_id in ($1, $2)", [adminVisit, inFlightAdmin])).rows[0].total, 0);
         await db.exec(migration);
+        // Test the rolling period independently of the first-upgrade reset boundary.
+        await db.exec("update public.planner_analytics_state set reset_at = now() - interval '31 days'");
         await db.query("update public.planner_events set created_at = now() - interval '8 days' where visit_id = $1", [fresh]);
         await db.exec("set role authenticated");
         assert.equal((await report()).counts.builder_opened, 3);

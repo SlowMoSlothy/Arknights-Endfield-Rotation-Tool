@@ -8,13 +8,14 @@ const collector = fs.readFileSync("endfield/js/logic/plannerAnalytics.js", "utf8
 const shares = fs.readFileSync("endfield/js/logic/shareCode.js", "utf8");
 const tick = () => new Promise(resolve => setImmediate(resolve));
 
-function mount({ host = "rotationforge.gg", search = "", dnt, gpc, fetchResult,
+function mount({ host = "rotationforge.gg", search = "", dnt, gpc, fetchResult, userAgent = "", uaMobile, maxTouchPoints = 0,
     session = null, getSession, rpc = async () => ({ data: false }) } = {}) {
     const requests = [], timers = new Map(), delays = new Map(), listeners = {}, rpcCalls = [];
     let sequence = 0;
     const context = {
         URLSearchParams, crypto: { randomUUID }, location: { hostname: host, search },
-        navigator: { doNotTrack: dnt, globalPrivacyControl: gpc },
+        navigator: { doNotTrack: dnt, globalPrivacyControl: gpc, userAgent, maxTouchPoints,
+            userAgentData: uaMobile === undefined ? undefined : { mobile: uaMobile } },
         SUPABASE_URL: "https://example.supabase.co", SUPABASE_KEY: "sb_publishable_test",
         uiSettings: { timelineMode: "slot" },
         console: { info() {} },
@@ -58,7 +59,7 @@ test("milestones deduplicate per page load and transmit only fixed anonymous fie
     assert.equal(body.p_events[1].entry_kind, "restored");
     assert.equal(body.p_events[3].mode, "simulation");
     assert.deepEqual(Object.keys(body).sort(), ["p_events", "p_visit_id"]);
-    for (const event of body.p_events) assert.deepEqual(Object.keys(event).sort(), ["entry_kind", "event_name", "mode"]);
+    for (const event of body.p_events) assert.deepEqual(Object.keys(event).sort(), ["device_type", "entry_kind", "event_name", "mode"]);
     assert.equal(options.keepalive, true);
     assert.equal(options.credentials, "omit");
     assert.equal(options.referrerPolicy, "no-referrer");
@@ -70,6 +71,40 @@ test("milestones deduplicate per page load and transmit only fixed anonymous fie
     await tick();
     second.listeners.pagehide();
     assert.notEqual(second.requests[0].body.p_visit_id, body.p_visit_id);
+});
+
+test("device groups cover phones, tablets, desktop browsers and unavailable hints without transmitting browser details", async () => {
+    for (const [options, expected] of [
+        [{ userAgent: "Mozilla/5.0 (Linux; Android 14; secret-model) Mobile Safari/537.36", uaMobile: true }, "mobile"],
+        [{ userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) Mobile" }, "mobile"],
+        [{ userAgent: "Mozilla/5.0 (iPad; CPU OS 18_0 like Mac OS X) Mobile" }, "tablet"],
+        [{ userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15) Safari/605", maxTouchPoints: 5 }, "tablet"],
+        [{ userAgent: "Mozilla/5.0 (Linux; Android 14) Safari/537.36", uaMobile: false }, "tablet"],
+        [{ userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)", maxTouchPoints: 10 }, "desktop"],
+        [{ userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15)" }, "desktop"],
+        [{ userAgent: "Mozilla/5.0 (X11; Linux x86_64)" }, "desktop"],
+        [{ userAgent: "Mozilla/5.0 (X11; CrOS x86_64)" }, "desktop"],
+        [{ uaMobile: true }, "mobile"], [{}, "unknown"], [{ userAgent: "privacy-browser", uaMobile: false }, "unknown"]
+    ]) {
+        const m = mount(options);
+        await tick();
+        m.context.markPlannerReady("new");
+        m.listeners.pagehide();
+        for (const event of m.requests[0].body.p_events) assert.equal(event.device_type, expected);
+        assert.doesNotMatch(m.requests[0].options.body, /userAgent|secret-model|maxTouchPoints|Mozilla|Safari|Windows NT/);
+    }
+});
+
+test("the device group stays fixed for all later steps in the same visit", async () => {
+    const m = mount({ userAgent: "Mozilla/5.0 (iPhone) Mobile" });
+    await tick();
+    m.listeners.pagehide();
+    m.context.navigator.userAgent = "Mozilla/5.0 (Windows NT 10.0)";
+    m.context.markPlannerReady("new");
+    m.context.trackPlannerEvent("share_opened");
+    m.listeners.pagehide();
+    assert.equal(m.requests.length, 2);
+    assert.ok(m.requests.every(request => request.body.p_events.every(event => event.device_type === "mobile")));
 });
 
 test("local previews, privacy signals and the owner opt-out never send analytics", () => {
@@ -271,16 +306,22 @@ test("manual placement is measured after save, while restoring storage is not", 
 
 const reportScript = fs.readFileSync("endfield/js/ui/plannerAnalyticsReport.js", "utf8");
 function reportContext(rpc = async () => ({ data: { counts: {} } })) {
-    const element = tag => ({ tag, children: [], value: "", listeners: {},
+    const element = tag => ({ tag, children: [], value: "", listeners: {}, attributes: {},
+        setAttribute(name, value) { this.attributes[name] = value; }, focus() { this.focused = true; },
         append(...children) { this.children.push(...children); }, appendChild(child) { this.children.push(child); },
         addEventListener(name, callback) { this.listeners[name] = callback; } });
-    const c = { document: { createElement: element },
+    const root = element("div");
+    const c = { document: { createElement: element, getElementById: id => findReportNode(root, node => node.id === id) },
         createAdminTextElement: (tag, className, textContent) => Object.assign(element(tag), { className, textContent }),
         adminPanelState: { isAdmin: true, activeTab: "usage" },
         getAdminSupabaseClient: () => ({ rpc }), renderAdminReviewList() {} };
     vm.createContext(c);
     vm.runInContext(reportScript, c);
-    return { c, root: element("div") };
+    return { c, root };
+}
+function findReportNode(node, predicate) {
+    if (predicate(node)) return node;
+    for (const child of node.children || []) { const match = findReportNode(child, predicate); if (match) return match; }
 }
 
 test("the usage report renders percentages, empty state and usable period/cohort controls", async () => {
@@ -292,7 +333,7 @@ test("the usage report renders percentages, empty state and usable period/cohort
     await c.fetchPlannerAnalyticsReport();
     c.renderPlannerAnalyticsReport(root);
     const section = root.children[0];
-    const table = section.children.find(child => child.tag === "table");
+    const table = findReportNode(section, child => child.tag === "table");
     const body = table.children.find(child => child.tag === "tbody");
     const published = body.children.find(row => row.children[0].textContent === "Published successfully");
     assert.equal(published.children[1].textContent, "1");
@@ -301,7 +342,7 @@ test("the usage report renders percentages, empty state and usable period/cohort
     period.value = "30";
     period.listeners.change();
     await tick();
-    assert.deepEqual(calls.at(-1), { name: "get_planner_funnel", params: { p_days: 30, p_entry_kind: "all" } });
+    assert.deepEqual(calls.at(-1), { name: "get_planner_funnel", params: { p_days: 30, p_entry_kind: "all", p_device_type: "all" } });
     const empty = reportContext();
     await empty.c.fetchPlannerAnalyticsReport();
     empty.c.renderPlannerAnalyticsReport(empty.root);
@@ -320,4 +361,73 @@ test("stale report requests cannot overwrite another tab or a signed-out state",
         await fetching;
         assert.equal(vm.runInContext("plannerAnalyticsReport.data", c), null);
     }
+});
+
+test("device tabs keep period and cohort filters, show cohort totals and support keyboard navigation", async () => {
+    const calls = [];
+    const m = reportContext(async (name, params) => {
+        calls.push({ name, params: { ...params } });
+        return { data: { counts: { builder_opened: params.p_device_type === "mobile" ? 3 : 7 },
+            devices: { mobile: 3, tablet: 1, desktop: 2, unknown: 1 }, reset_at: "2026-11-26T12:00:00Z" } };
+    });
+    m.c.renderAdminReviewList = () => { m.root.children = []; m.c.renderPlannerAnalyticsReport(m.root); };
+    await m.c.fetchPlannerAnalyticsReport();
+    const tabs = () => findReportNode(m.root, node => node.attributes?.role === "tablist").children;
+    assert.deepEqual(tabs().map(button => button.children[1].textContent), ["7", "3", "1", "2", "1"]);
+    const toolbar = m.root.children[0].children[0];
+    const [period, cohort] = toolbar.children.map(label => label.children[0]);
+    period.value = "30"; period.listeners.change(); await tick();
+    cohort.value = "new"; cohort.listeners.change(); await tick();
+    tabs()[1].listeners.click(); await tick();
+    assert.deepEqual(calls.at(-1).params, { p_days: 30, p_entry_kind: "new", p_device_type: "mobile" });
+    assert.equal(tabs()[1].attributes["aria-selected"], "true");
+    assert.equal(tabs()[1].tabIndex, 0);
+    assert.equal(tabs()[1].focused, true);
+    assert.equal(tabs()[0].tabIndex, -1);
+    const panel = findReportNode(m.root, node => node.attributes?.role === "tabpanel");
+    assert.equal(panel.attributes["aria-labelledby"], tabs()[1].id);
+    assert.match(findReportNode(panel, node => node.className === "planner-usage-reset-date").textContent, /Statistics restarted/);
+    let prevented = false;
+    tabs()[1].listeners.keydown({ key: "ArrowRight", preventDefault() { prevented = true; } }); await tick();
+    assert.equal(prevented, true);
+    assert.equal(calls.at(-1).params.p_device_type, "tablet");
+    tabs()[2].listeners.keydown({ key: "End", preventDefault() {} }); await tick();
+    assert.equal(calls.at(-1).params.p_device_type, "unknown");
+    tabs()[4].listeners.keydown({ key: "Home", preventDefault() {} }); await tick();
+    assert.equal(calls.at(-1).params.p_device_type, "all");
+});
+
+test("device tabs remain usable during loading and errors, and stale responses cannot replace the selected device", async () => {
+    const pending = [];
+    const m = reportContext((_name, params) => new Promise(resolve => { pending.push({ resolve, device: params.p_device_type }); }));
+    m.c.renderAdminReviewList = () => { m.root.children = []; m.c.renderPlannerAnalyticsReport(m.root); };
+    const first = m.c.fetchPlannerAnalyticsReport();
+    let tabs = findReportNode(m.root, node => node.attributes?.role === "tablist");
+    assert.equal(tabs.children[0].children[1].textContent, "—");
+    assert.match(findReportNode(m.root, node => node.attributes?.role === "status").textContent, /Loading usage/);
+    assert.equal(findReportNode(m.root, node => node.tag === "table"), undefined);
+    tabs.children[1].listeners.click();
+    assert.equal(pending[1].device, "mobile");
+    pending[1].resolve({ error: new Error("missing migration") }); await tick();
+    assert.match(findReportNode(m.root, node => node.attributes?.role === "alert").textContent, /planner_analytics_devices.sql/);
+    tabs = findReportNode(m.root, node => node.attributes?.role === "tablist");
+    assert.equal(tabs.children[1].attributes["aria-selected"], "true");
+    assert.equal(findReportNode(m.root, node => node.tag === "table"), undefined);
+    pending[0].resolve({ data: { counts: { builder_opened: 99 } } }); await first;
+    assert.equal(vm.runInContext("plannerAnalyticsReport.data", m.c), null);
+    const retry = findReportNode(m.root, node => node.textContent === "Try again");
+    retry.listeners.click();
+    assert.equal(pending[2].device, "mobile");
+    pending[2].resolve({ data: { counts: { builder_opened: 3 }, devices: { mobile: 3 } } }); await tick();
+    assert.equal(vm.runInContext("plannerAnalyticsReport.data.counts.builder_opened", m.c), 3);
+    assert.equal(findReportNode(m.root, node => node.attributes?.role === "alert"), undefined);
+});
+
+test("signing out clears cached device statistics before rendering the report again", async () => {
+    const m = reportContext(async () => ({ data: { counts: { builder_opened: 7 }, devices: { desktop: 7 } } }));
+    await m.c.fetchPlannerAnalyticsReport();
+    m.c.adminPanelState.isAdmin = false;
+    m.c.renderPlannerAnalyticsReport(m.root);
+    assert.equal(m.root.children.length, 0);
+    assert.equal(vm.runInContext("plannerAnalyticsReport.data", m.c), null);
 });

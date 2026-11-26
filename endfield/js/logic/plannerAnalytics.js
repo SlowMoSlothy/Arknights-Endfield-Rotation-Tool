@@ -14,6 +14,21 @@
     let authVersion = 0;
     let sentBatch = false;
     let adminVisit = false;
+    // Classify once per page load; only the category is added to the event payload.
+    // Resizing a PC window or rotating a phone must not change the visit's group.
+    function detectDeviceType() {
+        try {
+            const ua = String(navigator.userAgent || "");
+            if (/iPad|Tablet|PlayBook|Silk/i.test(ua)
+                || (/Macintosh/i.test(ua) && Number(navigator.maxTouchPoints) > 1)) return "tablet";
+            if (/iPhone|iPod|Windows Phone/i.test(ua)) return "mobile";
+            if (/Android/i.test(ua)) return /Mobile/i.test(ua) || navigator.userAgentData?.mobile === true ? "mobile" : "tablet";
+            if (navigator.userAgentData?.mobile === true || /Mobile|Mobi/i.test(ua)) return "mobile";
+            if (/Windows NT|Macintosh|X11|CrOS|Linux/i.test(ua)) return "desktop";
+        } catch { /* Privacy tools may restrict browser hints. */ }
+        return "unknown";
+    }
+    const deviceType = detectDeviceType();
     const visitId = window.crypto?.randomUUID?.();
     const enabled = Boolean(visitId)
         && window.location.hostname === "rotationforge.gg"
@@ -114,6 +129,7 @@
         pending.push({
             event_name: name,
             entry_kind: entryKind,
+            device_type: deviceType,
             mode: typeof uiSettings !== "undefined" && uiSettings?.timelineMode === "simulation" ? "simulation" : "slot"
         });
         scheduleFlush();
