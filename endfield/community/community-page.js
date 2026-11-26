@@ -17,6 +17,30 @@ const discoverState = {
 };
 
 let toastTimeout = 0;
+const compactDiscoverQuery = window.matchMedia?.("(max-width: 680px)");
+let compactPreviewObserver = null;
+const compactPreviewLoaders = new WeakMap();
+
+function isCompactDiscoverView() {
+  return compactDiscoverQuery?.matches === true;
+}
+
+function observeCompactPreview(item, load) {
+  if (!isCompactDiscoverView()) return;
+  if (typeof window.IntersectionObserver !== "function") {
+    void load();
+    return;
+  }
+  if (!compactPreviewObserver) compactPreviewObserver = new window.IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting || observer !== compactPreviewObserver) return;
+      observer.unobserve(entry.target);
+      void compactPreviewLoaders.get(entry.target)?.();
+    });
+  }, { rootMargin: "200px" });
+  compactPreviewLoaders.set(item, load);
+  compactPreviewObserver.observe(item);
+}
 
 function list(value) {
   return Array.isArray(value) ? value : [];
@@ -248,17 +272,19 @@ function previewPopover(share) {
     requested = true;
     try {
       const actions = await loadPreviewActions(share);
-      const visible = actions.slice(0, 6);
       preview.replaceChildren();
-      if (!visible.length) {
+      if (!actions.length) {
         preview.appendChild(create("span", "preview-more", "No actions in this share"));
         return;
       }
-      visible.forEach((action, index) => {
-        if (index) preview.appendChild(create("span", "preview-arrow", "→"));
-        preview.appendChild(skillIcon(action));
+      preview.setAttribute("aria-label", `${actions.length} actions in rotation order`);
+      actions.forEach((action, index) => {
+        const step = create("span", `rotation-preview-step${index >= 6 ? " is-preview-extra" : ""}`);
+        if (index) step.appendChild(create("span", "preview-arrow", "→"));
+        step.appendChild(skillIcon(action));
+        preview.appendChild(step);
       });
-      if (actions.length > visible.length) preview.appendChild(create("span", "preview-more", `+${actions.length - visible.length}`));
+      if (actions.length > 6) preview.appendChild(create("span", "preview-more preview-overflow-count", `+${actions.length - 6}`));
     } catch (error) {
       console.warn(`Preview for ${share.short_code} could not be loaded:`, error);
       preview.replaceChildren(create("span", "preview-more", "Preview unavailable"));
@@ -330,10 +356,14 @@ function card(share) {
 
   const head = create("div", "card-head");
   const titleWrap = create("div", "card-title-wrap");
+  const title = create("h2", "card-title", share.title || "Untitled share");
+  title.title = title.textContent;
+  const byline = create("div", "card-meta-line");
+  byline.append(create("div", "author", text(share.author_name) || "Anonymous"),
+    create("div", "date", formatDate(share.created_at)));
   titleWrap.append(
-    create("h2", "card-title", share.title || "Untitled share"),
-    create("div", "author", text(share.author_name) || "Anonymous"),
-    create("div", "date", formatDate(share.created_at))
+    title,
+    byline
   );
   const open = create("a", "planner-link", "Open ↗");
   open.href = plannerUrl(share);
@@ -355,10 +385,13 @@ function card(share) {
   footer.appendChild(create("span", "stats", `${teamCount} operator${teamCount === 1 ? "" : "s"}`));
   const copy = create("button", "copy-button", "Copy");
   copy.type = "button";
+  copy.setAttribute("aria-label", `Copy link to ${share.title || share.short_code}`);
   copy.addEventListener("click", () => copyShare(share, copy));
   footer.appendChild(copy);
-  item.appendChild(footer);
-  if (window.RotationShareEngagement) item.appendChild(window.RotationShareEngagement.create(share.short_code));
+  const bottom = create("div", "card-bottom");
+  bottom.appendChild(footer);
+  if (window.RotationShareEngagement) bottom.appendChild(window.RotationShareEngagement.create(share.short_code));
+  item.appendChild(bottom);
 
   const openShare = () => {
     window.location.href = plannerUrl(share);
@@ -368,7 +401,7 @@ function card(share) {
   item.addEventListener("click", event => {
     if (event.target.closest("a, button, input, select, textarea")) return;
     const hasPreciseHover = window.matchMedia?.("(hover: hover) and (pointer: fine)").matches;
-    if (!hasPreciseHover && !item.classList.contains("is-preview-open")) {
+    if (!isCompactDiscoverView() && !hasPreciseHover && !item.classList.contains("is-preview-open")) {
       event.preventDefault();
       document.querySelectorAll(".rotation-card.is-preview-open").forEach(card => card.classList.remove("is-preview-open"));
       item.classList.add("is-preview-open");
@@ -383,6 +416,7 @@ function card(share) {
     event.preventDefault();
     openShare();
   });
+  observeCompactPreview(item, preview.load);
   return item;
 }
 
@@ -441,6 +475,9 @@ function render() {
   const count = document.getElementById("rotationCount");
   const status = document.getElementById("rotationStatus");
   if (!grid || !empty || !count || !status) return;
+
+  compactPreviewObserver?.disconnect();
+  compactPreviewObserver = null;
 
   renderTabs();
   grid.replaceChildren();
@@ -582,6 +619,7 @@ function resetFilters() {
 }
 
 function init() {
+  compactDiscoverQuery?.addEventListener?.("change", render);
   const params = new URLSearchParams(window.location.search);
   discoverState.type = params.get("type") === "simulation" ? "simulation" : "rotation";
   const operatorId = Number(params.get("operator"));

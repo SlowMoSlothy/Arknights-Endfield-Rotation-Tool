@@ -13,8 +13,8 @@ test("Discover is a standalone directory linked from the planner", () => {
   assert.doesNotMatch(plannerHtml, /onclick="saveRotationInCommunity\(\)"/);
   assert.match(communityHtml, /<h1 id="pageTitle">Rotations &amp; Simulations<\/h1>/);
   assert.match(communityHtml, /id="rotationGrid"/);
-  assert.match(communityHtml, /style\.css\?v=6/);
-  assert.match(communityHtml, /community-page\.js\?v=8/);
+  assert.match(communityHtml, /style\.css\?v=7/);
+  assert.match(communityHtml, /community-page\.js\?v=9/);
 });
 
 test("Discover separates rotation and simulation shares", () => {
@@ -27,7 +27,6 @@ test("Discover separates rotation and simulation shares", () => {
   assert.match(communityScript, /event\.target\.closest\("a, button, input, select, textarea"\)/);
   assert.match(communityScript, /window\.location\.href = plannerUrl\(share\)/);
   assert.match(communityScript, /resolve_rotation_share/);
-  assert.match(communityScript, /actions\.slice\(0, 6\)/);
   assert.match(communityScript, /item\.addEventListener\("pointerenter", preview\.load\)/);
   assert.match(communityScript, /classList\.contains\("is-preview-open"\)/);
 });
