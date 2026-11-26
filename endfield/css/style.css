@@ -962,11 +962,29 @@
     }
 }
 
-/* Status icons keep stack counts when the original sprite has no numbered variant. */
+/* Each Infliction / Vulnerability stack adds one quarter of its white contour. */
+.planner-effect-with-stack-ring > img {
+    padding: 12%;
+    box-sizing: border-box;
+}
+.planner-effect-stack-ring {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    pointer-events: none;
+}
+
+/* Other stackable statuses retain numeric badges. */
 .planner-effect-stack-count {
     position: absolute;
-    right: -4px;
-    bottom: -5px;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
     min-width: 13px;
     padding: 0 2px;
     border: 1px solid #d9df8c;

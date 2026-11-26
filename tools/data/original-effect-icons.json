@@ -1,0 +1,1120 @@
+{
+  "source": "https://endfield-assets.fffdan.com",
+  "endpoint": "https://endfield-assets.fffdan.com/vfs/Bundle/search/ui/sprites/bufficon?suffix=.png",
+  "retrieved": "2026-11-26T15:49:05.962Z",
+  "assets": [
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/airborne.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/airborne.png",
+      "localPath": "assets/ui/effects/original/airborne.webp",
+      "bytes": 2666,
+      "sha256": "2896a6f0b8e664b516850d4e43260d008e20acf5bdb6f86efc515147dcde9dde"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_cryst_enhance.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_cryst_enhance.png",
+      "localPath": "assets/ui/effects/original/icon_battle_affix_cryst_enhance.webp",
+      "bytes": 2838,
+      "sha256": "6f9f80df26a8a106f90785b867104a511b70adfe2af2a592f7931617942be9bc"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_cryst_vulnerable.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_cryst_vulnerable.png",
+      "localPath": "assets/ui/effects/original/icon_battle_affix_cryst_vulnerable.webp",
+      "bytes": 2916,
+      "sha256": "1315b5737452658ad5af1c53f353eaebb051adef861da15a77646dbb3ef10b03"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_enhance.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_enhance.png",
+      "localPath": "assets/ui/effects/original/icon_battle_affix_enhance.webp",
+      "bytes": 1706,
+      "sha256": "3fcce13337390309a415049d52053abf854dcf5a72e1330279c34505f1210957"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_extra_inflict.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_extra_inflict.png",
+      "localPath": "assets/ui/effects/original/icon_battle_affix_extra_inflict.webp",
+      "bytes": 3306,
+      "sha256": "53d817345e5136f00e4ac358ca149b0c34b9ddd5e8f77daef07d4a1b4ae73000"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_fire_enhance.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_fire_enhance.png",
+      "localPath": "assets/ui/effects/original/icon_battle_affix_fire_enhance.webp",
+      "bytes": 2200,
+      "sha256": "a48e90f9a19a17cc94db74b691079efb1e6d76bb324cda0c8c63f17349f97e3e"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_fire_vulnerable.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_fire_vulnerable.png",
+      "localPath": "assets/ui/effects/original/icon_battle_affix_fire_vulnerable.webp",
+      "bytes": 2258,
+      "sha256": "7e675a3e2fa33d0f8e32785616ab9c2ab556d6bc38e57cf6cc637e04b210d529"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_natural_enhance.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_natural_enhance.png",
+      "localPath": "assets/ui/effects/original/icon_battle_affix_natural_enhance.webp",
+      "bytes": 2086,
+      "sha256": "adadbb1e7d4fbfdb0e7c1d1c99b71a930570a5695c4abd264d8ec8d47632ccbc"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_natural_vulnerable.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_natural_vulnerable.png",
+      "localPath": "assets/ui/effects/original/icon_battle_affix_natural_vulnerable.webp",
+      "bytes": 2166,
+      "sha256": "53eb298180f43880d0c80cb8e7c80979b6e5984e96187ee300bd1edc22b5690a"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_physical_enhance.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_physical_enhance.png",
+      "localPath": "assets/ui/effects/original/icon_battle_affix_physical_enhance.webp",
+      "bytes": 2226,
+      "sha256": "40cf38048793e0868c1e3d87e83846d4e27379f701f2a61dcd12a4f789c4a749"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_physical_vulnerable.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_physical_vulnerable.png",
+      "localPath": "assets/ui/effects/original/icon_battle_affix_physical_vulnerable.webp",
+      "bytes": 2138,
+      "sha256": "077b464baec9bcf00893eccb6e1b54c15e660b80f218b293917d7a2996fc92ce"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_pulse_enhance.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_pulse_enhance.png",
+      "localPath": "assets/ui/effects/original/icon_battle_affix_pulse_enhance.webp",
+      "bytes": 2294,
+      "sha256": "5670ba820580ffc24dc16d1db6eb170507b8e1c20eba2862504bea793d225991"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_pulse_vulnerable.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_pulse_vulnerable.png",
+      "localPath": "assets/ui/effects/original/icon_battle_affix_pulse_vulnerable.webp",
+      "bytes": 2172,
+      "sha256": "c1a8985d57ba76562fa152ce4f95504f80db3cb1f66a1abbd9f44ad000518e8b"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_shelter.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_shelter.png",
+      "localPath": "assets/ui/effects/original/icon_battle_affix_shelter.webp",
+      "bytes": 1646,
+      "sha256": "7011b9a741a1084f090d66b27a641909a7477b4d2207abe0f01a4535f3b087b6"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_silence.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_silence.png",
+      "localPath": "assets/ui/effects/original/icon_battle_affix_silence.webp",
+      "bytes": 1556,
+      "sha256": "3c42f677401f71e61636d646aa1b16c223d1c683d3d4b1354aa36a2337f65ec8"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_slow.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_slow.png",
+      "localPath": "assets/ui/effects/original/icon_battle_affix_slow.webp",
+      "bytes": 2106,
+      "sha256": "b6e3550e6f0d7515498e255043ac467e16b9040c12b3ef3a36e83ed24da378a8"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_speedup.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_speedup.png",
+      "localPath": "assets/ui/effects/original/icon_battle_affix_speedup.webp",
+      "bytes": 2178,
+      "sha256": "2f36889019c71d80ab55afe2d24be73133509cc02248acd13ee3bd76a3ed17e6"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_spell_enhance.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_spell_enhance.png",
+      "localPath": "assets/ui/effects/original/icon_battle_affix_spell_enhance.webp",
+      "bytes": 2238,
+      "sha256": "0007b605ef8230dfcb87425e3ae1ccee0c39a314842152828856e2c66612b34d"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_spell_vulnerable.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_spell_vulnerable.png",
+      "localPath": "assets/ui/effects/original/icon_battle_affix_spell_vulnerable.webp",
+      "bytes": 2294,
+      "sha256": "9603bf0a24b79cf8346026811a8142e09941dd0941f6efba0b9dc7e56d3dda16"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_vulnerable.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_vulnerable.png",
+      "localPath": "assets/ui/effects/original/icon_battle_affix_vulnerable.webp",
+      "bytes": 1498,
+      "sha256": "96c09ff58aef62032d08acc7b16008bf1973094e3c14a85c8b21e202bb8751ab"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_weak.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_affix_weak.png",
+      "localPath": "assets/ui/effects/original/icon_battle_affix_weak.webp",
+      "bytes": 2162,
+      "sha256": "970633419b06244fdbece6ed01182fdb71450ecd031a74e0b39a16e1d0250447"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_antal_buff.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_antal_buff.png",
+      "localPath": "assets/ui/effects/original/icon_battle_antal_buff.webp",
+      "bytes": 2342,
+      "sha256": "03e633a0ffe70ce0665561cef6a7e8cd61f70d84c6de099fc8ac5685a3454b33"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_atb_down.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_atb_down.png",
+      "localPath": "assets/ui/effects/original/icon_battle_atb_down.webp",
+      "bytes": 1832,
+      "sha256": "91bdfe29546d22ffd8b0648f4de0e4773d3daf52cac26197b2f3ef1df7947f58"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_atb_up.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_atb_up.png",
+      "localPath": "assets/ui/effects/original/icon_battle_atb_up.webp",
+      "bytes": 1978,
+      "sha256": "42c2b1955b2355ab01bcc32acb412f8750a66d2ae006d3d4c5cd08babb079132"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_boss_agtrinit_count_hdg034.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_boss_agtrinit_count_hdg034.png",
+      "localPath": "assets/ui/effects/original/icon_battle_boss_agtrinit_count_hdg034.webp",
+      "bytes": 3662,
+      "sha256": "eedf3c79351d838be8d836be01eb0b480bb5b7718c2fb53f6a1d53e94960740f"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_atk_down.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_atk_down.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_atk_down.webp",
+      "bytes": 2760,
+      "sha256": "7bcebb0b63ceaa39d446d963e3966efe38b04b97e3120e0b45797c53ebde28ee"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_atk_up.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_atk_up.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_atk_up.webp",
+      "bytes": 2450,
+      "sha256": "d5b2f5029d07d57f4a3917173eb01bb2c1115c286069f016b8e0d60ac914cc11"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_chr_no_lastcombo_stop_atb_recove.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_chr_no_lastcombo_stop_atb_recove.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_chr_no_lastcombo_stop_atb_recove.webp",
+      "bytes": 2254,
+      "sha256": "7a599d2a375a39e1d67befcdcbcf244f1e617446e07f3e4478d1147278f434d8"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_countdown.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_countdown.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_countdown.webp",
+      "bytes": 1596,
+      "sha256": "9cdbd78daeb481fa1540de4e636852ccb20d47932471b21c9bd8848ae01c3495"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_countdown02.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_countdown02.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_countdown02.webp",
+      "bytes": 1540,
+      "sha256": "706a3f6487a165a4548c4ec8cd7f34f383a973a7547a275639e0bdadab3c559c"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_cryst_res_down.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_cryst_res_down.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_cryst_res_down.webp",
+      "bytes": 2360,
+      "sha256": "c65750f2d6d71820e8222e1de2375e78fbaf3e378e9a5a60a81e137ff10615d7"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_def_down.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_def_down.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_def_down.webp",
+      "bytes": 1824,
+      "sha256": "2b220b80052941524af5cd6a16d4f805e212e96c48d39ef093f559c9c6b36c5b"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_def_up.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_def_up.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_def_up.webp",
+      "bytes": 1376,
+      "sha256": "cc50e09aecf47a39347e5d0aa41d0719e29e80a609afbd4a90d9edc5368c3166"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_fire_res_down.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_fire_res_down.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_fire_res_down.webp",
+      "bytes": 2060,
+      "sha256": "b9c5f163f2f5f5099cb7d6300761d6503f438d96e3733ea623a2d8637bcdaab5"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_heal.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_heal.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_heal.webp",
+      "bytes": 1548,
+      "sha256": "dfb153596446bba362a5a0d7d595fd48e51f39429ed4fb0f20254aadfe828f5e"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_jsspsi_inkmark.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_jsspsi_inkmark.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_jsspsi_inkmark.webp",
+      "bytes": 2762,
+      "sha256": "daaefda7d250c4b20a2808d520165cca86d0c172639b8868b92cb7feade401c1"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_liino_inspire.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_liino_inspire.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_liino_inspire.webp",
+      "bytes": 2460,
+      "sha256": "7be166e4bed81fdc179011a3a9fb4c9aa01268b57582bfbe9998dc7b066ee681"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_liino_normalskill_hit.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_liino_normalskill_hit.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_liino_normalskill_hit.webp",
+      "bytes": 2140,
+      "sha256": "a7c6634ec3e22f158c515e77bd771987cab92c0b30e4c00378f78ce0e7408fd1"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_liino_normalskill_music.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_liino_normalskill_music.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_liino_normalskill_music.webp",
+      "bytes": 1980,
+      "sha256": "10f5202f3c56483ad4d21f7db118f2d764227d801325851f2211c9a1bc6b3347"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_liino_ultskill_music.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_liino_ultskill_music.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_liino_ultskill_music.webp",
+      "bytes": 3000,
+      "sha256": "dcb93dd4c854d7d70593d89792b7072478c54060fa32b52348bd62e8def59b78"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_lizhiyan_combo_seal.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_lizhiyan_combo_seal.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_lizhiyan_combo_seal.webp",
+      "bytes": 2806,
+      "sha256": "56633c70370de9011b36c1c553ba383c96b40d2b83e80500b878dea4e3499623"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_lizhiyan_combo_vulnerable.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_lizhiyan_combo_vulnerable.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_lizhiyan_combo_vulnerable.webp",
+      "bytes": 2640,
+      "sha256": "878efdc1e4057cb8affd0d6ed0119473e64c42a55a26da9d0e337c3802194176"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_mimino_bomb_countdown.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_mimino_bomb_countdown.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_mimino_bomb_countdown.webp",
+      "bytes": 2044,
+      "sha256": "f5c1f136c3d69c425797cc4ffc72fb90d43937ef0f9d1fc400ce65848472c5cc"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_minghe_thundertrigger.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_minghe_thundertrigger.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_minghe_thundertrigger.webp",
+      "bytes": 3076,
+      "sha256": "983a3bc8cafc40b17aeb24cc1d79633eed5f8262c7e3b325af7d9322b503debf"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_natural_res_down.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_natural_res_down.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_natural_res_down.webp",
+      "bytes": 2164,
+      "sha256": "1f54737408264370241babc81d45e517f2111552e91db8bf8e9e2744d89243f0"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_phy_res_down.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_phy_res_down.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_phy_res_down.webp",
+      "bytes": 2024,
+      "sha256": "24d781d42d5f71b4de045f3288df5d70a2e2e2eaa30024c173a92c82c0a60875"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_pulse_res_down.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_pulse_res_down.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_pulse_res_down.webp",
+      "bytes": 2048,
+      "sha256": "b2763bd10937517b4e5ee0fafba01dae92e387d23246b2921ca970e774302a18"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_purrche_talent_01.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_purrche_talent_01.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_purrche_talent_01.webp",
+      "bytes": 832,
+      "sha256": "3f5127ee72a306fd679a5b73ae39ade8b7c4992f96d61ce91c975895982332b0"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_purrche_talent_02.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_purrche_talent_02.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_purrche_talent_02.webp",
+      "bytes": 664,
+      "sha256": "3f7e3e8ee28456e1ac207a49a3fe2ff69890fd2a3402cc19883c341f7618bdec"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_purrche_ult_vulnerable.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_purrche_ult_vulnerable.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_purrche_ult_vulnerable.webp",
+      "bytes": 2806,
+      "sha256": "42eabfd06585c0e7376073df02c0be233be0fedac8df07de6aa23f6726bb5101"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_typhoea_sheild.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_typhoea_sheild.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_typhoea_sheild.webp",
+      "bytes": 728,
+      "sha256": "e25e5c36c527f26a0f47e85ad050baf39d346ab6025d71cc6fb7238f8029ee7d"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_typhoea_sheild_broken.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_typhoea_sheild_broken.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_typhoea_sheild_broken.webp",
+      "bytes": 2878,
+      "sha256": "aaad3c30d143b5e19ea218471e5c19064707f76cf9c7a39a7cd55db6a083a68a"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_ult_laser.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_ult_laser.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_ult_laser.webp",
+      "bytes": 2516,
+      "sha256": "f66908b1627ae708773365e37b809184befe358171aa90bd9974961b13e82ea2"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_ult_skill.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_ult_skill.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_ult_skill.webp",
+      "bytes": 2438,
+      "sha256": "f145e7b1ff11456a07770cb5c7aa64bd73b1cf64594e6dfb8d500a7977b16eb6"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_wpn_funnel_0019.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_wpn_funnel_0019.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_wpn_funnel_0019.webp",
+      "bytes": 3032,
+      "sha256": "8cb45048bd7bd78abae57feba77a33a99e34433613e2572f3d8f008df448f230"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_wpn_sword_0022.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_wpn_sword_0022.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_wpn_sword_0022.webp",
+      "bytes": 2184,
+      "sha256": "6fa7f340473e29cf22bdb0643436628b2e285553f93f54f7cb95365d84829d50"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_wpn_sword_0026.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_wpn_sword_0026.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_wpn_sword_0026.webp",
+      "bytes": 2592,
+      "sha256": "029c70fd1312ac983bd29938984c5315093ed411cd5e18f26f38e14be49ae695"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_wulfa_blood.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_buff_wulfa_blood.png",
+      "localPath": "assets/ui/effects/original/icon_battle_buff_wulfa_blood.webp",
+      "bytes": 3208,
+      "sha256": "a9e469988bbf65c4c45083b4f31c9e0fcc3b9cc02398a561af3520a9559996f6"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_burning.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_burning.png",
+      "localPath": "assets/ui/effects/original/icon_battle_burning.webp",
+      "bytes": 2284,
+      "sha256": "0faa69638c57367a563e4051ad70ef9c8aa69680ff71a97614ee08a5a9f6c696"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_camille_normal_skill_bat.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_camille_normal_skill_bat.png",
+      "localPath": "assets/ui/effects/original/icon_battle_camille_normal_skill_bat.webp",
+      "bytes": 2794,
+      "sha256": "fc1cc2e0af3846cb69e6dbff2922ffae26b3c211db859a87fe25d74ad58f1c4b"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_camille_ult_state.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_camille_ult_state.png",
+      "localPath": "assets/ui/effects/original/icon_battle_camille_ult_state.webp",
+      "bytes": 2020,
+      "sha256": "d719f36eb354d4c96bc23b0d6777a4db45335ac9d1fc41daecbbd7f90d90a503"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_chr_no_lastcombo_weak.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_chr_no_lastcombo_weak.png",
+      "localPath": "assets/ui/effects/original/icon_battle_chr_no_lastcombo_weak.webp",
+      "bytes": 2510,
+      "sha256": "c9631e0f2f1adb07ef88f690bba5ea421b3b487a8e9c00c27ab7eefb231d1c4a"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_clear_inflict_and_abnormal.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_clear_inflict_and_abnormal.png",
+      "localPath": "assets/ui/effects/original/icon_battle_clear_inflict_and_abnormal.webp",
+      "bytes": 2386,
+      "sha256": "292a41e7cfcbb408b95ad42efae5e4885aca5b0ae81c2e6f5a158d7f2f2f2d28"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_combo_skill_dmg_up.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_combo_skill_dmg_up.png",
+      "localPath": "assets/ui/effects/original/icon_battle_combo_skill_dmg_up.webp",
+      "bytes": 2512,
+      "sha256": "d1e03cd9d6bfaf2d048535fe8cf9495d5961dc0c5bfef2a328b8a67a02b4e8c5"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_conduct.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_conduct.png",
+      "localPath": "assets/ui/effects/original/icon_battle_conduct.webp",
+      "bytes": 2992,
+      "sha256": "8696377da477ff27db3fe2d4e93fb1c95d32359a1496af78c2456ea18dbc59cd"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_continuous_healing.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_continuous_healing.png",
+      "localPath": "assets/ui/effects/original/icon_battle_continuous_healing.webp",
+      "bytes": 1658,
+      "sha256": "da8351d77d53602b490fc46bfb6a44c5d87cacd2d09244ba4476c123ecc5d056"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_corrupt.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_corrupt.png",
+      "localPath": "assets/ui/effects/original/icon_battle_corrupt.webp",
+      "bytes": 1952,
+      "sha256": "140c4e84aae66094f5f7f11d6f695c028e81fb4f4c75ae3995bf6376fbe23099"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_count_hdg034.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_count_hdg034.png",
+      "localPath": "assets/ui/effects/original/icon_battle_count_hdg034.webp",
+      "bytes": 2906,
+      "sha256": "b69b4c36c0edc2c1e4b0c4d99509c90f12a7ab0d92c91f58fe174a7cba4a6665"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_crit_rate_up.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_crit_rate_up.png",
+      "localPath": "assets/ui/effects/original/icon_battle_crit_rate_up.webp",
+      "bytes": 2616,
+      "sha256": "36d789014c9a866cfc36d2dedc93dae7d8f5dc18e24ababa485f5526925da417"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_crit_up.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_crit_up.png",
+      "localPath": "assets/ui/effects/original/icon_battle_crit_up.webp",
+      "bytes": 2796,
+      "sha256": "dede9c4c1a1bab04a71975febf24fba623215ae9861d23fbc6668bdef67c1245"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_cryst_dmg_down.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_cryst_dmg_down.png",
+      "localPath": "assets/ui/effects/original/icon_battle_cryst_dmg_down.webp",
+      "bytes": 2928,
+      "sha256": "a28d7ee49a9199deb17e73c80ebf6a8c55f0d6b5c4954cc2b387acf33bda4887"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_cryst_dmg_up.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_cryst_dmg_up.png",
+      "localPath": "assets/ui/effects/original/icon_battle_cryst_dmg_up.webp",
+      "bytes": 2868,
+      "sha256": "cba32875a650118fcfc564919be08953ab11479fa528be768eb026deaa8eff88"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_cryst_taken_up.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_cryst_taken_up.png",
+      "localPath": "assets/ui/effects/original/icon_battle_cryst_taken_up.webp",
+      "bytes": 2276,
+      "sha256": "2cfc788965c88e2a14b6a6084bf66f7836647a8b1282d3e9eca4e7cac5f29b8b"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_dapan_buff.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_dapan_buff.png",
+      "localPath": "assets/ui/effects/original/icon_battle_dapan_buff.webp",
+      "bytes": 2150,
+      "sha256": "78ecf45edc02e0fcce963decb38597bbbcb599e07def00ff3026c1c7a392f8d8"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_eny_inkcommon_layer.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_eny_inkcommon_layer.png",
+      "localPath": "assets/ui/effects/original/icon_battle_eny_inkcommon_layer.webp",
+      "bytes": 2816,
+      "sha256": "4c3cee108cf6386fe6f7fe646e1a5e199751fe752ab6af00aa4824a6c90e0107"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_eny_resist_inflict.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_eny_resist_inflict.png",
+      "localPath": "assets/ui/effects/original/icon_battle_eny_resist_inflict.webp",
+      "bytes": 3302,
+      "sha256": "ecdd9007737a3742c56bad21418c19f34611c03e35c35e9b519747b864c5369d"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_eny_resist_inflict_cryst.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_eny_resist_inflict_cryst.png",
+      "localPath": "assets/ui/effects/original/icon_battle_eny_resist_inflict_cryst.webp",
+      "bytes": 2794,
+      "sha256": "168652a405085be5e42c757c928a72f8563acbef8e8629a8d1e691bda5975d60"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_eny_resist_inflict_fire.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_eny_resist_inflict_fire.png",
+      "localPath": "assets/ui/effects/original/icon_battle_eny_resist_inflict_fire.webp",
+      "bytes": 2178,
+      "sha256": "a90f72199fd97fa51bbb2de664347c3f9811f8952b14e09976763dbc002f9574"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_eny_resist_inflict_natural.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_eny_resist_inflict_natural.png",
+      "localPath": "assets/ui/effects/original/icon_battle_eny_resist_inflict_natural.webp",
+      "bytes": 2232,
+      "sha256": "23d41470ab38e5ccbe90a6644bb93c68ee9ccfad99af43c9c7ca7d26afb642cb"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_eny_resist_inflict_phy.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_eny_resist_inflict_phy.png",
+      "localPath": "assets/ui/effects/original/icon_battle_eny_resist_inflict_phy.webp",
+      "bytes": 2594,
+      "sha256": "6f78eed26dd7aeb2f3b12e8aa5d666777bb2d03c290993b65bc014a75c9d61b0"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_eny_resist_inflict_pulse.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_eny_resist_inflict_pulse.png",
+      "localPath": "assets/ui/effects/original/icon_battle_eny_resist_inflict_pulse.webp",
+      "bytes": 2542,
+      "sha256": "01c4ef2dc7242e0bff6d77c23711395c617cdd3a551959c29aa3b2e5022f07f3"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_fire_dmg_down.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_fire_dmg_down.png",
+      "localPath": "assets/ui/effects/original/icon_battle_fire_dmg_down.webp",
+      "bytes": 2032,
+      "sha256": "103f225b9066c5cf8e1a563a3dc1555f188b26ffef49cb01d0fc1ef07b13d42e"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_fire_dmg_up.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_fire_dmg_up.png",
+      "localPath": "assets/ui/effects/original/icon_battle_fire_dmg_up.webp",
+      "bytes": 2354,
+      "sha256": "4d58604771d9aa69389e1d6f5c766718762b512778b5fa68d66d796c91e2cd7a"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_fire_dmp_up.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_fire_dmp_up.png",
+      "localPath": "assets/ui/effects/original/icon_battle_fire_dmp_up.webp",
+      "bytes": 1904,
+      "sha256": "3151489af90aae98a973238f94d4d0cb7fcbb751a866af72fac27e6342719f36"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_fire_taken_up.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_fire_taken_up.png",
+      "localPath": "assets/ui/effects/original/icon_battle_fire_taken_up.webp",
+      "bytes": 2052,
+      "sha256": "aa2b10a87171d8ecc1f6ec688fafeeebe0e8b34d81c62d1d7935e11d5197858e"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_fracture.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_fracture.png",
+      "localPath": "assets/ui/effects/original/icon_battle_fracture.webp",
+      "bytes": 1912,
+      "sha256": "ba172b2cdc91bdd3458dc13a61d05959e075083996b871b7311ea94dbe7e071d"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_frozen.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_frozen.png",
+      "localPath": "assets/ui/effects/original/icon_battle_frozen.webp",
+      "bytes": 2990,
+      "sha256": "f6dcea3bc3382ffb76777625ecd4fde16cc503902b735b4bbe9ab5a56bdcaa71"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_heal_no_infliction_or_noguard.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_heal_no_infliction_or_noguard.png",
+      "localPath": "assets/ui/effects/original/icon_battle_heal_no_infliction_or_noguard.webp",
+      "bytes": 2322,
+      "sha256": "1873d337346f3c06625f1724fea1bbd4f612629b0e596ed8c39fdcef0f574d7f"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_ikut_talent_1.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_ikut_talent_1.png",
+      "localPath": "assets/ui/effects/original/icon_battle_ikut_talent_1.webp",
+      "bytes": 2486,
+      "sha256": "be52b945008dc986a7491fd23e550fda51de9e3c2abfeb224e25a7b5f5884bb2"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_laevat_potential_1.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_laevat_potential_1.png",
+      "localPath": "assets/ui/effects/original/icon_battle_laevat_potential_1.webp",
+      "bytes": 1744,
+      "sha256": "c7a73844787cb48e904e506ae9a6a7dcbe689ad42d9723bd6bb7cb34eb47faab"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_lastrite_buff.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_lastrite_buff.png",
+      "localPath": "assets/ui/effects/original/icon_battle_lastrite_buff.webp",
+      "bytes": 2846,
+      "sha256": "9b55631361ce0b8d77d2adf5a88be7633a044f0e6f906640663bba04420b27cc"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_lifeng_potential_5.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_lifeng_potential_5.png",
+      "localPath": "assets/ui/effects/original/icon_battle_lifeng_potential_5.webp",
+      "bytes": 2036,
+      "sha256": "84cf50023c8d4f55c9df6dac7cec5ef44a67323950df1521990764f030ff88a9"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_natural_dmg_down.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_natural_dmg_down.png",
+      "localPath": "assets/ui/effects/original/icon_battle_natural_dmg_down.webp",
+      "bytes": 1884,
+      "sha256": "d36f69cbd9a7b2dbe0fbac947c2735dc533672a758e1858742f363b946917ca6"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_natural_dmg_up.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_natural_dmg_up.png",
+      "localPath": "assets/ui/effects/original/icon_battle_natural_dmg_up.webp",
+      "bytes": 2218,
+      "sha256": "c1f6bf49fd68f47efa0448d0fdfeb7c7bc7bc1e09c99527ece69a62e74f4554a"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_natural_up.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_natural_up.png",
+      "localPath": "assets/ui/effects/original/icon_battle_natural_up.webp",
+      "bytes": 1876,
+      "sha256": "f10d4fa456f679d3ef9c0e6f673b8d42726f005846376563f3ae9f4feb97f6bc"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_nature_taken_up.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_nature_taken_up.png",
+      "localPath": "assets/ui/effects/original/icon_battle_nature_taken_up.webp",
+      "bytes": 1902,
+      "sha256": "af024e1e9a6c58789afd1abb9ed1394fde7106d01988503c35e291ed86158a39"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_no_guard.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_no_guard.png",
+      "localPath": "assets/ui/effects/original/icon_battle_no_guard.webp",
+      "bytes": 1752,
+      "sha256": "52a229db1ea7e5759809a25d8d21623cd2273ee9cc1e72a679461152737c178b"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_outzone_dmg_down.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_outzone_dmg_down.png",
+      "localPath": "assets/ui/effects/original/icon_battle_outzone_dmg_down.webp",
+      "bytes": 3224,
+      "sha256": "615cb140397d64da55ace27b7b8a1c4644b2c9ac449a198ca39ef0ee7cbe2bdd"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_physical_dmg_down.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_physical_dmg_down.png",
+      "localPath": "assets/ui/effects/original/icon_battle_physical_dmg_down.webp",
+      "bytes": 2312,
+      "sha256": "60f023cecf87f4b2d57772a1b253e93ada322167ea33ce2cf7ac617de2131e56"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_physical_dmg_up.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_physical_dmg_up.png",
+      "localPath": "assets/ui/effects/original/icon_battle_physical_dmg_up.webp",
+      "bytes": 2090,
+      "sha256": "72921c50c9adf19a2f6f1d1cbab30311982e8a8489d9b3c1db3a7c8bbebe34cf"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_physical_infliction_up.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_physical_infliction_up.png",
+      "localPath": "assets/ui/effects/original/icon_battle_physical_infliction_up.webp",
+      "bytes": 2574,
+      "sha256": "62edf75e6fad38c72ab493e3a53218c093cad688390e11aed5bd5813eeec3946"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_pograni_buff.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_pograni_buff.png",
+      "localPath": "assets/ui/effects/original/icon_battle_pograni_buff.webp",
+      "bytes": 1934,
+      "sha256": "7a07cd622847cd204d868b1c0ab0a0c0e0d0e43298da048d4c88cea971059373"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_pograni_talent_1.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_pograni_talent_1.png",
+      "localPath": "assets/ui/effects/original/icon_battle_pograni_talent_1.webp",
+      "bytes": 2288,
+      "sha256": "c5edfef671bec4853c2a64293fddbc70265715e247c546733b907c563752bf73"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_primary_attribute_all_up.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_primary_attribute_all_up.png",
+      "localPath": "assets/ui/effects/original/icon_battle_primary_attribute_all_up.webp",
+      "bytes": 2860,
+      "sha256": "5836aa34d70ba179491837f5705da4d59c94492a63f733d813972cf749a9d0a9"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_pulse_dmg_down.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_pulse_dmg_down.png",
+      "localPath": "assets/ui/effects/original/icon_battle_pulse_dmg_down.webp",
+      "bytes": 1986,
+      "sha256": "ed8f26361b90c2c49f1a2895295bc15ef44175c97d49f3da6e4af7c4afc82cd7"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_pulse_dmg_up.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_pulse_dmg_up.png",
+      "localPath": "assets/ui/effects/original/icon_battle_pulse_dmg_up.webp",
+      "bytes": 2142,
+      "sha256": "437eae5011a3086ed0255ca8706084d74e59c4c03321dfff14bf77149a2593ae"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_pulse_taken_up.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_pulse_taken_up.png",
+      "localPath": "assets/ui/effects/original/icon_battle_pulse_taken_up.webp",
+      "bytes": 1974,
+      "sha256": "d22dc3e5bfc87e9ad32c3491547800666a018212c246544a403c7b1ef25383f6"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_shield.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_shield.png",
+      "localPath": "assets/ui/effects/original/icon_battle_shield.webp",
+      "bytes": 1386,
+      "sha256": "0a544cb89817e17183788f51fe760ef05ee77c98d0bf78e10d0207829780330f"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_slbomb_1.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_slbomb_1.png",
+      "localPath": "assets/ui/effects/original/icon_battle_slbomb_1.webp",
+      "bytes": 2662,
+      "sha256": "81d9444f29b30d035daabaaa2082268c788d6d633dd9d9326582622f53fbee16"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_spell_taken_up.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_spell_taken_up.png",
+      "localPath": "assets/ui/effects/original/icon_battle_spell_taken_up.webp",
+      "bytes": 1912,
+      "sha256": "ac94cbdf79276625c1f9e6004de595e76f892f113e2e37793afdf9e7b54df982"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_spell_up.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_spell_up.png",
+      "localPath": "assets/ui/effects/original/icon_battle_spell_up.webp",
+      "bytes": 2674,
+      "sha256": "19fccb28a76209a354ddad520f5b4dd3ef327b1e0eeeb36cae2277141915e7e5"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_tangtang_comboskillwater.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_tangtang_comboskillwater.png",
+      "localPath": "assets/ui/effects/original/icon_battle_tangtang_comboskillwater.webp",
+      "bytes": 2812,
+      "sha256": "29d3a7a7d9aa56e1e7d739be823d928f95553680f60074405a1f8015c689a69f"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_tangtang_speedup.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_tangtang_speedup.png",
+      "localPath": "assets/ui/effects/original/icon_battle_tangtang_speedup.webp",
+      "bytes": 2410,
+      "sha256": "eb0443a0858c7e1fff77e49b7ce2623c5b31c42e47a73e386bdf615228272da3"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_tangtang_ultskilldebuff.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_tangtang_ultskilldebuff.png",
+      "localPath": "assets/ui/effects/original/icon_battle_tangtang_ultskilldebuff.webp",
+      "bytes": 3008,
+      "sha256": "48a06e9baa1d32663307269f502736f132f3bc2aa5328f12a6dd5f65baed059e"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_weapon_atk_skill_ready.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_weapon_atk_skill_ready.png",
+      "localPath": "assets/ui/effects/original/icon_battle_weapon_atk_skill_ready.webp",
+      "bytes": 1922,
+      "sha256": "42fde7b5fd7187f503807fca570f17672a7420095c1e036a3541dbfc6a16f09a"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_weapon_heal_skill_ready.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_weapon_heal_skill_ready.png",
+      "localPath": "assets/ui/effects/original/icon_battle_weapon_heal_skill_ready.webp",
+      "bytes": 1750,
+      "sha256": "b860d2a4bcb2a27a0815d53368d63d2e18144786a7e5ef704abe5398fd394dae"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_wolfgd_talent_1.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_wolfgd_talent_1.png",
+      "localPath": "assets/ui/effects/original/icon_battle_wolfgd_talent_1.webp",
+      "bytes": 1526,
+      "sha256": "bf185ddbabf92d66d4343a9b2f6bbb19359a440e68f0d74c758c270be7abd1a1"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_yvonne_buff.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_yvonne_buff.png",
+      "localPath": "assets/ui/effects/original/icon_battle_yvonne_buff.webp",
+      "bytes": 3382,
+      "sha256": "9e37e06aa39fbdbfb23bdbf24e718e6c18ef8ad63f9fe076819d9f9466cda4da"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_zhuangfy_debuff_01.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_zhuangfy_debuff_01.png",
+      "localPath": "assets/ui/effects/original/icon_battle_zhuangfy_debuff_01.webp",
+      "bytes": 2112,
+      "sha256": "e5c3e30d451a0ffdeaa2a1578ba34dd0393c7be861ded03aa479656f35fe15a8"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_zhuangfy_have_sword.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_battle_zhuangfy_have_sword.png",
+      "localPath": "assets/ui/effects/original/icon_battle_zhuangfy_have_sword.webp",
+      "bytes": 2262,
+      "sha256": "9bbb41d9dbd8a725a1572593e196a87019ec010e53c95e9fe6fc47b704766401"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_buff_heal.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_buff_heal.png",
+      "localPath": "assets/ui/effects/original/icon_buff_heal.webp",
+      "bytes": 1888,
+      "sha256": "bc116e7fe0f013199defc3ff9562fef2e4a3f0abd4e62f175c634e96c799b278"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_buff_status_armour.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_buff_status_armour.png",
+      "localPath": "assets/ui/effects/original/icon_buff_status_armour.webp",
+      "bytes": 3294,
+      "sha256": "ad48ed05f6019351b29aac29f69803ed12987dc59e45f236d3685aa7f6e8d0c2"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_damagetxt_airborne.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_damagetxt_airborne.png",
+      "localPath": "assets/ui/effects/original/icon_damagetxt_airborne.webp",
+      "bytes": 536,
+      "sha256": "9d955babf6da9a3e23822f0bb65351a8a473627c536053bdca2e6cb6d42f5f50"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_damagetxt_crush.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_damagetxt_crush.png",
+      "localPath": "assets/ui/effects/original/icon_damagetxt_crush.webp",
+      "bytes": 548,
+      "sha256": "68756a75fdf606a02842248b5806394d721361021c09136b812b3b2817f614d1"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_damagetxt_fixed.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_damagetxt_fixed.png",
+      "localPath": "assets/ui/effects/original/icon_damagetxt_fixed.webp",
+      "bytes": 2918,
+      "sha256": "2493aa962a5b546b53a0b6f56ea3e5a5c595547b0685b66f65a1ea93d0511cc2"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_damagetxt_fracture.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_damagetxt_fracture.png",
+      "localPath": "assets/ui/effects/original/icon_damagetxt_fracture.webp",
+      "bytes": 902,
+      "sha256": "f9b2ab58ff3a2cc44e26429f70741ea867e45ec4547f1a7763a1cfa95062dcb9"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_damagetxt_knockdown.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_damagetxt_knockdown.png",
+      "localPath": "assets/ui/effects/original/icon_damagetxt_knockdown.webp",
+      "bytes": 594,
+      "sha256": "b29be4d835bd6b7ef61c415252bc3bd6d58436be5980914377f7ba69e1cf793e"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_fire.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_fire.png",
+      "localPath": "assets/ui/effects/original/icon_energy_fire.webp",
+      "bytes": 3602,
+      "sha256": "641db066aa8e0423ef3b11a142afbab4e8aeabba056e615fd16a535b3f469d6d"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_fusion_combust.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_fusion_combust.png",
+      "localPath": "assets/ui/effects/original/icon_energy_fusion_combust.webp",
+      "bytes": 3266,
+      "sha256": "57a817d41b6b1883d3b95e41b63a990e2cb8f02d59ff7bf18c35ba71db825b5f"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_fusion_condense.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_fusion_condense.png",
+      "localPath": "assets/ui/effects/original/icon_energy_fusion_condense.webp",
+      "bytes": 3922,
+      "sha256": "96da86bf630457fc189442592de75c7fc366e7caeec596f882fdbdbfd9f5a719"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_fusion_conduct.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_fusion_conduct.png",
+      "localPath": "assets/ui/effects/original/icon_energy_fusion_conduct.webp",
+      "bytes": 4630,
+      "sha256": "6151d01c4aa8046694d1b8ab6733b71222b94b909eaa0885184d2d55d3b33cd2"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_fusion_cryst.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_fusion_cryst.png",
+      "localPath": "assets/ui/effects/original/icon_energy_fusion_cryst.webp",
+      "bytes": 2322,
+      "sha256": "c2863565e8b098c0715142a5796ed2c72f7c5f8bd693b75d910c42129c7d34e6"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_fusion_fire.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_fusion_fire.png",
+      "localPath": "assets/ui/effects/original/icon_energy_fusion_fire.webp",
+      "bytes": 2768,
+      "sha256": "0c5aa72741c72c1756e879ead2a95563b70137f77a3d1533dc563b4f19b2ad8e"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_fusion_pulse.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_fusion_pulse.png",
+      "localPath": "assets/ui/effects/original/icon_energy_fusion_pulse.webp",
+      "bytes": 3532,
+      "sha256": "10eae31a545d81fb13c61aa482586685ef29f801ca399284cc262f2183ba4ddb"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_fusion_radiate.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_fusion_radiate.png",
+      "localPath": "assets/ui/effects/original/icon_energy_fusion_radiate.webp",
+      "bytes": 3910,
+      "sha256": "f483566dc15f78780cef556136e9cb3bbb8cef1ec07fc68fa983006a8d9752c0"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_fusion_shatter.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_fusion_shatter.png",
+      "localPath": "assets/ui/effects/original/icon_energy_fusion_shatter.webp",
+      "bytes": 4036,
+      "sha256": "be25731b7dc17613cc8fa99cdc9210a357f4edbd4981ef4cc2c31a22f3d8a679"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_fusion_shock.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_fusion_shock.png",
+      "localPath": "assets/ui/effects/original/icon_energy_fusion_shock.webp",
+      "bytes": 3792,
+      "sha256": "9d6f8578c3e159a223387cb0633a3d22b11e18fd069c9f1e642e284ecddbd75c"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_fusion_wither.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_fusion_wither.png",
+      "localPath": "assets/ui/effects/original/icon_energy_fusion_wither.webp",
+      "bytes": 3838,
+      "sha256": "ef8b07e1a1939c142038508e27f3d48316d948e1b29dde6673a15d37bee1ff7c"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_natural.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_natural.png",
+      "localPath": "assets/ui/effects/original/icon_energy_natural.webp",
+      "bytes": 3658,
+      "sha256": "285c297429594a25618afeec206c7537ad585764468ea005971532934de782db"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_pulse.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_energy_pulse.png",
+      "localPath": "assets/ui/effects/original/icon_energy_pulse.webp",
+      "bytes": 3784,
+      "sha256": "6d1886759392213b1342d8f7d3a31a43921f5fbd4b01ecc1054512f00f504b22"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_guide_battle_airborne.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_guide_battle_airborne.png",
+      "localPath": "assets/ui/effects/original/icon_guide_battle_airborne.webp",
+      "bytes": 606,
+      "sha256": "c868c771904001d5f21e95931c081d16b8ef5285320ea6d787fdbf84f7f0e279"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_guide_battle_crush.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_guide_battle_crush.png",
+      "localPath": "assets/ui/effects/original/icon_guide_battle_crush.webp",
+      "bytes": 660,
+      "sha256": "c3b3ca0f95cd490d417cdcefb5f4077643e74c7e4fd32ce2a0bf31e0ce0825e8"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_guide_battle_fracture.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_guide_battle_fracture.png",
+      "localPath": "assets/ui/effects/original/icon_guide_battle_fracture.webp",
+      "bytes": 1202,
+      "sha256": "def6b40ac87f340bbb1a6bd15348e84462d571912e55f622d9f1b1b25f5daa20"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_guide_battle_knockdown.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_guide_battle_knockdown.png",
+      "localPath": "assets/ui/effects/original/icon_guide_battle_knockdown.webp",
+      "bytes": 596,
+      "sha256": "d5ca21637a04bd35c5d22b634b9d1843fcef15df007dacc0acbecdafb8cc76c2"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_infliction_nature.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_infliction_nature.png",
+      "localPath": "assets/ui/effects/original/icon_infliction_nature.webp",
+      "bytes": 1422,
+      "sha256": "6b555701e20f407c260de0f71b7fead34c93a3cd7a594905e599603519c1fd50"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_laevat_energy_1.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_laevat_energy_1.png",
+      "localPath": "assets/ui/effects/original/icon_laevat_energy_1.webp",
+      "bytes": 382,
+      "sha256": "0e9d706c7e2aea33511838dd1994d882575663e157a3123ee7bf98a83dd7bf95"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_laevat_energy_2.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_laevat_energy_2.png",
+      "localPath": "assets/ui/effects/original/icon_laevat_energy_2.webp",
+      "bytes": 728,
+      "sha256": "3f0fb52372240ed80ebda9f4e4fb55caa9b2c5190716c6885c645c515712cc3a"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_laevat_energy_3.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_laevat_energy_3.png",
+      "localPath": "assets/ui/effects/original/icon_laevat_energy_3.webp",
+      "bytes": 890,
+      "sha256": "58a8aaab2188d607f1ff9228669dc8a63771b3ce25721a6c6c9724092cf57250"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_laevat_energy_4.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_laevat_energy_4.png",
+      "localPath": "assets/ui/effects/original/icon_laevat_energy_4.webp",
+      "bytes": 764,
+      "sha256": "9cdca7769e59eccd5d437a41d430c81338ad788ade415637961ffce438cdeaaa"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_laevat_energy_5.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_laevat_energy_5.png",
+      "localPath": "assets/ui/effects/original/icon_laevat_energy_5.webp",
+      "bytes": 968,
+      "sha256": "1c7c8774d8523162741458c616523897f172786a726d6c02eca157c8de39f8bf"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_shadow_attribute_atk.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_shadow_attribute_atk.png",
+      "localPath": "assets/ui/effects/original/icon_shadow_attribute_atk.webp",
+      "bytes": 2170,
+      "sha256": "ddb3e9882984cbc6d8c20d6ae51515a18890e6670cfaa2fe72a602f6eefde893"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_shadow_attribute_defense.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_shadow_attribute_defense.png",
+      "localPath": "assets/ui/effects/original/icon_shadow_attribute_defense.webp",
+      "bytes": 1464,
+      "sha256": "4a0384cb65bfed1f7c1d38bcbba72b778c7ae979c18bbe1f543d607789848001"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_shadow_attribute_penetrate.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_shadow_attribute_penetrate.png",
+      "localPath": "assets/ui/effects/original/icon_shadow_attribute_penetrate.webp",
+      "bytes": 1724,
+      "sha256": "cee7afa855048b26fb34aece9f211a0b9ecbc6cd73e75f40fad50d5ac42070ea"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_skill_endmin_debuff.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_skill_endmin_debuff.png",
+      "localPath": "assets/ui/effects/original/icon_skill_endmin_debuff.webp",
+      "bytes": 2194,
+      "sha256": "7ef8da522bd3f261511ec18dd210a02a060fae9438aa1381fc1caf0b52f1a838"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_skill_lifeng_debuff.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_skill_lifeng_debuff.png",
+      "localPath": "assets/ui/effects/original/icon_skill_lifeng_debuff.webp",
+      "bytes": 2252,
+      "sha256": "661301eb96a848603beee9e16fc41fb746562d85bf38bb4d894cd7466f3f1780"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_status_corrupt.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_status_corrupt.png",
+      "localPath": "assets/ui/effects/original/icon_status_corrupt.webp",
+      "bytes": 1952,
+      "sha256": "140c4e84aae66094f5f7f11d6f695c028e81fb4f4c75ae3995bf6376fbe23099"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_term_ba_crystbreak.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/icon_term_ba_crystbreak.png",
+      "localPath": "assets/ui/effects/original/icon_term_ba_crystbreak.webp",
+      "bytes": 2516,
+      "sha256": "e068fe62d84d0555c8ce30e2183ef536e3cf78c37d1754153e5a70c264d5490a"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/knockback.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/knockback.png",
+      "localPath": "assets/ui/effects/original/knockback.webp",
+      "bytes": 3032,
+      "sha256": "9eb2a04e69da798cface915318e61e8bc4a8f7b09b207a47b4524d1b7ed1b3fb"
+    },
+    {
+      "sourcePath": "assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/knockdown.png",
+      "sourceUrl": "https://endfield-assets.fffdan.com/vfs/Bundle/file/assets/beyond/dynamicassets/gameplay/ui/sprites/bufficon/knockdown.png",
+      "localPath": "assets/ui/effects/original/knockdown.webp",
+      "bytes": 2920,
+      "sha256": "2ce9ed504caf3c0b3544f666d1145ea85b1428a6fd11dfadbbe309b5837894d3"
+    }
+  ]
+}

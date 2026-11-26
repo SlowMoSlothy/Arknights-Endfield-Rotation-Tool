@@ -1,208 +1,235 @@
 {
   "source": "https://endfield-assets.fffdan.com/vfs/Bundle/file/",
-  "retrieved": "2026-11-03",
+  "retrieved": "2026-11-26",
   "effects": {
     "artful_intent": {
-      "icon": null,
-      "note": "No unambiguous dedicated original icon identified; hidden in compact icon trays, name retained in details"
+      "icon": "assets/ui/effects/original/icon_battle_buff_jsspsi_inkmark.webp",
+      "sourceFile": "icon_battle_buff_jsspsi_inkmark.png",
+      "retrieved": "2026-11-26",
+      "note": "Si (internal ID jsspsi) Battle Skill ink mark; inferred from original asset name and Artful Intent skill data."
     },
     "arts_amp": {
-      "icon": "assets/ui/effects/icon_battle_affix_spell_enhance.png",
-      "sourceFile": "icon_battle_affix_spell_enhance.png"
+      "icon": "assets/ui/effects/original/icon_battle_affix_spell_enhance.webp",
+      "sourceFile": "icon_battle_affix_spell_enhance.png",
+      "retrieved": "2026-11-26"
     },
     "arts_infliction": {
       "icon": null,
-      "note": "Generic planner event; no unique elemental status icon"
+      "note": "Generic Arts Infliction trigger; the element-specific statuses have original icons."
     },
     "arts_infliction_consumed": {
       "icon": null,
-      "note": "Generic planner event; no unique elemental status icon"
+      "note": "Generic consumption event; no unique elemental status."
     },
     "arts_reaction": {
       "icon": null,
-      "note": "Generic planner event; no unique elemental status icon"
+      "note": "Generic Arts Reaction trigger; individual reactions have their own original icons."
     },
     "arts_reaction_consumed": {
       "icon": null,
-      "note": "Generic planner event; no unique elemental status icon"
+      "note": "Generic reaction consumption event; no unique status."
     },
     "arts_susceptibility": {
-      "icon": "assets/ui/effects/icon_battle_affix_spell_vulnerable.png",
-      "sourceFile": "icon_battle_affix_spell_vulnerable.png"
+      "icon": "assets/ui/effects/original/icon_battle_affix_spell_vulnerable.webp",
+      "sourceFile": "icon_battle_affix_spell_vulnerable.png",
+      "retrieved": "2026-11-26"
     },
     "atk_up": {
-      "icon": "assets/ui/effects/icon_battle_buff_atk_up.png",
-      "sourceFile": "icon_battle_buff_atk_up.png"
+      "icon": "assets/ui/effects/original/icon_battle_buff_atk_up.webp",
+      "sourceFile": "icon_battle_buff_atk_up.png",
+      "retrieved": "2026-11-26"
     },
     "auxiliary_crystal": {
       "stackIcons": [
         "assets/operators/skills/xaihi/bs_small_1.png",
         "assets/operators/skills/xaihi/bs_small_2.png"
       ],
-      "note": "Existing Auxiliary Crystal stack artwork"
+      "note": "Retained existing numbered Auxiliary Crystal artwork; no unambiguous dedicated replacement in the original bufficon catalog."
     },
     "auxiliary_crystal_used_up": {
       "icon": null,
-      "note": "No unambiguous dedicated original icon identified; hidden in compact icon trays, name retained in details"
+      "note": "Crystal depletion trigger, not an active status."
     },
     "breach": {
-      "icon": "assets/ui/effects/icon_damagetxt_fracture.png",
-      "sourceFile": "icon_damagetxt_fracture.png"
+      "icon": "assets/ui/effects/original/icon_damagetxt_fracture.webp",
+      "sourceFile": "icon_damagetxt_fracture.png",
+      "retrieved": "2026-11-26"
     },
     "combustion": {
-      "icon": "assets/ui/effects/icon_battle_burning.png",
-      "sourceFile": "icon_battle_burning.png"
+      "icon": "assets/ui/effects/original/icon_battle_burning.webp",
+      "sourceFile": "icon_battle_burning.png",
+      "retrieved": "2026-11-26"
     },
     "combustion_consumed": {
-      "icon": "assets/ui/effects/icon_battle_burning.png",
-      "sourceFile": "icon_battle_burning.png"
+      "icon": "assets/ui/effects/original/icon_battle_burning.webp",
+      "sourceFile": "icon_battle_burning.png",
+      "retrieved": "2026-11-26"
     },
     "corrosion": {
-      "icon": "assets/ui/effects/icon_battle_corrupt.png",
-      "sourceFile": "icon_battle_corrupt.png"
+      "icon": "assets/ui/effects/original/icon_battle_corrupt.webp",
+      "sourceFile": "icon_battle_corrupt.png",
+      "retrieved": "2026-11-26"
     },
     "corrosion_consumed": {
-      "icon": "assets/ui/effects/icon_battle_corrupt.png",
-      "sourceFile": "icon_battle_corrupt.png"
+      "icon": "assets/ui/effects/original/icon_battle_corrupt.webp",
+      "sourceFile": "icon_battle_corrupt.png",
+      "retrieved": "2026-11-26"
     },
     "crit_up": {
-      "icon": "assets/ui/effects/icon_battle_crit_up.png",
-      "sourceFile": "icon_battle_crit_up.png"
+      "icon": "assets/ui/effects/original/icon_battle_crit_up.webp",
+      "sourceFile": "icon_battle_crit_up.png",
+      "retrieved": "2026-11-26"
     },
     "crush": {
-      "icon": "assets/ui/effects/icon_damagetxt_crush.png",
-      "sourceFile": "icon_damagetxt_crush.png"
+      "icon": "assets/ui/effects/original/icon_damagetxt_crush.webp",
+      "sourceFile": "icon_damagetxt_crush.png",
+      "retrieved": "2026-11-26"
     },
     "cryo_amp": {
-      "icon": "assets/ui/effects/icon_battle_affix_cryst_enhance.png",
-      "sourceFile": "icon_battle_affix_cryst_enhance.png"
+      "icon": "assets/ui/effects/original/icon_battle_affix_cryst_enhance.webp",
+      "sourceFile": "icon_battle_affix_cryst_enhance.png",
+      "retrieved": "2026-11-26"
     },
     "cryo_burst": {
       "icon": null,
-      "note": "No unambiguous dedicated original icon identified; hidden in compact icon trays, name retained in details"
+      "note": "Instant Cryo Burst damage event; no unambiguous dedicated status sprite identified."
     },
     "cryo_infliction": {
-      "stackIcons": [
-        "assets/ui/debuffs/cryo_infliction_1.png",
-        "assets/ui/debuffs/cryo_infliction_2.png",
-        "assets/ui/debuffs/cryo_infliction_3.png",
-        "assets/ui/debuffs/cryo_infliction_4.png"
-      ],
-      "note": "Existing stack-specific original artwork"
+      "icon": "assets/ui/effects/original/icon_energy_fusion_cryst.webp",
+      "sourceFile": "icon_energy_fusion_cryst.png",
+      "retrieved": "2026-11-26",
+      "note": "Original Cryo Infliction glyph; each stack adds a quarter of the white contour.",
+      "stackSegments": 4
     },
     "cryo_susceptibility": {
-      "icon": "assets/ui/effects/icon_battle_affix_cryst_vulnerable.png",
-      "sourceFile": "icon_battle_affix_cryst_vulnerable.png"
+      "icon": "assets/ui/effects/original/icon_battle_affix_cryst_vulnerable.webp",
+      "sourceFile": "icon_battle_affix_cryst_vulnerable.png",
+      "retrieved": "2026-11-26"
     },
     "dive_attack": {
       "icon": null,
-      "note": "No unambiguous dedicated original icon identified; hidden in compact icon trays, name retained in details"
+      "note": "Action trigger, not an active status."
     },
     "electric_amp": {
-      "icon": "assets/ui/effects/icon_battle_affix_pulse_enhance.png",
-      "sourceFile": "icon_battle_affix_pulse_enhance.png"
+      "icon": "assets/ui/effects/original/icon_battle_affix_pulse_enhance.webp",
+      "sourceFile": "icon_battle_affix_pulse_enhance.png",
+      "retrieved": "2026-11-26"
     },
     "electric_infliction": {
-      "stackIcons": [
-        "assets/ui/debuffs/electric_infliction_1.png",
-        "assets/ui/debuffs/electric_infliction_2.png",
-        "assets/ui/debuffs/electric_infliction_3.png",
-        "assets/ui/debuffs/electric_infliction_4.png"
-      ],
-      "note": "Existing stack-specific original artwork"
+      "icon": "assets/ui/effects/original/icon_energy_fusion_pulse.webp",
+      "sourceFile": "icon_energy_fusion_pulse.png",
+      "retrieved": "2026-11-26",
+      "note": "Original Electric Infliction glyph; each stack adds a quarter of the white contour.",
+      "stackSegments": 4
     },
     "electric_susceptibility": {
-      "icon": "assets/ui/effects/icon_battle_affix_pulse_vulnerable.png",
-      "sourceFile": "icon_battle_affix_pulse_vulnerable.png"
+      "icon": "assets/ui/effects/original/icon_battle_affix_pulse_vulnerable.webp",
+      "sourceFile": "icon_battle_affix_pulse_vulnerable.png",
+      "retrieved": "2026-11-26"
     },
     "electrification": {
-      "icon": "assets/ui/effects/icon_battle_conduct.png",
-      "sourceFile": "icon_battle_conduct.png"
+      "icon": "assets/ui/effects/original/icon_battle_conduct.webp",
+      "sourceFile": "icon_battle_conduct.png",
+      "retrieved": "2026-11-26"
     },
     "electrification_consumed": {
-      "icon": "assets/ui/effects/icon_battle_conduct.png",
-      "sourceFile": "icon_battle_conduct.png"
+      "icon": "assets/ui/effects/original/icon_battle_conduct.webp",
+      "sourceFile": "icon_battle_conduct.png",
+      "retrieved": "2026-11-26"
     },
     "final_strike": {
       "icon": null,
-      "note": "No unambiguous dedicated original icon identified; hidden in compact icon trays, name retained in details"
+      "note": "Action trigger, not an active status."
     },
     "firefang_vesperwings": {
-      "icon": null,
-      "note": "Camille status; Rossi's Ultimate glyph is unrelated. No verified dedicated status sprite identified; hidden in compact icon trays, name retained in details"
+      "icon": "assets/ui/effects/original/icon_battle_camille_normal_skill_bat.webp",
+      "sourceFile": "icon_battle_camille_normal_skill_bat.png",
+      "retrieved": "2026-11-26"
     },
     "focus": {
-      "icon": "assets/operators/skills/yvonne/cs_small.png",
-      "note": "Original source-skill glyph; distinct status sprite not identified"
+      "icon": "assets/ui/effects/original/icon_battle_antal_buff.webp",
+      "sourceFile": "icon_battle_antal_buff.png",
+      "retrieved": "2026-11-26",
+      "note": "Antal Focus; original operator-specific status glyph. Replaces unrelated Yvonne Combo Skill artwork."
     },
     "gloompurge_arts_amp": {
-      "icon": "assets/ui/effects/icon_battle_affix_spell_enhance.png",
-      "sourceFile": "icon_battle_affix_spell_enhance.png"
+      "icon": "assets/ui/effects/original/icon_battle_affix_spell_enhance.webp",
+      "sourceFile": "icon_battle_affix_spell_enhance.png",
+      "retrieved": "2026-11-26"
     },
     "gloompurger_array": {
-      "icon": "assets/operators/skills/zhuang/ult_small.png",
-      "note": "Original source-skill glyph; distinct status sprite not identified"
+      "icon": null,
+      "note": "Arcane area/trigger state; no dedicated status glyph identified in the complete bufficon catalog. Removed unrelated Zhuang Ultimate artwork. Name remains in inspectors."
     },
     "heat_amp": {
-      "icon": "assets/ui/effects/icon_battle_affix_fire_enhance.png",
-      "sourceFile": "icon_battle_affix_fire_enhance.png"
+      "icon": "assets/ui/effects/original/icon_battle_affix_fire_enhance.webp",
+      "sourceFile": "icon_battle_affix_fire_enhance.png",
+      "retrieved": "2026-11-26"
     },
     "heat_followup": {
       "icon": null,
-      "note": "No unambiguous dedicated original icon identified; hidden in compact icon trays, name retained in details"
+      "note": "Instant follow-up damage event, not an active status."
     },
     "heat_infliction": {
-      "stackIcons": [
-        "assets/ui/debuffs/heat_infliction_1.png",
-        "assets/ui/debuffs/heat_infliction_2.png",
-        "assets/ui/debuffs/heat_infliction_3.png",
-        "assets/ui/debuffs/heat_infliction_4.png"
-      ],
-      "note": "Existing stack-specific original artwork"
+      "icon": "assets/ui/effects/original/icon_energy_fusion_fire.webp",
+      "sourceFile": "icon_energy_fusion_fire.png",
+      "retrieved": "2026-11-26",
+      "note": "Original Heat Infliction glyph; each stack adds a quarter of the white contour.",
+      "stackSegments": 4
     },
     "heat_susceptibility": {
-      "icon": "assets/ui/effects/icon_battle_affix_fire_vulnerable.png",
-      "sourceFile": "icon_battle_affix_fire_vulnerable.png"
+      "icon": "assets/ui/effects/original/icon_battle_affix_fire_vulnerable.webp",
+      "sourceFile": "icon_battle_affix_fire_vulnerable.png",
+      "retrieved": "2026-11-26"
     },
     "hp_treatment": {
-      "icon": "assets/ui/effects/icon_battle_buff_heal.png",
-      "sourceFile": "icon_battle_buff_heal.png"
+      "icon": "assets/ui/effects/original/icon_battle_buff_heal.webp",
+      "sourceFile": "icon_battle_buff_heal.png",
+      "retrieved": "2026-11-26"
     },
     "hypothermic_perfusion": {
-      "icon": "assets/ui/effects/icon_battle_lastrite_buff.png",
-      "sourceFile": "icon_battle_lastrite_buff.png"
+      "icon": "assets/ui/effects/original/icon_battle_lastrite_buff.webp",
+      "sourceFile": "icon_battle_lastrite_buff.png",
+      "retrieved": "2026-11-26"
     },
     "immobilization": {
       "icon": null,
-      "note": "No unambiguous dedicated original icon identified; hidden in compact icon trays, name retained in details"
+      "note": "No unambiguous dedicated Immobilization sprite identified; do not substitute Silence, Solidification or Imprisonment."
     },
     "imprisonment": {
-      "icon": "assets/operators/skills/zhuang/bs_small.png",
-      "note": "Original source-skill glyph; distinct status sprite not identified"
+      "icon": "assets/ui/effects/original/icon_battle_buff_lizhiyan_combo_seal.webp",
+      "sourceFile": "icon_battle_buff_lizhiyan_combo_seal.png",
+      "retrieved": "2026-11-26",
+      "note": "Arcane (internal ID lizhiyan) combo seal; inferred from original asset name and combo skill data. Replaces unrelated Zhuang skill artwork."
     },
     "inksoul": {
       "icon": null,
-      "note": "No unambiguous dedicated original icon identified; hidden in compact icon trays, name retained in details"
+      "note": "Si proxy entity; no dedicated status sprite identified. Artful Intent uses the ink mark."
     },
     "knock_down": {
-      "icon": "assets/ui/effects/icon_damagetxt_knockdown.png",
-      "sourceFile": "icon_damagetxt_knockdown.png"
+      "icon": "assets/ui/effects/original/icon_damagetxt_knockdown.webp",
+      "sourceFile": "icon_damagetxt_knockdown.png",
+      "retrieved": "2026-11-26"
     },
     "lift": {
-      "icon": "assets/ui/effects/icon_damagetxt_airborne.png",
-      "sourceFile": "icon_damagetxt_airborne.png"
+      "icon": "assets/ui/effects/original/icon_damagetxt_airborne.webp",
+      "sourceFile": "icon_damagetxt_airborne.png",
+      "retrieved": "2026-11-26"
     },
     "liino_cosmovoice_stance": {
-      "icon": "assets/ui/effects/icon_battle_buff_liino_ultskill_music.png",
-      "sourceFile": "icon_battle_buff_liino_ultskill_music.png"
+      "icon": "assets/ui/effects/original/icon_battle_buff_liino_ultskill_music.webp",
+      "sourceFile": "icon_battle_buff_liino_ultskill_music.png",
+      "retrieved": "2026-11-26"
     },
     "liino_vocalist_stance": {
-      "icon": "assets/ui/effects/icon_battle_buff_liino_normalskill_music.png",
-      "sourceFile": "icon_battle_buff_liino_normalskill_music.png"
+      "icon": "assets/ui/effects/original/icon_battle_buff_liino_normalskill_music.webp",
+      "sourceFile": "icon_battle_buff_liino_normalskill_music.png",
+      "retrieved": "2026-11-26"
     },
     "link": {
-      "icon": "assets/ui/effects/icon_skill_lifeng_debuff.png",
-      "sourceFile": "icon_skill_lifeng_debuff.png"
+      "icon": "assets/ui/effects/original/icon_skill_lifeng_debuff.webp",
+      "sourceFile": "icon_skill_lifeng_debuff.png",
+      "retrieved": "2026-11-26"
     },
     "melting_flames": {
       "stackIcons": [
@@ -211,121 +238,140 @@
         "assets/ui/buffs/laevatain/melting_flames_3.png",
         "assets/ui/buffs/laevatain/melting_flames_4.png"
       ],
-      "note": "Existing stack-specific original artwork"
+      "note": "Retained existing numbered Melting Flames artwork. Original icon_laevat_energy_1–5 files are archived, but their stage semantics are not verified as a replacement for the four planner stacks."
     },
     "nature_burst_damage_taken": {
-      "icon": "assets/ui/effects/icon_battle_nature_taken_up.png",
-      "sourceFile": "icon_battle_nature_taken_up.png"
+      "icon": "assets/ui/effects/original/icon_battle_nature_taken_up.webp",
+      "sourceFile": "icon_battle_nature_taken_up.png",
+      "retrieved": "2026-11-26"
     },
     "nature_infliction": {
-      "stackIcons": [
-        "assets/ui/debuffs/nature_infliction_1.png",
-        "assets/ui/debuffs/nature_infliction_2.png",
-        "assets/ui/debuffs/nature_infliction_3.png",
-        "assets/ui/debuffs/nature_infliction_4.png"
-      ],
-      "note": "Existing stack-specific original artwork"
+      "icon": "assets/ui/effects/original/icon_infliction_nature.webp",
+      "sourceFile": "icon_infliction_nature.png",
+      "retrieved": "2026-11-26",
+      "note": "Original Nature Infliction glyph; each stack adds a quarter of the white contour.",
+      "stackSegments": 4
     },
     "nature_susceptibility": {
-      "icon": "assets/ui/effects/icon_battle_affix_natural_vulnerable.png",
-      "sourceFile": "icon_battle_affix_natural_vulnerable.png"
+      "icon": "assets/ui/effects/original/icon_battle_affix_natural_vulnerable.webp",
+      "sourceFile": "icon_battle_affix_natural_vulnerable.png",
+      "retrieved": "2026-11-26"
     },
     "olden_stare": {
-      "icon": "assets/ui/effects/icon_battle_tangtang_ultskilldebuff.png",
-      "sourceFile": "icon_battle_tangtang_ultskilldebuff.png"
+      "icon": "assets/ui/effects/original/icon_battle_tangtang_ultskilldebuff.webp",
+      "sourceFile": "icon_battle_tangtang_ultskilldebuff.png",
+      "retrieved": "2026-11-26"
     },
     "operator_attacked": {
       "icon": null,
-      "note": "No unambiguous dedicated original icon identified; hidden in compact icon trays, name retained in details"
+      "note": "Combat trigger, not an active status."
     },
     "operator_attacked_low_hp": {
       "icon": null,
-      "note": "No unambiguous dedicated original icon identified; hidden in compact icon trays, name retained in details"
+      "note": "Combat trigger, not an active status."
     },
     "originium_crystal": {
-      "icon": "assets/ui/effects/icon_skill_endmin_debuff.png",
-      "sourceFile": "icon_skill_endmin_debuff.png"
+      "icon": "assets/ui/effects/original/icon_skill_endmin_debuff.webp",
+      "sourceFile": "icon_skill_endmin_debuff.png",
+      "retrieved": "2026-11-26"
     },
     "originium_crystal_consumed": {
-      "icon": null,
-      "note": "No unambiguous dedicated original icon identified; hidden in compact icon trays, name retained in details"
+      "icon": "assets/ui/effects/original/icon_skill_endmin_debuff.webp",
+      "sourceFile": "icon_skill_endmin_debuff.png",
+      "retrieved": "2026-11-26",
+      "note": "Original Originium Crystal artwork; consumption is described by the effect name."
     },
     "physical_susceptibility": {
-      "icon": "assets/ui/effects/icon_battle_affix_physical_vulnerable.png",
-      "sourceFile": "icon_battle_affix_physical_vulnerable.png"
+      "icon": "assets/ui/effects/original/icon_battle_affix_physical_vulnerable.webp",
+      "sourceFile": "icon_battle_affix_physical_vulnerable.png",
+      "retrieved": "2026-11-26"
     },
     "protection": {
-      "icon": "assets/ui/effects/icon_battle_affix_shelter.png",
-      "sourceFile": "icon_battle_affix_shelter.png"
+      "icon": "assets/ui/effects/original/icon_battle_affix_shelter.webp",
+      "sourceFile": "icon_battle_affix_shelter.png",
+      "retrieved": "2026-11-26"
     },
     "pull": {
       "icon": null,
-      "note": "No unambiguous dedicated original icon identified; hidden in compact icon trays, name retained in details"
+      "note": "Displacement action; no original Pull sprite identified. Do not substitute Knockback."
     },
     "push": {
-      "icon": "assets/ui/effects/knockback.png",
-      "sourceFile": "knockback.png"
+      "icon": "assets/ui/effects/original/knockback.webp",
+      "sourceFile": "knockback.png",
+      "retrieved": "2026-11-26"
     },
     "rossi_crit_buff": {
-      "icon": "assets/ui/effects/icon_battle_crit_up.png",
-      "sourceFile": "icon_battle_crit_up.png"
+      "icon": "assets/ui/effects/original/icon_battle_crit_up.webp",
+      "sourceFile": "icon_battle_crit_up.png",
+      "retrieved": "2026-11-26"
     },
     "shield": {
-      "icon": "assets/ui/effects/icon_battle_shield.png",
-      "sourceFile": "icon_battle_shield.png"
+      "icon": "assets/ui/effects/original/icon_battle_shield.webp",
+      "sourceFile": "icon_battle_shield.png",
+      "retrieved": "2026-11-26"
     },
     "slow": {
-      "icon": "assets/ui/effects/icon_battle_affix_slow.png",
-      "sourceFile": "icon_battle_affix_slow.png"
+      "icon": "assets/ui/effects/original/icon_battle_affix_slow.webp",
+      "sourceFile": "icon_battle_affix_slow.png",
+      "retrieved": "2026-11-26"
     },
     "solidification": {
-      "icon": "assets/ui/effects/icon_battle_frozen.png",
-      "sourceFile": "icon_battle_frozen.png"
+      "icon": "assets/ui/effects/original/icon_battle_frozen.webp",
+      "sourceFile": "icon_battle_frozen.png",
+      "retrieved": "2026-11-26"
     },
     "solidification_consumed": {
-      "icon": "assets/ui/effects/icon_battle_frozen.png",
-      "sourceFile": "icon_battle_frozen.png"
+      "icon": "assets/ui/effects/original/icon_battle_frozen.webp",
+      "sourceFile": "icon_battle_frozen.png",
+      "retrieved": "2026-11-26"
     },
     "sp_recovery": {
-      "icon": null,
-      "note": "No unambiguous dedicated original icon identified; hidden in compact icon trays, name retained in details"
+      "icon": "assets/ui/effects/original/icon_battle_atb_up.webp",
+      "sourceFile": "icon_battle_atb_up.png",
+      "retrieved": "2026-11-26",
+      "note": "Original SP (internal name ATB) recovery glyph; the event amount and timing remain unchanged."
     },
     "stagger": {
       "icon": null,
-      "note": "No unambiguous dedicated original icon identified; hidden in compact icon trays, name retained in details"
+      "note": "Combat resource/damage event, not an active status."
     },
     "steel_oath": {
-      "icon": "assets/ui/effects/icon_battle_pograni_buff.png",
-      "sourceFile": "icon_battle_pograni_buff.png"
+      "icon": "assets/ui/effects/original/icon_battle_pograni_buff.webp",
+      "sourceFile": "icon_battle_pograni_buff.png",
+      "retrieved": "2026-11-26"
     },
     "vulnerable": {
-      "stackIcons": [
-        "assets/ui/debuffs/vulnerable_1.png",
-        "assets/ui/debuffs/vulnerable_2.png",
-        "assets/ui/debuffs/vulnerable_3.png",
-        "assets/ui/debuffs/vulnerable_4.png"
-      ],
-      "note": "Existing stack-specific original artwork"
+      "icon": "assets/ui/effects/original/icon_battle_affix_vulnerable.webp",
+      "sourceFile": "icon_battle_affix_vulnerable.png",
+      "retrieved": "2026-11-26",
+      "note": "Original Vulnerability status glyph; each stack adds a quarter of the white contour.",
+      "stackSegments": 4
     },
     "vulnerable_consumed": {
-      "icon": "assets/ui/debuffs/vulnerable_1.png",
-      "note": "Vulnerable artwork; consumption is described by the effect name"
+      "icon": "assets/ui/effects/original/icon_battle_affix_vulnerable.webp",
+      "sourceFile": "icon_battle_affix_vulnerable.png",
+      "retrieved": "2026-11-26",
+      "note": "Original Vulnerability status glyph; consumption is described by the effect name."
     },
     "weaken": {
-      "icon": "assets/ui/effects/icon_battle_affix_weak.png",
-      "sourceFile": "icon_battle_affix_weak.png"
+      "icon": "assets/ui/effects/original/icon_battle_affix_weak.webp",
+      "sourceFile": "icon_battle_affix_weak.png",
+      "retrieved": "2026-11-26"
     },
     "weakness": {
-      "icon": null,
-      "note": "No unambiguous dedicated original icon identified; hidden in compact icon trays, name retained in details"
+      "icon": "assets/ui/effects/original/icon_battle_affix_weak.webp",
+      "sourceFile": "icon_battle_affix_weak.png",
+      "retrieved": "2026-11-26",
+      "note": "Weakness is the current name of Weaken; both keys use the same original status sprite."
     },
     "whirlpool": {
-      "icon": "assets/ui/effects/icon_battle_tangtang_comboskillwater.png",
-      "sourceFile": "icon_battle_tangtang_comboskillwater.png"
+      "icon": "assets/ui/effects/original/icon_battle_tangtang_comboskillwater.webp",
+      "sourceFile": "icon_battle_tangtang_comboskillwater.png",
+      "retrieved": "2026-11-26"
     },
     "yvonne_next_attack_final_strike": {
       "icon": null,
-      "note": "No unambiguous dedicated original icon identified; hidden in compact icon trays, name retained in details"
+      "note": "One-shot action readiness marker; no dedicated original Final Strike-ready sprite identified."
     }
   }
 }

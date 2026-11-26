@@ -2,6 +2,7 @@ function escapeEnemyHtml(value) {
     return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
 }
 function getEffectIcon(effect) {
+    if (typeof resolveDebuffIcon === "function") return resolveDebuffIcon(effect);
     if (effect.stackable) {
         const stacks = effect.stacks || 1;
         return `${effect.iconBase}_${stacks}.png`;
@@ -136,12 +137,19 @@ function renderEnemyEffects() {
     const effects = collectEnemyEffects();
 
     effects.forEach(effect => {
+        const iconPath = getEffectIcon(effect);
+        if (!iconPath) return;
+        const item = document.createElement("span");
+        item.className = "enemy-effect-item";
         const icon = document.createElement("img");
         icon.className = "enemy-effect-icon";
-        icon.src = getEffectIcon(effect);
+        icon.src = iconPath;
         icon.alt = effect.name || "Effect";
         icon.title = effect.name || "Effect";
-        container.appendChild(icon);
+        item.appendChild(icon);
+        if (typeof guardPlannerEffectImage === "function") guardPlannerEffectImage(icon, item);
+        if (typeof appendPlannerEffectStackBadge === "function") appendPlannerEffectStackBadge(item, effect, "debuff");
+        container.appendChild(item);
     });
 }
 

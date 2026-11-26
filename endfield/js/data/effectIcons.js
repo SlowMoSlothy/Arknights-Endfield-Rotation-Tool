@@ -1,10 +1,10 @@
 // Original status sprites and explicit no-icon decisions. See docs/effect-icons.md.
 const PLANNER_EFFECT_ICONS = {
   "artful_intent": {
-    "icon": null
+    "icon": "assets/ui/effects/original/icon_battle_buff_jsspsi_inkmark.webp"
   },
   "arts_amp": {
-    "icon": "assets/ui/effects/icon_battle_affix_spell_enhance.png"
+    "icon": "assets/ui/effects/original/icon_battle_affix_spell_enhance.webp"
   },
   "arts_infliction": {
     "icon": null
@@ -19,10 +19,10 @@ const PLANNER_EFFECT_ICONS = {
     "icon": null
   },
   "arts_susceptibility": {
-    "icon": "assets/ui/effects/icon_battle_affix_spell_vulnerable.png"
+    "icon": "assets/ui/effects/original/icon_battle_affix_spell_vulnerable.webp"
   },
   "atk_up": {
-    "icon": "assets/ui/effects/icon_battle_buff_atk_up.png"
+    "icon": "assets/ui/effects/original/icon_battle_buff_atk_up.webp"
   },
   "auxiliary_crystal": {
     "stackIcons": [
@@ -34,127 +34,115 @@ const PLANNER_EFFECT_ICONS = {
     "icon": null
   },
   "breach": {
-    "icon": "assets/ui/effects/icon_damagetxt_fracture.png"
+    "icon": "assets/ui/effects/original/icon_damagetxt_fracture.webp"
   },
   "combustion": {
-    "icon": "assets/ui/effects/icon_battle_burning.png"
+    "icon": "assets/ui/effects/original/icon_battle_burning.webp"
   },
   "combustion_consumed": {
-    "icon": "assets/ui/effects/icon_battle_burning.png"
+    "icon": "assets/ui/effects/original/icon_battle_burning.webp"
   },
   "corrosion": {
-    "icon": "assets/ui/effects/icon_battle_corrupt.png"
+    "icon": "assets/ui/effects/original/icon_battle_corrupt.webp"
   },
   "corrosion_consumed": {
-    "icon": "assets/ui/effects/icon_battle_corrupt.png"
+    "icon": "assets/ui/effects/original/icon_battle_corrupt.webp"
   },
   "crit_up": {
-    "icon": "assets/ui/effects/icon_battle_crit_up.png"
+    "icon": "assets/ui/effects/original/icon_battle_crit_up.webp"
   },
   "crush": {
-    "icon": "assets/ui/effects/icon_damagetxt_crush.png"
+    "icon": "assets/ui/effects/original/icon_damagetxt_crush.webp"
   },
   "cryo_amp": {
-    "icon": "assets/ui/effects/icon_battle_affix_cryst_enhance.png"
+    "icon": "assets/ui/effects/original/icon_battle_affix_cryst_enhance.webp"
   },
   "cryo_burst": {
     "icon": null
   },
   "cryo_infliction": {
-    "stackIcons": [
-      "assets/ui/debuffs/cryo_infliction_1.png",
-      "assets/ui/debuffs/cryo_infliction_2.png",
-      "assets/ui/debuffs/cryo_infliction_3.png",
-      "assets/ui/debuffs/cryo_infliction_4.png"
-    ]
+    "icon": "assets/ui/effects/original/icon_energy_fusion_cryst.webp",
+    "stackSegments": 4
   },
   "cryo_susceptibility": {
-    "icon": "assets/ui/effects/icon_battle_affix_cryst_vulnerable.png"
+    "icon": "assets/ui/effects/original/icon_battle_affix_cryst_vulnerable.webp"
   },
   "dive_attack": {
     "icon": null
   },
   "electric_amp": {
-    "icon": "assets/ui/effects/icon_battle_affix_pulse_enhance.png"
+    "icon": "assets/ui/effects/original/icon_battle_affix_pulse_enhance.webp"
   },
   "electric_infliction": {
-    "stackIcons": [
-      "assets/ui/debuffs/electric_infliction_1.png",
-      "assets/ui/debuffs/electric_infliction_2.png",
-      "assets/ui/debuffs/electric_infliction_3.png",
-      "assets/ui/debuffs/electric_infliction_4.png"
-    ]
+    "icon": "assets/ui/effects/original/icon_energy_fusion_pulse.webp",
+    "stackSegments": 4
   },
   "electric_susceptibility": {
-    "icon": "assets/ui/effects/icon_battle_affix_pulse_vulnerable.png"
+    "icon": "assets/ui/effects/original/icon_battle_affix_pulse_vulnerable.webp"
   },
   "electrification": {
-    "icon": "assets/ui/effects/icon_battle_conduct.png"
+    "icon": "assets/ui/effects/original/icon_battle_conduct.webp"
   },
   "electrification_consumed": {
-    "icon": "assets/ui/effects/icon_battle_conduct.png"
+    "icon": "assets/ui/effects/original/icon_battle_conduct.webp"
   },
   "final_strike": {
     "icon": null
   },
   "firefang_vesperwings": {
-    "icon": null
+    "icon": "assets/ui/effects/original/icon_battle_camille_normal_skill_bat.webp"
   },
   "focus": {
-    "icon": "assets/operators/skills/yvonne/cs_small.png"
+    "icon": "assets/ui/effects/original/icon_battle_antal_buff.webp"
   },
   "gloompurge_arts_amp": {
-    "icon": "assets/ui/effects/icon_battle_affix_spell_enhance.png"
+    "icon": "assets/ui/effects/original/icon_battle_affix_spell_enhance.webp"
   },
   "gloompurger_array": {
-    "icon": "assets/operators/skills/zhuang/ult_small.png"
+    "icon": null
   },
   "heat_amp": {
-    "icon": "assets/ui/effects/icon_battle_affix_fire_enhance.png"
+    "icon": "assets/ui/effects/original/icon_battle_affix_fire_enhance.webp"
   },
   "heat_followup": {
     "icon": null
   },
   "heat_infliction": {
-    "stackIcons": [
-      "assets/ui/debuffs/heat_infliction_1.png",
-      "assets/ui/debuffs/heat_infliction_2.png",
-      "assets/ui/debuffs/heat_infliction_3.png",
-      "assets/ui/debuffs/heat_infliction_4.png"
-    ]
+    "icon": "assets/ui/effects/original/icon_energy_fusion_fire.webp",
+    "stackSegments": 4
   },
   "heat_susceptibility": {
-    "icon": "assets/ui/effects/icon_battle_affix_fire_vulnerable.png"
+    "icon": "assets/ui/effects/original/icon_battle_affix_fire_vulnerable.webp"
   },
   "hp_treatment": {
-    "icon": "assets/ui/effects/icon_battle_buff_heal.png"
+    "icon": "assets/ui/effects/original/icon_battle_buff_heal.webp"
   },
   "hypothermic_perfusion": {
-    "icon": "assets/ui/effects/icon_battle_lastrite_buff.png"
+    "icon": "assets/ui/effects/original/icon_battle_lastrite_buff.webp"
   },
   "immobilization": {
     "icon": null
   },
   "imprisonment": {
-    "icon": "assets/operators/skills/zhuang/bs_small.png"
+    "icon": "assets/ui/effects/original/icon_battle_buff_lizhiyan_combo_seal.webp"
   },
   "inksoul": {
     "icon": null
   },
   "knock_down": {
-    "icon": "assets/ui/effects/icon_damagetxt_knockdown.png"
+    "icon": "assets/ui/effects/original/icon_damagetxt_knockdown.webp"
   },
   "lift": {
-    "icon": "assets/ui/effects/icon_damagetxt_airborne.png"
+    "icon": "assets/ui/effects/original/icon_damagetxt_airborne.webp"
   },
   "liino_cosmovoice_stance": {
-    "icon": "assets/ui/effects/icon_battle_buff_liino_ultskill_music.png"
+    "icon": "assets/ui/effects/original/icon_battle_buff_liino_ultskill_music.webp"
   },
   "liino_vocalist_stance": {
-    "icon": "assets/ui/effects/icon_battle_buff_liino_normalskill_music.png"
+    "icon": "assets/ui/effects/original/icon_battle_buff_liino_normalskill_music.webp"
   },
   "link": {
-    "icon": "assets/ui/effects/icon_skill_lifeng_debuff.png"
+    "icon": "assets/ui/effects/original/icon_skill_lifeng_debuff.webp"
   },
   "melting_flames": {
     "stackIcons": [
@@ -165,21 +153,17 @@ const PLANNER_EFFECT_ICONS = {
     ]
   },
   "nature_burst_damage_taken": {
-    "icon": "assets/ui/effects/icon_battle_nature_taken_up.png"
+    "icon": "assets/ui/effects/original/icon_battle_nature_taken_up.webp"
   },
   "nature_infliction": {
-    "stackIcons": [
-      "assets/ui/debuffs/nature_infliction_1.png",
-      "assets/ui/debuffs/nature_infliction_2.png",
-      "assets/ui/debuffs/nature_infliction_3.png",
-      "assets/ui/debuffs/nature_infliction_4.png"
-    ]
+    "icon": "assets/ui/effects/original/icon_infliction_nature.webp",
+    "stackSegments": 4
   },
   "nature_susceptibility": {
-    "icon": "assets/ui/effects/icon_battle_affix_natural_vulnerable.png"
+    "icon": "assets/ui/effects/original/icon_battle_affix_natural_vulnerable.webp"
   },
   "olden_stare": {
-    "icon": "assets/ui/effects/icon_battle_tangtang_ultskilldebuff.png"
+    "icon": "assets/ui/effects/original/icon_battle_tangtang_ultskilldebuff.webp"
   },
   "operator_attacked": {
     "icon": null
@@ -188,66 +172,62 @@ const PLANNER_EFFECT_ICONS = {
     "icon": null
   },
   "originium_crystal": {
-    "icon": "assets/ui/effects/icon_skill_endmin_debuff.png"
+    "icon": "assets/ui/effects/original/icon_skill_endmin_debuff.webp"
   },
   "originium_crystal_consumed": {
-    "icon": null
+    "icon": "assets/ui/effects/original/icon_skill_endmin_debuff.webp"
   },
   "physical_susceptibility": {
-    "icon": "assets/ui/effects/icon_battle_affix_physical_vulnerable.png"
+    "icon": "assets/ui/effects/original/icon_battle_affix_physical_vulnerable.webp"
   },
   "protection": {
-    "icon": "assets/ui/effects/icon_battle_affix_shelter.png"
+    "icon": "assets/ui/effects/original/icon_battle_affix_shelter.webp"
   },
   "pull": {
     "icon": null
   },
   "push": {
-    "icon": "assets/ui/effects/knockback.png"
+    "icon": "assets/ui/effects/original/knockback.webp"
   },
   "rossi_crit_buff": {
-    "icon": "assets/ui/effects/icon_battle_crit_up.png"
+    "icon": "assets/ui/effects/original/icon_battle_crit_up.webp"
   },
   "shield": {
-    "icon": "assets/ui/effects/icon_battle_shield.png"
+    "icon": "assets/ui/effects/original/icon_battle_shield.webp"
   },
   "slow": {
-    "icon": "assets/ui/effects/icon_battle_affix_slow.png"
+    "icon": "assets/ui/effects/original/icon_battle_affix_slow.webp"
   },
   "solidification": {
-    "icon": "assets/ui/effects/icon_battle_frozen.png"
+    "icon": "assets/ui/effects/original/icon_battle_frozen.webp"
   },
   "solidification_consumed": {
-    "icon": "assets/ui/effects/icon_battle_frozen.png"
+    "icon": "assets/ui/effects/original/icon_battle_frozen.webp"
   },
   "sp_recovery": {
-    "icon": null
+    "icon": "assets/ui/effects/original/icon_battle_atb_up.webp"
   },
   "stagger": {
     "icon": null
   },
   "steel_oath": {
-    "icon": "assets/ui/effects/icon_battle_pograni_buff.png"
+    "icon": "assets/ui/effects/original/icon_battle_pograni_buff.webp"
   },
   "vulnerable": {
-    "stackIcons": [
-      "assets/ui/debuffs/vulnerable_1.png",
-      "assets/ui/debuffs/vulnerable_2.png",
-      "assets/ui/debuffs/vulnerable_3.png",
-      "assets/ui/debuffs/vulnerable_4.png"
-    ]
+    "icon": "assets/ui/effects/original/icon_battle_affix_vulnerable.webp",
+    "stackSegments": 4
   },
   "vulnerable_consumed": {
-    "icon": "assets/ui/debuffs/vulnerable_1.png"
+    "icon": "assets/ui/effects/original/icon_battle_affix_vulnerable.webp"
   },
   "weaken": {
-    "icon": "assets/ui/effects/icon_battle_affix_weak.png"
+    "icon": "assets/ui/effects/original/icon_battle_affix_weak.webp"
   },
   "weakness": {
-    "icon": null
+    "icon": "assets/ui/effects/original/icon_battle_affix_weak.webp"
   },
   "whirlpool": {
-    "icon": "assets/ui/effects/icon_battle_tangtang_comboskillwater.png"
+    "icon": "assets/ui/effects/original/icon_battle_tangtang_comboskillwater.webp"
   },
   "yvonne_next_attack_final_strike": {
     "icon": null
@@ -345,6 +325,26 @@ function guardPlannerEffectImage(image, container = image) {
 
 function appendPlannerEffectStackBadge(container, effect, type) {
     const entry = getPlannerEffectIconEntry(effect);
+    if (entry?.stackSegments) {
+        const rawCount = Number(effect.stackCount ?? effect.currentStacks ?? effect.stacks ?? effect.stacksApplied ?? 1);
+        const count = Number.isFinite(rawCount) ? Math.max(1, Math.min(Math.floor(rawCount), entry.stackSegments)) : 1;
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', '0 0 32 32');
+        svg.setAttribute('class', 'planner-effect-stack-ring');
+        svg.setAttribute('role', 'img');
+        svg.setAttribute('aria-label', `${count} of ${entry.stackSegments} stacks`);
+        for (let index = 0; index < count; index++) {
+            const arc = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            for (const [key, value] of Object.entries({ cx: 16, cy: 16, r: 13, pathLength: 360,
+                'stroke-dasharray': `${360 / entry.stackSegments - 10} ${360 - 360 / entry.stackSegments + 10}`,
+                transform: `rotate(${-135 + index * 360 / entry.stackSegments} 16 16)` })) arc.setAttribute(key, String(value));
+            svg.appendChild(arc);
+        }
+        container.classList.add('planner-effect-with-stack-ring');
+        container.style.position = 'relative';
+        container.appendChild(svg);
+        return;
+    }
     if (entry?.stackIcons) return; // Original artwork already contains the stack number.
     const registry = type === 'buff'
         ? (typeof BUFF_REGISTRY !== 'undefined' ? BUFF_REGISTRY : {})

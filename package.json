@@ -1,6 +1,8 @@
 {
   "type": "module",
   "scripts": {
+    "sync:effect-icons": "node tools/sync-effect-icons.js",
+    "build:effect-icons": "node tools/build-effect-icons.js",
     "sync:enemies": "node tools/sync-endfield-enemies.js",
     "sync:equipment": "node tools/sync-endfield-equipment.js",
     "build:operators": "node tools/build-operator-pages.js",
