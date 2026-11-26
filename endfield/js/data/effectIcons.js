@@ -214,11 +214,11 @@ const PLANNER_EFFECT_ICONS = {
     "icon": "assets/ui/effects/original/icon_battle_pograni_buff.webp"
   },
   "vulnerable": {
-    "icon": "assets/ui/effects/original/icon_battle_affix_vulnerable.webp",
+    "icon": "assets/ui/effects/original/icon_shadow_attribute_penetrate.webp",
     "stackSegments": 4
   },
   "vulnerable_consumed": {
-    "icon": "assets/ui/effects/original/icon_battle_affix_vulnerable.webp"
+    "icon": "assets/ui/effects/original/icon_shadow_attribute_penetrate.webp"
   },
   "weaken": {
     "icon": "assets/ui/effects/original/icon_battle_affix_weak.webp"

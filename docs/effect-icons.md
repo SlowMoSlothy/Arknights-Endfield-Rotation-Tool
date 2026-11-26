@@ -90,8 +90,8 @@ Canonical `appliesEffect` takes precedence over instance IDs and stale database 
 | `sp_recovery` | assets/ui/effects/original/icon_battle_atb_up.webp | Original SP (internal name ATB) recovery glyph; the event amount and timing remain unchanged. |
 | `stagger` | No dedicated icon | Combat resource/damage event, not an active status. |
 | `steel_oath` | assets/ui/effects/original/icon_battle_pograni_buff.webp | Original status sprite |
-| `vulnerable` | assets/ui/effects/original/icon_battle_affix_vulnerable.webp | Original Vulnerability status glyph; each stack adds a quarter of the white contour. |
-| `vulnerable_consumed` | assets/ui/effects/original/icon_battle_affix_vulnerable.webp | Original Vulnerability status glyph; consumption is described by the effect name. |
+| `vulnerable` | assets/ui/effects/original/icon_shadow_attribute_penetrate.webp | Diagonal split-shield Vulnerability glyph confirmed by the user against the in-game German Anfälligkeit description and original icon #111. Each stack adds a quarter of the white contour. |
+| `vulnerable_consumed` | assets/ui/effects/original/icon_shadow_attribute_penetrate.webp | Same confirmed split-shield Vulnerability glyph; consumption is described by the effect name. |
 | `weaken` | assets/ui/effects/original/icon_battle_affix_weak.webp | Original status sprite |
 | `weakness` | assets/ui/effects/original/icon_battle_affix_weak.webp | Weakness is the current name of Weaken; both keys use the same original status sprite. |
 | `whirlpool` | assets/ui/effects/original/icon_battle_tangtang_comboskillwater.webp | Original status sprite |

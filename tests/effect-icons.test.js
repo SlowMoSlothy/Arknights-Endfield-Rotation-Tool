@@ -94,7 +94,9 @@ test('operator statuses override unrelated skill glyphs and enemy panel uses the
         focus: 'icon_battle_antal_buff',
         imprisonment: 'icon_battle_buff_lizhiyan_combo_seal',
         artful_intent: 'icon_battle_buff_jsspsi_inkmark',
-        weakness: 'icon_battle_affix_weak'
+        weakness: 'icon_battle_affix_weak',
+        vulnerable: 'icon_shadow_attribute_penetrate',
+        vulnerable_consumed: 'icon_shadow_attribute_penetrate'
     };
     for (const [key, sprite] of Object.entries(statuses)) {
         const effect = { id: 'proc-instance', appliesEffect: key, icon: 'assets/operators/skills/rossi/ult_small.png' };

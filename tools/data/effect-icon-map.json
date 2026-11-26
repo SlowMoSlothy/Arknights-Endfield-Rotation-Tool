@@ -341,17 +341,17 @@
       "retrieved": "2026-11-26"
     },
     "vulnerable": {
-      "icon": "assets/ui/effects/original/icon_battle_affix_vulnerable.webp",
-      "sourceFile": "icon_battle_affix_vulnerable.png",
+      "icon": "assets/ui/effects/original/icon_shadow_attribute_penetrate.webp",
+      "sourceFile": "icon_shadow_attribute_penetrate.png",
       "retrieved": "2026-11-26",
-      "note": "Original Vulnerability status glyph; each stack adds a quarter of the white contour.",
+      "note": "Diagonal split-shield Vulnerability glyph confirmed by the user against the in-game German Anfälligkeit description and original icon #111. Each stack adds a quarter of the white contour.",
       "stackSegments": 4
     },
     "vulnerable_consumed": {
-      "icon": "assets/ui/effects/original/icon_battle_affix_vulnerable.webp",
-      "sourceFile": "icon_battle_affix_vulnerable.png",
+      "icon": "assets/ui/effects/original/icon_shadow_attribute_penetrate.webp",
+      "sourceFile": "icon_shadow_attribute_penetrate.png",
       "retrieved": "2026-11-26",
-      "note": "Original Vulnerability status glyph; consumption is described by the effect name."
+      "note": "Same confirmed split-shield Vulnerability glyph; consumption is described by the effect name."
     },
     "weaken": {
       "icon": "assets/ui/effects/original/icon_battle_affix_weak.webp",
