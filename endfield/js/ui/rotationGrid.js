@@ -344,6 +344,11 @@ function consumeAllDebuffStacks(effectName, stackState, metaState) {
 
 function resolveSlotModeSkillData(skillData, debuffStackState) {
     let resolvedSkillData = skillData;
+    if (typeof resolveSiTeamSkill === "function") {
+        resolvedSkillData = resolveSiTeamSkill(resolvedSkillData,
+            typeof selectedTeam !== "undefined" ? selectedTeam : [],
+            typeof operators !== "undefined" ? operators : []);
+    }
     if (typeof resolveSimulationAttributeVariant === "function") {
         resolvedSkillData = resolveSimulationAttributeVariant(resolvedSkillData, resolvedSkillData?.operatorId);
     }

@@ -13,6 +13,96 @@
 @import url("mobile.css?v=27");
 @import url("tooltip.css");
 @import url("skill-elements.css?v=10");
+.planner-fixes {
+    box-sizing: border-box;
+    width: min(1040px, calc(100% - 32px));
+    margin: 28px auto 0;
+    padding: 18px;
+    border: 1px solid rgba(160,170,169,0.22);
+    border-radius: 12px;
+    background: rgba(11,16,18,0.34);
+    color: #d7dedd;
+    font-size: 14px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.planner-fixes h2 {
+    margin: 0 0 12px;
+    font-size: 22px;
+    line-height: 1.2;
+}
+
+.planner-fixes-list {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.planner-fixes-list > li + li {
+    margin-top: 10px;
+}
+
+.planner-fix-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 14px;
+}
+
+.planner-fix-heading h3 {
+    margin: 0;
+    color: #f6f7f0;
+    font-size: 16px;
+}
+
+.planner-fix-heading time {
+    color: #a0aaa9;
+    font-size: 13px;
+}
+
+.planner-fixes p {
+    margin: 7px 0 0;
+    max-width: 85ch;
+}
+
+.planner-fix-thanks {
+    color: #f8f546;
+}
+
+.planner-fixes-history {
+    margin-top: 14px;
+    border-top: 1px solid rgba(160,170,169,0.16);
+}
+
+.planner-fixes-history summary {
+    min-height: 44px;
+    padding: 11px 0;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.planner-fixes-history summary:focus-visible {
+    outline: 2px solid #f8f546;
+    outline-offset: 3px;
+}
+
+.planner-fixes-date-group + .planner-fixes-date-group {
+    margin-top: 16px;
+}
+
+.planner-fixes-date {
+    margin: 0 0 8px;
+    color: #a0aaa9;
+    font-size: 14px;
+}
+
+@media (max-width: 900px) {
+    .planner-fixes {
+        width: calc(100% - 20px);
+        padding: 14px;
+    }
+}
+
 .seo-description {
     margin-top: 34px;
     margin-bottom: 30px;

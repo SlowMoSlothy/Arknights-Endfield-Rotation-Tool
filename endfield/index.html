@@ -41,7 +41,7 @@
       "isAccessibleForFree": true
     }
   </script>
-  <link rel="stylesheet" href="css/style.css?v=113">
+  <link rel="stylesheet" href="css/style.css?v=114">
   <link rel="stylesheet" href="css/mobile.css?v=27">
   <link rel="stylesheet" href="css/operatorPortraits.css?v=4">
   <link rel="stylesheet" href="css/operatorAvatarFrames.css?v=1">
@@ -980,6 +980,33 @@
       <div id="enemyModalList" class="settings-section"></div>
     </div>
   </div>
+  <section class="planner-fixes" aria-labelledby="plannerFixesTitle" lang="en">
+    <h2 id="plannerFixesTitle">Recent fixes</h2>
+    <ul class="planner-fixes-list">
+      <li>
+        <article aria-labelledby="siInflictionFixTitle">
+          <div class="planner-fix-heading">
+            <h3 id="siInflictionFixTitle">Si · Brushwork Realm</h3>
+            <time datetime="2026-11-27">27 Nov 2026</time>
+          </div>
+          <p>Fixed missing Infliction in Slot mode and combo detection. Brushwork Realm now applies Cryo Infliction, or Heat Infliction when a Heat operator occupies Team Position 01. Initial Stroke and Final Stroke do not add another stack.</p>
+          <p class="planner-fix-thanks">Thank you to the anonymous reporter who pointed out the missing Infliction on Si’s Battle Skill!</p>
+        </article>
+      </li>
+    </ul>
+    <details class="planner-fixes-history">
+      <summary>Earlier fixes (3)</summary>
+      <section class="planner-fixes-date-group" aria-labelledby="plannerFixes20261126">
+        <h3 id="plannerFixes20261126" class="planner-fixes-date"><time datetime="2026-11-26">26 Nov 2026</time></h3>
+        <ul class="planner-fixes-list">
+          <li><strong>Buff and debuff icons:</strong> Corrected mismatched icons, including Camille’s effect and Vulnerability, using the original game icons.</li>
+          <li><strong>Infliction and Vulnerability stacks:</strong> Added the missing quarter-ring contours so each additional stack adds a quarter of the outline.</li>
+          <li><strong>Multi-row debuffs:</strong> Wrapped icons now extend downward beneath the portrait instead of overlapping the skill card.</li>
+        </ul>
+      </section>
+    </details>
+  </section>
+
   <section class="seo-description" aria-labelledby="seoTitle">
     <div class="seo-intro">
       <p class="seo-kicker">Open Beta Combat Planner</p>
@@ -1054,7 +1081,7 @@
   <script src="js/data/gearData.js"></script>
   <script src="js/logic/operatorStateEngine.js?v=20261107"></script>
   <script src="js/logic/battlefieldResourceEngine.js?v=1"></script>
-  <script src="js/logic/siMechanics.js?v=3"></script>
+  <script src="js/logic/siMechanics.js?v=4"></script>
   <script src="js/logic/basicAttack.js?v=3"></script>
   <script src="js/logic/storage.js?v=4"></script>
   <script src="js/logic/weaponPassiveEngine.js?v=20261125"></script>
@@ -1069,7 +1096,7 @@
   <script src="js/logic/snakeLayout.js"></script>
   <script src="js/logic/reactionEngine.js"></script>
   <script src="js/logic/inflictionEngine.js?v=20261125"></script>
-  <script src="js/logic/comboEngine.js?v=20261125"></script>
+  <script src="js/logic/comboEngine.js?v=20261127"></script>
   <script src="js/logic/operatorPassiveEngine.js?v=2"></script>
   <script src="js/logic/followUpEngine.js?v=1"></script>
   <script src="js/logic/dragDrop.js?v=6"></script>
@@ -1080,7 +1107,7 @@
   <script src="js/ui/skillIconRenderer.js?v=2"></script>
   <script src="js/ui/skillsPanel.js?v=20261125-face-crops"></script>
   <script src="js/ui/operatorBuffs.js?v=2"></script>
-    <script src="js/ui/rotationGrid.js?v=20261125"></script>
+    <script src="js/ui/rotationGrid.js?v=20261127"></script>
     <script src="js/ui/weaponAtkChart.js?v=26"></script>
     <script src="js/logic/weaponPassiveIntegration.js?v=10"></script>
   <script src="js/ui/teamSelection.js?v=20261125-element-frames"></script>

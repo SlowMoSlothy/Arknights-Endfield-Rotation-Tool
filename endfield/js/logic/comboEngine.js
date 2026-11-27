@@ -535,6 +535,11 @@ function applySkillEffectsToComboMap(
     contextEffectMap = effectMap,
     skipResourceUpdates = false
 ) {
+    if (typeof resolveSiTeamSkill === "function") {
+        skillData = resolveSiTeamSkill(skillData,
+            typeof selectedTeam !== "undefined" ? selectedTeam : [],
+            typeof operators !== "undefined" ? operators : []);
+    }
     if (typeof resolveSimulationAttributeVariant === "function") {
         skillData = resolveSimulationAttributeVariant(skillData, skillData?.operatorId);
     }

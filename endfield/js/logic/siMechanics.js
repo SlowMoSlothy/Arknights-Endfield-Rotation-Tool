@@ -6,7 +6,8 @@ function resolveSiTeamSkill(skill, team = [], operatorList = []) {
     return {
         ...skill,
         debuffs: [
-            ...(skill.debuffs || []),
+            ...(skill.debuffs || []).filter(effect =>
+                !['cryo_infliction', 'heat_infliction', 'immobilization'].includes(effect.appliesEffect || effect.id)),
             { id: `${element}_infliction`, name: `${element === 'heat' ? 'Heat' : 'Cryo'} Infliction`,
                 appliesEffect: `${element}_infliction`, visible: true, persistsForCombo: true,
                 stackable: true, stacksApplied: 1, maxStacks: 4 },
