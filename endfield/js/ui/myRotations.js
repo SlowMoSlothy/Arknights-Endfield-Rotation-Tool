@@ -528,15 +528,38 @@ function createMyTeamPreview(row) {
 }
 
 function createMyRotationPreview(row) {
-    if (typeof createCommunityRotationPreview === "function") {
-        const preview = createCommunityRotationPreview(row, { limit: 8 });
-        preview.classList.add("my-rotation-preview");
-        return preview;
-    }
-
     const preview = document.createElement("div");
     preview.className = "my-rotation-preview";
-    preview.textContent = `${getMyRotationActionCount(row)} actions`;
+    preview.setAttribute("aria-label", "Skill order preview");
+    const skills = getMyRotationSkills(row);
+    if (!skills.length) {
+        preview.appendChild(createMyTextElement("span", "my-preview-empty", "No skill preview available"));
+        return preview;
+    }
+    preview.appendChild(createMyTextElement("span", "my-preview-caption", "Skill order"));
+    const sequence = document.createElement("ol");
+    sequence.className = "my-preview-sequence";
+    skills.slice(0, 12).forEach((skill, index) => {
+        const step = document.createElement("li");
+        step.className = "my-preview-step";
+        step.title = `${index + 1}. ${skill.name || "Skill"}`;
+        step.setAttribute("aria-label", step.title);
+        const number = createMyTextElement("span", "my-preview-number", String(index + 1));
+        number.setAttribute("aria-hidden", "true");
+        step.appendChild(number);
+        const makeIcon = skill.isBasicAttack && typeof createBasicAttackIcon === "function"
+            ? createBasicAttackIcon : typeof createSkillIcon === "function" ? createSkillIcon : null;
+        step.appendChild(makeIcon ? makeIcon(skill, {
+            size: "small", useSmallIcon: true, extraClasses: ["my-preview-skill-icon"]
+        }) : createMyOperatorPlaceholder());
+        sequence.appendChild(step);
+    });
+    if (skills.length > 12) {
+        const more = createMyTextElement("li", "my-preview-more", `+${skills.length - 12}`);
+        more.title = "Open this rotation’s details to see all actions";
+        sequence.appendChild(more);
+    }
+    preview.appendChild(sequence);
     return preview;
 }
 
@@ -784,6 +807,7 @@ function createMyRotationCard(row) {
     card.classList.toggle("is-selected", String(row.id) === String(myRotationsState.detailRotationId));
     card.addEventListener("click", () => selectMyRotation(row));
     card.addEventListener("keydown", event => {
+        if (event.target !== card) return;
         if (event.key !== "Enter" && event.key !== " ") return;
         event.preventDefault();
         selectMyRotation(row);
@@ -792,6 +816,7 @@ function createMyRotationCard(row) {
     const titleRow = document.createElement("div");
     titleRow.className = "my-rotation-title-row";
     const title = createMyTextElement("h3", "my-rotation-title", row.title || "Untitled rotation");
+    title.title = title.textContent;
     titleRow.append(title, createMyStatusBadge(row));
 
     const updated = formatMyDate(row.updated_at || row.created_at);
@@ -800,12 +825,6 @@ function createMyRotationCard(row) {
         "div",
         "my-rotation-meta",
         [`Updated ${updated || "-"}`, `${skillCount} action${skillCount === 1 ? "" : "s"}`].join(" - ")
-    );
-
-    const description = createMyTextElement(
-        "p",
-        "my-rotation-description",
-        row.description || "No description added."
     );
 
     const actions = document.createElement("div");
@@ -822,7 +841,13 @@ function createMyRotationCard(row) {
         createMyActionButton("Delete", "is-danger", () => deleteMyRotation(row), busy)
     );
 
-    card.append(titleRow, meta, createMyTeamPreview(row), createMyRotationPreview(row), description, createMyChipRow(row), actions);
+    card.append(titleRow, meta, createMyTeamPreview(row), createMyRotationPreview(row));
+    if (String(row.description || "").trim()) {
+        card.appendChild(createMyTextElement("p", "my-rotation-description", row.description));
+    }
+    const chips = createMyChipRow(row);
+    if (chips.children.length) card.appendChild(chips);
+    card.appendChild(actions);
     return card;
 }
 

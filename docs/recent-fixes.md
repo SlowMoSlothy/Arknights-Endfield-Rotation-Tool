@@ -7,3 +7,5 @@ In **Admin → Reports**, **Resolve & publish fix** saves the resolved status an
 The planner reads only the public copy through `list_recent_fixes`, groups entries by the Europe/Berlin calendar date and retains its existing history if loading fails. Restoring or dismissing a report hides its fix entry. Resolving it again reuses the same entry; repeated resolves do not duplicate or redate an already-resolved entry.
 
 The existing `set_issue_report_status` RPC remains supported. Its resolved action also publishes safe default copy. The new admin UI uses `resolve_issue_report_with_fix` so custom public copy and the status change cannot succeed separately. Run `recent_fixes.sql` again if an older report migration has replaced the status RPC.
+
+Fixes made without an issue report can be added to `releaseEntries` in `endfield/js/ui/recentFixes.js` and to the saved HTML history. They are merged with database entries by `entry_key`, share the same date groups and require no new SQL migration. Use this only for release fixes unrelated to report status; a report's public entry must stay controlled by its resolution state.

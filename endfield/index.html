@@ -41,7 +41,7 @@
       "isAccessibleForFree": true
     }
   </script>
-  <link rel="stylesheet" href="css/style.css?v=115">
+  <link rel="stylesheet" href="css/style.css?v=116">
   <link rel="stylesheet" href="css/mobile.css?v=27">
   <link rel="stylesheet" href="css/operatorPortraits.css?v=4">
   <link rel="stylesheet" href="css/operatorAvatarFrames.css?v=1">
@@ -985,18 +985,28 @@
     <p id="recentFixesStatus" class="planner-fixes-status" role="status" hidden></p>
     <button id="recentFixesRetry" class="planner-fixes-retry" type="button" hidden>Try again</button>
     <div id="recentFixesEntries">
+    <section class="planner-fixes-date-group" aria-labelledby="plannerFixes20261127">
+    <h3 id="plannerFixes20261127" class="planner-fixes-date"><time datetime="2026-11-27">27 Nov 2026</time></h3>
     <ul class="planner-fixes-list">
+      <li>
+        <article aria-labelledby="myRotationsFixTitle">
+          <div class="planner-fix-heading">
+            <h4 id="myRotationsFixTitle">My Rotations · Layout</h4>
+          </div>
+          <p>Fixed oversized vertical skill previews. Saved rotations now use compact cards with numbered skill icons, clearer team portraits and accessible actions. Full rotations remain available in the details.</p>
+        </article>
+      </li>
       <li>
         <article aria-labelledby="siInflictionFixTitle">
           <div class="planner-fix-heading">
-            <h3 id="siInflictionFixTitle">Si · Brushwork Realm</h3>
-            <time datetime="2026-11-27">27 Nov 2026</time>
+            <h4 id="siInflictionFixTitle">Si · Brushwork Realm</h4>
           </div>
           <p>Fixed missing Infliction in Slot mode and combo detection. Brushwork Realm now applies Cryo Infliction, or Heat Infliction when a Heat operator occupies Team Position 01. Initial Stroke and Final Stroke do not add another stack.</p>
           <p class="planner-fix-thanks">Thank you to the anonymous reporter who pointed out the missing Infliction on Si’s Battle Skill!</p>
         </article>
       </li>
     </ul>
+    </section>
     <details class="planner-fixes-history">
       <summary>Earlier fixes (3)</summary>
       <section class="planner-fixes-date-group" aria-labelledby="plannerFixes20261126">
@@ -1117,9 +1127,9 @@
   <script src="js/ui/teamSelection.js?v=20261125-element-frames"></script>
   <script src="js/ui/communityRotations.js?v=1"></script>
   <script src="js/ui/operatorGallery.js?v=2"></script>
-  <script src="js/ui/myRotations.js?v=7"></script>
+  <script src="js/ui/myRotations.js?v=8"></script>
   <script src="js/ui/adminPanel.js?v=22"></script>
-  <script src="js/ui/recentFixes.js?v=1"></script>
+  <script src="js/ui/recentFixes.js?v=2"></script>
   <script src="js/ui/plannerAnalyticsReport.js?v=4"></script>
   <script src="js/ui/reportIssue.js?v=3"></script>
   <script src="js/ui/onboarding.js?v=7"></script>

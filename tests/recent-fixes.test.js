@@ -35,7 +35,7 @@ test('public history groups all fixes from the same Berlin calendar day, newest 
     assert.equal(m.calls[0][0],'list_recent_fixes');
     const latest = m.root.children[0];
     assert.equal(latest.attributes['aria-label'],'27 Nov 2026');
-    assert.deepEqual(all(latest).filter(node=>node.tag==='h4').map(node=>node.textContent),['Si','Near midnight']);
+    assert.deepEqual(all(latest).filter(node=>node.tag==='h4').map(node=>node.textContent),['My Rotations · Layout','Si','Near midnight']);
     assert.equal(all(latest).find(node=>node.tag==='time').dateTime,'2026-11-27');
     assert.equal(all(latest).filter(node=>node.className==='planner-fix-thanks').length,2);
     const older = m.root.children[1];
@@ -43,6 +43,15 @@ test('public history groups all fixes from the same Berlin calendar day, newest 
     assert.equal(older.children[0].textContent,'Earlier fixes (1)');
     assert.equal(older.children[1].attributes['aria-label'],'25 Nov 2026');
     assert.equal(m.status.hidden,true);
+});
+
+test('release fixes remain visible alongside database entries and duplicate keys render only once', async () => {
+    let rows=[];
+    const m=mount(async()=>({data:rows})); await tick();
+    assert.equal(all(m.root).filter(node=>node.tag==='h4' && node.textContent==='My Rotations · Layout').length,1);
+    rows=[{...entry('Updated public layout entry','2026-11-27T21:56:58Z'),entry_key:'my-rotations-compact-preview'}];
+    await m.ctx.RecentFixes.refresh();
+    assert.deepEqual(all(m.root).filter(node=>node.tag==='h4').map(node=>node.textContent),['Updated public layout entry']);
 });
 
 test('history loads near the section, preserves fallback on failure, and retries without raw error disclosure', async () => {
@@ -85,6 +94,6 @@ test('a missing client or malformed response can recover while all public text i
     assert.equal(m.root.children[0],m.saved);
     m.ctx.supabaseClient.rpc=async()=>({data:[entry('<img src=x onerror=alert(1)>','2026-11-27T12:00:00Z')]});
     await m.ctx.RecentFixes.refresh();
-    assert.equal(all(m.root).find(node=>node.tag==='h4').textContent,'<img src=x onerror=alert(1)>');
+    assert.equal(all(m.root).some(node=>node.tag==='h4' && node.textContent==='<img src=x onerror=alert(1)>'),true);
     assert.equal(all(m.root).some(node=>node.tag==='img'),false);
 });

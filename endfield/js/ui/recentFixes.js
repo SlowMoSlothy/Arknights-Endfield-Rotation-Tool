@@ -1,4 +1,12 @@
 (() => {
+    // Release fixes without an issue report travel with the deployed code.
+    const releaseEntries = [{
+        entry_key: "my-rotations-compact-preview",
+        title: "My Rotations · Layout",
+        summary: "Fixed oversized vertical skill previews. Saved rotations now use compact cards with numbered skill icons, clearer team portraits and accessible actions. Full rotations remain available in the details.",
+        thank_you: "",
+        fixed_at: "2026-11-27T21:56:58Z"
+    }];
     const root = document.getElementById("recentFixesEntries");
     if (!root) return;
     const status = document.getElementById("recentFixesStatus");
@@ -50,11 +58,14 @@
     }
     function render(entries) {
         if (!Array.isArray(entries) || entries.some(entry => !entry ||
+            typeof entry.entry_key !== "string" || !entry.entry_key ||
             typeof entry.title !== "string" || typeof entry.summary !== "string" ||
             typeof entry.thank_you !== "string" || !Number.isFinite(Date.parse(entry.fixed_at)))) {
             throw new Error("Invalid fix history");
         }
-        const groups = group(entries);
+        const merged = new Map(releaseEntries.map(entry => [entry.entry_key, entry]));
+        entries.forEach(entry => merged.set(entry.entry_key, entry));
+        const groups = group([...merged.values()]);
         if (!groups.length) {
             root.replaceChildren(node("p", "", "No recent fixes yet."));
             return;

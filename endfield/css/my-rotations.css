@@ -40,6 +40,22 @@ body.my-rotations-modal-open {
     overscroll-behavior: none;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+    background: rgba(5,9,11,0.82);
+}
+
+#myRotationsModal .my-rotations-dialog {
+    background: linear-gradient(150deg, #283132, #171e20 65%);
+}
+
+#myRotationsModal .settings-header {
+    background: #222b2d;
+}
+
+#myRotationsModal .my-rotations-session-bar {
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(8,14,16,0.45);
+    box-shadow: none;
 }
 
 #myRotationsModal .my-rotations-dialog,
@@ -504,6 +520,7 @@ body.report-issue-modal-open {
     min-height: 0;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    align-content: start;
     gap: 12px;
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -512,17 +529,16 @@ body.report-issue-modal-open {
 }
 
 .my-rotation-card {
-    display: grid;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
     gap: 10px;
-    align-content: start;
     padding: 14px;
     border: 1px solid rgba(160,170,169,0.20);
-    border-radius: 16px;
-    background:
-        linear-gradient(180deg, rgba(160,170,169,0.11), rgba(7,9,10,0.54)),
-        radial-gradient(circle at 10% 8%, rgba(248,245,70,0.07), transparent 34%);
+    border-radius: 12px;
+    background: linear-gradient(145deg, #293233, #1b2325);
     contain: layout paint;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.025);
+    box-shadow: inset 0 2px 0 rgba(248,245,70,0.16);
     cursor: pointer;
 }
 
@@ -550,6 +566,7 @@ body.report-issue-modal-open {
     color: #fff;
     font-size: 16px;
     line-height: 1.15;
+    overflow-wrap: anywhere;
 }
 
 .my-status-badge {
@@ -587,21 +604,27 @@ body.report-issue-modal-open {
 }
 
 .my-team-preview {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 7px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
 }
 
 .my-team-operator {
     min-width: 0;
-    display: inline-flex;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 6px;
-    max-width: 130px;
     border: 1px solid rgba(160,170,169,0.18);
-    border-radius: 999px;
+    border-radius: 9px;
     background: rgba(7,9,10,0.42);
-    padding: 4px 8px 4px 4px;
+    padding: 7px 3px;
+}
+
+.my-team-preview .my-operator-avatar {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 auto;
 }
 
 .my-operator-avatar,
@@ -626,6 +649,7 @@ body.report-issue-modal-open {
 
 .my-team-operator-name {
     min-width: 0;
+    max-width: 100%;
     color: rgba(242,242,242,0.86);
     font-size: 10px;
     font-weight: 900;
@@ -636,6 +660,95 @@ body.report-issue-modal-open {
 
 .my-rotation-preview {
     min-width: 0;
+    padding: 9px;
+    border: 1px solid rgba(160,170,169,0.12);
+    border-radius: 9px;
+    background: rgba(5,10,12,0.32);
+}
+
+.my-preview-caption {
+    display: block;
+    margin-bottom: 6px;
+    color: #a0aaa9;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.my-preview-sequence {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.my-preview-step {
+    display: grid;
+    justify-items: center;
+    flex: 0 0 32px;
+    gap: 3px;
+}
+
+.my-preview-number {
+    color: rgba(242,242,242,0.52);
+    font-size: 9px;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.my-rotation-preview .my-preview-skill-icon {
+    --ef-size: 32px;
+    width: 32px;
+    height: 32px;
+    filter: none;
+}
+
+.my-preview-more {
+    display: grid;
+    place-items: center;
+    min-width: 32px;
+    height: 32px;
+    border: 1px dashed rgba(248,245,70,0.32);
+    border-radius: 7px;
+    color: #f8f546;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.my-preview-empty {
+    color: #a0aaa9;
+    font-size: 12px;
+}
+
+.my-rotation-card .my-rotation-actions {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid rgba(160,170,169,0.14);
+    gap: 6px;
+}
+
+.my-rotation-card .my-action-btn {
+    min-height: 44px;
+    padding-inline: 11px;
+    border-radius: 8px;
+    box-shadow: none;
+}
+
+.my-rotation-card .my-action-btn.is-danger {
+    margin-left: auto;
+    border-color: transparent;
+    background: transparent;
+}
+
+.my-rotation-card .my-action-btn:focus-visible {
+    outline: 2px solid #f8f546;
+    outline-offset: 2px;
 }
 
 .my-rotation-description {
@@ -643,6 +756,11 @@ body.report-issue-modal-open {
     color: rgba(242,242,242,0.76);
     font-size: 12px;
     line-height: 1.45;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    overflow-wrap: anywhere;
 }
 
 .my-chip-row {
@@ -882,6 +1000,24 @@ body.report-issue-modal-open {
     .my-rotations-session-bar {
         align-items: stretch;
         flex-direction: column;
+    }
+
+    #myRotationsModal .my-rotations-session-bar {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+    }
+
+    #myRotationsModal .my-rotations-session-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    #myRotationsModal .my-rotations-session-actions button {
+        min-height: 44px;
+        padding-inline: 9px;
     }
 
     .my-rotations-session-actions,
