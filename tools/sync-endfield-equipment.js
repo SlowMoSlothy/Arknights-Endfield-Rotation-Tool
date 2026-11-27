@@ -76,10 +76,12 @@ export async function fetchWeaponList(get = requestJson) {
 
 function identity(existing, field, mapping, sourceId, name) {
   const mapped = mapping[sourceId];
-  if (mapped) return mapped;
+  // A checked-in mapping may be new to an existing deployment. Reuse its
+  // legacy row before creating a second weapon/profile under the suggested key.
+  if (mapped && existing.some(row => row[field] === mapped)) return mapped;
   const matches = existing.filter(row => normalizeName(row.name) === normalizeName(name));
   requireValue(matches.length <= 1, `Ambiguous existing name: ${name}`);
-  const key = matches[0]?.[field] || (name === 'Industry 0.1' ? 'industry_01' : slug(name));
+  const key = matches[0]?.[field] || mapped || (name === 'Industry 0.1' ? 'industry_01' : slug(name));
   requireValue(!existing.some(row => row[field] === key && normalizeName(row.name) !== normalizeName(name)), `Key collision: ${key}`);
   mapping[sourceId] = key;
   return key;
@@ -289,22 +291,21 @@ export async function checkDatabaseWriteAccess(ref, token, get = requestJson) {
     'Database session is read-only. Check the token Database Read-write permission and the project read-only/storage status; no import was attempted.');
 }
 
-export async function sync({ output = path.join(ROOT, '.cache/equipment-import'), apply = false, env = process.env, get = requestJson } = {}) {
+export async function sync({ output = path.join(ROOT, '.cache/equipment-import'), keysPath = path.join(ROOT, 'tools/data/equipment-source-keys.json'), apply = false, weaponsOnly = false, env = process.env, get = requestJson } = {}) {
   const config = await publicConfiguration(env);
   const ref = new URL(config.url).hostname.match(/^([a-z0-9]+)\.supabase\.co$/)?.[1];
   if (apply) requireValue(ref && env.SUPABASE_ACCESS_TOKEN, '--apply requires SUPABASE_ACCESS_TOKEN (Supabase Management API personal access token) and a supabase.co project URL');
   if (apply) await checkDatabaseWriteAccess(ref, env.SUPABASE_ACCESS_TOKEN, get);
-  const keysPath = path.join(ROOT, 'tools/data/equipment-source-keys.json');
   let keys;
   try { keys = JSON.parse(await fs.readFile(keysPath, 'utf8')); } catch (error) { if (error.code !== 'ENOENT') throw error; keys = { weapons: {}, gear_items: {}, gear_sets: {} }; }
   console.log('Reading current Supabase catalog and public equipment sources...');
   const [existing, list, gear, sets, i18n] = await Promise.all([
     readExisting(config.url, config.key, get), fetchWeaponList(get),
-    get(`${TOOLS}/localdb/optimized/equipment/equipment-details.json`),
-    get(`${TOOLS}/localdb/optimized/equipment/suits/suits-list.json`),
-    get(`${TOOLS}/localdb/optimized/i18n/I18nTextTable_EN.json`)
+    weaponsOnly ? {} : get(`${TOOLS}/localdb/optimized/equipment/equipment-details.json`),
+    weaponsOnly ? {} : get(`${TOOLS}/localdb/optimized/equipment/suits/suits-list.json`),
+    weaponsOnly ? {} : get(`${TOOLS}/localdb/optimized/i18n/I18nTextTable_EN.json`)
   ]);
-  requireValue(list.length >= existing.weapons.length * 0.9 && Object.keys(gear).length >= Math.max(1, existing.gear_items.length * 0.9), 'Source catalog shrank unexpectedly; import stopped');
+  requireValue(list.length >= existing.weapons.length * 0.9 && (weaponsOnly || Object.keys(gear).length >= Math.max(1, existing.gear_items.length * 0.9)), 'Source catalog shrank unexpectedly; import stopped');
   const catalog = { weapons: [], weapon_essence_profiles: [], gear_sets: [], gear_items: [] };
   // Sequential detail requests keep the community API load low.
   for (const [index, summary] of list.entries()) {
@@ -314,8 +315,10 @@ export async function sync({ output = path.join(ROOT, '.cache/equipment-import')
     catalog.weapons.push(weapon); catalog.weapon_essence_profiles.push(profile);
     if ((index + 1) % 20 === 0) console.log(`Read ${index + 1}/${list.length} weapon details`);
   }
-  const mapped = mapGear(gear, sets, i18n, existing, keys);
-  catalog.gear_sets = mapped.sets; catalog.gear_items = mapped.items;
+  if (!weaponsOnly) {
+    const mapped = mapGear(gear, sets, i18n, existing, keys);
+    catalog.gear_sets = mapped.sets; catalog.gear_items = mapped.items;
+  }
   const report = diffCatalog(catalog, existing);
   const query = buildSql(catalog, report);
   await fs.mkdir(output, { recursive: true });
@@ -337,8 +340,8 @@ export async function sync({ output = path.join(ROOT, '.cache/equipment-import')
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
   try {
-    const { values } = parseArgs({ options: { apply: { type: 'boolean', default: false }, output: { type: 'string' }, help: { type: 'boolean' } } });
-    if (values.help) console.log('npm run sync:equipment -- [--output DIRECTORY] [--apply]\nDefault: read sources and prepare SQL/report only. --apply requires SUPABASE_ACCESS_TOKEN.');
-    else await sync(values);
+    const { values } = parseArgs({ options: { 'weapons-only': { type: 'boolean', default: false }, apply: { type: 'boolean', default: false }, output: { type: 'string' }, help: { type: 'boolean' } } });
+    if (values.help) console.log('npm run sync:equipment -- [--output DIRECTORY] [--weapons-only] [--apply]\nDefault: read sources and prepare SQL/report only. --apply requires SUPABASE_ACCESS_TOKEN.');
+    else await sync({ ...values, weaponsOnly: values['weapons-only'] });
   } catch (error) { console.error(`Equipment import failed: ${error.message}`); process.exitCode = 1; }
 }
