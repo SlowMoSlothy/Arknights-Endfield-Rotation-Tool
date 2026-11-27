@@ -41,7 +41,7 @@
       "isAccessibleForFree": true
     }
   </script>
-  <link rel="stylesheet" href="css/style.css?v=114">
+  <link rel="stylesheet" href="css/style.css?v=115">
   <link rel="stylesheet" href="css/mobile.css?v=27">
   <link rel="stylesheet" href="css/operatorPortraits.css?v=4">
   <link rel="stylesheet" href="css/operatorAvatarFrames.css?v=1">
@@ -982,6 +982,9 @@
   </div>
   <section class="planner-fixes" aria-labelledby="plannerFixesTitle" lang="en">
     <h2 id="plannerFixesTitle">Recent fixes</h2>
+    <p id="recentFixesStatus" class="planner-fixes-status" role="status" hidden></p>
+    <button id="recentFixesRetry" class="planner-fixes-retry" type="button" hidden>Try again</button>
+    <div id="recentFixesEntries">
     <ul class="planner-fixes-list">
       <li>
         <article aria-labelledby="siInflictionFixTitle">
@@ -1005,6 +1008,7 @@
         </ul>
       </section>
     </details>
+    </div>
   </section>
 
   <section class="seo-description" aria-labelledby="seoTitle">
@@ -1114,7 +1118,8 @@
   <script src="js/ui/communityRotations.js?v=1"></script>
   <script src="js/ui/operatorGallery.js?v=2"></script>
   <script src="js/ui/myRotations.js?v=7"></script>
-  <script src="js/ui/adminPanel.js?v=21"></script>
+  <script src="js/ui/adminPanel.js?v=22"></script>
+  <script src="js/ui/recentFixes.js?v=1"></script>
   <script src="js/ui/plannerAnalyticsReport.js?v=4"></script>
   <script src="js/ui/reportIssue.js?v=3"></script>
   <script src="js/ui/onboarding.js?v=7"></script>

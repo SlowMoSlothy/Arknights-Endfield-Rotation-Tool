@@ -115,6 +115,7 @@ const adminPanelState = {
     detailRotationId: "",
     actionIds: new Set(),
     reportActionIds: new Set(),
+    reportFixDrafts: new Map(),
     operatorActionIds: new Set(),
     authStatus: "",
     authStatusClass: "",
@@ -673,6 +674,41 @@ function createAdminIssueReportsToolbar(closedCount) {
     return toolbar;
 }
 
+function getAdminReportFixDraft(row) {
+    const id = String(row.id);
+    if (!adminPanelState.reportFixDrafts.has(id)) {
+        const titles = { missing_data: "Missing data corrected", incorrect_data: "Incorrect data corrected", bug: "Planner issue fixed" };
+        adminPanelState.reportFixDrafts.set(id, {
+            title: titles[row.report_type] || "Reported issue resolved",
+            summary: "Fixed an issue reported by a community member."
+        });
+    }
+    return adminPanelState.reportFixDrafts.get(id);
+}
+
+function createAdminReportFixEditor(row, isBusy) {
+    const draft = getAdminReportFixDraft(row);
+    const editor = document.createElement("div");
+    editor.className = "admin-report-fix-editor";
+    editor.appendChild(createAdminTextElement("p", "admin-detail-note",
+        "Resolving publishes the text below in Recent fixes with the date and a thank-you to the anonymous reporter. The report itself stays private."));
+    for (const [key, label, limit, tag] of [["title", "Public fix title", 120, "input"], ["summary", "What was fixed? (public)", 800, "textarea"]]) {
+        const field = document.createElement("label");
+        field.className = "admin-field";
+        field.appendChild(createAdminTextElement("span", "", label));
+        const input = document.createElement(tag);
+        input.value = draft[key];
+        input.maxLength = limit;
+        input.disabled = isBusy;
+        if (tag === "textarea") input.rows = 3;
+        else input.type = "text";
+        input.addEventListener("input", () => { draft[key] = input.value; });
+        field.appendChild(input);
+        editor.appendChild(field);
+    }
+    return editor;
+}
+
 function createAdminIssueReportCard(row) {
     const reportId = String(row?.id || "");
     const isBusy = adminPanelState.reportActionIds.has(reportId);
@@ -719,12 +755,13 @@ function createAdminIssueReportCard(row) {
         actions.appendChild(createAdminActionButton("Dismiss", () => setAdminIssueReportStatus(row.id, "dismissed"), { danger: true, disabled: isBusy }));
     }
     if (row.status !== "resolved") {
-        actions.appendChild(createAdminActionButton(isBusy ? "Saving..." : "Resolve", () => setAdminIssueReportStatus(row.id, "resolved"), { primary: true, disabled: isBusy }));
+        actions.appendChild(createAdminActionButton(isBusy ? "Saving..." : "Resolve & publish fix", () => setAdminIssueReportStatus(row.id, "resolved"), { primary: true, disabled: isBusy }));
     }
 
     card.append(header, meta, description);
     if (additional) card.appendChild(additional);
     if (row.review_note) card.appendChild(createAdminTextElement("p", "admin-detail-note", `Admin note: ${row.review_note}`));
+    if (row.status !== "resolved") card.appendChild(createAdminReportFixEditor(row, isBusy));
     card.appendChild(actions);
     return card;
 }
@@ -1922,6 +1959,15 @@ async function fetchAdminIssueReports() {
 async function setAdminIssueReportStatus(reportId, status) {
     const client = getAdminSupabaseClient();
     if (!client || !reportId) return;
+    if (adminPanelState.reportActionIds.has(String(reportId))) return;
+
+    const row = adminPanelState.reports.find(report => String(report.id) === String(reportId));
+    const draft = status === "resolved" ? getAdminReportFixDraft(row || { id: reportId }) : null;
+    if (draft && ((draft.title.trim() && draft.title.trim().length < 3) || draft.title.length > 120 ||
+        (draft.summary.trim() && draft.summary.trim().length < 10) || draft.summary.length > 800)) {
+        setAdminReviewStatus("Public title: 3–120 characters. Public description: 10–800 characters. Leave either empty to use the default text.", "is-error");
+        return;
+    }
 
     let reviewNote = "";
     if (status === "dismissed") {
@@ -1936,20 +1982,29 @@ async function setAdminIssueReportStatus(reportId, status) {
     renderAdminReviewList();
 
     try {
-        const { data, error } = await client.rpc("set_issue_report_status", {
-            target_report_id: reportId,
-            report_status: status,
-            admin_review_note: reviewNote
-        });
+        const { data, error } = status === "resolved"
+            ? await client.rpc("resolve_issue_report_with_fix", {
+                target_report_id: reportId, public_fix_title: draft.title.trim(), public_fix_summary: draft.summary.trim()
+            })
+            : await client.rpc("set_issue_report_status", {
+                target_report_id: reportId, report_status: status, admin_review_note: reviewNote
+            });
         if (error) throw error;
         const updated = Array.isArray(data) ? data[0] : data;
+        if (String(updated?.id) !== id || updated.status !== status) throw new Error("The report update was not confirmed. Please refresh and try again.");
         adminPanelState.reports = adminPanelState.reports.map(row => (
-            String(row.id) === id ? { ...row, ...updated, status, review_note: reviewNote } : row
+            String(row.id) === id ? { ...row, ...updated } : row
         ));
-        setAdminReviewStatus(`Report marked as ${formatAdminReportStatus(status).toLowerCase()}.`, "is-success");
+        adminPanelState.reportFixDrafts.delete(id);
+        setAdminReviewStatus(status === "resolved" ? "Report marked as resolved and published in Recent fixes."
+            : `Report marked as ${formatAdminReportStatus(status).toLowerCase()}.`, "is-success");
+        if (window.RecentFixes) void window.RecentFixes.refresh({ force: true });
     } catch (error) {
         console.error("Issue report status update failed:", error);
-        setAdminReviewStatus(error?.message || "Report status could not be updated.", "is-error");
+        const missingPublicationService = status === "resolved" && ["PGRST202", "42883"].includes(error?.code);
+        setAdminReviewStatus(missingPublicationService
+            ? "Automatic fix publication is not available yet. Run supabase/recent_fixes.sql, then retry. The report was not resolved."
+            : error?.message || "Report status could not be updated.", "is-error");
     } finally {
         adminPanelState.reportActionIds.delete(id);
         refreshAdminNotificationCount();
@@ -1982,6 +2037,7 @@ function setAdminReviewTab(tabId) {
     adminPanelState.batkEditor = null;
     adminPanelState.actionIds.clear();
     adminPanelState.reportActionIds.clear();
+    adminPanelState.reportFixDrafts.clear();
     adminPanelState.operatorActionIds.clear();
     adminPanelState.loaded = false;
     adminPanelState.reviewError = "";
