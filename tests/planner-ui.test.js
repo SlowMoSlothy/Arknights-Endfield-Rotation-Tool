@@ -230,9 +230,9 @@ test("simulation lets a newly applied stack satisfy a total-stack Combo trigger"
 });
 
 test("slot mode resolves and displays physical-status Vulnerable stacks", () => {
-  assert.match(rotationGridScript, /function resolveSlotModeSkillData\(skillData, debuffStackState\)/);
+  assert.match(rotationGridScript, /function resolveSlotModeSkillData\(skillData, debuffStackState[,)]/);
   assert.match(rotationGridScript, /resolveSimulationPhysicalStatusSkill\(resolvedSkillData, debuffStackState\)/);
-  assert.match(rotationGridScript, /skillData = resolveSlotModeSkillData\(skillData, rotationDebuffStackState\)/);
+  assert.match(rotationGridScript, /skillData = resolveSlotModeSkillData\(skillData, rotationDebuffStackState[,)]/);
   assert.match(rotationGridScript, /consumeSlotModeSkillDebuffs\(skillData, rotationDebuffStackState, rotationDebuffMetaState\)/);
 });
 

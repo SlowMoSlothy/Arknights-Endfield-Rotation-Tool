@@ -17,7 +17,8 @@ function context() {
   };
   ctx.getOperatorBySkillId = id => ctx.operators.find(op => op.skills.some(skill => skill.id === id));
   vm.createContext(ctx);
-  for (const file of ['logic/comboEngine.js', 'logic/inflictionEngine.js', 'logic/weaponPassiveEngine.js',
+  for (const file of ['data/buffRegistry.js', 'data/debuffRegistry.js', 'logic/reactionEngine.js',
+    'logic/comboEngine.js', 'logic/inflictionEngine.js', 'logic/weaponPassiveEngine.js',
     'logic/weaponPassiveSimulation.js', 'ui/rotationGrid.js']) {
     vm.runInContext(fs.readFileSync(`endfield/js/${file}`, 'utf8'), ctx);
   }
@@ -88,6 +89,96 @@ test('salvage restores weapons and builds stacks; Battle Skill consumes stacks a
   assert.equal(ctx.resolveComboResourceSkill(skill(3502), state).damageProfile.atkMultiplier, 3);
   assert.equal(ctx.resolveComboResourceSkill(skill(3505), state).comboResourceResolution.unavailable, true);
   assert.equal(skill(3502).damageProfile.atkMultiplier, 3);
+});
+
+test('Slot mode tracks Kay resources separately from enemy effects and forces Combustion only at three', () => {
+  for (const count of [0, 1, 2, 3]) {
+    const ctx = context(), resources = ctx.createInitialComboResourceState();
+    const stacks = {}, meta = {}, buffs = {}, buffMeta = {};
+    const resolve = id => {
+      const resolved = ctx.resolveSlotModeSkillData(skill(id), stacks, resources);
+      const active = ctx.applySkillDebuffsAndGetActiveState(resolved, {}, {}, stacks, meta, buffs, buffMeta);
+      return { resolved, active };
+    };
+    for (let i = 0; i < count; i++) resolve(3503);
+    const { resolved, active } = resolve(3502);
+    assert.equal(resolved.comboResourceResolution.captured.hot, count);
+    assert.equal(resolved.damageProfile.atkMultiplier, 3 + count);
+    assert.equal(active.some(effect => effect.id === 'combustion'), count === 3);
+    assert.equal(active.find(effect => effect.id === 'nature_infliction')?.currentStacks, 1);
+    assert.equal(resources.kay_weapons, 3);
+    assert.equal(resources.kay_dropped_weapons, 0);
+    assert.equal(resources.kay_hot_edgy_naives, 0);
+    assert.equal(Object.keys(stacks).some(key => key.startsWith('kay_')), false);
+    assert.equal(resolve(3502).resolved.debuffs.some(effect => effect.id === 'combustion'), false,
+      'The next Bash cannot reuse the consumed stacks');
+  }
+});
+
+test('Slot mode includes explicit pickups and does not grant a stack for an unavailable pickup', () => {
+  const ctx = context(), resources = ctx.createInitialComboResourceState();
+  for (const id of [3505, 3503, 3505, 3505, 3503, 3503]) {
+    ctx.resolveSlotModeSkillData(skill(id), {}, resources);
+  }
+  assert.equal(resources.kay_hot_edgy_naives, 1);
+  assert.equal(resources.kay_dropped_weapons, 2);
+  const bash = ctx.resolveSlotModeSkillData(skill(3502), {}, resources);
+  assert.equal(bash.comboResourceResolution.captured.hot, 3);
+  assert.equal(bash.debuffs.find(effect => effect.id === 'combustion')?.durationSeconds, 5);
+  assert.equal(resources.kay_hot_edgy_naives, 0);
+  assert.equal(skill(3502).debuffs.some(effect => effect.id === 'combustion'), false);
+});
+
+test('the rendered Slot rotation shows Kay Combustion after salvaging three Weapons, including on redraw', () => {
+  const ctx = context(), trays = [];
+  const node = () => ({ classList: { add() {}, remove() {} }, dataset: {},
+    appendChild() {}, setAttribute() {}, addEventListener() {} });
+  ctx.document = { getElementById: () => node(), createElement: node, documentElement: node() };
+  for (const name of ['removeBasicAttackEntriesFromRotation', 'initRotationDragDrop', 'initTapInput',
+    'renderEnemyEffects', 'renderOperatorBuffs', 'updateRotationActionStates']) ctx[name] = () => {};
+  ctx.isSimulationTimelineMode = () => false;
+  ctx.getTimelineBasicAttackData = () => ({});
+  ctx.getTimelineSecondsPerSlot = () => 1;
+  ctx.createRotationTimelineStep = () => ({ step: node(), skillSlot: node() });
+  ctx.createRotationTimelineConnector = node;
+  ctx.createEffectTray = (effects, kind) => {
+    if (kind === 'debuff') trays.push(Array.from(effects, effect => effect.id));
+    return null;
+  };
+  ctx.rotation = [3503, 3503, 3503, 3502].map(id => ({ id }));
+  for (let i = 0; i < 2; i++) {
+    trays.length = 0;
+    ctx.renderRotation();
+    assert.equal(trays.length, 4);
+    assert.equal(trays.slice(0, 3).some(ids => ids.includes('combustion')), false);
+    assert.ok(trays[3].includes('combustion'));
+    assert.ok(trays[3].includes('nature_infliction'));
+  }
+  ctx.rotation.splice(0, 1);
+  trays.length = 0;
+  ctx.renderRotation();
+  assert.equal(trays.length, 3);
+  assert.equal(trays[2].includes('combustion'), false, 'Deleting a throw must recalculate the Bash outcome');
+});
+
+test('Simulation retains forced Combustion for five seconds without requiring Heat Infliction', () => {
+  const ctx = context();
+  const neutral = { id: 101, operatorId: 1, type: 'Battle Skill' };
+  const events = [3503, 3503, 3503, 3502, 3502].map((id, index) => ({
+    kind: 'manual', time: index * 6, order: index, sourceOperatorId: 35, skillData: skill(id)
+  }));
+  events.splice(4, 0, ...[22.9, 23].map(time => ({
+    kind: 'manual', time, order: 0, sourceOperatorId: 1, skillData: neutral
+  })));
+  const resolved = ctx.enrichSimulationSkillEventsWithEffects(events);
+  const bash = resolved.find(event => event.time === 18);
+  assert.equal(bash.skillData.comboResourceResolution.captured.hot, 3);
+  assert.equal(bash.skillData.comboResourceResolution.after.kay_hot_edgy_naives, 0);
+  assert.equal(bash.activeDebuffs.find(effect => effect.id === 'combustion')?.durationSeconds, 5);
+  assert.ok(bash.activeDebuffs.some(effect => effect.id === 'nature_infliction'));
+  assert.ok(resolved.find(event => event.time === 22.9).activeDebuffs.some(effect => effect.id === 'combustion'));
+  assert.equal(resolved.find(event => event.time === 23).activeDebuffs.some(effect => effect.id === 'combustion'), false);
+  assert.equal(resolved.find(event => event.time === 24).skillData.debuffs.some(effect => effect.id === 'combustion'), false);
 });
 
 test('automatic timeline enforces six-second cooldown, weapon exhaustion and manual recovery', () => {

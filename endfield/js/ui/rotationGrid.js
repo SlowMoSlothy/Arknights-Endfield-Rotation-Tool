@@ -342,7 +342,7 @@ function consumeAllDebuffStacks(effectName, stackState, metaState) {
     delete metaState[key];
 }
 
-function resolveSlotModeSkillData(skillData, debuffStackState) {
+function resolveSlotModeSkillData(skillData, debuffStackState, comboResourceState = {}) {
     let resolvedSkillData = skillData;
     if (typeof resolveSiTeamSkill === "function") {
         resolvedSkillData = resolveSiTeamSkill(resolvedSkillData,
@@ -351,6 +351,11 @@ function resolveSlotModeSkillData(skillData, debuffStackState) {
     }
     if (typeof resolveSimulationAttributeVariant === "function") {
         resolvedSkillData = resolveSimulationAttributeVariant(resolvedSkillData, resolvedSkillData?.operatorId);
+    }
+    // Keep operator resources across slots without exposing them as enemy debuffs.
+    if (typeof resolveComboResourceSkill === "function") {
+        resolvedSkillData = resolveComboResourceSkill(resolvedSkillData, comboResourceState);
+        applyComboResourceUpdates(resolvedSkillData, comboResourceState);
     }
     if (typeof resolveSimulationPhysicalStatusSkill === "function") {
         resolvedSkillData = resolveSimulationPhysicalStatusSkill(resolvedSkillData, debuffStackState);
@@ -7067,6 +7072,9 @@ function renderRotation() {
     const timelineBasicAttackData = getTimelineBasicAttackData();
     const timelineSecondsPerSlot = getTimelineSecondsPerSlot(timelineBasicAttackData);
 
+    const comboResourceState = typeof createInitialComboResourceState === "function"
+        ? createInitialComboResourceState() : {};
+
     let slotConsumedEffectMap = {};
     rotation.forEach((entry, index) => {
         const { step, skillSlot } = createRotationTimelineStep(index, timelineSecondsPerSlot, {
@@ -7076,7 +7084,7 @@ function renderRotation() {
         if (entry) {
             let skillData = typeof getRotationActionData === "function" ? getRotationActionData(entry) : getSkillById(entry.id);
             if (skillData && !skillData.isBasicAttack) {
-                skillData = resolveSlotModeSkillData(skillData, rotationDebuffStackState);
+                skillData = resolveSlotModeSkillData(skillData, rotationDebuffStackState, comboResourceState);
                 const skillDiv = document.createElement("div");
                 skillDiv.className = "skill rotation-skill";
                 if (skillData.elementType) skillDiv.classList.add(`ef-element-${skillData.elementType}`);
