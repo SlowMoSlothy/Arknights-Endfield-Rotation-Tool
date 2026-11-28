@@ -747,6 +747,9 @@ function createAdminIssueReportCard(row) {
 
     const actions = document.createElement("div");
     actions.className = "admin-review-actions";
+    const snapshot = window.ReportRotation?.normalize(row.rotation_snapshot);
+    if (snapshot) actions.appendChild(createAdminActionButton("Load reported rotation",
+        () => loadAdminReportRotation(row), { disabled: isBusy }));
     actions.appendChild(pageLink);
     if (row.status !== "pending") {
         actions.appendChild(createAdminActionButton("Restore", () => setAdminIssueReportStatus(row.id, "pending"), { disabled: isBusy }));
@@ -760,10 +763,27 @@ function createAdminIssueReportCard(row) {
 
     card.append(header, meta, description);
     if (additional) card.appendChild(additional);
+    if (window.ReportRotation) card.appendChild(window.ReportRotation.preview(row.rotation_snapshot));
     if (row.review_note) card.appendChild(createAdminTextElement("p", "admin-detail-note", `Admin note: ${row.review_note}`));
     if (row.status !== "resolved") card.appendChild(createAdminReportFixEditor(row, isBusy));
     card.appendChild(actions);
     return card;
+}
+
+async function loadAdminReportRotation(row) {
+    const snapshot = window.ReportRotation?.normalize(row?.rotation_snapshot);
+    if (!snapshot || typeof applyBuildShareCode !== "function") {
+        setAdminReviewStatus("The reported rotation cannot be loaded.", "is-error");
+        return;
+    }
+    if (!confirm("Load the rotation captured with this report? Your current local setup will be replaced.")) return;
+    try {
+        await applyBuildShareCode(snapshot.share_code);
+        closeAdminPanel();
+    } catch (error) {
+        console.error("Reported rotation load failed:", error);
+        setAdminReviewStatus("The reported rotation could not be loaded.", "is-error");
+    }
 }
 
 function getAdminRowActions(row, isBusy, isActive = false) {
@@ -1939,7 +1959,7 @@ async function fetchAdminIssueReports() {
     try {
         const { data, error } = await client
             .from("issue_reports")
-            .select("id,report_type,description,additional_information,page_url,team_operator_ids,team_operator_names,status,review_note,reviewed_at,created_at,updated_at")
+            .select("id,report_type,description,additional_information,page_url,team_operator_ids,team_operator_names,rotation_snapshot,status,review_note,reviewed_at,created_at,updated_at")
             .eq("game", "arknights_endfield")
             .order("created_at", { ascending: false });
         if (error) throw error;
@@ -1949,7 +1969,7 @@ async function fetchAdminIssueReports() {
         console.error("Admin issue reports could not be loaded:", error);
         adminPanelState.reports = [];
         adminPanelState.loaded = true;
-        adminPanelState.reviewError = "Issue reports could not be loaded. Run the latest supabase/issue_reports.sql and refresh.";
+        adminPanelState.reviewError = "Issue reports could not be loaded. Apply supabase/issue_report_rotations.sql after the existing report setup, then refresh.";
     } finally {
         adminPanelState.loading = false;
         renderAdminReviewList();

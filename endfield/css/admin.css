@@ -1099,6 +1099,63 @@ textarea.admin-batk-input {
     background: linear-gradient(180deg, transparent, rgba(18,20,22,0.98) 35%);
 }
 
+.admin-report-rotation {
+    min-width: 0;
+    border: 1px solid rgba(160,170,169,0.25);
+    border-radius: 12px;
+    padding: 12px;
+    background: rgba(7,10,11,0.45);
+}
+
+.admin-report-rotation summary {
+    cursor: pointer;
+    color: #F8F546;
+    font-weight: 700;
+}
+
+.admin-report-rotation-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0;
+    gap: 8px;
+}
+
+.admin-report-rotation-step {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 8px;
+    background: rgba(160,170,169,0.08);
+}
+
+.admin-report-step-number {
+    flex: 0 0 24px;
+    color: #F8F546;
+    font-variant-numeric: tabular-nums;
+}
+
+.admin-report-rotation-step img {
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+.admin-report-step-copy {
+    min-width: 0;
+    display: grid;
+    gap: 3px;
+    overflow-wrap: anywhere;
+}
+
+.admin-report-step-copy small {
+    color: #a4afad;
+}
+
 @keyframes admin-state-spin {
     to {
         transform: rotate(360deg);

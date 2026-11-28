@@ -29,7 +29,8 @@ function buildIssueReportPayload({
     description,
     additionalInformation = "",
     pageUrl = window.location.href,
-    operatorContext = getReportOperatorContext()
+    operatorContext = getReportOperatorContext(),
+    rotationSnapshot = window.ReportRotation?.capture() || null
 }) {
     return {
         game: "arknights_endfield",
@@ -38,7 +39,8 @@ function buildIssueReportPayload({
         additional_information: String(additionalInformation || "").trim().slice(0, REPORT_ADDITIONAL_MAX_LENGTH),
         page_url: String(pageUrl || "").slice(0, 1000),
         team_operator_ids: operatorContext.ids,
-        team_operator_names: operatorContext.names
+        team_operator_names: operatorContext.names,
+        rotation_snapshot: rotationSnapshot
     };
 }
 
@@ -60,6 +62,15 @@ function updateReportIssueContextPreview() {
 
     const { names } = getReportOperatorContext();
     preview.textContent = names.length ? names.join(", ") : "Current page · No team selected";
+    const rotationPreview = document.getElementById("reportIssueRotationPreview");
+    if (rotationPreview) {
+        const snapshot = window.ReportRotation?.capture();
+        rotationPreview.textContent = snapshot
+            ? `${snapshot.rotation.length} action${snapshot.rotation.length === 1 ? "" : "s"} attached · ${snapshot.mode === "simulation" ? "Simulation" : "Slot mode"}`
+            : typeof rotation !== "undefined" && Array.isArray(rotation) && rotation.some(Boolean)
+                ? "The current rotation could not be attached. You can still send a report."
+                : "No rotation to attach.";
+    }
 }
 
 function openReportIssueModal() {
@@ -126,9 +137,13 @@ async function submitReportIssue(event) {
         const { error } = await client.from("issue_reports").insert(payload);
         if (error) throw error;
 
-        setReportIssueStatus("Thank you. Your report was sent anonymously.", "is-success");
+        const missingRotation = !payload.rotation_snapshot
+            && typeof rotation !== "undefined" && Array.isArray(rotation) && rotation.some(Boolean);
+        setReportIssueStatus(missingRotation
+            ? "Thank you. Your report was sent anonymously, but the rotation could not be attached."
+            : "Thank you. Your report was sent anonymously.", "is-success");
         document.getElementById("reportIssueForm")?.reset();
-        window.setTimeout(closeReportIssueModal, 1100);
+        if (!missingRotation) window.setTimeout(closeReportIssueModal, 1100);
     } catch (error) {
         console.error("Issue report submission failed:", error);
         setReportIssueStatus(
