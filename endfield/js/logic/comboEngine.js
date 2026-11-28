@@ -410,6 +410,8 @@ function hasRequiredComboRuleEffects(rule, effectMap) {
     ].filter(Boolean);
 
     const hasRequiredEffects = requiredEffects.every(effectName => hasEffect(effectName));
+    const hasRequiredBuffStacks = !rule?.requiresBuffStacks || hasEffect(
+        rule.requiresBuffStacks.buff, rule.requiresBuffStacks.minStacks);
     const hasRequiredStacks = !rule?.requiresEffectStacks || hasEffect(
         rule.requiresEffectStacks.effect || rule.requiresEffectStacks.debuff || rule.requiresEffectStacks.buff,
         rule.requiresEffectStacks.minStacks
@@ -418,16 +420,11 @@ function hasRequiredComboRuleEffects(rule, effectMap) {
         .filter(Boolean)
         .every(effectName => !hasEffect(effectName));
 
-    return hasRequiredEffects && hasRequiredStacks && hasNoExcludedEffects;
+    return hasRequiredEffects && hasRequiredBuffStacks && hasRequiredStacks && hasNoExcludedEffects;
 }
 
 function hasRequiredComboBuff(rule, effectMap) {
-    if (rule?.requiresEffect || rule?.requiresDebuff || rule?.requiresEffectStacks || rule?.noneOf) {
-        return hasRequiredComboRuleEffects(rule, effectMap);
-    }
-
-    const requiredList = Array.isArray(rule?.requiresBuff) ? rule.requiresBuff : [rule?.requiresBuff];
-    return requiredList.every(buffName => Boolean(effectMap[normalizeComboEffectKey(buffName)]));
+    return hasRequiredComboRuleEffects(rule, effectMap);
 }
 
 function addEffectDefinitionToMap(effect, effectMap) {
@@ -454,6 +451,17 @@ function applyConditionalDebuffsToComboMap(skillData, effectMap, contextEffectMa
             if (effect.persistsForCombo === false) return;
             addEffectDefinitionToMap(effect, effectMap);
         });
+    });
+}
+
+function consumeConditionalComboBuffs(skillData, effectMap, contextEffectMap) {
+    (skillData?.conditionalDebuffs || []).forEach(rule => {
+        const config = rule.consumeBuffStacks;
+        if (!config?.buff || !hasRequiredComboBuff(rule, contextEffectMap)) return;
+        const key = normalizeComboEffectKey(config.buff);
+        const remaining = Number(effectMap[key] || 0) - Number(config.amount || 1);
+        if (remaining > 0) effectMap[key] = remaining;
+        else delete effectMap[key];
     });
 }
 
@@ -544,6 +552,9 @@ function applySkillEffectsToComboMap(
         skillData = resolveSimulationAttributeVariant(skillData, skillData?.operatorId);
     }
     skillData = resolveSimulationPhysicalStatusSkill(skillData, contextEffectMap);
+    const conditionContext = { ...contextEffectMap };
+    const matchedRules = (skillData?.conditionalDebuffs || [])
+        .filter(rule => hasRequiredComboBuff(rule, conditionContext));
     const transientComboTriggerEffects = new Set([
         "final_strike",
         "combo_skill",
@@ -558,8 +569,8 @@ function applySkillEffectsToComboMap(
     ]);
 
     const allEffects = [
-        ...(Array.isArray(skillData?.debuffs) ? skillData.debuffs : []),
-        ...(Array.isArray(skillData?.buffs) ? skillData.buffs : [])
+        ...(matchedRules.some(rule => rule.skipNormalDebuffs) ? [] : (Array.isArray(skillData?.debuffs) ? skillData.debuffs : [])),
+        ...(matchedRules.some(rule => rule.skipNormalBuffs) ? [] : (Array.isArray(skillData?.buffs) ? skillData.buffs : []))
     ];
 
     allEffects.forEach(effect => {
@@ -575,7 +586,7 @@ function applySkillEffectsToComboMap(
         addEffectDefinitionToMap(effect, effectMap);
     });
 
-    applyConditionalDebuffsToComboMap(skillData, effectMap, contextEffectMap);
+    applyConditionalDebuffsToComboMap(skillData, effectMap, conditionContext);
     removeConsumedDebuffsFromEffectMap(skillData, effectMap);
 
     const consumedInflictionBuff = consumeInflictionToBuffFromEffectMap(skillData, effectMap) ||
@@ -605,7 +616,10 @@ function applySkillEffectsToComboMap(
             matchingInfliction.maxStacks
         );
     }
-    if (!skipResourceUpdates && effectMap === contextEffectMap) applyComboResourceUpdates(skillData, effectMap);
+    if (effectMap === contextEffectMap) {
+        consumeConditionalComboBuffs(skillData, effectMap, conditionContext);
+        if (!skipResourceUpdates) applyComboResourceUpdates(skillData, effectMap);
+    }
 }
 
 function collectPersistentEffectsFromRotationUpToIndex(endIndex) {
@@ -792,6 +806,8 @@ function insertComboChain(startSkillId, startIndex) {
         currentSkillData = resolveComboResourceSkill(currentSkillData, effectMapBeforeSkill);
         const currentEffects = collectEffectsFromSkill(currentSkillData, effectMapBeforeSkill);
         applyComboResourceUpdates(currentSkillData, persistentEffectMap);
+        consumeConditionalComboBuffs(currentSkillData, persistentEffectMap, effectMapBeforeSkill);
+        consumeConditionalComboBuffs(currentSkillData, chainEffectMap, effectMapBeforeSkill);
 
 Object.entries(currentEffects).forEach(([effectName, amount]) => {
     addAmountToEffectMap(chainEffectMap, effectName, amount);

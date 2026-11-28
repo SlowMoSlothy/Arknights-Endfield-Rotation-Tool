@@ -34,14 +34,17 @@ test('public history groups all fixes from the same Berlin calendar day, newest 
     const m=mount(async()=>({data:rows})); await tick();
     assert.equal(m.calls[0][0],'list_recent_fixes');
     const latest = m.root.children[0];
-    assert.equal(latest.attributes['aria-label'],'27 Nov 2026');
-    assert.deepEqual(all(latest).filter(node=>node.tag==='h4').map(node=>node.textContent),['My Rotations · Layout','Si','Near midnight']);
-    assert.equal(all(latest).find(node=>node.tag==='time').dateTime,'2026-11-27');
-    assert.equal(all(latest).filter(node=>node.className==='planner-fix-thanks').length,2);
+    assert.equal(latest.attributes['aria-label'],'28 Nov 2026');
+    assert.deepEqual(all(latest).filter(node=>node.tag==='h4').map(node=>node.textContent),['Conditional operator effects']);
     const older = m.root.children[1];
     assert.equal(older.tag,'details');
-    assert.equal(older.children[0].textContent,'Earlier fixes (1)');
-    assert.equal(older.children[1].attributes['aria-label'],'25 Nov 2026');
+    assert.equal(older.children[0].textContent,'Earlier fixes (4)');
+    const previousDay = older.children[1];
+    assert.equal(previousDay.attributes['aria-label'],'27 Nov 2026');
+    assert.deepEqual(all(previousDay).filter(node=>node.tag==='h4').map(node=>node.textContent),['My Rotations · Layout','Si','Near midnight']);
+    assert.equal(all(previousDay).find(node=>node.tag==='time').dateTime,'2026-11-27');
+    assert.equal(all(previousDay).filter(node=>node.className==='planner-fix-thanks').length,2);
+    assert.equal(older.children[2].attributes['aria-label'],'25 Nov 2026');
     assert.equal(m.status.hidden,true);
 });
 
@@ -51,7 +54,17 @@ test('release fixes remain visible alongside database entries and duplicate keys
     assert.equal(all(m.root).filter(node=>node.tag==='h4' && node.textContent==='My Rotations · Layout').length,1);
     rows=[{...entry('Updated public layout entry','2026-11-27T21:56:58Z'),entry_key:'my-rotations-compact-preview'}];
     await m.ctx.RecentFixes.refresh();
-    assert.deepEqual(all(m.root).filter(node=>node.tag==='h4').map(node=>node.textContent),['Updated public layout entry']);
+    assert.deepEqual(all(m.root).filter(node=>node.tag==='h4').map(node=>node.textContent),['Conditional operator effects','Updated public layout entry']);
+});
+
+test('operator audit release shares its date group with the published Kay report and retains its acknowledgement', async () => {
+    const m=mount(async()=>({data:[entry('Kay · Really Heavy Bash','2026-11-28T14:00:00Z')]})); await tick();
+    const latest=m.root.children[0];
+    assert.equal(latest.attributes['aria-label'],'28 Nov 2026');
+    assert.deepEqual(all(latest).filter(node=>node.tag==='h4').map(node=>node.textContent),['Conditional operator effects','Kay · Really Heavy Bash']);
+    assert.equal(all(latest).filter(node=>node.className==='planner-fix-thanks').length,1);
+    const summary=all(latest).find(node=>node.tag==='p' && node.textContent.includes('Wulfgard')).textContent;
+    for (const name of ['Wulfgard','Tangtang','Zhuang Fangyi','Lifeng','Laevatain']) assert.ok(summary.includes(name));
 });
 
 test('history loads near the section, preserves fallback on failure, and retries without raw error disclosure', async () => {

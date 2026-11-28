@@ -1,6 +1,12 @@
 (() => {
     // Release fixes without an issue report travel with the deployed code.
     const releaseEntries = [{
+        entry_key: "conditional-operator-effects",
+        title: "Conditional operator effects",
+        summary: "Corrected conditional effects for Wulfgard, Tangtang and Zhuang Fangyi in Slot mode, including reaction consumption, Whirlpool-based Arts Susceptibility and stack-scaled effects. Fixed Lifeng's pre-hit Vulnerability check and Laevatain's four-stack replacement and consumption in combo detection.",
+        thank_you: "",
+        fixed_at: "2026-11-28T15:16:54Z"
+    }, {
         entry_key: "my-rotations-compact-preview",
         title: "My Rotations · Layout",
         summary: "Fixed oversized vertical skill previews. Saved rotations now use compact cards with numbered skill icons, clearer team portraits and accessible actions. Full rotations remain available in the details.",

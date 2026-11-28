@@ -225,7 +225,7 @@ function hasRequiredRotationConditionalEffects(rule, activeBuffMetaState, active
 
     if (rule?.requiresBuffStacks) {
         const key = normalizeKey(rule.requiresBuffStacks.buff);
-        return Number(activeBuffStackState[key] || 0) >= Number(rule.requiresBuffStacks.minStacks || 1);
+        if (Number(activeBuffStackState[key] || 0) < Number(rule.requiresBuffStacks.minStacks || 1)) return false;
     }
 
     if (rule?.requiresEffectStacks) {
@@ -252,25 +252,23 @@ function hasRequiredRotationConditionalEffects(rule, activeBuffMetaState, active
 
 function getMatchedConditionalRules(skillData, activeBuffMetaState, activeBuffStackState, debuffMetaState = {}, debuffStackState = {}) {
     if (!Array.isArray(skillData?.conditionalDebuffs)) return [];
-    return skillData.conditionalDebuffs.filter(rule => {
-        if (rule?.requiresEffect || rule?.requiresDebuff || rule?.requiresEffectStacks || rule?.noneOf) {
-            return hasRequiredRotationConditionalEffects(rule, activeBuffMetaState, activeBuffStackState, debuffMetaState, debuffStackState);
-        }
-        return hasRequiredRotationBuff(rule, activeBuffMetaState, activeBuffStackState);
-    });
+    return skillData.conditionalDebuffs.filter(rule =>
+        hasRequiredRotationConditionalEffects(rule, activeBuffMetaState, activeBuffStackState, debuffMetaState, debuffStackState));
 }
 
-function shouldSkipNormalBuffs(skillData, activeBuffMetaState, activeBuffStackState) {
-    return getMatchedConditionalRules(skillData, activeBuffMetaState, activeBuffStackState).some(rule => rule.skipNormalBuffs === true);
+function shouldSkipNormalBuffs(skillData, activeBuffMetaState, activeBuffStackState, contextDebuffs = {}) {
+    return getMatchedConditionalRules(skillData, activeBuffMetaState, activeBuffStackState,
+        contextDebuffs.meta, contextDebuffs.stacks).some(rule => rule.skipNormalBuffs === true);
 }
 
-function shouldSkipNormalDebuffs(skillData, activeBuffMetaState, activeBuffStackState) {
-    return getMatchedConditionalRules(skillData, activeBuffMetaState, activeBuffStackState).some(rule => rule.skipNormalDebuffs === true);
+function shouldSkipNormalDebuffs(skillData, activeBuffMetaState, activeBuffStackState, contextDebuffs = {}) {
+    return getMatchedConditionalRules(skillData, activeBuffMetaState, activeBuffStackState,
+        contextDebuffs.meta, contextDebuffs.stacks).some(rule => rule.skipNormalDebuffs === true);
 }
 
-function applySkillBuffsAndGetActiveState(skillData, stackState, metaState, activeBuffMetaState = metaState, activeBuffStackState = stackState) {
+function applySkillBuffsAndGetActiveState(skillData, stackState, metaState, activeBuffMetaState = metaState, activeBuffStackState = stackState, contextDebuffs = {}) {
     consumeRotationBuffsForSkill(skillData, stackState, metaState);
-    if (!shouldSkipNormalBuffs(skillData, activeBuffMetaState, activeBuffStackState)) {
+    if (!shouldSkipNormalBuffs(skillData, activeBuffMetaState, activeBuffStackState, contextDebuffs)) {
         getVisibleRotationBuffs(skillData).forEach(effect => {
             if (effect.persistsForCombo !== false) addBuffToRotationState(effect, stackState, metaState);
         });
@@ -342,7 +340,7 @@ function consumeAllDebuffStacks(effectName, stackState, metaState) {
     delete metaState[key];
 }
 
-function resolveSlotModeSkillData(skillData, debuffStackState, comboResourceState = {}) {
+function resolveSlotModeSkillData(skillData, debuffStackState, comboResourceState = {}, battlefieldResourceState = {}, triggerEffectMap = {}) {
     let resolvedSkillData = skillData;
     if (typeof resolveSiTeamSkill === "function") {
         resolvedSkillData = resolveSiTeamSkill(resolvedSkillData,
@@ -357,8 +355,16 @@ function resolveSlotModeSkillData(skillData, debuffStackState, comboResourceStat
         resolvedSkillData = resolveComboResourceSkill(resolvedSkillData, comboResourceState);
         applyComboResourceUpdates(resolvedSkillData, comboResourceState);
     }
+    const activeDebuffsBefore = Object.entries(debuffStackState).map(([id, currentStacks]) => ({ id, currentStacks }));
+    if (typeof resolveBattlefieldResourceSkill === "function") {
+        // Slots have no clock: retain placed resources until an action consumes them.
+        resolvedSkillData = resolveBattlefieldResourceSkill(resolvedSkillData, activeDebuffsBefore, 0, battlefieldResourceState).skillData;
+    }
     if (typeof resolveSimulationPhysicalStatusSkill === "function") {
         resolvedSkillData = resolveSimulationPhysicalStatusSkill(resolvedSkillData, debuffStackState);
+    }
+    if (typeof applySimulationConsumedEffectScaling === "function") {
+        resolvedSkillData = applySimulationConsumedEffectScaling(resolvedSkillData, activeDebuffsBefore, triggerEffectMap);
     }
     return resolvedSkillData;
 }
@@ -518,18 +524,19 @@ function consumeSteelOathForSkill(skillData, stackState, metaState, appliedDebuf
     return consumed;
 }
 
-function applySkillDebuffsAndGetActiveState(skillData, activeBuffMetaState, activeBuffStackState, debuffStackState, debuffMetaState, buffStackState, buffMetaState, triggerEffectMap = {}) {
-    const appliedDebuffs = shouldSkipNormalDebuffs(skillData, activeBuffMetaState, activeBuffStackState)
+function applySkillDebuffsAndGetActiveState(skillData, activeBuffMetaState, activeBuffStackState, debuffStackState, debuffMetaState, buffStackState, buffMetaState, triggerEffectMap = {}, contextDebuffs = null) {
+    // Conditions refer to the target before this action consumes or adds effects.
+    const debuffStackStateBeforeSkill = contextDebuffs?.stacks || { ...debuffStackState };
+    const debuffMetaStateBeforeSkill = contextDebuffs?.meta || { ...debuffMetaState };
+    const before = { stacks: debuffStackStateBeforeSkill, meta: debuffMetaStateBeforeSkill };
+    const appliedDebuffs = shouldSkipNormalDebuffs(skillData, activeBuffMetaState, activeBuffStackState, before)
         ? [] : (skillData.debuffs || []);
     const conditionalDebuffs = getMatchedConditionalRules(skillData, activeBuffMetaState, activeBuffStackState,
-        debuffMetaState, debuffStackState).flatMap(rule => rule.debuffs || []);
+        debuffMetaStateBeforeSkill, debuffStackStateBeforeSkill).flatMap(rule => rule.debuffs || []);
     consumeSteelOathForSkill(skillData, debuffStackState, debuffMetaState,
         [...appliedDebuffs, ...conditionalDebuffs], triggerEffectMap);
 
-    const debuffStackStateBeforeSkill = { ...debuffStackState };
-    const debuffMetaStateBeforeSkill = { ...debuffMetaState };
-
-    if (!shouldSkipNormalDebuffs(skillData, activeBuffMetaState, activeBuffStackState)) {
+    if (!shouldSkipNormalDebuffs(skillData, activeBuffMetaState, activeBuffStackState, before)) {
         getVisibleRotationDebuffs(skillData).forEach(effect => {
             if (effect.persistsForCombo !== false) addDebuffToRotationState(effect, debuffStackState, debuffMetaState);
         });
@@ -5127,6 +5134,7 @@ function enrichSimulationSkillEventsWithEffects(events) {
             expireTimedEffects(rotationBuffStackState, rotationBuffMetaState, typeof BUFF_REGISTRY !== "undefined" ? BUFF_REGISTRY : null);
             expireTimedEffects(rotationDebuffStackState, rotationDebuffMetaState, typeof DEBUFF_REGISTRY !== "undefined" ? DEBUFF_REGISTRY : null);
             const activeDebuffsBeforeSkill = getActiveDebuffsFromRotationState(rotationDebuffStackState, rotationDebuffMetaState);
+            const contextDebuffs = { stacks: { ...rotationDebuffStackState }, meta: { ...rotationDebuffMetaState } };
             const activeBuffsBeforeSkill = {
                 ...rotationBuffMetaState
             };
@@ -5174,7 +5182,7 @@ function enrichSimulationSkillEventsWithEffects(events) {
             };
             (Array.isArray(skillDataWithTimedEffects.consumeDebuffs) ? skillDataWithTimedEffects.consumeDebuffs : [])
                 .forEach(effectName => consumeAllDebuffStacks(effectName, rotationDebuffStackState, rotationDebuffMetaState));
-            applySkillBuffsAndGetActiveState(skillDataWithTimedEffects, rotationBuffStackState, rotationBuffMetaState, activeBuffsBeforeSkill, activeBuffStacksBeforeSkill);
+            applySkillBuffsAndGetActiveState(skillDataWithTimedEffects, rotationBuffStackState, rotationBuffMetaState, activeBuffsBeforeSkill, activeBuffStacksBeforeSkill, contextDebuffs);
             const activeDebuffs = applySkillDebuffsAndGetActiveState(
                 skillDataWithTimedEffects,
                 activeBuffsBeforeSkill,
@@ -5183,7 +5191,8 @@ function enrichSimulationSkillEventsWithEffects(events) {
                 rotationDebuffMetaState,
                 rotationBuffStackState,
                 rotationBuffMetaState,
-                event.triggerEffectMap || {}
+                event.triggerEffectMap || {},
+                contextDebuffs
             );
             const enrichedEvent = {
                 ...event,
@@ -7074,6 +7083,7 @@ function renderRotation() {
 
     const comboResourceState = typeof createInitialComboResourceState === "function"
         ? createInitialComboResourceState() : {};
+    const battlefieldResourceState = {};
 
     let slotConsumedEffectMap = {};
     rotation.forEach((entry, index) => {
@@ -7084,7 +7094,7 @@ function renderRotation() {
         if (entry) {
             let skillData = typeof getRotationActionData === "function" ? getRotationActionData(entry) : getSkillById(entry.id);
             if (skillData && !skillData.isBasicAttack) {
-                skillData = resolveSlotModeSkillData(skillData, rotationDebuffStackState, comboResourceState);
+                skillData = resolveSlotModeSkillData(skillData, rotationDebuffStackState, comboResourceState, battlefieldResourceState, slotConsumedEffectMap);
                 const skillDiv = document.createElement("div");
                 skillDiv.className = "skill rotation-skill";
                 if (skillData.elementType) skillDiv.classList.add(`ef-element-${skillData.elementType}`);
@@ -7097,10 +7107,11 @@ function renderRotation() {
                 const activeBuffStacksBeforeSkill = {
                     ...rotationBuffStackState
                 };
+                const contextDebuffs = { stacks: { ...rotationDebuffStackState }, meta: { ...rotationDebuffMetaState } };
                 const consumedEffects = consumeSlotModeSkillDebuffs(skillData, rotationDebuffStackState, rotationDebuffMetaState);
                 if (Object.keys(consumedEffects).length) slotConsumedEffectMap = consumedEffects;
                 else if (!entry.autoInserted && Number(skillData.id) !== 2203) slotConsumedEffectMap = {};
-                applySkillBuffsAndGetActiveState(skillData, rotationBuffStackState, rotationBuffMetaState, activeBuffsBeforeSkill, activeBuffStacksBeforeSkill);
+                applySkillBuffsAndGetActiveState(skillData, rotationBuffStackState, rotationBuffMetaState, activeBuffsBeforeSkill, activeBuffStacksBeforeSkill, contextDebuffs);
                 const inner = document.createElement("div");
                 inner.className = "rotation-skill-composite";
                 const portrait = document.createElement("img");
@@ -7122,7 +7133,7 @@ function renderRotation() {
                 inner.appendChild(typeBadge);
                 inner.appendChild(glyphBadge);
                 skillDiv.appendChild(inner);
-                const activeDebuffs = applySkillDebuffsAndGetActiveState(skillData, activeBuffsBeforeSkill, activeBuffStacksBeforeSkill, rotationDebuffStackState, rotationDebuffMetaState, rotationBuffStackState, rotationBuffMetaState, slotConsumedEffectMap);
+                const activeDebuffs = applySkillDebuffsAndGetActiveState(skillData, activeBuffsBeforeSkill, activeBuffStacksBeforeSkill, rotationDebuffStackState, rotationDebuffMetaState, rotationBuffStackState, rotationBuffMetaState, slotConsumedEffectMap, contextDebuffs);
                 if (Number(skillData.id) === 2203) slotConsumedEffectMap = {};
                 const activeBuffsAfterEffects = getActiveBuffsFromRotationState(rotationBuffStackState, rotationBuffMetaState);
                 const buffTray = createEffectTray(activeBuffsAfterEffects, "buff");

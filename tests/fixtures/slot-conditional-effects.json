@@ -1,0 +1,2383 @@
+{
+  "source": "Public RotationForge planner database, read-only export",
+  "checkedAt": "2026-11-28",
+  "operatorCount": 36,
+  "skillCount": 172,
+  "operators": [
+    {
+      "id": 14,
+      "name": "Chen Qianyu",
+      "elementType": "physical",
+      "comboResources": []
+    },
+    {
+      "id": 6,
+      "name": "Arclight",
+      "elementType": "electric",
+      "comboResources": []
+    },
+    {
+      "id": 10,
+      "name": "Alesh",
+      "elementType": "physical",
+      "comboResources": []
+    },
+    {
+      "id": 32,
+      "name": "Purrchena",
+      "elementType": "physical",
+      "comboResources": []
+    },
+    {
+      "id": 7,
+      "name": "Avywenna",
+      "elementType": "electric",
+      "comboResources": []
+    },
+    {
+      "id": 33,
+      "name": "Si",
+      "elementType": "cryo",
+      "comboResources": []
+    },
+    {
+      "id": 2,
+      "name": "Akekuri",
+      "elementType": "heat",
+      "comboResources": []
+    },
+    {
+      "id": 22,
+      "name": "Pogranichnik",
+      "elementType": "physical",
+      "comboResources": []
+    },
+    {
+      "id": 34,
+      "name": "Argent Flow",
+      "elementType": "electric",
+      "comboResources": []
+    },
+    {
+      "id": 8,
+      "name": "Antal",
+      "elementType": "electric",
+      "comboResources": []
+    },
+    {
+      "id": 13,
+      "name": "Catcher",
+      "elementType": "physical",
+      "comboResources": []
+    },
+    {
+      "id": 35,
+      "name": "Kay",
+      "elementType": "nature",
+      "comboResources": [
+        {
+          "name": "Weapons",
+          "effect": "kay_weapons",
+          "maxStacks": 3,
+          "initialStacks": 3
+        },
+        {
+          "name": "Dropped Weapons",
+          "effect": "kay_dropped_weapons",
+          "maxStacks": 3,
+          "initialStacks": 0
+        },
+        {
+          "name": "Hot Edgy Naives",
+          "effect": "kay_hot_edgy_naives",
+          "maxStacks": 3,
+          "initialStacks": 0
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "name": "Mimino",
+      "elementType": "physical",
+      "comboResources": [
+        {
+          "name": "Portable Device",
+          "effect": "mimino_device",
+          "maxStacks": 1,
+          "initialStacks": 0
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "name": "Laevatain",
+      "elementType": "heat",
+      "comboResources": []
+    },
+    {
+      "id": 18,
+      "name": "Estella",
+      "elementType": "cryo",
+      "comboResources": []
+    },
+    {
+      "id": 19,
+      "name": "Fluorite",
+      "elementType": "nature",
+      "comboResources": []
+    },
+    {
+      "id": 20,
+      "name": "Last Rite",
+      "elementType": "cryo",
+      "comboResources": []
+    },
+    {
+      "id": 11,
+      "name": "Gilberta",
+      "elementType": "nature",
+      "comboResources": []
+    },
+    {
+      "id": 12,
+      "name": "Ardelia",
+      "elementType": "nature",
+      "comboResources": []
+    },
+    {
+      "id": 16,
+      "name": "Da Pan",
+      "elementType": "physical",
+      "comboResources": []
+    },
+    {
+      "id": 17,
+      "name": "Ember",
+      "elementType": "heat",
+      "comboResources": []
+    },
+    {
+      "id": 31,
+      "name": "Typhoeus",
+      "elementType": "nature",
+      "comboResources": []
+    },
+    {
+      "id": 4,
+      "name": "Perlica",
+      "elementType": "electric",
+      "comboResources": []
+    },
+    {
+      "id": 5,
+      "name": "Rossi",
+      "elementType": "physical",
+      "comboResources": []
+    },
+    {
+      "id": 21,
+      "name": "Lifeng",
+      "elementType": "physical",
+      "comboResources": []
+    },
+    {
+      "id": 23,
+      "name": "Snowshine",
+      "elementType": "cryo",
+      "comboResources": []
+    },
+    {
+      "id": 27,
+      "name": "Mi Fu",
+      "elementType": "physical",
+      "comboResources": []
+    },
+    {
+      "id": 24,
+      "name": "Wulfgard",
+      "elementType": "heat",
+      "comboResources": []
+    },
+    {
+      "id": 25,
+      "name": "Xaihi",
+      "elementType": "cryo",
+      "comboResources": []
+    },
+    {
+      "id": 26,
+      "name": "Yvonne",
+      "elementType": "cryo",
+      "comboResources": []
+    },
+    {
+      "id": 15,
+      "name": "Tangtang",
+      "elementType": "cryo",
+      "comboResources": []
+    },
+    {
+      "id": 28,
+      "name": "Arcane",
+      "elementType": "nature",
+      "comboResources": []
+    },
+    {
+      "id": 29,
+      "name": "Camille",
+      "elementType": "heat",
+      "comboResources": []
+    },
+    {
+      "id": 30,
+      "name": "Liino",
+      "elementType": "electric",
+      "comboResources": []
+    },
+    {
+      "id": 9,
+      "name": "Zhuang",
+      "elementType": "electric",
+      "comboResources": []
+    },
+    {
+      "id": 3,
+      "name": "Endministrator",
+      "elementType": "physical",
+      "comboResources": []
+    }
+  ],
+  "buffs": [
+    {
+      "id": "melting_flames",
+      "name": "Melting Flames",
+      "iconBase": "assets/ui/buffs/laevatain/melting_flames",
+      "extension": "png",
+      "maxStacks": 4,
+      "stackable": true
+    },
+    {
+      "id": "electrification",
+      "name": "Electrification",
+      "iconBase": "assets/ui/buffs/electrification",
+      "extension": "png",
+      "maxStacks": 4,
+      "stackable": true
+    },
+    {
+      "id": "electric_amp",
+      "name": "Electric Amp",
+      "iconBase": "assets/ui/buffs/electric_amp",
+      "extension": "svg",
+      "maxStacks": 0,
+      "stackable": false
+    },
+    {
+      "id": "arts_amp",
+      "name": "Arts Amp",
+      "iconBase": "assets/ui/buffs/arts_amp",
+      "extension": "png",
+      "maxStacks": 0,
+      "stackable": false
+    },
+    {
+      "id": "cryo_amp",
+      "name": "Cryo Amp",
+      "iconBase": "assets/ui/buffs/cryo_amp",
+      "extension": "png",
+      "maxStacks": 0,
+      "stackable": false
+    },
+    {
+      "id": "auxiliary_crystal",
+      "name": "Auxiliary Crystal",
+      "iconBase": "assets/operators/skills/xaihi/bs_small",
+      "extension": "png",
+      "maxStacks": 2,
+      "onConsume": {
+        "id": "xaihi_auxiliary_crystal_treatment",
+        "name": "Auxiliary Crystal Treatment",
+        "type": "Treatment Proc",
+        "shortType": "PROC",
+        "operatorId": 25,
+        "damageProfile": null,
+        "sustainProfile": {
+          "verified": true,
+          "sourceUrl": "https://www.icy-veins.com/arknights-endfield/xaihi-profile-skills",
+          "skillLevel": 12,
+          "treatments": [
+            {
+              "name": "Controlled Operator Treatment",
+              "target": "controlled_operator",
+              "tickCount": 1,
+              "baseTreatment": 324,
+              "willMultiplier": 0.76
+            }
+          ],
+          "conditionalBuffs": [
+            {
+              "name": "Arts Amp",
+              "valuePercent": 15,
+              "conditionLabel": "At Max HP",
+              "durationSeconds": 25
+            }
+          ]
+        }
+      },
+      "stackable": true,
+      "consumeStacks": 1,
+      "durationSeconds": 20,
+      "consumeOnSkillType": "final_strike",
+      "onFullyConsumedEffect": "auxiliary_crystal_used_up"
+    },
+    {
+      "id": "atk_up",
+      "name": "ATK Up",
+      "iconBase": "assets/ui/buffs/atk_up",
+      "extension": "png",
+      "maxStacks": 4,
+      "stackable": true
+    },
+    {
+      "id": "crit_up",
+      "name": "Crit Up",
+      "iconBase": "assets/ui/buffs/crit_up",
+      "extension": "png",
+      "maxStacks": 4,
+      "stackable": true
+    },
+    {
+      "id": "link",
+      "name": "Link",
+      "iconBase": "assets/ui/buffs/link",
+      "verified": true,
+      "extension": "png",
+      "maxStacks": 4,
+      "sourceUrl": "https://endfield.wiki.gg/wiki/Damage",
+      "stackable": true,
+      "consumeAllStacks": true,
+      "consumeOnSkillType": [
+        "Battle Skill",
+        "Ultimate"
+      ],
+      "skillValueByStacks": {
+        "maxStacks": 4,
+        "valueField": "multiplicativeDamageBonusPercent",
+        "valuesBySkillType": {
+          "bs": {
+            "1": 30,
+            "2": 45,
+            "3": 60,
+            "4": 75
+          },
+          "ult": {
+            "1": 20,
+            "2": 30,
+            "3": 40,
+            "4": 50
+          },
+          "ultimate": {
+            "1": 20,
+            "2": 30,
+            "3": 40,
+            "4": 50
+          },
+          "battle_skill": {
+            "1": 30,
+            "2": 45,
+            "3": 60,
+            "4": 75
+          }
+        }
+      }
+    },
+    {
+      "id": "hypothermic_perfusion",
+      "name": "Hypothermic Perfusion",
+      "iconBase": "assets/operators/skills/lastrite/bs_small",
+      "extension": "png",
+      "maxStacks": 0,
+      "stackable": false,
+      "consumeStacks": 1,
+      "consumeOnSkillType": "final_strike"
+    },
+    {
+      "id": "shield",
+      "name": "Shield",
+      "iconBase": "assets/ui/buffs/ember/shield",
+      "extension": "png",
+      "maxStacks": 0,
+      "stackable": false
+    },
+    {
+      "id": "protection",
+      "name": "Protection",
+      "iconBase": "assets/ui/buffs/protection",
+      "extension": "png",
+      "maxStacks": 0,
+      "stackable": false
+    },
+    {
+      "id": "whirlpool",
+      "name": "Whirlpool",
+      "iconBase": "assets/operators/skills/tangtang/65px-Combo-Tangtang",
+      "extension": "webp",
+      "maxStacks": 2,
+      "stackable": true
+    },
+    {
+      "id": "rossi_crit_buff",
+      "name": "Crit Rate / Crit DMG",
+      "target": "self",
+      "iconBase": "assets/buffs/rossi/crit_buff",
+      "verified": true,
+      "extension": "png",
+      "maxStacks": 0,
+      "sourceUrl": "https://endfield.wiki.gg/wiki/Rossi",
+      "stackable": false,
+      "critRatePercent": 15,
+      "durationSeconds": 15,
+      "critDamagePercent": 30
+    }
+  ],
+  "skills": [
+    {
+      "id": 102,
+      "operatorId": 1,
+      "name": "Smouldering Fire",
+      "type": "Battle Skill",
+      "shortType": "BS",
+      "description": "Applies Heat Infliction and grants Melting Flame. At 4 Melting Flame, consumes all stacks and applies Combustion instead of the normal Heat Infliction.",
+      "conditionalDebuffs": [
+        {
+          "debuffs": [
+            {
+              "id": "combustion",
+              "name": "Combustion",
+              "visible": true,
+              "iconBase": "assets/debuffs/combustion",
+              "stackable": false,
+              "appliesEffect": "combustion",
+              "persistsForCombo": true
+            }
+          ],
+          "skipNormalBuffs": true,
+          "consumeBuffStacks": {
+            "buff": "melting_flames",
+            "amount": 4
+          },
+          "skipNormalDebuffs": true,
+          "requiresBuffStacks": {
+            "buff": "melting_flames",
+            "minStacks": 4
+          }
+        }
+      ],
+      "debuffs": [
+        {
+          "id": "heat_infliction",
+          "name": "Heat Infliction",
+          "visible": true,
+          "iconBase": "assets/debuffs/heat_infliction",
+          "maxStacks": 4,
+          "stackable": true,
+          "appliesEffect": "heat_infliction",
+          "stacksApplied": 1,
+          "persistsForCombo": true
+        }
+      ],
+      "buffs": [
+        {
+          "id": "melting_flames",
+          "name": "Melting Flame",
+          "visible": true,
+          "iconBase": "assets/ui/buffs/laevatain/melting_flames",
+          "maxStacks": 4,
+          "stackable": true,
+          "appliesEffect": "melting_flames",
+          "stacksApplied": 1,
+          "persistsForCombo": true
+        }
+      ],
+      "damageProfile": {
+        "atkMultiplier": 0.68,
+        "hitCount": 1,
+        "element": "heat"
+      }
+    },
+    {
+      "id": 502,
+      "operatorId": 5,
+      "name": "Crimson Shadow",
+      "type": "Battle Skill",
+      "shortType": "BS",
+      "description": "Applies Lift. If Vulnerability is present, Rossi also performs a Heat follow-up.",
+      "physicalStatusResolution": {
+        "verified": true,
+        "sourceUrl": "https://endfield.games/en/tutorials/battle/",
+        "statusEffect": "lift",
+        "vulnerableEffect": "vulnerable",
+        "statusApplication": {
+          "name": "Lift",
+          "visible": true,
+          "iconBase": "assets/debuffs/lift"
+        },
+        "vulnerabilityMode": "stack",
+        "vulnerableApplication": {
+          "name": "Vulnerable",
+          "visible": true,
+          "iconBase": "assets/debuffs/vulnerable",
+          "maxStacks": 4,
+          "stacksApplied": 1
+        }
+      },
+      "debuffs": [
+        {
+          "id": "lift",
+          "name": "Lift",
+          "visible": true,
+          "iconBase": "assets/debuffs/lift",
+          "appliesEffect": "lift",
+          "persistsForCombo": false
+        },
+        {
+          "id": "heat_followup",
+          "name": "Heat Follow-up",
+          "visible": false,
+          "appliesEffect": "heat_followup",
+          "persistsForCombo": false
+        }
+      ],
+      "damageProfile": {
+        "atkMultiplier": 2.13,
+        "hitCount": 1,
+        "element": "physical"
+      }
+    },
+    {
+      "id": 903,
+      "operatorId": 9,
+      "name": "Breath of Transformation",
+      "type": "Combo Skill",
+      "shortType": "CS",
+      "description": "Triggers on Final Strike or Finisher against a target with Electric Infliction. Consumes Electric Infliction to forcibly apply Electrification.",
+      "consumedEffectScaling": {
+        "effect": "electric_infliction",
+        "effectValues": [
+          {
+            "effect": "electrification",
+            "maxStacks": 4,
+            "minimumStacksApplied": 1,
+            "stacksAppliedPerStack": 1,
+            "stacksAppliedWhenExisting": 1
+          }
+        ],
+        "ultimateEnergyBase": 10,
+        "ultimateEnergyPerStack": 10
+      },
+      "debuffs": [
+        {
+          "id": "electrification",
+          "name": "Electrification",
+          "visible": true,
+          "maxStacks": 4,
+          "stackable": true,
+          "appliesEffect": "electrification",
+          "stacksApplied": 1,
+          "persistsForCombo": true
+        }
+      ],
+      "comboTriggers": [
+        {
+          "anyOf": [
+            {
+              "effect": "final_strike",
+              "minStacks": 1
+            },
+            {
+              "effect": "finisher",
+              "minStacks": 1
+            }
+          ]
+        },
+        {
+          "effect": "electric_infliction",
+          "minStacks": 1
+        }
+      ],
+      "allowSelfTrigger": true,
+      "consumeDebuffs": [
+        "electric_infliction"
+      ],
+      "damageProfile": {
+        "atkMultiplier": 1.6,
+        "hitCount": 1,
+        "element": "electric"
+      }
+    },
+    {
+      "id": 1903,
+      "operatorId": 19,
+      "name": "Free Giveaway",
+      "type": "Combo Skill",
+      "shortType": "CS",
+      "description": "Triggers when the enemy has at least 2 Cryo or Nature Infliction stacks. Adds another stack of the matching Arts Infliction.",
+      "matchingInfliction": {
+        "maxStacks": 4,
+        "minStacks": 2,
+        "stacksApplied": 1,
+        "candidateEffects": [
+          "cryo_infliction",
+          "nature_infliction"
+        ]
+      },
+      "comboTriggers": [
+        {
+          "effect": "cryo_infliction",
+          "minStacks": 2
+        },
+        {
+          "effect": "nature_infliction",
+          "minStacks": 2
+        }
+      ],
+      "allowSelfTrigger": true
+    },
+    {
+      "id": 2203,
+      "operatorId": 22,
+      "name": "Full Moon Slash",
+      "type": "Combo Skill",
+      "shortType": "CS",
+      "description": "Triggers when Breach or Crush consumes Vulnerable stacks. Deals Physical DMG and recovers SP.",
+      "triggerEffectScaling": {
+        "effect": "vulnerable_consumed",
+        "maxStacks": 4,
+        "sourceUrl": "https://endfield.wiki.gg/wiki/Pogranichnik",
+        "skillLevel": 1,
+        "stackSource": "trigger",
+        "variantsByStacks": {
+          "1": {
+            "spRecovery": 5,
+            "damageProfile": {
+              "hitCount": 1,
+              "atkMultiplier": 0.42
+            },
+            "damageSequences": [
+              {
+                "label": "SEQ 1",
+                "spRecovery": 5,
+                "atkMultiplier": 0.42,
+                "sequenceIndex": 1
+              }
+            ],
+            "ultimateEnergyGain": 10
+          },
+          "2": {
+            "spRecovery": 12,
+            "damageProfile": {
+              "hitCount": 2,
+              "atkMultiplier": 0.96
+            },
+            "damageSequences": [
+              {
+                "label": "SEQ 1",
+                "spRecovery": 5,
+                "atkMultiplier": 0.42,
+                "sequenceIndex": 1
+              },
+              {
+                "label": "SEQ 2",
+                "spRecovery": 7,
+                "atkMultiplier": 0.54,
+                "sequenceIndex": 2
+              }
+            ],
+            "ultimateEnergyGain": 10
+          },
+          "3": {
+            "spRecovery": 25,
+            "damageProfile": {
+              "hitCount": 3,
+              "atkMultiplier": 1.62
+            },
+            "damageSequences": [
+              {
+                "label": "SEQ 1",
+                "spRecovery": 5,
+                "atkMultiplier": 0.42,
+                "sequenceIndex": 1
+              },
+              {
+                "label": "SEQ 2",
+                "spRecovery": 7,
+                "atkMultiplier": 0.54,
+                "sequenceIndex": 2
+              },
+              {
+                "label": "SEQ 3",
+                "spRecovery": 13,
+                "atkMultiplier": 0.66,
+                "sequenceIndex": 3
+              }
+            ],
+            "ultimateEnergyGain": 10
+          },
+          "4": {
+            "spRecovery": 35,
+            "damageProfile": {
+              "hitCount": 3,
+              "atkMultiplier": 2.28
+            },
+            "damageSequences": [
+              {
+                "label": "SEQ 1",
+                "spRecovery": 5,
+                "atkMultiplier": 0.42,
+                "sequenceIndex": 1
+              },
+              {
+                "label": "SEQ 2",
+                "spRecovery": 7,
+                "atkMultiplier": 0.54,
+                "sequenceIndex": 2
+              },
+              {
+                "label": "Enhanced SEQ 3",
+                "enhanced": true,
+                "spRecovery": 23,
+                "atkMultiplier": 1.32,
+                "sequenceIndex": 3
+              }
+            ],
+            "ultimateEnergyGain": 10
+          }
+        }
+      },
+      "comboTriggers": [
+        {
+          "effect": "vulnerable_consumed",
+          "minStacks": 1
+        },
+        {
+          "anyOf": [
+            {
+              "effect": "breach",
+              "minStacks": 1
+            },
+            {
+              "effect": "crush",
+              "minStacks": 1
+            }
+          ]
+        }
+      ],
+      "allowSelfTrigger": true,
+      "spRecovery": {
+        "source": "Full Moon Slash",
+        "effects": [
+          "vulnerable"
+        ],
+        "maxStacks": 4,
+        "amountByStacks": {
+          "1": 5,
+          "2": 12,
+          "3": 25,
+          "4": 35
+        },
+        "fallbackStacks": 1
+      },
+      "damageProfile": {
+        "atkMultiplier": 1.62,
+        "hitCount": 1,
+        "element": "physical"
+      }
+    },
+    {
+      "id": 503,
+      "operatorId": 5,
+      "name": "Moment of Blazing Shadow",
+      "type": "Combo Skill",
+      "shortType": "CS",
+      "description": "Triggers when the enemy has Vulnerability and any Arts Infliction. Consumes all Arts Infliction stacks, applies Lift, and buffs Rossi's Crit stats.",
+      "consumedEffectScaling": {
+        "effects": [
+          "heat_infliction",
+          "electric_infliction",
+          "cryo_infliction",
+          "nature_infliction"
+        ],
+        "maxStacks": 4,
+        "sourceUrl": "https://endfield.wiki.gg/wiki/Rossi",
+        "skillLevel": 1,
+        "damageSequences": [
+          {
+            "label": "COMBO SEQUENCE 1",
+            "sequenceIndex": 1,
+            "baseAtkMultiplier": 0.67,
+            "ultimateEnergyGain": 10
+          },
+          {
+            "label": "COMBO SEQUENCE 2",
+            "sequenceIndex": 2,
+            "baseAtkMultiplier": 1.33,
+            "ultimateEnergyGain": 10,
+            "atkMultiplierPerStack": 0.8,
+            "consumesConfiguredEffects": true
+          }
+        ],
+        "stackAggregation": "sum",
+        "damageAtkMultiplierPerStack": 0.8
+      },
+      "debuffs": [
+        {
+          "id": "lift",
+          "name": "Lift",
+          "visible": true,
+          "iconBase": "assets/debuffs/lift",
+          "appliesEffect": "lift",
+          "persistsForCombo": false
+        },
+        {
+          "id": "vulnerable",
+          "name": "Vulnerable",
+          "visible": true,
+          "iconBase": "assets/debuffs/vulnerable",
+          "maxStacks": 4,
+          "stackable": true,
+          "appliesEffect": "vulnerable",
+          "stacksApplied": 2,
+          "persistsForCombo": true
+        },
+        {
+          "id": "arts_infliction_consumed",
+          "name": "Arts Infliction Consumed",
+          "visible": false,
+          "appliesEffect": "arts_infliction_consumed",
+          "persistsForCombo": false
+        }
+      ],
+      "buffs": [
+        {
+          "id": "rossi_crit_buff",
+          "name": "Crit Rate / Crit DMG",
+          "target": "self",
+          "visible": true,
+          "iconBase": "assets/buffs/rossi/crit_buff",
+          "stackable": false,
+          "appliesEffect": "rossi_crit_buff",
+          "critRatePercent": 15,
+          "durationSeconds": 15,
+          "persistsForCombo": true,
+          "critDamagePercent": 30
+        }
+      ],
+      "comboTriggers": [
+        {
+          "effect": "vulnerable",
+          "minStacks": 1
+        },
+        {
+          "anyOf": [
+            {
+              "effect": "heat_infliction",
+              "minStacks": 1
+            },
+            {
+              "effect": "electric_infliction",
+              "minStacks": 1
+            },
+            {
+              "effect": "nature_infliction",
+              "minStacks": 1
+            },
+            {
+              "effect": "cryo_infliction",
+              "minStacks": 1
+            }
+          ]
+        }
+      ],
+      "allowSelfTrigger": true,
+      "consumeDebuffs": [
+        "arts_infliction",
+        "heat_infliction",
+        "electric_infliction",
+        "nature_infliction",
+        "cryo_infliction"
+      ],
+      "damageProfile": {
+        "atkMultiplier": 2,
+        "hitCount": 1,
+        "element": "physical"
+      }
+    },
+    {
+      "id": 101,
+      "operatorId": 1,
+      "name": "Flaming Cinders",
+      "type": "Final Strike",
+      "shortType": "FS",
+      "description": "Final Strike. Absorbs Heat Infliction and converts absorbed stacks into Melting Flame.",
+      "consumeInflictionToBuff": {
+        "ratio": 1,
+        "visible": true,
+        "buffName": "Melting Flame",
+        "iconBase": "assets/ui/buffs/laevatain/melting_flames",
+        "grantBuff": "melting_flames",
+        "maxStacks": 4,
+        "stackable": true,
+        "infliction": "heat_infliction"
+      },
+      "debuffs": [
+        {
+          "id": "final_strike",
+          "name": "Final Strike",
+          "visible": false,
+          "appliesEffect": "final_strike",
+          "persistsForCombo": false
+        }
+      ],
+      "damageProfile": {
+        "atkMultiplier": 4,
+        "hitCount": 1,
+        "element": "heat"
+      }
+    },
+    {
+      "id": 103,
+      "operatorId": 1,
+      "name": "Seethe",
+      "type": "Combo Skill",
+      "shortType": "CS",
+      "description": "Triggers on Combustion or Corrosion.",
+      "buffs": [
+        {
+          "id": "melting_flames",
+          "name": "Melting Flame",
+          "visible": true,
+          "iconBase": "assets/ui/buffs/laevatain/melting_flames",
+          "maxStacks": 4,
+          "stackable": true,
+          "appliesEffect": "melting_flames",
+          "stacksApplied": 1,
+          "persistsForCombo": true
+        }
+      ],
+      "comboTriggers": [
+        {
+          "anyOf": [
+            {
+              "effect": "combustion",
+              "minStacks": 1
+            },
+            {
+              "effect": "corrosion",
+              "minStacks": 1
+            }
+          ]
+        }
+      ],
+      "damageProfile": {
+        "atkMultiplier": 2.4,
+        "hitCount": 1,
+        "element": "heat"
+      }
+    },
+    {
+      "id": 1104,
+      "operatorId": 11,
+      "name": "Arcane Staff: Gravity Field",
+      "type": "Ultimate",
+      "shortType": "Ult",
+      "description": "Applies Nature Infliction, Slow, and Arts Susceptibility. Lifted targets remain airborne while the field persists.",
+      "activeEffectScaling": {
+        "effect": "vulnerable",
+        "maxStacks": 4,
+        "sourceUrl": "https://endfield.wiki.gg/wiki/Gilberta",
+        "skillLevel": 1,
+        "effectValues": [
+          {
+            "effect": "arts_susceptibility",
+            "durationSeconds": 5,
+            "baseValuePercent": 18,
+            "valuePercentPerStack": 1.8
+          }
+        ]
+      },
+      "debuffs": [
+        {
+          "id": "nature_infliction",
+          "name": "Nature Infliction",
+          "visible": true,
+          "iconBase": "assets/debuffs/nature_infliction",
+          "maxStacks": 4,
+          "stackable": true,
+          "appliesEffect": "nature_infliction",
+          "stacksApplied": 1,
+          "persistsForCombo": true
+        },
+        {
+          "id": "slow",
+          "name": "Slow",
+          "visible": true,
+          "stackable": false,
+          "valuePercent": 80,
+          "appliesEffect": "slow",
+          "durationSeconds": 5,
+          "persistsForCombo": true
+        },
+        {
+          "id": "arts_susceptibility",
+          "name": "Arts Susceptibility",
+          "visible": true,
+          "iconBase": "assets/debuffs/arts_susceptibility",
+          "stackable": false,
+          "valuePercent": 18,
+          "appliesEffect": "arts_susceptibility",
+          "durationSeconds": 5,
+          "persistsForCombo": true
+        }
+      ],
+      "damageProfile": {
+        "atkMultiplier": 3.33,
+        "hitCount": 1,
+        "element": "nature"
+      }
+    },
+    {
+      "id": 902,
+      "operatorId": 9,
+      "name": "Mantra of Sundering",
+      "type": "Battle Skill",
+      "shortType": "BS",
+      "description": "Consumes Electrification to create Sunderblades, channels nearby Sunderblades for Thunder Strikes, and grants Electric Amp.",
+      "battlefieldResource": {
+        "name": "Sunderblades",
+        "strikes": {
+          "useAllActiveStacks": true,
+          "finalStrikeMultiplier": 6,
+          "atkMultiplierPerStrike": 0.45,
+          "bonusAtkMultiplierPerConsumedStack": 0.09
+        },
+        "creation": {
+          "baseStacks": 1,
+          "consumedEffect": "electrification",
+          "fallbackStacks": 1,
+          "maxStacksPerUse": 3,
+          "stacksPerConsumedStack": 1,
+          "fallbackWhenBelowStacks": 3
+        },
+        "maxStacks": 9,
+        "resourceKey": "sunderblades",
+        "durationSeconds": 36,
+        "ownerOperatorId": 9,
+        "progressiveBuff": {
+          "effect": "electric_amp",
+          "target": "self",
+          "baseValue": 18,
+          "valueField": "electricDamageBonusPercent",
+          "valuePerStrike": 2,
+          "durationSeconds": 5
+        },
+        "ultimateEnergyPerStrike": 6
+      },
+      "buffs": [
+        {
+          "id": "electric_amp",
+          "name": "Electric Amp",
+          "target": "self",
+          "visible": true,
+          "stackable": false,
+          "appliesEffect": "electric_amp",
+          "durationSeconds": 5,
+          "persistsForCombo": true,
+          "electricDamageBonusPercent": 18
+        }
+      ],
+      "consumeDebuffs": [
+        "electrification"
+      ],
+      "damageProfile": {
+        "atkMultiplier": 0.2,
+        "hitCount": 1,
+        "element": "electric"
+      }
+    },
+    {
+      "id": 1503,
+      "operatorId": 15,
+      "name": "RIVER, TO ME!",
+      "type": "Combo Skill",
+      "shortType": "CS",
+      "description": "Triggers when applying Cryo Infliction or dealing Arts Burst DMG. Creates a Whirlpool.",
+      "battlefieldResource": {
+        "name": "Whirlpool",
+        "creation": {
+          "maxStacksPerUse": 1,
+          "guaranteedStacks": 1
+        },
+        "iconBase": "assets/operators/skills/tangtang/65px-Combo-Tangtang",
+        "maxStacks": 2,
+        "sourceUrl": "https://www.icy-veins.com/arknights-endfield/tangtang-profile-skills",
+        "skillLevel": 12,
+        "resourceKey": "whirlpool",
+        "displayTrack": "buff",
+        "durationSeconds": 30,
+        "ownerOperatorId": 15
+      },
+      "debuffs": [
+        {
+          "id": "slow",
+          "name": "Slow",
+          "visible": true,
+          "appliesEffect": "slow",
+          "persistsForCombo": true
+        }
+      ],
+      "buffs": [],
+      "comboTriggers": [
+        {
+          "effect": "cryo_infliction",
+          "minStacks": 1
+        },
+        {
+          "effect": "arts_burst",
+          "minStacks": 1
+        }
+      ],
+      "allowSelfTrigger": true,
+      "damageProfile": {
+        "atkMultiplier": 1.07,
+        "hitCount": 1,
+        "element": "cryo"
+      }
+    },
+    {
+      "id": 1502,
+      "operatorId": 15,
+      "name": "IMA WAVERIDAAH!",
+      "type": "Battle Skill",
+      "shortType": "BS",
+      "description": "Shoots Cryo waves that apply Cryo Infliction and can trigger Waterspouts from existing Whirlpools.",
+      "battlefieldResource": {
+        "name": "Whirlpool",
+        "iconBase": "assets/operators/skills/tangtang/65px-Combo-Tangtang",
+        "maxStacks": 2,
+        "sourceUrl": "https://www.icy-veins.com/arknights-endfield/tangtang-profile-skills",
+        "skillLevel": 12,
+        "consumption": {
+          "consumeAllActive": true
+        },
+        "resourceKey": "whirlpool",
+        "displayTrack": "buff",
+        "durationSeconds": 30,
+        "ownerOperatorId": 15,
+        "outcomesByConsumedStacks": {
+          "0": {
+            "actionOverride": {
+              "debuffs": [
+                {
+                  "id": "cryo_infliction",
+                  "name": "Cryo Infliction",
+                  "visible": true,
+                  "maxStacks": 4,
+                  "stackable": true,
+                  "appliesEffect": "cryo_infliction",
+                  "stacksApplied": 1,
+                  "persistsForCombo": true
+                }
+              ],
+              "spRecovery": 0,
+              "damageProfile": {
+                "element": "cryo",
+                "hitCount": 2,
+                "atkMultiplier": 4.8
+              },
+              "damageSequences": [
+                {
+                  "label": "Shot",
+                  "atkMultiplier": 1.8,
+                  "sequenceIndex": 1
+                },
+                {
+                  "label": "Waterspout 1",
+                  "atkMultiplier": 3,
+                  "sequenceIndex": 2
+                }
+              ]
+            }
+          },
+          "1": {
+            "actionOverride": {
+              "debuffs": [
+                {
+                  "id": "cryo_infliction",
+                  "name": "Cryo Infliction",
+                  "visible": true,
+                  "maxStacks": 4,
+                  "stackable": true,
+                  "appliesEffect": "cryo_infliction",
+                  "stacksApplied": 1,
+                  "persistsForCombo": true
+                },
+                {
+                  "id": "arts_susceptibility",
+                  "name": "Arts Susceptibility",
+                  "visible": true,
+                  "iconBase": "assets/debuffs/arts_susceptibility",
+                  "stackable": false,
+                  "valuePercent": 5,
+                  "appliesEffect": "arts_susceptibility",
+                  "durationSeconds": 15,
+                  "persistsForCombo": true
+                }
+              ],
+              "spReturn": true,
+              "spRecovery": 20,
+              "damageProfile": {
+                "element": "cryo",
+                "hitCount": 3,
+                "atkMultiplier": 7.8
+              },
+              "damageSequences": [
+                {
+                  "label": "Shot",
+                  "atkMultiplier": 1.8,
+                  "sequenceIndex": 1
+                },
+                {
+                  "label": "Waterspout 1",
+                  "atkMultiplier": 3,
+                  "sequenceIndex": 2
+                },
+                {
+                  "label": "Waterspout 2",
+                  "atkMultiplier": 3,
+                  "sequenceIndex": 3
+                }
+              ]
+            }
+          },
+          "2": {
+            "actionOverride": {
+              "debuffs": [
+                {
+                  "id": "cryo_infliction",
+                  "name": "Cryo Infliction",
+                  "visible": true,
+                  "maxStacks": 4,
+                  "stackable": true,
+                  "appliesEffect": "cryo_infliction",
+                  "stacksApplied": 1,
+                  "persistsForCombo": true
+                },
+                {
+                  "id": "arts_susceptibility",
+                  "name": "Arts Susceptibility",
+                  "visible": true,
+                  "iconBase": "assets/debuffs/arts_susceptibility",
+                  "stackable": false,
+                  "valuePercent": 10,
+                  "appliesEffect": "arts_susceptibility",
+                  "durationSeconds": 15,
+                  "persistsForCombo": true
+                }
+              ],
+              "spReturn": true,
+              "spRecovery": 40,
+              "damageProfile": {
+                "element": "cryo",
+                "hitCount": 4,
+                "atkMultiplier": 10.8
+              },
+              "damageSequences": [
+                {
+                  "label": "Shot",
+                  "atkMultiplier": 1.8,
+                  "sequenceIndex": 1
+                },
+                {
+                  "label": "Waterspout 1",
+                  "atkMultiplier": 3,
+                  "sequenceIndex": 2
+                },
+                {
+                  "label": "Waterspout 2",
+                  "atkMultiplier": 3,
+                  "sequenceIndex": 3
+                },
+                {
+                  "label": "Waterspout 3",
+                  "atkMultiplier": 3,
+                  "sequenceIndex": 4
+                }
+              ]
+            }
+          }
+        }
+      },
+      "debuffs": [
+        {
+          "id": "cryo_infliction",
+          "name": "Cryo Infliction",
+          "visible": true,
+          "maxStacks": 4,
+          "stackable": true,
+          "appliesEffect": "cryo_infliction",
+          "stacksApplied": 1,
+          "persistsForCombo": true
+        }
+      ],
+      "damageSequences": [
+        {
+          "label": "Shot",
+          "atkMultiplier": 1.8,
+          "sequenceIndex": 1
+        },
+        {
+          "label": "Waterspout 1",
+          "atkMultiplier": 3,
+          "sequenceIndex": 2
+        }
+      ],
+      "damageProfile": {
+        "atkMultiplier": 2.13,
+        "hitCount": 1,
+        "element": "cryo"
+      }
+    },
+    {
+      "id": 803,
+      "operatorId": 8,
+      "name": "EMP Test Site",
+      "type": "Combo Skill",
+      "shortType": "CS",
+      "description": "Triggers when a focused enemy suffers a Physical Status or Arts Infliction, then applies another stack of the same effect.",
+      "matchingInfliction": {
+        "maxStacks": 4,
+        "minStacks": 1,
+        "stacksApplied": 1,
+        "candidateEffects": [
+          "arts_infliction",
+          "heat_infliction",
+          "electric_infliction",
+          "cryo_infliction",
+          "nature_infliction",
+          "vulnerable",
+          "slow",
+          "lift",
+          "stagger"
+        ]
+      },
+      "comboTriggers": [
+        {
+          "effect": "focus",
+          "minStacks": 1
+        },
+        {
+          "anyOf": [
+            {
+              "effect": "arts_infliction",
+              "minStacks": 1
+            },
+            {
+              "effect": "heat_infliction",
+              "minStacks": 1
+            },
+            {
+              "effect": "electric_infliction",
+              "minStacks": 1
+            },
+            {
+              "effect": "cryo_infliction",
+              "minStacks": 1
+            },
+            {
+              "effect": "nature_infliction",
+              "minStacks": 1
+            },
+            {
+              "effect": "vulnerable",
+              "minStacks": 1
+            },
+            {
+              "effect": "slow",
+              "minStacks": 1
+            },
+            {
+              "effect": "lift",
+              "minStacks": 1
+            },
+            {
+              "effect": "stagger",
+              "minStacks": 1
+            }
+          ]
+        }
+      ],
+      "damageProfile": {
+        "atkMultiplier": 1.51,
+        "hitCount": 1,
+        "element": "electric"
+      }
+    },
+    {
+      "id": 2502,
+      "operatorId": 25,
+      "name": "Distributed DoS",
+      "type": "Battle Skill",
+      "shortType": "BS",
+      "description": "Summons Auxiliary Crystal. The crystal provides HP Treatment after Final Strikes and grants Arts Amp if HP is full.",
+      "buffs": [
+        {
+          "id": "auxiliary_crystal",
+          "name": "Auxiliary Crystal",
+          "visible": true,
+          "maxStacks": 2,
+          "onConsume": {
+            "id": "xaihi_auxiliary_crystal_treatment",
+            "name": "Auxiliary Crystal Treatment",
+            "type": "Treatment Proc",
+            "shortType": "PROC",
+            "operatorId": 25,
+            "damageProfile": null,
+            "sustainProfile": {
+              "verified": true,
+              "sourceUrl": "https://www.icy-veins.com/arknights-endfield/xaihi-profile-skills",
+              "skillLevel": 12,
+              "treatments": [
+                {
+                  "name": "Controlled Operator Treatment",
+                  "target": "controlled_operator",
+                  "tickCount": 1,
+                  "baseTreatment": 324,
+                  "willMultiplier": 0.76
+                }
+              ],
+              "conditionalBuffs": [
+                {
+                  "name": "Arts Amp",
+                  "valuePercent": 15,
+                  "conditionLabel": "At Max HP",
+                  "durationSeconds": 25
+                }
+              ]
+            }
+          },
+          "stackable": true,
+          "appliesEffect": "auxiliary_crystal",
+          "consumeStacks": 1,
+          "stacksApplied": 2,
+          "durationSeconds": 20,
+          "persistsForCombo": true,
+          "consumeOnSkillType": "final_strike",
+          "onFullyConsumedEffect": "auxiliary_crystal_used_up"
+        }
+      ],
+      "damageProfile": null
+    },
+    {
+      "id": 2503,
+      "operatorId": 25,
+      "name": "Stress Testing",
+      "type": "Combo Skill",
+      "shortType": "CS",
+      "description": "Triggers when Auxiliary Crystal uses up its HP treatments. Applies Cryo Infliction.",
+      "debuffs": [
+        {
+          "id": "cryo_infliction",
+          "name": "Cryo Infliction",
+          "visible": true,
+          "maxStacks": 4,
+          "stackable": true,
+          "appliesEffect": "cryo_infliction",
+          "stacksApplied": 1,
+          "persistsForCombo": true
+        }
+      ],
+      "comboTriggers": [
+        {
+          "effect": "auxiliary_crystal_used_up",
+          "minStacks": 1
+        }
+      ],
+      "allowSelfTrigger": true,
+      "damageProfile": {
+        "atkMultiplier": 2,
+        "hitCount": 1,
+        "element": "cryo"
+      }
+    },
+    {
+      "id": 1202,
+      "operatorId": 12,
+      "name": "Dolly Rush",
+      "type": "Battle Skill",
+      "shortType": "BS",
+      "description": "Creates Mr. Dolly healing zones. If Corrosion is present nearby, Dolly Rush can recast for free.",
+      "battlefieldResource": {
+        "name": "Shadow of Mr. Dolly",
+        "creation": {
+          "maxStacksPerUse": 3,
+          "guaranteedStacks": 3
+        },
+        "iconBase": "assets/operators/skills/ardelia/bs_small",
+        "maxStacks": 10,
+        "sourceUrl": "https://www.icy-veins.com/arknights-endfield/ardelia-profile-skills",
+        "skillLevel": 12,
+        "resourceKey": "shadow_of_mr_dolly",
+        "displayTrack": "buff",
+        "durationSeconds": 10,
+        "ownerOperatorId": 12
+      },
+      "consumeDebuffs": [
+        "corrosion"
+      ],
+      "damageProfile": {
+        "atkMultiplier": 1.42,
+        "hitCount": 1,
+        "element": "nature"
+      }
+    },
+    {
+      "id": 3402,
+      "operatorId": 34,
+      "name": "Darkness Cowed",
+      "type": "Battle Skill",
+      "shortType": "BS",
+      "description": "Sweeps his lance for Physical DMG and applies Lift. After Stars Shifted, this skill becomes Bolt Rush for 20s.",
+      "physicalStatusResolution": {
+        "statusName": "Lift",
+        "statusEffect": "lift",
+        "statusApplication": {
+          "name": "Lift",
+          "iconBase": "assets/ui/debuffs/lift"
+        },
+        "vulnerabilityMode": "stack",
+        "vulnerableApplication": {
+          "name": "Vulnerable",
+          "maxStacks": 4,
+          "stacksApplied": 1
+        }
+      },
+      "damageProfile": {
+        "atkMultiplier": 3.5,
+        "hitCount": 1,
+        "element": "physical"
+      }
+    },
+    {
+      "id": 3404,
+      "operatorId": 34,
+      "name": "Heavens Sundered",
+      "type": "Ultimate",
+      "shortType": "Ult",
+      "description": "The charge, Cleansing Cleave and Ground Pierce deal Electric DMG. Cleansing Cleave applies 1 Electric Infliction; Ground Pierce applies Crush. A non-weak enemy can stop the charge early. Sunderization explosions are not calculated.",
+      "physicalStatusResolution": {
+        "statusName": "Crush",
+        "statusEffect": "crush",
+        "statusApplication": {
+          "name": "Crush"
+        },
+        "vulnerabilityMode": "consume",
+        "vulnerableApplication": {
+          "name": "Vulnerable",
+          "maxStacks": 4,
+          "stacksApplied": 1
+        }
+      },
+      "debuffs": [
+        {
+          "id": "electric_infliction",
+          "name": "Electric Infliction",
+          "visible": true,
+          "maxStacks": 4,
+          "stackable": true,
+          "appliesEffect": "electric_infliction",
+          "stacksApplied": 1,
+          "persistsForCombo": true
+        }
+      ],
+      "damageSequences": [
+        {
+          "name": "Charge (complete)",
+          "element": "electric",
+          "atkMultiplier": 1.75
+        },
+        {
+          "name": "Cleansing Cleave",
+          "element": "electric",
+          "atkMultiplier": 5
+        },
+        {
+          "name": "Ground Pierce",
+          "element": "electric",
+          "atkMultiplier": 7.5
+        }
+      ],
+      "damageProfile": {
+        "atkMultiplier": 14.25,
+        "hitCount": 1,
+        "element": "electric"
+      }
+    },
+    {
+      "id": 1904,
+      "operatorId": 19,
+      "name": "Apex Prankster",
+      "type": "Ultimate",
+      "shortType": "Ult",
+      "description": "Deals Nature DMG. If the target has at least 2 Cryo or Nature Infliction stacks, applies the same Arts Infliction again.",
+      "matchingInfliction": {
+        "maxStacks": 4,
+        "minStacks": 2,
+        "stacksApplied": 1,
+        "candidateEffects": [
+          "cryo_infliction",
+          "nature_infliction"
+        ]
+      },
+      "damageProfile": {
+        "atkMultiplier": 4.44,
+        "hitCount": 1,
+        "element": "nature"
+      }
+    },
+    {
+      "id": 2001,
+      "operatorId": 20,
+      "name": "Dance of Rime",
+      "type": "Final Strike",
+      "shortType": "FS",
+      "description": "Final Strike. Applies Cryo Infliction only while Hypothermic Perfusion is active.",
+      "conditionalDebuffs": [
+        {
+          "debuffs": [
+            {
+              "id": "cryo_infliction",
+              "name": "Cryo Infliction",
+              "visible": true,
+              "maxStacks": 4,
+              "stackable": true,
+              "appliesEffect": "cryo_infliction",
+              "stacksApplied": 1,
+              "persistsForCombo": true
+            }
+          ],
+          "requiresBuff": "hypothermic_perfusion"
+        }
+      ],
+      "debuffs": [
+        {
+          "id": "final_strike",
+          "name": "Final Strike",
+          "visible": false,
+          "appliesEffect": "final_strike",
+          "persistsForCombo": false
+        }
+      ],
+      "damageProfile": {
+        "atkMultiplier": 4,
+        "hitCount": 1,
+        "element": "cryo"
+      }
+    },
+    {
+      "id": 2002,
+      "operatorId": 20,
+      "name": "Esoteric Legacy of Seš'qa",
+      "type": "Battle Skill",
+      "shortType": "BS",
+      "description": "Applies Hypothermic Perfusion to the controlled operator's weapon and returns 30 SP. The next Final Strike within the duration creates Last Rite's Mirage, dealing Cryo DMG and applying Cryo Infliction.",
+      "buffs": [
+        {
+          "id": "hypothermic_perfusion",
+          "name": "Hypothermic Perfusion",
+          "visible": true,
+          "appliesEffect": "hypothermic_perfusion",
+          "consumeStacks": 1,
+          "persistsForCombo": true,
+          "consumeOnSkillType": "final_strike"
+        }
+      ],
+      "spRecovery": {
+        "amount": 30,
+        "source": "Esoteric Legacy of Seš'qa"
+      },
+      "damageProfile": {
+        "atkMultiplier": 1.42,
+        "hitCount": 1,
+        "element": "cryo"
+      }
+    },
+    {
+      "id": 2102,
+      "operatorId": 21,
+      "name": "Turbid Avatar",
+      "type": "Battle Skill",
+      "shortType": "BS",
+      "description": "Deals 3 hits of Physical DMG, applies Knock Down and 1 Vulnerable stack. If the target had no Vulnerable stacks before the last hit, also applies Physical Susceptibility.",
+      "conditionalDebuffs": [
+        {
+          "noneOf": [
+            "vulnerable"
+          ],
+          "debuffs": [
+            {
+              "id": "physical_susceptibility",
+              "name": "Physical Susceptibility",
+              "visible": true,
+              "stackable": false,
+              "appliesEffect": "physical_susceptibility",
+              "persistsForCombo": true
+            }
+          ]
+        }
+      ],
+      "debuffs": [
+        {
+          "id": "knock_down",
+          "name": "Knock Down",
+          "visible": true,
+          "appliesEffect": "knock_down",
+          "persistsForCombo": false
+        },
+        {
+          "id": "vulnerable",
+          "name": "Vulnerable",
+          "visible": true,
+          "maxStacks": 4,
+          "stackable": true,
+          "appliesEffect": "vulnerable",
+          "stacksApplied": 1,
+          "persistsForCombo": true
+        }
+      ],
+      "damageProfile": {
+        "atkMultiplier": 1.95,
+        "hitCount": 1,
+        "element": "physical"
+      }
+    },
+    {
+      "id": 2103,
+      "operatorId": 21,
+      "name": "Aspect of Wrath",
+      "type": "Combo Skill",
+      "shortType": "CS",
+      "description": "Triggers when the controlled operator performs a Final Strike on an enemy with Physical Susceptibility or Breach. Deals Physical DMG and grants Link.",
+      "buffs": [
+        {
+          "id": "link",
+          "name": "Link",
+          "visible": true,
+          "iconBase": "assets/ui/buffs/link",
+          "verified": true,
+          "maxStacks": 4,
+          "sourceUrl": "https://endfield.wiki.gg/wiki/Damage",
+          "stackable": true,
+          "appliesEffect": "link",
+          "stacksApplied": 1,
+          "consumeAllStacks": true,
+          "persistsForCombo": true,
+          "consumeOnSkillType": [
+            "Battle Skill",
+            "Ultimate"
+          ],
+          "skillValueByStacks": {
+            "maxStacks": 4,
+            "valueField": "multiplicativeDamageBonusPercent",
+            "valuesBySkillType": {
+              "bs": {
+                "1": 30,
+                "2": 45,
+                "3": 60,
+                "4": 75
+              },
+              "ult": {
+                "1": 20,
+                "2": 30,
+                "3": 40,
+                "4": 50
+              },
+              "ultimate": {
+                "1": 20,
+                "2": 30,
+                "3": 40,
+                "4": 50
+              },
+              "battle_skill": {
+                "1": 30,
+                "2": 45,
+                "3": 60,
+                "4": 75
+              }
+            }
+          }
+        }
+      ],
+      "comboTriggers": [
+        {
+          "effect": "final_strike",
+          "minStacks": 1
+        },
+        {
+          "anyOf": [
+            {
+              "effect": "physical_susceptibility",
+              "minStacks": 1
+            },
+            {
+              "effect": "breach",
+              "minStacks": 1
+            }
+          ]
+        }
+      ],
+      "allowSelfTrigger": true,
+      "damageProfile": {
+        "atkMultiplier": 2.14,
+        "hitCount": 1,
+        "element": "physical"
+      }
+    },
+    {
+      "id": 2104,
+      "operatorId": 21,
+      "name": "Heart of the Unmoving",
+      "type": "Ultimate",
+      "shortType": "Ult",
+      "description": "Deals massive Physical DMG, knocks enemies down, and pulls them closer.",
+      "activeEffectScaling": {
+        "effect": "link",
+        "maxStacks": 4,
+        "sourceUrl": "https://endfield.wiki.gg/wiki/Lifeng",
+        "skillLevel": 1,
+        "variantsByStacks": {
+          "1": {
+            "damageProfile": {
+              "element": "physical",
+              "hitCount": 3,
+              "atkMultiplier": 6.23
+            },
+            "damageSequences": [
+              {
+                "label": "SEQ 1",
+                "atkMultiplier": 1.78,
+                "sequenceIndex": 1
+              },
+              {
+                "label": "SEQ 2",
+                "atkMultiplier": 1.78,
+                "sequenceIndex": 2
+              },
+              {
+                "label": "Link Additional Hit",
+                "atkMultiplier": 2.67,
+                "sequenceIndex": 3,
+                "requiresEffect": "link"
+              }
+            ]
+          },
+          "2": {
+            "damageProfile": {
+              "element": "physical",
+              "hitCount": 3,
+              "atkMultiplier": 6.23
+            },
+            "damageSequences": [
+              {
+                "label": "SEQ 1",
+                "atkMultiplier": 1.78,
+                "sequenceIndex": 1
+              },
+              {
+                "label": "SEQ 2",
+                "atkMultiplier": 1.78,
+                "sequenceIndex": 2
+              },
+              {
+                "label": "Link Additional Hit",
+                "atkMultiplier": 2.67,
+                "sequenceIndex": 3,
+                "requiresEffect": "link"
+              }
+            ]
+          },
+          "3": {
+            "damageProfile": {
+              "element": "physical",
+              "hitCount": 3,
+              "atkMultiplier": 6.23
+            },
+            "damageSequences": [
+              {
+                "label": "SEQ 1",
+                "atkMultiplier": 1.78,
+                "sequenceIndex": 1
+              },
+              {
+                "label": "SEQ 2",
+                "atkMultiplier": 1.78,
+                "sequenceIndex": 2
+              },
+              {
+                "label": "Link Additional Hit",
+                "atkMultiplier": 2.67,
+                "sequenceIndex": 3,
+                "requiresEffect": "link"
+              }
+            ]
+          },
+          "4": {
+            "damageProfile": {
+              "element": "physical",
+              "hitCount": 3,
+              "atkMultiplier": 6.23
+            },
+            "damageSequences": [
+              {
+                "label": "SEQ 1",
+                "atkMultiplier": 1.78,
+                "sequenceIndex": 1
+              },
+              {
+                "label": "SEQ 2",
+                "atkMultiplier": 1.78,
+                "sequenceIndex": 2
+              },
+              {
+                "label": "Link Additional Hit",
+                "atkMultiplier": 2.67,
+                "sequenceIndex": 3,
+                "requiresEffect": "link"
+              }
+            ]
+          }
+        }
+      },
+      "debuffs": [
+        {
+          "id": "knock_down",
+          "name": "Knock Down x2",
+          "visible": true,
+          "appliesEffect": "knock_down",
+          "persistsForCombo": false
+        },
+        {
+          "id": "vulnerable",
+          "name": "Vulnerable",
+          "visible": true,
+          "maxStacks": 4,
+          "stackable": true,
+          "appliesEffect": "vulnerable",
+          "stacksApplied": 2,
+          "persistsForCombo": true
+        }
+      ],
+      "damageSequences": [
+        {
+          "label": "SEQ 1",
+          "atkMultiplier": 1.78,
+          "sequenceIndex": 1
+        },
+        {
+          "label": "SEQ 2",
+          "atkMultiplier": 1.78,
+          "sequenceIndex": 2
+        }
+      ],
+      "damageProfile": {
+        "atkMultiplier": 3.56,
+        "hitCount": 1,
+        "element": "physical"
+      }
+    },
+    {
+      "id": 3405,
+      "operatorId": 34,
+      "name": "Bolt Rush",
+      "type": "Battle Skill",
+      "shortType": "BS2",
+      "description": "After Stars Shifted, replaces Darkness Cowed for 20s. Deals Electric DMG and forcibly applies Electrification. Consumes all Electric Infliction, raising this Electrification’s Status Level by 1 per stack consumed. Consuming Electric Infliction also applies 1 Vulnerability stack. Sunderization and talent damage are not calculated.",
+      "forcedArtsStatus": {
+        "statusEffect": "electrification",
+        "baseStatusLevel": 1,
+        "consumeInfliction": "electric_infliction",
+        "statusApplication": {
+          "name": "Electrification",
+          "iconBase": "assets/ui/debuffs/electrification"
+        },
+        "onConsumedInfliction": {
+          "id": "vulnerable",
+          "name": "Vulnerable",
+          "visible": true,
+          "maxStacks": 4,
+          "stackable": true,
+          "appliesEffect": "vulnerable",
+          "stacksApplied": 1,
+          "persistsForCombo": true
+        }
+      },
+      "damageProfile": {
+        "atkMultiplier": 7,
+        "hitCount": 1,
+        "element": "electric"
+      }
+    },
+    {
+      "id": 2705,
+      "operatorId": 27,
+      "name": "Qingbo Triplex - Trail and Mangle",
+      "type": "Battle Skill",
+      "shortType": "BS",
+      "description": "Costs 50 SP. Mi Fu unleashes a flurry of strikes that deal Physical DMG and applies 1 Vulnerability stack, with the final hit applying Crush. If that Crush consumes at least 3 Vulnerability stacks, the next Battle Skill is replaced with World Splitter.",
+      "physicalStatusResolution": {
+        "verified": true,
+        "sourceUrl": "https://endfield.wiki.gg/wiki/Crush",
+        "damageType": "crush",
+        "statusName": "Crush",
+        "statusEffect": "crush",
+        "vulnerableEffect": "vulnerable",
+        "statusApplication": {
+          "name": "Crush",
+          "visible": true
+        },
+        "artsIntensityScaling": true,
+        "consumeAllVulnerable": true,
+        "operatorLevelScaling": true,
+        "vulnerableApplication": {
+          "name": "Vulnerable",
+          "visible": true,
+          "maxStacks": 4,
+          "stacksApplied": 1
+        },
+        "staggeredDamageMultiplier": 1.3,
+        "damageAtkMultiplierByStacks": {
+          "1": 3,
+          "2": 4.5,
+          "3": 6,
+          "4": 7.5
+        }
+      },
+      "debuffs": [
+        {
+          "id": "crush",
+          "name": "Crush",
+          "visible": true,
+          "appliesEffect": "crush",
+          "persistsForCombo": false
+        }
+      ],
+      "consumeDebuffs": [
+        "vulnerable"
+      ],
+      "damageProfile": {
+        "atkMultiplier": 2,
+        "hitCount": 1,
+        "element": "physical"
+      }
+    },
+    {
+      "id": 3502,
+      "operatorId": 35,
+      "name": "Really Heavy Bash",
+      "type": "Battle Skill",
+      "shortType": "BS",
+      "description": "Salvages all dropped Weapons, then consumes all Hot Edgy Naives. Deals 300% + 100% per stack (up to 3) Nature DMG and applies Nature Infliction. At 3 stacks, forcibly applies Combustion for 5s.",
+      "resourceChanges": [
+        {
+          "effect": "kay_dropped_weapons",
+          "grants": [
+            {
+              "effect": "kay_weapons",
+              "maxStacks": 3
+            },
+            {
+              "effect": "kay_hot_edgy_naives",
+              "maxStacks": 3
+            }
+          ],
+          "consume": "all"
+        },
+        {
+          "effect": "kay_hot_edgy_naives",
+          "capture": "hot",
+          "consume": "all"
+        }
+      ],
+      "debuffs": [
+        {
+          "id": "nature_infliction",
+          "name": "Nature Infliction",
+          "visible": true,
+          "maxStacks": 4,
+          "stackable": true,
+          "appliesEffect": "nature_infliction",
+          "stacksApplied": 1,
+          "persistsForCombo": true
+        }
+      ],
+      "resourceOutcomes": [
+        {
+          "capture": "hot",
+          "debuffs": [
+            {
+              "id": "combustion",
+              "name": "Combustion",
+              "visible": true,
+              "appliesEffect": "combustion",
+              "durationSeconds": 5,
+              "persistsForCombo": true
+            }
+          ],
+          "minStacks": 3
+        }
+      ],
+      "resourceDamageScaling": {
+        "capture": "hot",
+        "perStack": 1,
+        "maxStacks": 3
+      },
+      "damageProfile": {
+        "atkMultiplier": 3,
+        "hitCount": 1,
+        "element": "nature"
+      }
+    },
+    {
+      "id": 3503,
+      "operatorId": 35,
+      "name": "Really Kwik Smash",
+      "type": "Combo Skill",
+      "shortType": "CS",
+      "description": "Requires at least 1 Weapon and a new Nature Infliction or Arts Burst hit. Throws 1 Weapon, recovers 12 SP and forcibly applies Nature Burst. Pick up the dropped Weapon explicitly or salvage it with Battle Skill.",
+      "resourceChanges": [
+        {
+          "effect": "kay_weapons",
+          "grants": [
+            {
+              "effect": "kay_dropped_weapons",
+              "maxStacks": 3
+            }
+          ],
+          "consume": 1
+        }
+      ],
+      "resourceRequirements": [
+        {
+          "effect": "kay_weapons",
+          "minStacks": 1
+        }
+      ],
+      "forcedInflictionBursts": [
+        "nature_infliction"
+      ],
+      "comboTriggers": [
+        {
+          "anyOf": [
+            {
+              "effect": "nature_infliction"
+            },
+            {
+              "effect": "arts_burst"
+            }
+          ]
+        }
+      ],
+      "comboEventTriggers": [
+        "nature_infliction",
+        "arts_burst"
+      ],
+      "allowSelfTrigger": true,
+      "spRecovery": {
+        "amount": 12
+      },
+      "damageProfile": {
+        "atkMultiplier": 0.7,
+        "hitCount": 1,
+        "element": "nature"
+      }
+    },
+    {
+      "id": 3505,
+      "operatorId": 35,
+      "name": "Salvage Weapon",
+      "type": "Mechanic Event",
+      "shortType": "Pickup",
+      "description": "Place when the controlled operator touches one dropped Weapon. Restores 1 Weapon and grants 1 Hot Edgy Naives stack. Does nothing when no Weapon is on the battlefield.",
+      "resourceChanges": [
+        {
+          "effect": "kay_dropped_weapons",
+          "grants": [
+            {
+              "effect": "kay_weapons",
+              "maxStacks": 3
+            },
+            {
+              "effect": "kay_hot_edgy_naives",
+              "maxStacks": 3
+            }
+          ],
+          "consume": 1
+        }
+      ],
+      "resourceRequirements": [
+        {
+          "effect": "kay_dropped_weapons",
+          "minStacks": 1
+        }
+      ],
+      "damageProfile": null
+    },
+    {
+      "id": 3602,
+      "operatorId": 36,
+      "name": "Counter-Assault Tactic — Attach Device",
+      "type": "Battle Skill",
+      "shortType": "BS",
+      "description": "Attaches a portable device. Recast to detonate, or apply Lift, Knock Down, Solidification or Immobilization to trigger Concentrating Fusillade.",
+      "resourceChanges": [
+        {
+          "set": 1,
+          "effect": "mimino_device"
+        }
+      ],
+      "damageProfile": null
+    },
+    {
+      "id": 3605,
+      "operatorId": 36,
+      "name": "Counter-Assault Tactic — Detonate Device",
+      "type": "Battle Skill",
+      "shortType": "BS2",
+      "description": "Detonates an attached device, deals unquantified Physical DMG, applies Vulnerable, Protection and Physical Amp. Zone values and lifetime are unknown.",
+      "resourceChanges": [
+        {
+          "effect": "mimino_device",
+          "consume": "all"
+        }
+      ],
+      "debuffs": [
+        {
+          "id": "vulnerable",
+          "name": "Vulnerable",
+          "visible": true,
+          "maxStacks": 4,
+          "stackable": true,
+          "appliesEffect": "vulnerable",
+          "stacksApplied": 1,
+          "persistsForCombo": true
+        }
+      ],
+      "resourceRequirements": [
+        {
+          "effect": "mimino_device",
+          "minStacks": 1
+        }
+      ],
+      "damageProfile": null
+    },
+    {
+      "id": 3603,
+      "operatorId": 36,
+      "name": "Concentrating Fusillade",
+      "type": "Combo Skill",
+      "shortType": "CS",
+      "description": "Requires a device attached before a new Lift, Knock Down, Solidification or Immobilization. Shoots down the device for Physical DMG and an enhanced buff zone. Numeric values remain unavailable.",
+      "resourceChanges": [
+        {
+          "effect": "mimino_device",
+          "consume": "all"
+        }
+      ],
+      "debuffs": [
+        {
+          "id": "vulnerable",
+          "name": "Vulnerable",
+          "visible": true,
+          "maxStacks": 4,
+          "stackable": true,
+          "appliesEffect": "vulnerable",
+          "stacksApplied": 1,
+          "persistsForCombo": true
+        }
+      ],
+      "resourceRequirements": [
+        {
+          "effect": "mimino_device",
+          "minStacks": 1
+        }
+      ],
+      "comboTriggers": [
+        {
+          "anyOf": [
+            {
+              "effect": "lift"
+            },
+            {
+              "effect": "knock_down"
+            },
+            {
+              "effect": "solidification"
+            },
+            {
+              "effect": "immobilization"
+            },
+            {
+              "effect": "immobilize"
+            }
+          ]
+        }
+      ],
+      "comboEventTriggers": [
+        "lift",
+        "knock_down",
+        "solidification",
+        "immobilization",
+        "immobilize"
+      ],
+      "allowSelfTrigger": true,
+      "damageProfile": null
+    },
+    {
+      "id": 2402,
+      "operatorId": 24,
+      "name": "Thermite Tracers",
+      "type": "Battle Skill",
+      "shortType": "BS",
+      "description": "Applies Heat Infliction. If Combustion or Electrification is active, consumes it instead for extra Heat DMG.",
+      "conditionalDebuffs": [
+        {
+          "noneOf": [
+            "combustion",
+            "electrification"
+          ],
+          "debuffs": [
+            {
+              "id": "heat_infliction",
+              "name": "Heat Infliction",
+              "visible": true,
+              "iconBase": "assets/debuffs/heat_infliction",
+              "maxStacks": 4,
+              "stackable": true,
+              "appliesEffect": "heat_infliction",
+              "stacksApplied": 1,
+              "persistsForCombo": true
+            }
+          ]
+        }
+      ],
+      "consumeDebuffs": [
+        "combustion",
+        "electrification"
+      ],
+      "damageProfile": {
+        "atkMultiplier": 1.02,
+        "hitCount": 1,
+        "element": "heat"
+      }
+    }
+  ]
+}
